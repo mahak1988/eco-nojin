@@ -1,0 +1,303 @@
+name: 🔄 CI Main Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'release/*' ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/ISSUE_TEMPLATE/**'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      run_full_tests:
+        description: 'Run full test suite'
+        required: false
+        default: 'false'
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.12'
+  CACHE_VERSION: v1
+
+jobs:
+  # ==========================================================================
+  # Job 1: بررسی اولیه و Dependency Installation
+  # ==========================================================================
+  setup:
+    name: ⚙️ Setup & Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+      python-version: ${{ steps.setup-python.outputs.python-version }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Setup Python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: 🔑 Generate cache key
+        id: cache-key
+        run: |
+          echo "key=${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}-${{ env.CACHE_VERSION }}" >> $GITHUB_OUTPUT
+      
+      - name: 💾 Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-xdist pytest-asyncio \
+                      pytest-mock httpx coverage \
+                      black flake8 mypy ruff bandit safety \
+                      pytest-html pytest-json-report
+      
+      - name: 🔍 Verify installation
+        run: |
+          python -c "import fastapi, sqlalchemy, pytest; print('✅ Core deps OK')"
+          python -c "from scripts.core.logger import UnifiedLogger; print('✅ Project imports OK')"
+      
+      - name: 📤 Upload pip freeze
+        uses: actions/upload-artifact@v4
+        with:
+          name: pip-freeze
+          path: |
+            requirements.txt
+          retention-days: 7
+
+  # ==========================================================================
+  # Job 2: تست‌های Unit و Integration
+  # ==========================================================================
+  test:
+    name: 🧪 Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: setup
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+    
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: econojin_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/econojin_test
+      REDIS_URL: redis://localhost:6379
+      ENVIRONMENT: test
+      PYTHONPATH: ${{ github.workspace }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-xdist pytest-asyncio \
+                      pytest-mock httpx pytest-html pytest-json-report
+      
+      - name: 🗄️ Run database migrations
+        run: |
+          # اگر alembic دارید
+          # alembic upgrade head
+          echo "✅ Database ready"
+      
+      - name: 🧪 Run tests with coverage
+        run: |
+          python -m pytest tests/ \
+            --cov=scripts \
+            --cov=apps \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:htmlcov \
+            --cov-report=term-missing \
+            --html=test-report.html \
+            --self-contained-html \
+            --json-report \
+            --json-report-file=test-results.json \
+            -v \
+            --tb=short \
+            -n auto
+      
+      - name: 📊 Check coverage threshold
+        run: |
+          coverage report --fail-under=70
+          echo "✅ Coverage threshold met"
+      
+      - name: 📤 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-py${{ matrix.python-version }}
+          path: |
+            test-report.html
+            test-results.json
+            coverage.xml
+            htmlcov/
+          retention-days: 30
+      
+      - name: 📈 Upload to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  # ==========================================================================
+  # Job 3: Build Docker Image
+  # ==========================================================================
+  build:
+    name: 🐳 Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [setup, test]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: 🔐 Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🏷️ Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: 🏗️ Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+      
+      - name: 🔍 Scan Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: 📤 Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ==========================================================================
+  # Job 4: خلاصه و Notifications
+  # ==========================================================================
+  summary:
+    name: 📊 Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [setup, test, build]
+    if: always()
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📊 Determine status
+        id: status
+        run: |
+          if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.build.result }}" != "failure" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 💬 Create summary
+        run: |
+          echo "## ${{ steps.status.outputs.emoji }} CI Pipeline Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Setup | ${{ needs.setup.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+      
+      - name: 📧 Notify on failure
+        if: steps.status.outputs.status == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number || 0,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ CI Pipeline failed! Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})'
+            })

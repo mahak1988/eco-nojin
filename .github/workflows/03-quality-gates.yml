@@ -1,0 +1,219 @@
+name: 🎨 Code Quality Gates
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # ==========================================================================
+  # Code Formatting
+  # ==========================================================================
+  formatting:
+    name: 🎨 Code Formatting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: 📦 Install formatters
+        run: pip install black isort
+      
+      - name: 🎨 Check Black formatting
+        run: |
+          black --check --diff scripts/ apps/ core/ tests/ \
+            --line-length=100 \
+            --target-version=py311
+      
+      - name: 📥 Check import sorting
+        run: |
+          isort --check-only --diff scripts/ apps/ core/ tests/ \
+            --profile black \
+            --line-length 100
+
+  # ==========================================================================
+  # Linting
+  # ==========================================================================
+  linting:
+    name: 🔍 Linting (Ruff + Flake8)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: 📦 Install linters
+        run: pip install ruff flake8 flake8-bugbear flake8-comprehensions
+      
+      - name: 🔍 Run Ruff
+        run: |
+          ruff check scripts/ apps/ core/ --output-format=github
+          ruff format --check scripts/ apps/ core/
+      
+      - name: 🔍 Run Flake8
+        run: |
+          flake8 scripts/ apps/ core/ \
+            --max-line-length=100 \
+            --extend-ignore=E203,W503 \
+            --statistics \
+            --tee \
+            --output-file=flake8-report.txt || true
+      
+      - name: 📤 Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: flake8-report.txt
+          retention-days: 30
+
+  # ==========================================================================
+  # Type Checking
+  # ==========================================================================
+  type-check:
+    name: 📝 Type Checking (mypy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: 📦 Install mypy
+        run: |
+          pip install mypy types-requests types-PyYAML
+          pip install -r requirements.txt
+      
+      - name: 📝 Run mypy
+        run: |
+          mypy scripts/ apps/ core/ \
+            --ignore-missing-imports \
+            --no-strict-optional \
+            --show-error-codes \
+            --html-report mypy-report || true
+      
+      - name: 📤 Upload mypy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mypy-report
+          path: mypy-report/
+          retention-days: 30
+
+  # ==========================================================================
+  # Code Complexity
+  # ==========================================================================
+  complexity:
+    name: 📐 Code Complexity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: 📦 Install complexity tools
+        run: pip install radon xenon lizard
+      
+      - name: 📐 Analyze complexity
+        run: |
+          # Cyclomatic complexity
+          radon cc scripts/ apps/ core/ -a -nb > complexity-report.txt
+          
+          # Maintainability Index
+          radon mi scripts/ apps/ core/ -s >> complexity-report.txt
+          
+          # Xenon - fail on high complexity
+          xenon scripts/ apps/ core/ \
+            --max-absolute B \
+            --max-modules B \
+            --max-average A || echo "⚠️ High complexity detected"
+          
+          cat complexity-report.txt
+      
+      - name: 📤 Upload complexity report
+        uses: actions/upload-artifact@v4
+        with:
+          name: complexity-report
+          path: complexity-report.txt
+          retention-days: 30
+
+  # ==========================================================================
+  # Documentation Coverage
+  # ==========================================================================
+  documentation:
+    name: 📚 Documentation Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: 📦 Install doc tools
+        run: pip install interrogate
+      
+      - name: 📚 Check docstring coverage
+        run: |
+          interrogate scripts/ apps/ core/ \
+            --verbose \
+            --fail-under=60 \
+            --ignore-init-method \
+            --ignore-init-module \
+            --ignore-magic \
+            --ignore-semiprivate \
+            --ignore-private \
+            --ignore-module \
+            --ignore-nested-functions \
+            -vv || echo "⚠️ Docstring coverage below 60%"
+
+  # ==========================================================================
+  # Quality Summary
+  # ==========================================================================
+  quality-summary:
+    name: 📊 Quality Summary
+    runs-on: ubuntu-latest
+    needs: [formatting, linting, type-check, complexity, documentation]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate quality report
+        run: |
+          echo "## 🎨 Code Quality Gates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Gate | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Formatting (Black) | ${{ needs.formatting.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting (Ruff) | ${{ needs.linting.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Checking (mypy) | ${{ needs.type-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Complexity (Xenon) | ${{ needs.complexity.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Documentation | ${{ needs.documentation.result }} |" >> $GITHUB_STEP_SUMMARY

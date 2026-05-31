@@ -1,0 +1,36 @@
+# Node
+node_modules/
+.pnpm-store/
+.pnpm/
+.env*
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Build output
+.next/
+out/
+coverage/
+playwright-report/
+
+# Package managers
+package-lock.json
+yarn.lock
+
+# Security infrastructure secrets
+/infrastructure/security/cloudflared/credentials.json
+/infrastructure/security/headscale/data/
+/infrastructure/security/headscale/private_key.pem
+/infrastructure/security/openvpn/ovpn-data/
+
+# System
+Thumbs.db
+
+# Guardian Security Reports
+reports/guardian_*.md
+_security_fix_backup_*/# Assessment Reports
+phase*_report.json
+
+# CI/CD Artifacts
+.github/actions/
