@@ -1,0 +1,119 @@
+{
+  "common": {
+    "appName": "Econojin",
+    "tagline": "वैज्ञानिक कार्बन प्लेटफॉर्म",
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "calculator": "कैलकुलेटर",
+    "map": "नक्शा",
+    "shop": "दुकान",
+    "library": "पुस्तकालय",
+    "about": "हमारे बारे में",
+    "contact": "संपर्क",
+    "login": "लॉगिन",
+    "logout": "लॉगआउट",
+    "register": "पंजीकरण",
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "privacy": "गोपनीयता",
+    "terms": "नियम",
+    "policy": "नीति",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित",
+    "create": "बनाएं",
+    "search": "खोजें",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता",
+    "language": "भाषा",
+    "theme": "थीम",
+    "dark": "डार्क",
+    "light": "लाइट"
+  },
+  "auth": {
+    "welcomeBack": "वापसी पर स्वागत",
+    "loginSubtitle": "जारी रखने के लिए लॉगिन करें",
+    "registerSubtitle": "नया खाता बनाएं",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "fullName": "पूरा नाम",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "noAccount": "खाता नहीं है?",
+    "hasAccount": "पहले से खाता है?",
+    "loginButton": "लॉगिन",
+    "registerButton": "खाता बनाएं",
+    "orContinueWith": "या जारी रखें",
+    "wallet": "वॉलेट"
+  },
+  "maahak": {
+    "title": "माहक स्मार्ट कंसोल",
+    "subtitle": "Econojin AI सहायक",
+    "greeting": "नमस्ते! मैं माहक हूं",
+    "helpText": "आज मैं आपकी कैसे मदद कर सकता हूं?",
+    "askQuestion": "मुझसे कुछ भी पूछें...",
+    "systemStatus": "सिस्टम स्थिति",
+    "allSystemsNormal": "सभी सिस्टम सामान्य",
+    "alerts": "अलर्ट",
+    "tasks": "कार्य",
+    "insights": "अंतर्दृष्टि"
+  },
+  "pages": {
+    "about": {
+      "title": "Econojin के बारे में",
+      "mission": "हमारा मिशन",
+      "vision": "हमारी दृष्टि",
+      "team": "हमारी टीम",
+      "story": "हमारी कहानी"
+    },
+    "contact": {
+      "title": "संपर्क करें",
+      "subtitle": "हम आपसे सुनना चाहेंगे",
+      "formTitle": "संदेश भेजें",
+      "name": "आपका नाम",
+      "email": "ईमेल",
+      "subject": "विषय",
+      "message": "संदेश",
+      "send": "भेजें"
+    },
+    "privacy": {
+      "title": "गोपनीयता नीति",
+      "lastUpdated": "अंतिम अद्यतन"
+    },
+    "terms": {
+      "title": "नियम और शर्तें",
+      "acceptance": "शर्तों की स्वीकृति"
+    },
+    "policy": {
+      "title": "हमारी नीति",
+      "sustainability": "स्थिरता",
+      "transparency": "पारदर्शिता"
+    }
+  },
+  "sentinel": {
+    "title": "Sentinel-2 उपग्रह सत्यापन"
+  },
+  "security": {
+    "title": "सुरक्षा डैशबोर्ड"
+  },
+  "inventory": {
+    "title": "इन्वेंटरी प्रबंधन"
+  },
+  "accounting": {
+    "title": "लेखा प्रणाली"
+  },
+  "carbon": {
+    "title": "कार्बन कैलकुलेटर"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड"
+  },
+  "shop": {
+    "title": "Econojin दुकान"
+  },
+  "library": {
+    "title": "डिजिटल पुस्तकालय"
+  }
+}
