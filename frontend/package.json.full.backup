@@ -1,0 +1,38 @@
+{
+  "name": "economugin-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@web3modal/ethereum": "^2.7.1",
+    "leaflet": "^1.9.4",
+    "next": "14.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-leaflet": "^4.2.1",
+    "viem": "^2.9.0",
+    "wagmi": "^2.5.0",
+    "@web3modal/wagmi": "^4.1.0",
+    "@tanstack/react-query": "^5.28.0",
+    "@react-leaflet/core": "^2.1.0",
+    "geojson": "^0.5.0",
+    "chart.js": "^4.4.1",
+    "react-chartjs-2": "^5.2.0",
+    "jspdf": "^2.5.1",
+    "html2canvas": "^1.4.1",
+    "next-i18next": "^15.2.0",
+    "i18next": "^23.10.0",
+    "react-i18next": "^14.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "25.9.1",
+    "@types/react": "19.2.15",
+    "typescript": "5.2.2",
+    "@types/viem": "^2.0.0",
+    "@types/leaflet": "^1.9.8"
+  }
+}

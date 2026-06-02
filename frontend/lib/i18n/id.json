@@ -1,0 +1,119 @@
+{
+  "common": {
+    "appName": "Econojin",
+    "tagline": "Platform Karbon Ilmiah",
+    "home": "Beranda",
+    "dashboard": "Dasbor",
+    "calculator": "Kalkulator",
+    "map": "Peta",
+    "shop": "Toko",
+    "library": "Perpustakaan",
+    "about": "Tentang",
+    "contact": "Kontak",
+    "login": "Masuk",
+    "logout": "Keluar",
+    "register": "Daftar",
+    "profile": "Profil",
+    "settings": "Pengaturan",
+    "privacy": "Privasi",
+    "terms": "Ketentuan",
+    "policy": "Kebijakan",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "create": "Buat",
+    "search": "Cari",
+    "loading": "Memuat...",
+    "error": "Kesalahan",
+    "success": "Berhasil",
+    "language": "Bahasa",
+    "theme": "Tema",
+    "dark": "Gelap",
+    "light": "Terang"
+  },
+  "auth": {
+    "welcomeBack": "Selamat datang kembali",
+    "loginSubtitle": "Masuk untuk melanjutkan",
+    "registerSubtitle": "Buat akun baru",
+    "email": "Email",
+    "password": "Kata sandi",
+    "confirmPassword": "Konfirmasi kata sandi",
+    "fullName": "Nama lengkap",
+    "forgotPassword": "Lupa kata sandi?",
+    "noAccount": "Belum punya akun?",
+    "hasAccount": "Sudah punya akun?",
+    "loginButton": "Masuk",
+    "registerButton": "Buat akun",
+    "orContinueWith": "Atau lanjutkan dengan",
+    "wallet": "Dompet"
+  },
+  "maahak": {
+    "title": "Konsol Pintar Maahak",
+    "subtitle": "Asisten AI Econojin",
+    "greeting": "Halo! Saya Maahak",
+    "helpText": "Bagaimana saya bisa membantu hari ini?",
+    "askQuestion": "Tanyakan apa saja...",
+    "systemStatus": "Status sistem",
+    "allSystemsNormal": "Semua sistem normal",
+    "alerts": "Peringatan",
+    "tasks": "Tugas",
+    "insights": "Wawasan"
+  },
+  "pages": {
+    "about": {
+      "title": "Tentang Econojin",
+      "mission": "Misi Kami",
+      "vision": "Visi Kami",
+      "team": "Tim Kami",
+      "story": "Cerita Kami"
+    },
+    "contact": {
+      "title": "Hubungi Kami",
+      "subtitle": "Kami ingin mendengar dari Anda",
+      "formTitle": "Kirim Pesan",
+      "name": "Nama Anda",
+      "email": "Email",
+      "subject": "Subjek",
+      "message": "Pesan",
+      "send": "Kirim"
+    },
+    "privacy": {
+      "title": "Kebijakan Privasi",
+      "lastUpdated": "Terakhir Diperbarui"
+    },
+    "terms": {
+      "title": "Syarat dan Ketentuan",
+      "acceptance": "Penerimaan Syarat"
+    },
+    "policy": {
+      "title": "Kebijakan Kami",
+      "sustainability": "Keberlanjutan",
+      "transparency": "Transparansi"
+    }
+  },
+  "sentinel": {
+    "title": "Verifikasi Satelit Sentinel-2"
+  },
+  "security": {
+    "title": "Dasbor Keamanan"
+  },
+  "inventory": {
+    "title": "Manajemen Inventaris"
+  },
+  "accounting": {
+    "title": "Sistem Akuntansi"
+  },
+  "carbon": {
+    "title": "Kalkulator Karbon"
+  },
+  "dashboard": {
+    "title": "Dasbor"
+  },
+  "shop": {
+    "title": "Toko Econojin"
+  },
+  "library": {
+    "title": "Perpustakaan Digital"
+  }
+}

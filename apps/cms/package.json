@@ -1,0 +1,13 @@
+{
+  "name": "@econojin/cms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "develop": "strapi develop",
+    "build": "strapi build",
+    "start": "strapi start"
+  },
+  "dependencies": {
+    "@strapi/strapi": "^5.0.0"
+  }
+}

@@ -1,0 +1,68 @@
+# === Core Dependencies ===
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.3
+pydantic-settings==2.7.0
+python-dotenv==1.0.1
+python-multipart==0.0.18
+
+# === Database ===
+SQLAlchemy==2.0.36
+psycopg2-binary==2.9.10
+GeoAlchemy2==0.17.1
+alembic==1.14.0
+
+# === Scientific Computing ===
+numpy==2.2.0
+pandas==2.2.3
+scipy==1.14.1
+xarray==2024.11.0
+netCDF4==1.7.2
+rasterio==1.4.3
+shapely==2.0.6
+geopandas==1.0.1
+
+# === Climate Data ===
+cdsapi==0.7.4
+
+# === Security ===
+cryptography==44.0.0
+PyJWT==2.10.1
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+
+# === Logging & Monitoring ===
+structlog==24.4.0
+prometheus-client==0.21.1
+
+# === Development Tools ===
+black==24.10.0
+isort==5.13.2
+flake8==7.1.1
+mypy==1.13.0
+ruff==0.8.3
+bandit==1.8.2
+safety==3.2.14
+
+# === Testing ===
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+pytest-mock==3.14.0
+pytest-xdist==3.6.1
+httpx==0.28.1
+coverage==7.6.9
+hypothesis==6.122.3
+factory-boy==3.3.1
+
+# === Task Queue ===
+celery==5.4.0
+redis==5.2.1
+
+# === Utilities ===
+requests==2.32.3
+tqdm==4.67.1
+rich==13.9.4
+click==8.1.7
+typer==0.15.1
+tenacity==9.0.0

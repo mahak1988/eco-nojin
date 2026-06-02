@@ -1,0 +1,26 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "lint": {
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": ["lint"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["type-check"],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["test"],
+      "outputs": ["apps/web/.next/**"]
+    },
+    "dev:web": {
+      "cache": false
+    },
+    "dev:cms": {
+      "cache": false
+    }
+  }
+}

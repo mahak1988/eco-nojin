@@ -1,0 +1,1976 @@
+{
+  "timestamp": "2026-06-02T15:46:40.241297",
+  "root": "D:\\econojin.com",
+  "summary": {
+    "critical": 4,
+    "warning": 73,
+    "success": 6
+  },
+  "analyzers": {
+    "📁 Structure Analyzer": {
+      "stats": {
+        "total_files": 29569,
+        "total_dirs": 671,
+        "total_size_mb": 498.37,
+        "file_types": {
+          "no_ext": 28717,
+          ".py": 244,
+          ".tsx": 219,
+          ".json": 106,
+          ".ts": 96,
+          ".md": 30,
+          ".yml": 25,
+          ".js": 21,
+          ".exe": 16,
+          ".txt": 14,
+          ".css": 10,
+          ".sol": 9,
+          ".example": 6,
+          ".yaml": 6,
+          ".sql": 6
+        },
+        "large_files_count": 71,
+        "deep_paths_count": 42,
+        "large_files": [
+          {
+            "path": "package-lock.json",
+            "size_mb": 0.92
+          },
+          {
+            "path": "frontend\\package-lock.json",
+            "size_mb": 0.64
+          },
+          {
+            "path": "models\\all-MiniLM-L6-v2\\model.safetensors",
+            "size_mb": 86.66
+          },
+          {
+            "path": ".pnpm-store\\v11\\index.db",
+            "size_mb": 7.16
+          },
+          {
+            "path": ".pnpm-store\\v11\\files\\00\\36316e2444c842dd6878eca5dc695688de61b759eac39b143e8c41d285068558ea54c95da35b2c7236af7f97e3eb3e782efc670eb720f4259dc435ad91bb1e",
+            "size_mb": 0.69
+          },
+          {
+            "path": ".pnpm-store\\v11\\files\\00\\d5a85b89b3c8394115cf96a0b9d6e8b39c5c5dc62b2139b58e5ecb2eae350c2dba97e4d2fce68fb09e09504422d55ccc74f69357bee85bcf7bf691f9581153",
+            "size_mb": 0.78
+          },
+          {
+            "path": ".pnpm-store\\v11\\files\\02\\fca05d0113c2d518a10c8facf3043f10607fce94fa227feec7df7acba651ca7cbef1cf9802b6ddfe6c45a7d7fd727cc36469b4174bdf62b85606c3ac0ddff5",
+            "size_mb": 0.52
+          },
+          {
+            "path": ".pnpm-store\\v11\\files\\03\\d38f9cf18ee2298e559b58012b0b0d664e13e0a5f66893bb12606ae35ea2f326a02f2f22853e59ad25b24d1a050137205fcc89ea2ef0b69b817a4c576046c6",
+            "size_mb": 0.57
+          },
+          {
+            "path": ".pnpm-store\\v11\\files\\0b\\6ad3fa8ff4bac46502acf42b5c90dc8a524a824a5d4f8b746630210d7ca0fe21b956e982679a7c974edb8cbbbac44ce70f96112b2e546244785fe9bdc66c42",
+            "size_mb": 0.83
+          },
+          {
+            "path": ".pnpm-store\\v11\\files\\0c\\0a6fc0dc79e977dabd622de25d903bb63253affb69a03b91402f2fb15e0e2f8c65f350ca7e22e63a61ceb3af2bb8d7620347e9f624c07833de88d96d962ff8",
+            "size_mb": 0.85
+          }
+        ],
+        "deep_paths": [
+          {
+            "path": "apps\\web\\src\\app\\[locale]\\src\\lib\\supabase\\client.ts",
+            "depth": 9
+          },
+          {
+            "path": "apps\\web\\src\\app\\[locale]\\src\\components\\ui\\alert.tsx",
+            "depth": 9
+          },
+          {
+            "path": "apps\\web\\src\\app\\[locale]\\src\\components\\ui\\label.tsx",
+            "depth": 9
+          },
+          {
+            "path": ".pnpm-store\\v11\\projects\\9222c30457a0b11aadb8a0a791789040\\src\\app\\[locale]\\accounting\\page.tsx",
+            "depth": 9
+          },
+          {
+            "path": ".pnpm-store\\v11\\projects\\9222c30457a0b11aadb8a0a791789040\\src\\app\\[locale]\\calendar\\page.tsx",
+            "depth": 9
+          }
+        ]
+      },
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.92 MB",
+          "path": "package-lock.json",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:34.219292"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.64 MB",
+          "path": "frontend\\package-lock.json",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:34.230481"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 86.66 MB",
+          "path": "models\\all-MiniLM-L6-v2\\model.safetensors",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:37.176532"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 7.16 MB",
+          "path": ".pnpm-store\\v11\\index.db",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:41.405241"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.69 MB",
+          "path": ".pnpm-store\\v11\\files\\00\\36316e2444c842dd6878eca5dc695688de61b759eac39b143e8c41d285068558ea54c95da35b2c7236af7f97e3eb3e782efc670eb720f4259dc435ad91bb1e",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.668235"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.78 MB",
+          "path": ".pnpm-store\\v11\\files\\00\\d5a85b89b3c8394115cf96a0b9d6e8b39c5c5dc62b2139b58e5ecb2eae350c2dba97e4d2fce68fb09e09504422d55ccc74f69357bee85bcf7bf691f9581153",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.678436"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.52 MB",
+          "path": ".pnpm-store\\v11\\files\\02\\fca05d0113c2d518a10c8facf3043f10607fce94fa227feec7df7acba651ca7cbef1cf9802b6ddfe6c45a7d7fd727cc36469b4174bdf62b85606c3ac0ddff5",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.717725"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.57 MB",
+          "path": ".pnpm-store\\v11\\files\\03\\d38f9cf18ee2298e559b58012b0b0d664e13e0a5f66893bb12606ae35ea2f326a02f2f22853e59ad25b24d1a050137205fcc89ea2ef0b69b817a4c576046c6",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.735407"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.83 MB",
+          "path": ".pnpm-store\\v11\\files\\0b\\6ad3fa8ff4bac46502acf42b5c90dc8a524a824a5d4f8b746630210d7ca0fe21b956e982679a7c974edb8cbbbac44ce70f96112b2e546244785fe9bdc66c42",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.859678"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.85 MB",
+          "path": ".pnpm-store\\v11\\files\\0c\\0a6fc0dc79e977dabd622de25d903bb63253affb69a03b91402f2fb15e0e2f8c65f350ca7e22e63a61ceb3af2bb8d7620347e9f624c07833de88d96d962ff8",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.869665"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 129.47 MB",
+          "path": ".pnpm-store\\v11\\files\\0d\\11b0f53911e918d8d8fe6da1d6bb64451cc4f0e8afa2558f9e84956584bc1de43652957b480533f04fc6c6d41fa2a4fce30e28316183221875c9e0fa38e091",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:45.890021"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.56 MB",
+          "path": ".pnpm-store\\v11\\files\\17\\3bed2ab8b1c0e873bac0f1cefe55c823cd54e6a3393c8cd824c9780c5a56a116cc7f5914b2877d68a8dc1f7fc6d40867bbb8a06890e586dd9425f37f9bc5d6",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.050656"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 2.52 MB",
+          "path": ".pnpm-store\\v11\\files\\17\\f47f1d01a885ce149c8100898c9e5ec2b63a5c71dc41b61b5e6e87e7173fb0492ce134507696a2f8eefc60fa4a43204532cfdf39aba0f3e965ba9e069c2ce9",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.061891"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.75 MB",
+          "path": ".pnpm-store\\v11\\files\\19\\6f5425940a9594ef3cb0b141652efa8c6dddf6c4a61d43982189e374043d2231768174a2d3c425e175e05002e8ffc67ec5b7e5b6743e0b5a7b1ad7b9200965",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.086126"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.21 MB",
+          "path": ".pnpm-store\\v11\\files\\1d\\1fa766b8ff6f0084e84a3d92e0aaca6be8739bdd684df20acde06ac4ae93b59bd814b27ca6a65c850dd03df883f6597e7480057995013a1e719d5a2052ca4e",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.149034"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 2.71 MB",
+          "path": ".pnpm-store\\v11\\files\\21\\4bf98524b22afaabd5010b58de3f040c1d2b22867845c09d85432d63d975f105c3e523b9751d3d100f44a6e79fc90e0da99cae18298c84679156d3b3bcc282",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.216474"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.49 MB",
+          "path": ".pnpm-store\\v11\\files\\22\\3486e6e3b7c05bdd0b528dc8ada06236d9dd35a60b430712d50ab0f4ba8f89a36411f3a2bd237ad5208cca6bae9c292b1df5025763a149d0804234c7780399",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.228660"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.30 MB",
+          "path": ".pnpm-store\\v11\\files\\2a\\e64c78b9126b75306601c6a76c5e602763acca7da4c2808fb7b209a4c84d85a4770409575038cd6e8f329d50ed5cd9920b879d47ccdfc6470e1c99168d9ed4",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.380033"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.75 MB",
+          "path": ".pnpm-store\\v11\\files\\30\\418bb4655deefa0bbee3519359afd964f289560a5b8dae3745f6cc643f5fadfe914c6be2269b63f16e9ee90a8dbcc89f6c476b5598deed3847a7181cd49f78",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.469864"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.31 MB",
+          "path": ".pnpm-store\\v11\\files\\30\\b28fd6da40416f1da0fd0d8c21a1f31ddc15cc0eeb0e2708875cbce95a4ac73a33fec2c130496c7529f389be177c4a546127bf4f0a5db0a4f6d9319704a9f6",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.476354"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 2.41 MB",
+          "path": ".pnpm-store\\v11\\files\\35\\9dd1d12341e0b941d80ceab3bb643a54af25db5b49092b56de6d407f8b723d980dca01cab66a6a030c56a865e051501a0ca97cffce600e04d78d5001e9b0b7",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.561474"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.85 MB",
+          "path": ".pnpm-store\\v11\\files\\38\\5486f40f4be0d56a09a44f340cbf7714dca231408050983651fd7208b95d047467d7d01ddb69b4f64a18254517d2c0916e3c401e5252c7e8ed665a1bb75c50",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.610634"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.22 MB",
+          "path": ".pnpm-store\\v11\\files\\39\\86d6371636d4a9c140487192b76c7ecf8048305f92db2ea18c48039657788ac2d4f0db8902b8e535ca7ca1a4b9e3fcfffa8ab1f37d7c1b5d23d96e51287e3b",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.629194"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.03 MB",
+          "path": ".pnpm-store\\v11\\files\\41\\66126e111154be4e92d1cf477933386640079fb3a56060d6b601af8c1526073a1d75fa89910ac2d76573ea77c37aa5b98c0c28b26de01a3c26b78a79710124",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.753226"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.54 MB",
+          "path": ".pnpm-store\\v11\\files\\41\\f1475f1e12df0076cd2947d2e01a9bf177818a61312241946cbd3bd81f2928115a5381b33c4a90c87fefc4eb37f9d92b9df836816d1b6782214b5d90c41443",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.763193"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 3.49 MB",
+          "path": ".pnpm-store\\v11\\files\\48\\3de3dae65deb223db8e395bd19d95f4580ee1634080630cb631b10e0cb748465d2ecb2426fdab91ff4d3439918f2f3d9002d2ad3e3211d7ad11f62571d38d5",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.873576"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.25 MB",
+          "path": ".pnpm-store\\v11\\files\\4b\\01e21c3c877a8b7baa2e2cbc7f00f43e80251d86f7fc79bd57cce56368f49e60275d3d8842a3e3dcf7097075a32fe54f6509051ca8bcfad710b43615d03103",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.919236"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.85 MB",
+          "path": ".pnpm-store\\v11\\files\\4c\\81a42848c627b949b34e3c7039b748f2ac29870760e0e15105907531d74b3fecd92dde2381ff52cb56bbe0d76ab46888c4807c0c2050eb711c1b07d08d9a50",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:46.943538"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.83 MB",
+          "path": ".pnpm-store\\v11\\files\\50\\bdb42ee2df0d33934c40221fb8bfb7092159d034df1bd0015024e095ae15d38cc83d618e3799195673cbc6a6ec682d25187377a8dc5ff61a8ea3ea27e26910",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.020970"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.03 MB",
+          "path": ".pnpm-store\\v11\\files\\51\\d09a415ef8ca0e2dfcfcb6ebbe0b8a4253a0103474c0623dc89cb23bd626815c832ee63589453dfd585fa876b06e17be16aa785a30fdb32c329ed9e2152048",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.039542"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.31 MB",
+          "path": ".pnpm-store\\v11\\files\\53\\2f0f65b5741c239044f411a0c97690da7de91428152f7d6909a0bbaa2fd76f09e1191f035245cb8b1388eb7833fcf5f601e15c2b1d2faea06905c84c94a7f8",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.061034"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.28 MB",
+          "path": ".pnpm-store\\v11\\files\\59\\b1066d98934208b0ad565d1bda6197739321c1c1d83bd6f9e88c8e438b65d55f30af8c9475060c435138db7abaf7ae1ac42374bec3b2a67b1b7a422e4aceda",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.174090"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.25 MB",
+          "path": ".pnpm-store\\v11\\files\\5c\\3c28fdc5fc34289c8c8e5643a46ac8dc3709efadfe31ccabef014e6db0d3b31fc126dd33954bc348a0afc0337e8fab68f73131f874f8b0f8d375e5053bec31",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.217140"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.83 MB",
+          "path": ".pnpm-store\\v11\\files\\5d\\ae84782cbe2e0db8d87e489668ffe65c4935b9b34148ad653f6366558acacdcb7a598bc27dadf0c1442f324e5e83f8f59e9bcb838e33c4226bd229c3fcfd56",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.240182"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.68 MB",
+          "path": ".pnpm-store\\v11\\files\\61\\8198c1400b1e332209fb48e3e90fafff0c796e688e8ce9e7409ed3aebb61970ca1475bb9330c472482f10b397473d48c0f28d9e03a189ceb29d041f03f131b",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.300051"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.29 MB",
+          "path": ".pnpm-store\\v11\\files\\68\\9c69e553b59adedb2aed90f78cba20860b51bce1719aa6652f30bc477b231e9706acd8822de49ae0fe9de5c8c8e98e80208e82f3ed141a3f8c311a0ae0191e",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.422036"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.66 MB",
+          "path": ".pnpm-store\\v11\\files\\68\\e9e19c4ea5e6bb2667274cf7cae7e542279fd224971f0cfa5ba88db9f0214d59b34d395f4c4c73672b9f590ee4b1b6c0752f5470b2f3cdaf1735555708ece5",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.428461"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.96 MB",
+          "path": ".pnpm-store\\v11\\files\\6d\\ef68a7c8a99ce326b7a886f069ad0e3edf038c14328c2661f5b973146eff4af6e8dea81f64142cb57fc0be4706373e82b6d0b5667272a66c199fe409d65dff",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.515386"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.69 MB",
+          "path": ".pnpm-store\\v11\\files\\6e\\a2a9b3d0fe426eea239417d7fb968cca7b7546d408099ef24a783883a233a9a1091afca69da21a64a5fcefdf4f4bb4388cc89d70dd350a90379151d403bc3a",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.527507"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 5.75 MB",
+          "path": ".pnpm-store\\v11\\files\\73\\f7af14416c3c165931f2404c79419b25263b9fe024e7b9c1607fa37a7f592a907d99faa9dd72633870a38729392516965a1e8de3e87e0b67100e2d162a4535",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.623960"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.73 MB",
+          "path": ".pnpm-store\\v11\\files\\7b\\d9b47273f8e94a9cac8dc29fc45d96e0c4963f63d06b1f6b8fa94f258cca04c2b7b43006238fc9113876db2574fec5943b1843a282ca6bfd387ebe4b7c0dcd",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.767322"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.66 MB",
+          "path": ".pnpm-store\\v11\\files\\7e\\d94f3d6b65763fb18ae5bbaa9f0bff8dc5f9b68d175d6f3d9b0c877863fe16729676a28e0fd28f44c6ed0b5d52fa56348ee38e1425e6961c22582afe1c3089",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.818391"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.49 MB",
+          "path": ".pnpm-store\\v11\\files\\80\\8c910dfa39972c381ca6395c80c32917884e9c22896a19e395364e007fe46a43d6c2378c6417cd3e790bbbf9b74676e43e96953448a19ed44c7ff1c8988acc",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.846978"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.48 MB",
+          "path": ".pnpm-store\\v11\\files\\81\\67d2d59cef702bc6bdb006c2ad01bd57b47d68cc3f4dd746fa4388eafe71d45516b10ca43e9a764c36eeb1661857b74033b7e72fc4820bda9bf21d164ca647",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.862140"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.69 MB",
+          "path": ".pnpm-store\\v11\\files\\82\\873cdc88516e38275e92d6367286a406577e585b51d455e490c5f42caf385d92d8b41c7add80470633b9030f1f5a5c4e8aaf3fd16cc80bb609d19fc8e11220",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.881283"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.66 MB",
+          "path": ".pnpm-store\\v11\\files\\82\\ed4afbec77563c7e04b65ccf9c03b17cb175ca2d6ed94c18aa4c56016a05001b2df842aa9266c81f9031f36992b9da4d03d86891607203af993f574924c98f",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.886911"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.71 MB",
+          "path": ".pnpm-store\\v11\\files\\86\\e8a1556d255e4335f35f37554e61447b067456019f068a631aaa74d1ef33e21999ef23d261becfaf3aa37283a369aa21db0de82a4fa51c2883cf1f6ed52c2f",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:47.953187"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.32 MB",
+          "path": ".pnpm-store\\v11\\files\\8a\\0eb7a77e8a5b7c03d131053f3a4fe578b2217e0991c6109f66e8a1dce40a9bbafe6cb4830f7121a0b56af6845010107d061246a9f2e95eee63f4bdc6eff0e8",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.002149"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.58 MB",
+          "path": ".pnpm-store\\v11\\files\\8b\\53103796cdfeacf0e50682b3977d18c379d6174c3eab57086c4f81c73af62ac14a5e417d6653b19920987a96b5b9f432f1890201fcb2ab303c8b02b4c65c54",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.023338"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.60 MB",
+          "path": ".pnpm-store\\v11\\files\\8d\\91f2c3783ddb9547cef506d5de53cbbd988c7c03a3a59972499d46e684acc9886c62f367aa61cc382e4e4a1e5488610389517f2ce22ccfb5a32cf603c6a7f1",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.058610"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.26 MB",
+          "path": ".pnpm-store\\v11\\files\\9c\\c7f6531fa9b63d17f8037226682f0e20a389f3f4cf1e5072af75a0c7afb20a14f970e352f0e75d684af6c2fb3a20e2c66987c4c42e019041771d68423f6e3a",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.312011"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.68 MB",
+          "path": ".pnpm-store\\v11\\files\\9c\\d2b17b3277170eebebd8e4a39c0aa58c92b46379d5393b408d976bddf33b4f45cd6ceaf0ebea26ef2d4378043f02b7d92f69ce227321c326607f9f066ef9d2",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.312955"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.94 MB",
+          "path": ".pnpm-store\\v11\\files\\a2\\556ef844b9019303aa4571a4ed6278ddd10c9b0216d323a16a7dbcec9a816b8524f00acfda3dd72c38e417c5100c78b8632275f5fa0f06404d57017876b0d2",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.400387"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 8.46 MB",
+          "path": ".pnpm-store\\v11\\files\\a5\\22bb480ff8db063777558bc4cfea83a08b82057ce054d4800d00b1d59453daa0afcd10a5442fb18d4099f297d90c552ce0703ac50f48f2bc2cfad610cee878",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.446210"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 3.90 MB",
+          "path": ".pnpm-store\\v11\\files\\a6\\b657bf973ff93bc7dd5be5ee4b69931efa781d8d7a5558af4158a7f3dad59ae4be636bfa76397cfafd9adf57c4ce16199b0c7ac2e5d97075b01478d94fe715",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.476520"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.95 MB",
+          "path": ".pnpm-store\\v11\\files\\b3\\d8ab706e37d7cc4ecc67acb6fcbb34158c49dc95b674e6beddb12e82b0d2ed06f9704c95787e3cd8f6ab29609b00a7f4e9b98b35173710a2a12783e305096b",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.686759"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.91 MB",
+          "path": ".pnpm-store\\v11\\files\\b5\\2594c94f04a7579c70966c7e9b8b3632541654b8681e2276fcbdc3d02c98918a9899be28acc0edfcbf76ed4e414af3821ac0e4811020becfdc4741689e25c7",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.706122"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.55 MB",
+          "path": ".pnpm-store\\v11\\files\\b5\\82254dea24c81574b4cbbaffa0888deddd0de57f370de612b659379e298f3077a060f48d1eb1e5defc9251056982bb502e88bfc4a7e7519b5652648e14e435",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.712360"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.92 MB",
+          "path": ".pnpm-store\\v11\\files\\ba\\873f4441afe4e80a9c9f15cce633aa0c74c8a5044d4c27f0066374bc7b4fb1dcc42bcf2c56dfcb7b1f194fa401415345dc19a43286d617aefb3e3126630ce6",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.796507"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.60 MB",
+          "path": ".pnpm-store\\v11\\files\\bc\\422a2b8e97701bd497beb592903402bf6924dca4207bb8e9eb7d5dddae8836f81a5673d333a832fb02e87d10749bb8b2658a113308d2b2930536ec4cff6cf0",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.827263"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.77 MB",
+          "path": ".pnpm-store\\v11\\files\\bf\\e714a78f6035a0e97d78668403afe00e8e3e9760dc7b3ccf27bd114734925de72150442676d7e18bef8320bef571c2e4283dbdc4509908534cf14f2494e9b4",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:48.882870"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.54 MB",
+          "path": ".pnpm-store\\v11\\files\\c7\\b9a401f6a2152d1eb333bba12f27eb98d1bb5fa8d1a841f2ebef504ce7d2f65499109f67e068055225b396b590ff20e4ee0f79ad95fef0f56010b1820b9263",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.006246"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 46.73 MB",
+          "path": ".pnpm-store\\v11\\files\\cb\\7bfa4d25bb563827df4c8d57bb9f80da3735576a38ebc5142829cf69b584cbc306a5f89c171fcd50e45fe4a2d0ceefd377e0f6c1f8d61f9decbdc557c700d1",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.067774"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.98 MB",
+          "path": ".pnpm-store\\v11\\files\\da\\c3d5cedbe6c2ec1481e9acebe9b92d72c3fedfa0de4260b6f347cc3afcaf63caab9f9f787cc66000a5556ed5cca3dc9ea391b0a3da38a2b2f1dc649ce687e3",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.315643"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.54 MB",
+          "path": ".pnpm-store\\v11\\files\\e5\\b68993004aa30b3c0a0eca5f48b84b52c10aba17baa9ed38a139311b09c48cf4452ec9c200f4df414727c73374027d9264513c24e9a3265460ac0e4452cdc2",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.490247"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.19 MB",
+          "path": ".pnpm-store\\v11\\files\\ea\\9483370b7cc9e85edd2820f13053f0719692cf44018f429f01327681c44ca16a1a190ace1e468403f154c973b2ed6a50150adec1be789be263cbd17cf6cf22",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.566929"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 3.04 MB",
+          "path": ".pnpm-store\\v11\\files\\ed\\84ef00be4a3e33b9f7dd90256c15699b06b543eb69b7486a50d3361695f7a164f627a58042676d6a254f44332525231f235cbca07901fbac7bcfc5ae2ed7c1",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.615093"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 1.42 MB",
+          "path": ".pnpm-store\\v11\\files\\f0\\51bb04d8235397a2ff10916a10ee5f73229c6d6a8527cab7935d29d0e471d1f734e5fbbdbace8e61911e3c3ed3fa00df5cfdbb1be851cb5b208b8543d5df5a",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.660353"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 4.29 MB",
+          "path": ".pnpm-store\\v11\\files\\f8\\e35c923418e36988e9d353ddc3e5bcc5f609de90069ca334645873fed3fa905df9422b6ab33be754ff770d685ac46fa7cc00a1ef12bb246c149c35c7ba446b",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.798064"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 0.68 MB",
+          "path": ".pnpm-store\\v11\\files\\fa\\5c092291ba4c8b2272967779d136621836b09dce2ada349a64fbfd7f0edddfb3de546ea41579ac765d1b9583a9269b98d5db34b6ae31cfd98e5169ef85b776",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.823968"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "فایل بزرگ: 3.97 MB",
+          "path": ".pnpm-store\\v11\\files\\fc\\34e6be37b3b3f3d1957dbb7822a35068591ce0b1bfef689369f9951c4794c936a62ac56aa49a8e6e643d25adf7fa99f9ee6833571dadf6716df6949210f6f6",
+          "suggestion": "بررسی و بهینه‌سازی فایل",
+          "timestamp": "2026-06-02T15:45:49.854788"
+        },
+        {
+          "severity": "success",
+          "category": "structure",
+          "message": "پروژه شامل 29569 فایل در 671 پوشه است",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:45:50.243225"
+        },
+        {
+          "severity": "warning",
+          "category": "size",
+          "message": "71 فایل بزرگ (>500KB) یافت شد",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:45:50.243233"
+        },
+        {
+          "severity": "info",
+          "category": "structure",
+          "message": "42 مسیر عمیق (>8 سطح) یافت شد",
+          "path": "",
+          "suggestion": "ساختار پوشه‌ها را ساده‌تر کنید",
+          "timestamp": "2026-06-02T15:45:50.243236"
+        }
+      ]
+    },
+    "📦 Dependency Analyzer": {
+      "stats": {
+        "backend": {
+          "packages": {
+            "matplotlib": "requirements",
+            "seaborn": "requirements",
+            "aquacrop": "requirements",
+            "git+https://github.com/KUL-RSDA/AquaCrop.git": "requirements",
+            "cdsapi": "requirements",
+            "rioxarray": "requirements",
+            "geoalchemy2": "requirements",
+            "prometheus-client": "requirements",
+            "structlog": "requirements",
+            "rothc": "requirements",
+            "fastapi": "requirements",
+            "uvicorn[standard]": "requirements",
+            "pydantic": "requirements",
+            "pydantic-settings": "requirements",
+            "python-dotenv": "requirements",
+            "httpx": "requirements",
+            "sqlalchemy[asyncio]": "requirements",
+            "aiosqlite": "requirements",
+            "websockets": "requirements",
+            "celery[redis]": "requirements",
+            "redis": "requirements",
+            "alembic": "requirements",
+            "PyJWT": "requirements",
+            "pytest": "requirements",
+            "pytest-asyncio": "requirements",
+            "twilio": "requirements",
+            "python-multipart": "requirements",
+            "SQLAlchemy": "requirements",
+            "psycopg2-binary": "requirements",
+            "GeoAlchemy2": "requirements",
+            "numpy": "requirements",
+            "pandas": "requirements",
+            "scipy": "requirements",
+            "xarray": "requirements",
+            "netCDF4": "requirements",
+            "rasterio": "requirements",
+            "shapely": "requirements",
+            "geopandas": "requirements",
+            "cryptography": "requirements",
+            "passlib[bcrypt]": "requirements",
+            "python-jose[cryptography]": "requirements",
+            "black": "requirements",
+            "isort": "requirements",
+            "flake8": "requirements",
+            "mypy": "requirements",
+            "ruff": "requirements",
+            "bandit": "requirements",
+            "safety": "requirements",
+            "pytest-cov": "requirements",
+            "pytest-mock": "requirements",
+            "pytest-xdist": "requirements",
+            "coverage": "requirements",
+            "hypothesis": "requirements",
+            "factory-boy": "requirements",
+            "celery": "requirements",
+            "requests": "requirements",
+            "tqdm": "requirements",
+            "rich": "requirements",
+            "click": "requirements",
+            "typer": "requirements",
+            "tenacity": "requirements",
+            "﻿# AI Agent Dependencies - Flexible Versions": "requirements",
+            "langgraph": "requirements",
+            "langchain": "requirements",
+            "langchain-openai": "requirements",
+            "langchain-community": "requirements",
+            "qdrant-client": "requirements",
+            "sentence-transformers": "requirements",
+            "onnx": "requirements",
+            "onnxruntime": "requirements",
+            "sqlalchemy": "requirements",
+            "web3": "requirements",
+            "supabase": "requirements"
+          },
+          "requirements_files": [
+            {
+              "path": "requirements-fix.txt",
+              "packages": [
+                "matplotlib",
+                "seaborn",
+                "aquacrop"
+              ]
+            },
+            {
+              "path": "requirements-missing-fixed.txt",
+              "packages": [
+                "git+https://github.com/KUL-RSDA/AquaCrop.git",
+                "cdsapi",
+                "rioxarray",
+                "geoalchemy2",
+                "prometheus-client",
+                "structlog"
+              ]
+            },
+            {
+              "path": "requirements-missing.txt",
+              "packages": [
+                "aquacrop",
+                "prometheus-client",
+                "rioxarray",
+                "rothc",
+                "structlog"
+              ]
+            },
+            {
+              "path": "requirements.txt",
+              "packages": [
+                "fastapi",
+                "uvicorn[standard]",
+                "pydantic",
+                "pydantic-settings",
+                "python-dotenv",
+                "httpx",
+                "structlog",
+                "sqlalchemy[asyncio]",
+                "aiosqlite",
+                "websockets",
+                "celery[redis]",
+                "redis",
+                "alembic",
+                "PyJWT",
+                "pytest",
+                "pytest-asyncio",
+                "httpx",
+                "twilio"
+              ]
+            },
+            {
+              "path": "requirements_new.txt",
+              "packages": [
+                "fastapi",
+                "uvicorn[standard]",
+                "pydantic",
+                "pydantic-settings",
+                "python-dotenv",
+                "python-multipart",
+                "SQLAlchemy",
+                "psycopg2-binary",
+                "GeoAlchemy2",
+                "alembic",
+                "numpy",
+                "pandas",
+                "scipy",
+                "xarray",
+                "netCDF4",
+                "rasterio",
+                "shapely",
+                "geopandas",
+                "cdsapi",
+                "cryptography",
+                "PyJWT",
+                "passlib[bcrypt]",
+                "python-jose[cryptography]",
+                "structlog",
+                "prometheus-client",
+                "black",
+                "isort",
+                "flake8",
+                "mypy",
+                "ruff",
+                "bandit",
+                "safety",
+                "pytest",
+                "pytest-asyncio",
+                "pytest-cov",
+                "pytest-mock",
+                "pytest-xdist",
+                "httpx",
+                "coverage",
+                "hypothesis",
+                "factory-boy",
+                "celery",
+                "redis",
+                "requests",
+                "tqdm",
+                "rich",
+                "click",
+                "typer",
+                "tenacity"
+              ]
+            },
+            {
+              "path": "agents\\requirements.txt",
+              "packages": [
+                "﻿# AI Agent Dependencies - Flexible Versions",
+                "langgraph",
+                "langchain",
+                "langchain-openai",
+                "langchain-community",
+                "qdrant-client",
+                "sentence-transformers",
+                "redis",
+                "onnx",
+                "onnxruntime",
+                "pydantic",
+                "structlog"
+              ]
+            },
+            {
+              "path": "backend\\requirements.txt",
+              "packages": [
+                "fastapi",
+                "uvicorn[standard]",
+                "pydantic",
+                "python-multipart",
+                "structlog",
+                "websockets"
+              ]
+            },
+            {
+              "path": "econojin-library\\backend\\requirements.txt",
+              "packages": [
+                "fastapi",
+                "uvicorn[standard]",
+                "pydantic",
+                "pydantic-settings",
+                "sqlalchemy",
+                "alembic",
+                "psycopg2-binary",
+                "python-multipart",
+                "python-jose[cryptography]",
+                "passlib[bcrypt]",
+                "python-dotenv",
+                "httpx",
+                "web3",
+                "supabase"
+              ]
+            }
+          ],
+          "has_pyproject": true
+        },
+        "frontend": {
+          "packages": {
+            "turbo": "^1.9.0",
+            "pnpm": "^8.8.0",
+            "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+            "@openzeppelin/contracts": "^5.0.0",
+            "hardhat": "^2.19.0",
+            "dotenv": "^16.3.1",
+            "react": "18.3.1",
+            "react-dom": "18.3.1",
+            "react-scripts": "5.0.1",
+            "recharts": "^2.12.7",
+            "framer-motion": "^11.3.0",
+            "react-leaflet": "^4.2.1",
+            "leaflet": "^1.9.4",
+            "axios": "^1.7.2",
+            "next": "14.2.5",
+            "tailwindcss": "^3.4.7",
+            "zustand": "^4.5.4",
+            "date-fns": "^2.30.0",
+            "date-fns-jalali": "^3.6.0-0",
+            "lucide-react": "^0.400.0",
+            "@types/node": "22.1.0",
+            "@types/react": "18.3.3",
+            "@types/leaflet": "^1.9.12",
+            "typescript": "5.5.4",
+            "postcss": "^8.4.39",
+            "autoprefixer": "^10.4.19",
+            "@supabase/supabase-js": "^2.39.0",
+            "@supabase/ssr": "^0.5.1",
+            "react-hook-form": "^7.52.0",
+            "zod": "^3.23.8",
+            "ethers": "^6.9.0",
+            "clsx": "^2.1.1",
+            "tailwind-merge": "^3.6.0",
+            "@types/react-dom": "18.3.0",
+            "eslint": "^8.57.0",
+            "eslint-config-next": "14.2.5",
+            "@strapi/strapi": "^5.0.0",
+            "@hookform/resolvers": "^3.9.0",
+            "@tanstack/react-query": "^5.100.14",
+            "class-variance-authority": "^0.7.1",
+            "next-intl": "^3.17.0",
+            "@tailwindcss/forms": "^0.5.7",
+            "@tailwindcss/typography": "^0.5.13",
+            "prettier": "^3.3.3",
+            "@playwright/test": "^1.45.0"
+          },
+          "package_jsons": [
+            {
+              "path": "package.json",
+              "name": "econojin-monorepo",
+              "deps_count": 2,
+              "deps": [
+                "turbo",
+                "pnpm"
+              ]
+            },
+            {
+              "path": "contracts\\package.json",
+              "name": "econojin-contracts",
+              "deps_count": 4,
+              "deps": [
+                "@nomicfoundation/hardhat-toolbox",
+                "@openzeppelin/contracts",
+                "hardhat",
+                "dotenv"
+              ]
+            },
+            {
+              "path": "frontend\\package.json",
+              "name": "econojin-frontend",
+              "deps_count": 8,
+              "deps": [
+                "react",
+                "react-dom",
+                "react-scripts",
+                "recharts",
+                "framer-motion",
+                "react-leaflet",
+                "leaflet",
+                "axios"
+              ]
+            },
+            {
+              "path": "web\\package.json",
+              "name": "econojin-web",
+              "deps_count": 19,
+              "deps": [
+                "next",
+                "react",
+                "react-dom",
+                "recharts",
+                "leaflet",
+                "react-leaflet",
+                "framer-motion",
+                "tailwindcss",
+                "axios",
+                "zustand",
+                "date-fns",
+                "date-fns-jalali",
+                "lucide-react",
+                "@types/node",
+                "@types/react",
+                "@types/leaflet",
+                "typescript",
+                "postcss",
+                "autoprefixer"
+              ]
+            },
+            {
+              "path": "packages\\config-eslint\\package.json",
+              "name": "@econojin/config-eslint",
+              "deps_count": 0,
+              "deps": []
+            },
+            {
+              "path": "packages\\config-typescript\\package.json",
+              "name": "@econojin/config-typescript",
+              "deps_count": 0,
+              "deps": []
+            },
+            {
+              "path": "packages\\types\\package.json",
+              "name": "@econojin/types",
+              "deps_count": 0,
+              "deps": []
+            },
+            {
+              "path": "packages\\ui\\package.json",
+              "name": "@econojin/ui",
+              "deps_count": 0,
+              "deps": []
+            },
+            {
+              "path": "econojin-library\\frontend\\package.json",
+              "name": "econojin-library",
+              "deps_count": 23,
+              "deps": [
+                "next",
+                "react",
+                "react-dom",
+                "@supabase/supabase-js",
+                "@supabase/ssr",
+                "axios",
+                "zustand",
+                "react-hook-form",
+                "zod",
+                "date-fns",
+                "lucide-react",
+                "ethers",
+                "clsx",
+                "tailwind-merge",
+                "@types/node",
+                "@types/react",
+                "@types/react-dom",
+                "typescript",
+                "autoprefixer",
+                "postcss"
+              ]
+            },
+            {
+              "path": "apps\\admin\\package.json",
+              "name": "@econojin/admin",
+              "deps_count": 4,
+              "deps": [
+                "next",
+                "react",
+                "react-dom",
+                "typescript"
+              ]
+            },
+            {
+              "path": "apps\\cms\\package.json",
+              "name": "@econojin/cms",
+              "deps_count": 1,
+              "deps": [
+                "@strapi/strapi"
+              ]
+            },
+            {
+              "path": "apps\\web\\package.json",
+              "name": "@econojin/web",
+              "deps_count": 34,
+              "deps": [
+                "@hookform/resolvers",
+                "@tanstack/react-query",
+                "axios",
+                "class-variance-authority",
+                "clsx",
+                "date-fns",
+                "date-fns-jalali",
+                "framer-motion",
+                "leaflet",
+                "lucide-react",
+                "next",
+                "next-intl",
+                "react",
+                "react-dom",
+                "react-hook-form",
+                "react-leaflet",
+                "recharts",
+                "tailwind-merge",
+                "zod",
+                "zustand"
+              ]
+            },
+            {
+              "path": ".pnpm-store\\v11\\projects\\9222c30457a0b11aadb8a0a791789040\\package.json",
+              "name": "@econojin/web",
+              "deps_count": 34,
+              "deps": [
+                "@hookform/resolvers",
+                "@tanstack/react-query",
+                "axios",
+                "class-variance-authority",
+                "clsx",
+                "date-fns",
+                "date-fns-jalali",
+                "framer-motion",
+                "leaflet",
+                "lucide-react",
+                "next",
+                "next-intl",
+                "react",
+                "react-dom",
+                "react-hook-form",
+                "react-leaflet",
+                "recharts",
+                "tailwind-merge",
+                "zod",
+                "zustand"
+              ]
+            }
+          ]
+        }
+      },
+      "findings": [
+        {
+          "severity": "success",
+          "category": "backend",
+          "message": "73 پکیج پایتون نصب شده",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:46:02.928103"
+        },
+        {
+          "severity": "success",
+          "category": "frontend",
+          "message": "45 پکیج Node.js نصب شده",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:46:02.928115"
+        }
+      ]
+    },
+    "✨ Code Quality Analyzer": {
+      "stats": {
+        "python": {
+          "files": 244,
+          "total_lines": 46509,
+          "empty_lines": 7299,
+          "comment_lines": 2428,
+          "functions": 983,
+          "classes": 257,
+          "complex_files": [
+            {
+              "path": "deep_project_analyzer.py",
+              "lines": 639
+            },
+            {
+              "path": "scripts\\00_unify_econojin.py",
+              "lines": 694
+            },
+            {
+              "path": "scripts\\build_phase4_mega.py",
+              "lines": 3998
+            },
+            {
+              "path": "scripts\\final_complete_fix.py",
+              "lines": 909
+            },
+            {
+              "path": "scripts\\fix_all_final.py",
+              "lines": 685
+            },
+            {
+              "path": "scripts\\fix_all_simple.py",
+              "lines": 576
+            },
+            {
+              "path": "scripts\\fix_critical_issues_v2.py",
+              "lines": 546
+            },
+            {
+              "path": "scripts\\fix_final_issues.py",
+              "lines": 546
+            },
+            {
+              "path": "scripts\\fix_remaining_errors.py",
+              "lines": 548
+            },
+            {
+              "path": "scripts\\fix_syntax_errors.py",
+              "lines": 926
+            },
+            {
+              "path": "scripts\\generate_frontend.py",
+              "lines": 1748
+            },
+            {
+              "path": "scripts\\guardian.py",
+              "lines": 510
+            },
+            {
+              "path": "scripts\\implement_econojin_spec.py",
+              "lines": 3110
+            },
+            {
+              "path": "scripts\\pywin32_postinstall.py",
+              "lines": 734
+            },
+            {
+              "path": "scripts\\rebuild_everything.py",
+              "lines": 631
+            },
+            {
+              "path": "scripts\\run_econojin.py",
+              "lines": 645
+            },
+            {
+              "path": "scripts\\setup_dev_tools.py",
+              "lines": 731
+            },
+            {
+              "path": "scripts\\soil_water_module.py",
+              "lines": 1122
+            },
+            {
+              "path": "scripts\\test_comprehensive_health.py",
+              "lines": 567
+            },
+            {
+              "path": "scripts\\update_navbar_homepage.py",
+              "lines": 556
+            },
+            {
+              "path": "_security_fix_backup_20260531_0130\\scripts\\fix_final_issues.py",
+              "lines": 546
+            },
+            {
+              "path": "_final_backup_20260531_0359\\scripts\\fix_critical_issues_v2.py",
+              "lines": 546
+            },
+            {
+              "path": "_final_backup_20260531_0359\\scripts\\fix_final_issues.py",
+              "lines": 546
+            },
+            {
+              "path": "scripts\\security\\fix_exec.py",
+              "lines": 582
+            }
+          ]
+        },
+        "typescript": {
+          "files": 315,
+          "total_lines": 18789,
+          "components": 193,
+          "hooks": 2
+        },
+        "total_lines": 65298
+      },
+      "findings": [
+        {
+          "severity": "warning",
+          "category": "complexity",
+          "message": "24 فایل پایتون بزرگ (>500 خط)",
+          "path": "",
+          "suggestion": "فایل‌ها را به ماژول‌های کوچکتر تقسیم کنید",
+          "timestamp": "2026-06-02T15:46:09.227140"
+        }
+      ]
+    },
+    "🔒 Security Analyzer": {
+      "stats": {
+        "sensitive_files": [],
+        "env_files": [],
+        "exposed_secrets": [
+          {
+            "file": "scripts\\build_phase4_mega.py",
+            "pattern": "token"
+          },
+          {
+            "file": "contracts\\scripts\\deploy.js",
+            "pattern": "token"
+          },
+          {
+            "file": "contracts\\scripts\\deploy_local.js",
+            "pattern": "token"
+          },
+          {
+            "file": ".github\\workflows\\deploy.yml",
+            "pattern": "password"
+          }
+        ],
+        "security_score": 20
+      },
+      "findings": [
+        {
+          "severity": "critical",
+          "category": "security",
+          "message": "احتمال وجود secret: token",
+          "path": "scripts\\build_phase4_mega.py",
+          "suggestion": "از متغیرهای محیطی استفاده کنید",
+          "timestamp": "2026-06-02T15:46:24.183704"
+        },
+        {
+          "severity": "critical",
+          "category": "security",
+          "message": "احتمال وجود secret: token",
+          "path": "contracts\\scripts\\deploy.js",
+          "suggestion": "از متغیرهای محیطی استفاده کنید",
+          "timestamp": "2026-06-02T15:46:27.544601"
+        },
+        {
+          "severity": "critical",
+          "category": "security",
+          "message": "احتمال وجود secret: token",
+          "path": "contracts\\scripts\\deploy_local.js",
+          "suggestion": "از متغیرهای محیطی استفاده کنید",
+          "timestamp": "2026-06-02T15:46:27.578383"
+        },
+        {
+          "severity": "critical",
+          "category": "security",
+          "message": "احتمال وجود secret: password",
+          "path": ".github\\workflows\\deploy.yml",
+          "suggestion": "از متغیرهای محیطی استفاده کنید",
+          "timestamp": "2026-06-02T15:46:39.892043"
+        }
+      ]
+    },
+    "🛰️ Backend Analyzer": {
+      "stats": {
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\main.py"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/health",
+            "file": "api\\main.py"
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/modules",
+            "file": "api\\main.py"
+          },
+          {
+            "method": "GET",
+            "path": "/summary",
+            "file": "api\\modules\\accounting\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/transactions",
+            "file": "api\\modules\\accounting\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/chat",
+            "file": "api\\modules\\ai\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/otp/request",
+            "file": "api\\modules\\auth\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/otp/verify",
+            "file": "api\\modules\\auth\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/login",
+            "file": "api\\modules\\auth\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/profile",
+            "file": "api\\modules\\auth\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/profile/wallet",
+            "file": "api\\modules\\auth\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\calendar\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{event_id}",
+            "file": "api\\modules\\calendar\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\calendar\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{event_id}",
+            "file": "api\\modules\\calendar\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{event_id}",
+            "file": "api\\modules\\calendar\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/upcoming",
+            "file": "api\\modules\\calendar\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\community\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\community\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\community\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\community\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\community\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/stats",
+            "file": "api\\modules\\dashboard\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\desktop\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\desktop\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\desktop\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\desktop\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\desktop\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/balance",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/mine",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\ecomining\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\education\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\education\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\education\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\education\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\education\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\farmer\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\farmer\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{farmer_id}",
+            "file": "api\\modules\\farmer\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{farmer_id}",
+            "file": "api\\modules\\farmer\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{farmer_id}",
+            "file": "api\\modules\\farmer\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{farmer_id}/activities",
+            "file": "api\\modules\\farmer\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\games\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\games\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\games\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\games\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\games\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/calculate/area",
+            "file": "api\\modules\\gis\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/ndvi",
+            "file": "api\\modules\\gis\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/layers",
+            "file": "api\\modules\\gis\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\library\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\library\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\library\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\library\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\library\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\psychology\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\psychology\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\psychology\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\psychology\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\psychology\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\settings\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{id}",
+            "file": "api\\modules\\settings\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\settings\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{id}",
+            "file": "api\\modules\\settings\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{id}",
+            "file": "api\\modules\\settings\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/rothc",
+            "file": "api\\modules\\simulation\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/aquacrop",
+            "file": "api\\modules\\simulation\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/coupling",
+            "file": "api\\modules\\simulation\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/",
+            "file": "api\\modules\\store\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/{item_id}",
+            "file": "api\\modules\\store\\router.py"
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "file": "api\\modules\\store\\router.py"
+          },
+          {
+            "method": "PUT",
+            "path": "/{item_id}",
+            "file": "api\\modules\\store\\router.py"
+          },
+          {
+            "method": "DELETE",
+            "path": "/{item_id}",
+            "file": "api\\modules\\store\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/forecast",
+            "file": "api\\modules\\weather\\router.py"
+          },
+          {
+            "method": "GET",
+            "path": "/alerts",
+            "file": "api\\modules\\weather\\router.py"
+          }
+        ],
+        "endpoints_count": 79,
+        "models": [
+          {
+            "name": "UserAccount",
+            "file": "api\\modules\\auth\\models.py"
+          },
+          {
+            "name": "CalendarEvent",
+            "file": "api\\modules\\calendar\\models.py"
+          },
+          {
+            "name": "EventReminder",
+            "file": "api\\modules\\calendar\\models.py"
+          },
+          {
+            "name": "Farmer",
+            "file": "api\\modules\\farmer\\models.py"
+          },
+          {
+            "name": "StoreItem",
+            "file": "api\\modules\\store\\models.py"
+          }
+        ],
+        "models_count": 5,
+        "routers": [
+          "api\\modules\\accounting\\router.py",
+          "api\\modules\\ai\\router.py",
+          "api\\modules\\auth\\router.py",
+          "api\\modules\\calendar\\router.py",
+          "api\\modules\\community\\router.py",
+          "api\\modules\\dashboard\\router.py",
+          "api\\modules\\desktop\\router.py",
+          "api\\modules\\ecomining\\router.py",
+          "api\\modules\\education\\router.py",
+          "api\\modules\\farmer\\router.py",
+          "api\\modules\\games\\router.py",
+          "api\\modules\\gis\\router.py",
+          "api\\modules\\library\\router.py",
+          "api\\modules\\psychology\\router.py",
+          "api\\modules\\settings\\router.py",
+          "api\\modules\\simulation\\router.py",
+          "api\\modules\\store\\router.py",
+          "api\\modules\\weather\\router.py"
+        ],
+        "routers_count": 18
+      },
+      "findings": [
+        {
+          "severity": "success",
+          "category": "backend",
+          "message": "79 endpoint، 5 مدل، 18 router",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:46:40.234072"
+        }
+      ]
+    },
+    "🎨 Frontend Analyzer": {
+      "stats": {
+        "pages": [
+          {
+            "route": "/[locale]",
+            "file": "apps\\web\\src\\app\\[locale]\\page.tsx"
+          },
+          {
+            "route": "/[locale]/accounting",
+            "file": "apps\\web\\src\\app\\[locale]\\accounting\\page.tsx"
+          },
+          {
+            "route": "/[locale]/calendar",
+            "file": "apps\\web\\src\\app\\[locale]\\calendar\\page.tsx"
+          },
+          {
+            "route": "/[locale]/community",
+            "file": "apps\\web\\src\\app\\[locale]\\community\\page.tsx"
+          },
+          {
+            "route": "/[locale]/desktop",
+            "file": "apps\\web\\src\\app\\[locale]\\desktop\\page.tsx"
+          },
+          {
+            "route": "/[locale]/ecomining",
+            "file": "apps\\web\\src\\app\\[locale]\\ecomining\\page.tsx"
+          },
+          {
+            "route": "/[locale]/education",
+            "file": "apps\\web\\src\\app\\[locale]\\education\\page.tsx"
+          },
+          {
+            "route": "/[locale]/farmers",
+            "file": "apps\\web\\src\\app\\[locale]\\farmers\\page.tsx"
+          },
+          {
+            "route": "/[locale]/games",
+            "file": "apps\\web\\src\\app\\[locale]\\games\\page.tsx"
+          },
+          {
+            "route": "/[locale]/gis",
+            "file": "apps\\web\\src\\app\\[locale]\\gis\\page.tsx"
+          },
+          {
+            "route": "/[locale]/library",
+            "file": "apps\\web\\src\\app\\[locale]\\library\\page.tsx"
+          },
+          {
+            "route": "/[locale]/psychology",
+            "file": "apps\\web\\src\\app\\[locale]\\psychology\\page.tsx"
+          },
+          {
+            "route": "/[locale]/settings",
+            "file": "apps\\web\\src\\app\\[locale]\\settings\\page.tsx"
+          },
+          {
+            "route": "/[locale]/simulation",
+            "file": "apps\\web\\src\\app\\[locale]\\simulation\\page.tsx"
+          },
+          {
+            "route": "/[locale]/store",
+            "file": "apps\\web\\src\\app\\[locale]\\store\\page.tsx"
+          },
+          {
+            "route": "/[locale]/weather",
+            "file": "apps\\web\\src\\app\\[locale]\\weather\\page.tsx"
+          },
+          {
+            "route": "/[locale]/(auth)/login",
+            "file": "apps\\web\\src\\app\\[locale]\\(auth)\\login\\page.tsx"
+          },
+          {
+            "route": "/[locale]/(auth)/register",
+            "file": "apps\\web\\src\\app\\[locale]\\(auth)\\register\\page.tsx"
+          }
+        ],
+        "pages_count": 18,
+        "components": [
+          "apps\\web\\src\\components\\ai\\ChatWidget.tsx",
+          "apps\\web\\src\\components\\brand\\Logo.tsx",
+          "apps\\web\\src\\components\\calendar\\EventForm.tsx",
+          "apps\\web\\src\\components\\gis\\GisMap.tsx",
+          "apps\\web\\src\\components\\layout\\header.tsx",
+          "apps\\web\\src\\components\\layout\\main-layout.tsx",
+          "apps\\web\\src\\components\\layout\\sidebar.tsx",
+          "apps\\web\\src\\components\\modules\\ModuleDashboard.tsx",
+          "apps\\web\\src\\components\\providers\\app-providers.tsx",
+          "apps\\web\\src\\components\\providers\\query-provider.tsx",
+          "apps\\web\\src\\components\\providers\\theme-provider.tsx",
+          "apps\\web\\src\\components\\ui\\alert.tsx",
+          "apps\\web\\src\\components\\ui\\AnimatedStatCard.tsx",
+          "apps\\web\\src\\components\\ui\\badge.tsx",
+          "apps\\web\\src\\components\\ui\\button.tsx",
+          "apps\\web\\src\\components\\ui\\card.tsx",
+          "apps\\web\\src\\components\\ui\\ChartCard.tsx",
+          "apps\\web\\src\\components\\ui\\DataTable.tsx",
+          "apps\\web\\src\\components\\ui\\form-field.tsx",
+          "apps\\web\\src\\components\\ui\\input.tsx",
+          "apps\\web\\src\\components\\ui\\label.tsx",
+          "apps\\web\\src\\components\\ui\\media-hero.tsx",
+          "apps\\web\\src\\components\\ui\\toaster.tsx"
+        ],
+        "components_count": 23,
+        "hooks": [
+          "useAnalysisWebSocket",
+          "useCalendar",
+          "useModuleData"
+        ],
+        "hooks_count": 3
+      },
+      "findings": [
+        {
+          "severity": "success",
+          "category": "frontend",
+          "message": "18 صفحه، 23 کامپوننت، 3 هوک",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:46:40.239798"
+        }
+      ]
+    },
+    "💊 Health Check Analyzer": {
+      "stats": {
+        "checks": {
+          "package.json": true,
+          "requirements.txt": true,
+          "README.md": true,
+          ".env": false,
+          "api/main.py": true,
+          "dir_api": true,
+          "dir_web": true,
+          "dir_docs": true
+        },
+        "passed": 7,
+        "total": 8,
+        "health_score": 87.5
+      },
+      "findings": [
+        {
+          "severity": "success",
+          "category": "health",
+          "message": "امتیاز سلامت: 87.5% ✅",
+          "path": "",
+          "suggestion": "",
+          "timestamp": "2026-06-02T15:46:40.240302"
+        }
+      ]
+    }
+  }
+}

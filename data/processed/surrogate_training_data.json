@@ -1,0 +1,4002 @@
+[
+  {
+    "precip_mm": 210.4,
+    "temp_avg_c": 17.8,
+    "clay_pct": 31.2,
+    "management_code": 0,
+    "yield_kg_ha": 2692.4,
+    "soc_change_t_ha": 0.66
+  },
+  {
+    "precip_mm": 429.1,
+    "temp_avg_c": 21.5,
+    "clay_pct": 24.5,
+    "management_code": 2,
+    "yield_kg_ha": 3745.2,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 480.9,
+    "temp_avg_c": 18.0,
+    "clay_pct": 25.8,
+    "management_code": 0,
+    "yield_kg_ha": 3327.9,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 488.1,
+    "temp_avg_c": 23.7,
+    "clay_pct": 16.4,
+    "management_code": 2,
+    "yield_kg_ha": 3752.5,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 403.8,
+    "temp_avg_c": 15.4,
+    "clay_pct": 17.2,
+    "management_code": 2,
+    "yield_kg_ha": 3592.6,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 391.0,
+    "temp_avg_c": 21.9,
+    "clay_pct": 22.9,
+    "management_code": 0,
+    "yield_kg_ha": 3439.7,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 313.9,
+    "temp_avg_c": 17.1,
+    "clay_pct": 37.0,
+    "management_code": 1,
+    "yield_kg_ha": 3307.7,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 484.5,
+    "temp_avg_c": 21.9,
+    "clay_pct": 28.5,
+    "management_code": 2,
+    "yield_kg_ha": 3872.8,
+    "soc_change_t_ha": 1.2
+  },
+  {
+    "precip_mm": 280.9,
+    "temp_avg_c": 18.2,
+    "clay_pct": 40.0,
+    "management_code": 2,
+    "yield_kg_ha": 3456.8,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 410.1,
+    "temp_avg_c": 25.0,
+    "clay_pct": 20.0,
+    "management_code": 0,
+    "yield_kg_ha": 2852.3,
+    "soc_change_t_ha": 0.32
+  },
+  {
+    "precip_mm": 240.1,
+    "temp_avg_c": 23.2,
+    "clay_pct": 33.7,
+    "management_code": 1,
+    "yield_kg_ha": 2856.5,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 336.2,
+    "temp_avg_c": 20.5,
+    "clay_pct": 25.8,
+    "management_code": 0,
+    "yield_kg_ha": 2968.0,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 452.1,
+    "temp_avg_c": 16.0,
+    "clay_pct": 25.3,
+    "management_code": 2,
+    "yield_kg_ha": 4053.1,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 384.1,
+    "temp_avg_c": 16.6,
+    "clay_pct": 31.6,
+    "management_code": 1,
+    "yield_kg_ha": 3226.5,
+    "soc_change_t_ha": 1.22
+  },
+  {
+    "precip_mm": 288.1,
+    "temp_avg_c": 18.6,
+    "clay_pct": 22.1,
+    "management_code": 0,
+    "yield_kg_ha": 2658.2,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 397.1,
+    "temp_avg_c": 16.8,
+    "clay_pct": 26.3,
+    "management_code": 2,
+    "yield_kg_ha": 3430.0,
+    "soc_change_t_ha": 1.12
+  },
+  {
+    "precip_mm": 245.9,
+    "temp_avg_c": 22.6,
+    "clay_pct": 25.6,
+    "management_code": 0,
+    "yield_kg_ha": 2303.1,
+    "soc_change_t_ha": 0.7
+  },
+  {
+    "precip_mm": 443.8,
+    "temp_avg_c": 17.6,
+    "clay_pct": 35.4,
+    "management_code": 2,
+    "yield_kg_ha": 3644.6,
+    "soc_change_t_ha": 0.84
+  },
+  {
+    "precip_mm": 374.3,
+    "temp_avg_c": 16.2,
+    "clay_pct": 34.5,
+    "management_code": 1,
+    "yield_kg_ha": 3302.4,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 357.7,
+    "temp_avg_c": 17.6,
+    "clay_pct": 29.1,
+    "management_code": 0,
+    "yield_kg_ha": 2974.9,
+    "soc_change_t_ha": 0.71
+  },
+  {
+    "precip_mm": 436.1,
+    "temp_avg_c": 23.9,
+    "clay_pct": 37.6,
+    "management_code": 2,
+    "yield_kg_ha": 3891.7,
+    "soc_change_t_ha": 1.04
+  },
+  {
+    "precip_mm": 329.2,
+    "temp_avg_c": 17.0,
+    "clay_pct": 36.3,
+    "management_code": 0,
+    "yield_kg_ha": 3377.4,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 417.8,
+    "temp_avg_c": 23.7,
+    "clay_pct": 33.9,
+    "management_code": 0,
+    "yield_kg_ha": 2817.5,
+    "soc_change_t_ha": 0.95
+  },
+  {
+    "precip_mm": 373.3,
+    "temp_avg_c": 18.0,
+    "clay_pct": 27.5,
+    "management_code": 2,
+    "yield_kg_ha": 3801.8,
+    "soc_change_t_ha": 1.1
+  },
+  {
+    "precip_mm": 202.1,
+    "temp_avg_c": 17.8,
+    "clay_pct": 19.5,
+    "management_code": 2,
+    "yield_kg_ha": 3410.6,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 372.5,
+    "temp_avg_c": 23.3,
+    "clay_pct": 37.3,
+    "management_code": 2,
+    "yield_kg_ha": 3529.1,
+    "soc_change_t_ha": 1.34
+  },
+  {
+    "precip_mm": 354.0,
+    "temp_avg_c": 20.9,
+    "clay_pct": 22.5,
+    "management_code": 1,
+    "yield_kg_ha": 3054.3,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 375.8,
+    "temp_avg_c": 15.4,
+    "clay_pct": 31.8,
+    "management_code": 2,
+    "yield_kg_ha": 3804.3,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 467.2,
+    "temp_avg_c": 24.0,
+    "clay_pct": 33.0,
+    "management_code": 0,
+    "yield_kg_ha": 2849.7,
+    "soc_change_t_ha": 0.99
+  },
+  {
+    "precip_mm": 206.6,
+    "temp_avg_c": 21.4,
+    "clay_pct": 35.9,
+    "management_code": 0,
+    "yield_kg_ha": 2870.9,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 418.5,
+    "temp_avg_c": 20.9,
+    "clay_pct": 28.7,
+    "management_code": 1,
+    "yield_kg_ha": 3324.3,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 375.7,
+    "temp_avg_c": 23.4,
+    "clay_pct": 33.1,
+    "management_code": 2,
+    "yield_kg_ha": 3447.4,
+    "soc_change_t_ha": 1.33
+  },
+  {
+    "precip_mm": 483.6,
+    "temp_avg_c": 19.1,
+    "clay_pct": 20.2,
+    "management_code": 0,
+    "yield_kg_ha": 3193.7,
+    "soc_change_t_ha": 0.55
+  },
+  {
+    "precip_mm": 318.7,
+    "temp_avg_c": 20.1,
+    "clay_pct": 17.1,
+    "management_code": 2,
+    "yield_kg_ha": 3281.3,
+    "soc_change_t_ha": 1.04
+  },
+  {
+    "precip_mm": 279.2,
+    "temp_avg_c": 21.7,
+    "clay_pct": 29.1,
+    "management_code": 1,
+    "yield_kg_ha": 2762.7,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 326.7,
+    "temp_avg_c": 15.7,
+    "clay_pct": 20.4,
+    "management_code": 1,
+    "yield_kg_ha": 3250.5,
+    "soc_change_t_ha": 0.4
+  },
+  {
+    "precip_mm": 489.7,
+    "temp_avg_c": 16.7,
+    "clay_pct": 18.4,
+    "management_code": 2,
+    "yield_kg_ha": 3525.6,
+    "soc_change_t_ha": 0.99
+  },
+  {
+    "precip_mm": 306.0,
+    "temp_avg_c": 20.8,
+    "clay_pct": 20.9,
+    "management_code": 2,
+    "yield_kg_ha": 3354.3,
+    "soc_change_t_ha": 1.08
+  },
+  {
+    "precip_mm": 370.0,
+    "temp_avg_c": 19.9,
+    "clay_pct": 29.3,
+    "management_code": 2,
+    "yield_kg_ha": 3719.0,
+    "soc_change_t_ha": 0.93
+  },
+  {
+    "precip_mm": 494.0,
+    "temp_avg_c": 15.5,
+    "clay_pct": 18.2,
+    "management_code": 1,
+    "yield_kg_ha": 3251.5,
+    "soc_change_t_ha": 0.79
+  },
+  {
+    "precip_mm": 466.2,
+    "temp_avg_c": 21.0,
+    "clay_pct": 39.9,
+    "management_code": 0,
+    "yield_kg_ha": 3050.2,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 268.6,
+    "temp_avg_c": 24.8,
+    "clay_pct": 33.4,
+    "management_code": 2,
+    "yield_kg_ha": 3339.0,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 415.7,
+    "temp_avg_c": 17.2,
+    "clay_pct": 24.3,
+    "management_code": 2,
+    "yield_kg_ha": 3687.4,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 412.0,
+    "temp_avg_c": 19.2,
+    "clay_pct": 18.4,
+    "management_code": 1,
+    "yield_kg_ha": 3310.9,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 358.5,
+    "temp_avg_c": 23.7,
+    "clay_pct": 31.8,
+    "management_code": 1,
+    "yield_kg_ha": 3038.8,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 417.0,
+    "temp_avg_c": 20.4,
+    "clay_pct": 38.9,
+    "management_code": 0,
+    "yield_kg_ha": 3187.8,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 395.3,
+    "temp_avg_c": 21.6,
+    "clay_pct": 29.7,
+    "management_code": 0,
+    "yield_kg_ha": 3322.7,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 322.1,
+    "temp_avg_c": 20.2,
+    "clay_pct": 25.7,
+    "management_code": 1,
+    "yield_kg_ha": 3301.1,
+    "soc_change_t_ha": 0.79
+  },
+  {
+    "precip_mm": 405.6,
+    "temp_avg_c": 17.9,
+    "clay_pct": 36.1,
+    "management_code": 0,
+    "yield_kg_ha": 3394.4,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 434.3,
+    "temp_avg_c": 24.5,
+    "clay_pct": 19.8,
+    "management_code": 2,
+    "yield_kg_ha": 3406.4,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 409.5,
+    "temp_avg_c": 16.9,
+    "clay_pct": 35.1,
+    "management_code": 0,
+    "yield_kg_ha": 3068.8,
+    "soc_change_t_ha": 1.15
+  },
+  {
+    "precip_mm": 347.2,
+    "temp_avg_c": 23.7,
+    "clay_pct": 30.1,
+    "management_code": 1,
+    "yield_kg_ha": 3280.6,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 460.2,
+    "temp_avg_c": 16.9,
+    "clay_pct": 30.1,
+    "management_code": 2,
+    "yield_kg_ha": 4049.7,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 468.0,
+    "temp_avg_c": 18.8,
+    "clay_pct": 16.5,
+    "management_code": 0,
+    "yield_kg_ha": 3429.1,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 496.4,
+    "temp_avg_c": 15.7,
+    "clay_pct": 20.8,
+    "management_code": 2,
+    "yield_kg_ha": 4354.4,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 248.1,
+    "temp_avg_c": 18.4,
+    "clay_pct": 18.4,
+    "management_code": 1,
+    "yield_kg_ha": 3042.5,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 425.4,
+    "temp_avg_c": 22.1,
+    "clay_pct": 29.1,
+    "management_code": 0,
+    "yield_kg_ha": 2993.6,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 425.5,
+    "temp_avg_c": 16.7,
+    "clay_pct": 19.1,
+    "management_code": 2,
+    "yield_kg_ha": 3642.1,
+    "soc_change_t_ha": 0.92
+  },
+  {
+    "precip_mm": 298.8,
+    "temp_avg_c": 23.9,
+    "clay_pct": 36.0,
+    "management_code": 1,
+    "yield_kg_ha": 3116.5,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 306.7,
+    "temp_avg_c": 16.7,
+    "clay_pct": 33.0,
+    "management_code": 2,
+    "yield_kg_ha": 3386.3,
+    "soc_change_t_ha": 1.4
+  },
+  {
+    "precip_mm": 472.4,
+    "temp_avg_c": 16.3,
+    "clay_pct": 26.3,
+    "management_code": 2,
+    "yield_kg_ha": 4017.8,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 377.8,
+    "temp_avg_c": 21.3,
+    "clay_pct": 26.5,
+    "management_code": 2,
+    "yield_kg_ha": 3783.1,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 496.9,
+    "temp_avg_c": 16.3,
+    "clay_pct": 18.6,
+    "management_code": 2,
+    "yield_kg_ha": 3965.3,
+    "soc_change_t_ha": 1.1
+  },
+  {
+    "precip_mm": 275.0,
+    "temp_avg_c": 23.1,
+    "clay_pct": 27.8,
+    "management_code": 2,
+    "yield_kg_ha": 3487.5,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 214.7,
+    "temp_avg_c": 15.5,
+    "clay_pct": 35.8,
+    "management_code": 2,
+    "yield_kg_ha": 3087.6,
+    "soc_change_t_ha": 1.26
+  },
+  {
+    "precip_mm": 481.4,
+    "temp_avg_c": 18.3,
+    "clay_pct": 18.4,
+    "management_code": 1,
+    "yield_kg_ha": 3302.2,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 406.8,
+    "temp_avg_c": 24.4,
+    "clay_pct": 18.3,
+    "management_code": 2,
+    "yield_kg_ha": 3673.5,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 437.7,
+    "temp_avg_c": 24.0,
+    "clay_pct": 15.3,
+    "management_code": 2,
+    "yield_kg_ha": 3327.4,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 499.1,
+    "temp_avg_c": 20.6,
+    "clay_pct": 24.1,
+    "management_code": 1,
+    "yield_kg_ha": 3685.3,
+    "soc_change_t_ha": 0.64
+  },
+  {
+    "precip_mm": 338.6,
+    "temp_avg_c": 24.0,
+    "clay_pct": 35.4,
+    "management_code": 1,
+    "yield_kg_ha": 3259.8,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 491.0,
+    "temp_avg_c": 18.0,
+    "clay_pct": 19.5,
+    "management_code": 2,
+    "yield_kg_ha": 3973.2,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 397.8,
+    "temp_avg_c": 15.8,
+    "clay_pct": 29.2,
+    "management_code": 0,
+    "yield_kg_ha": 3089.2,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 233.4,
+    "temp_avg_c": 16.5,
+    "clay_pct": 29.8,
+    "management_code": 1,
+    "yield_kg_ha": 3243.1,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 287.9,
+    "temp_avg_c": 24.7,
+    "clay_pct": 19.9,
+    "management_code": 2,
+    "yield_kg_ha": 3048.0,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 409.4,
+    "temp_avg_c": 17.8,
+    "clay_pct": 17.0,
+    "management_code": 1,
+    "yield_kg_ha": 3375.8,
+    "soc_change_t_ha": 0.79
+  },
+  {
+    "precip_mm": 388.2,
+    "temp_avg_c": 19.4,
+    "clay_pct": 35.1,
+    "management_code": 0,
+    "yield_kg_ha": 2757.7,
+    "soc_change_t_ha": 1.2
+  },
+  {
+    "precip_mm": 399.4,
+    "temp_avg_c": 24.3,
+    "clay_pct": 32.2,
+    "management_code": 1,
+    "yield_kg_ha": 3453.9,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 441.4,
+    "temp_avg_c": 24.1,
+    "clay_pct": 23.0,
+    "management_code": 0,
+    "yield_kg_ha": 3233.6,
+    "soc_change_t_ha": 0.55
+  },
+  {
+    "precip_mm": 227.7,
+    "temp_avg_c": 21.8,
+    "clay_pct": 26.5,
+    "management_code": 2,
+    "yield_kg_ha": 2824.0,
+    "soc_change_t_ha": 0.71
+  },
+  {
+    "precip_mm": 229.2,
+    "temp_avg_c": 17.4,
+    "clay_pct": 39.6,
+    "management_code": 1,
+    "yield_kg_ha": 2913.6,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 363.8,
+    "temp_avg_c": 20.5,
+    "clay_pct": 33.9,
+    "management_code": 0,
+    "yield_kg_ha": 2784.5,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 209.4,
+    "temp_avg_c": 16.5,
+    "clay_pct": 27.1,
+    "management_code": 1,
+    "yield_kg_ha": 2780.3,
+    "soc_change_t_ha": 1.22
+  },
+  {
+    "precip_mm": 236.1,
+    "temp_avg_c": 16.1,
+    "clay_pct": 17.0,
+    "management_code": 1,
+    "yield_kg_ha": 2524.4,
+    "soc_change_t_ha": 0.45
+  },
+  {
+    "precip_mm": 241.7,
+    "temp_avg_c": 20.7,
+    "clay_pct": 27.2,
+    "management_code": 0,
+    "yield_kg_ha": 2546.9,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 446.8,
+    "temp_avg_c": 18.6,
+    "clay_pct": 21.0,
+    "management_code": 2,
+    "yield_kg_ha": 3751.8,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 253.3,
+    "temp_avg_c": 15.7,
+    "clay_pct": 35.3,
+    "management_code": 0,
+    "yield_kg_ha": 3099.4,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 312.6,
+    "temp_avg_c": 24.8,
+    "clay_pct": 29.5,
+    "management_code": 0,
+    "yield_kg_ha": 2266.0,
+    "soc_change_t_ha": 0.4
+  },
+  {
+    "precip_mm": 406.1,
+    "temp_avg_c": 20.4,
+    "clay_pct": 35.3,
+    "management_code": 2,
+    "yield_kg_ha": 3478.3,
+    "soc_change_t_ha": 1.12
+  },
+  {
+    "precip_mm": 220.1,
+    "temp_avg_c": 15.7,
+    "clay_pct": 39.0,
+    "management_code": 1,
+    "yield_kg_ha": 2819.2,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 207.7,
+    "temp_avg_c": 22.7,
+    "clay_pct": 33.6,
+    "management_code": 1,
+    "yield_kg_ha": 3081.3,
+    "soc_change_t_ha": 1.08
+  },
+  {
+    "precip_mm": 217.5,
+    "temp_avg_c": 17.7,
+    "clay_pct": 25.5,
+    "management_code": 1,
+    "yield_kg_ha": 3008.1,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 461.4,
+    "temp_avg_c": 17.6,
+    "clay_pct": 26.5,
+    "management_code": 1,
+    "yield_kg_ha": 3334.3,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 378.2,
+    "temp_avg_c": 17.3,
+    "clay_pct": 39.4,
+    "management_code": 2,
+    "yield_kg_ha": 3701.3,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 245.2,
+    "temp_avg_c": 23.4,
+    "clay_pct": 17.8,
+    "management_code": 0,
+    "yield_kg_ha": 2583.2,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 315.1,
+    "temp_avg_c": 23.8,
+    "clay_pct": 33.4,
+    "management_code": 0,
+    "yield_kg_ha": 3170.8,
+    "soc_change_t_ha": 0.71
+  },
+  {
+    "precip_mm": 257.4,
+    "temp_avg_c": 21.2,
+    "clay_pct": 36.9,
+    "management_code": 0,
+    "yield_kg_ha": 3113.5,
+    "soc_change_t_ha": 1.14
+  },
+  {
+    "precip_mm": 309.1,
+    "temp_avg_c": 19.0,
+    "clay_pct": 33.5,
+    "management_code": 1,
+    "yield_kg_ha": 3290.4,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 293.7,
+    "temp_avg_c": 18.5,
+    "clay_pct": 26.2,
+    "management_code": 1,
+    "yield_kg_ha": 3075.0,
+    "soc_change_t_ha": 0.93
+  },
+  {
+    "precip_mm": 246.0,
+    "temp_avg_c": 16.3,
+    "clay_pct": 22.3,
+    "management_code": 0,
+    "yield_kg_ha": 2826.8,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 466.9,
+    "temp_avg_c": 22.2,
+    "clay_pct": 32.3,
+    "management_code": 0,
+    "yield_kg_ha": 3429.7,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 396.1,
+    "temp_avg_c": 17.1,
+    "clay_pct": 22.1,
+    "management_code": 2,
+    "yield_kg_ha": 3844.2,
+    "soc_change_t_ha": 1.08
+  },
+  {
+    "precip_mm": 229.6,
+    "temp_avg_c": 15.5,
+    "clay_pct": 31.2,
+    "management_code": 2,
+    "yield_kg_ha": 3142.6,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 224.5,
+    "temp_avg_c": 19.7,
+    "clay_pct": 15.9,
+    "management_code": 0,
+    "yield_kg_ha": 2482.5,
+    "soc_change_t_ha": 0.5
+  },
+  {
+    "precip_mm": 304.2,
+    "temp_avg_c": 24.9,
+    "clay_pct": 19.8,
+    "management_code": 2,
+    "yield_kg_ha": 3309.9,
+    "soc_change_t_ha": 0.84
+  },
+  {
+    "precip_mm": 451.7,
+    "temp_avg_c": 15.7,
+    "clay_pct": 16.3,
+    "management_code": 2,
+    "yield_kg_ha": 3937.2,
+    "soc_change_t_ha": 1.15
+  },
+  {
+    "precip_mm": 251.9,
+    "temp_avg_c": 15.9,
+    "clay_pct": 32.6,
+    "management_code": 1,
+    "yield_kg_ha": 2646.5,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 212.7,
+    "temp_avg_c": 23.8,
+    "clay_pct": 35.5,
+    "management_code": 1,
+    "yield_kg_ha": 2782.3,
+    "soc_change_t_ha": 1.32
+  },
+  {
+    "precip_mm": 310.4,
+    "temp_avg_c": 23.4,
+    "clay_pct": 36.3,
+    "management_code": 1,
+    "yield_kg_ha": 3005.5,
+    "soc_change_t_ha": 0.77
+  },
+  {
+    "precip_mm": 459.4,
+    "temp_avg_c": 20.5,
+    "clay_pct": 38.5,
+    "management_code": 2,
+    "yield_kg_ha": 3937.9,
+    "soc_change_t_ha": 1.42
+  },
+  {
+    "precip_mm": 487.8,
+    "temp_avg_c": 19.1,
+    "clay_pct": 36.6,
+    "management_code": 0,
+    "yield_kg_ha": 3236.7,
+    "soc_change_t_ha": 0.54
+  },
+  {
+    "precip_mm": 371.4,
+    "temp_avg_c": 23.8,
+    "clay_pct": 15.8,
+    "management_code": 2,
+    "yield_kg_ha": 3410.1,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 302.4,
+    "temp_avg_c": 22.8,
+    "clay_pct": 26.9,
+    "management_code": 1,
+    "yield_kg_ha": 3224.4,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 499.4,
+    "temp_avg_c": 21.2,
+    "clay_pct": 19.2,
+    "management_code": 2,
+    "yield_kg_ha": 4263.8,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 202.5,
+    "temp_avg_c": 20.2,
+    "clay_pct": 18.9,
+    "management_code": 0,
+    "yield_kg_ha": 2439.4,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 438.6,
+    "temp_avg_c": 17.1,
+    "clay_pct": 24.0,
+    "management_code": 2,
+    "yield_kg_ha": 3918.2,
+    "soc_change_t_ha": 0.55
+  },
+  {
+    "precip_mm": 458.5,
+    "temp_avg_c": 17.8,
+    "clay_pct": 21.0,
+    "management_code": 0,
+    "yield_kg_ha": 3134.3,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 273.2,
+    "temp_avg_c": 17.7,
+    "clay_pct": 33.2,
+    "management_code": 1,
+    "yield_kg_ha": 2965.6,
+    "soc_change_t_ha": 0.93
+  },
+  {
+    "precip_mm": 453.8,
+    "temp_avg_c": 18.1,
+    "clay_pct": 16.5,
+    "management_code": 2,
+    "yield_kg_ha": 4017.6,
+    "soc_change_t_ha": 0.62
+  },
+  {
+    "precip_mm": 227.2,
+    "temp_avg_c": 23.4,
+    "clay_pct": 22.2,
+    "management_code": 2,
+    "yield_kg_ha": 3295.8,
+    "soc_change_t_ha": 1.22
+  },
+  {
+    "precip_mm": 242.3,
+    "temp_avg_c": 23.7,
+    "clay_pct": 19.1,
+    "management_code": 0,
+    "yield_kg_ha": 2439.4,
+    "soc_change_t_ha": 0.48
+  },
+  {
+    "precip_mm": 201.8,
+    "temp_avg_c": 19.2,
+    "clay_pct": 20.9,
+    "management_code": 1,
+    "yield_kg_ha": 2659.3,
+    "soc_change_t_ha": 0.44
+  },
+  {
+    "precip_mm": 306.0,
+    "temp_avg_c": 17.3,
+    "clay_pct": 17.7,
+    "management_code": 1,
+    "yield_kg_ha": 2635.6,
+    "soc_change_t_ha": 0.5
+  },
+  {
+    "precip_mm": 460.5,
+    "temp_avg_c": 21.0,
+    "clay_pct": 24.4,
+    "management_code": 1,
+    "yield_kg_ha": 3719.4,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 482.1,
+    "temp_avg_c": 20.2,
+    "clay_pct": 22.1,
+    "management_code": 1,
+    "yield_kg_ha": 3567.5,
+    "soc_change_t_ha": 0.66
+  },
+  {
+    "precip_mm": 480.6,
+    "temp_avg_c": 19.7,
+    "clay_pct": 18.3,
+    "management_code": 0,
+    "yield_kg_ha": 2970.8,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 423.6,
+    "temp_avg_c": 17.4,
+    "clay_pct": 34.0,
+    "management_code": 1,
+    "yield_kg_ha": 3725.8,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 480.0,
+    "temp_avg_c": 15.5,
+    "clay_pct": 23.7,
+    "management_code": 2,
+    "yield_kg_ha": 3763.1,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 313.7,
+    "temp_avg_c": 23.9,
+    "clay_pct": 16.0,
+    "management_code": 1,
+    "yield_kg_ha": 3056.5,
+    "soc_change_t_ha": 0.61
+  },
+  {
+    "precip_mm": 423.6,
+    "temp_avg_c": 17.2,
+    "clay_pct": 24.5,
+    "management_code": 1,
+    "yield_kg_ha": 3160.7,
+    "soc_change_t_ha": 1.18
+  },
+  {
+    "precip_mm": 300.9,
+    "temp_avg_c": 24.6,
+    "clay_pct": 39.4,
+    "management_code": 2,
+    "yield_kg_ha": 3245.2,
+    "soc_change_t_ha": 1.27
+  },
+  {
+    "precip_mm": 251.4,
+    "temp_avg_c": 15.5,
+    "clay_pct": 26.4,
+    "management_code": 0,
+    "yield_kg_ha": 2597.2,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 218.1,
+    "temp_avg_c": 16.4,
+    "clay_pct": 20.1,
+    "management_code": 1,
+    "yield_kg_ha": 2791.2,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 358.3,
+    "temp_avg_c": 24.7,
+    "clay_pct": 32.4,
+    "management_code": 0,
+    "yield_kg_ha": 3003.1,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 453.7,
+    "temp_avg_c": 15.5,
+    "clay_pct": 20.7,
+    "management_code": 0,
+    "yield_kg_ha": 3065.9,
+    "soc_change_t_ha": 1.21
+  },
+  {
+    "precip_mm": 286.6,
+    "temp_avg_c": 23.3,
+    "clay_pct": 24.9,
+    "management_code": 0,
+    "yield_kg_ha": 2849.6,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 334.4,
+    "temp_avg_c": 16.1,
+    "clay_pct": 35.9,
+    "management_code": 0,
+    "yield_kg_ha": 3258.8,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 416.8,
+    "temp_avg_c": 21.3,
+    "clay_pct": 33.0,
+    "management_code": 2,
+    "yield_kg_ha": 3806.4,
+    "soc_change_t_ha": 0.6
+  },
+  {
+    "precip_mm": 312.5,
+    "temp_avg_c": 22.6,
+    "clay_pct": 39.6,
+    "management_code": 1,
+    "yield_kg_ha": 3034.3,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 332.4,
+    "temp_avg_c": 22.7,
+    "clay_pct": 35.2,
+    "management_code": 1,
+    "yield_kg_ha": 3086.7,
+    "soc_change_t_ha": 1.04
+  },
+  {
+    "precip_mm": 311.2,
+    "temp_avg_c": 16.2,
+    "clay_pct": 35.8,
+    "management_code": 2,
+    "yield_kg_ha": 3592.3,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 283.0,
+    "temp_avg_c": 16.6,
+    "clay_pct": 26.4,
+    "management_code": 0,
+    "yield_kg_ha": 2463.0,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 210.2,
+    "temp_avg_c": 20.8,
+    "clay_pct": 35.4,
+    "management_code": 1,
+    "yield_kg_ha": 3203.7,
+    "soc_change_t_ha": 0.95
+  },
+  {
+    "precip_mm": 235.2,
+    "temp_avg_c": 18.5,
+    "clay_pct": 33.0,
+    "management_code": 2,
+    "yield_kg_ha": 3435.7,
+    "soc_change_t_ha": 1.12
+  },
+  {
+    "precip_mm": 250.4,
+    "temp_avg_c": 21.2,
+    "clay_pct": 26.4,
+    "management_code": 1,
+    "yield_kg_ha": 3363.8,
+    "soc_change_t_ha": 0.71
+  },
+  {
+    "precip_mm": 203.8,
+    "temp_avg_c": 22.9,
+    "clay_pct": 28.7,
+    "management_code": 2,
+    "yield_kg_ha": 3044.2,
+    "soc_change_t_ha": 1.37
+  },
+  {
+    "precip_mm": 306.6,
+    "temp_avg_c": 17.9,
+    "clay_pct": 21.9,
+    "management_code": 1,
+    "yield_kg_ha": 3088.9,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 209.2,
+    "temp_avg_c": 23.9,
+    "clay_pct": 27.4,
+    "management_code": 0,
+    "yield_kg_ha": 2450.0,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 227.4,
+    "temp_avg_c": 24.4,
+    "clay_pct": 31.9,
+    "management_code": 2,
+    "yield_kg_ha": 3048.0,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 404.2,
+    "temp_avg_c": 23.8,
+    "clay_pct": 24.3,
+    "management_code": 0,
+    "yield_kg_ha": 2986.8,
+    "soc_change_t_ha": 0.51
+  },
+  {
+    "precip_mm": 476.6,
+    "temp_avg_c": 17.4,
+    "clay_pct": 27.1,
+    "management_code": 2,
+    "yield_kg_ha": 3710.4,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 287.5,
+    "temp_avg_c": 19.7,
+    "clay_pct": 20.2,
+    "management_code": 1,
+    "yield_kg_ha": 2823.7,
+    "soc_change_t_ha": 1.03
+  },
+  {
+    "precip_mm": 203.6,
+    "temp_avg_c": 21.7,
+    "clay_pct": 22.2,
+    "management_code": 2,
+    "yield_kg_ha": 3442.4,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 338.8,
+    "temp_avg_c": 21.4,
+    "clay_pct": 16.3,
+    "management_code": 0,
+    "yield_kg_ha": 2985.1,
+    "soc_change_t_ha": 0.22
+  },
+  {
+    "precip_mm": 247.4,
+    "temp_avg_c": 17.6,
+    "clay_pct": 26.1,
+    "management_code": 2,
+    "yield_kg_ha": 3202.4,
+    "soc_change_t_ha": 1.11
+  },
+  {
+    "precip_mm": 216.2,
+    "temp_avg_c": 18.0,
+    "clay_pct": 20.9,
+    "management_code": 0,
+    "yield_kg_ha": 2573.1,
+    "soc_change_t_ha": 0.63
+  },
+  {
+    "precip_mm": 443.1,
+    "temp_avg_c": 18.9,
+    "clay_pct": 19.5,
+    "management_code": 1,
+    "yield_kg_ha": 3635.6,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 447.1,
+    "temp_avg_c": 21.6,
+    "clay_pct": 29.4,
+    "management_code": 1,
+    "yield_kg_ha": 3698.0,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 389.4,
+    "temp_avg_c": 24.7,
+    "clay_pct": 37.4,
+    "management_code": 2,
+    "yield_kg_ha": 3911.6,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 284.7,
+    "temp_avg_c": 21.1,
+    "clay_pct": 24.6,
+    "management_code": 1,
+    "yield_kg_ha": 3275.8,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 230.2,
+    "temp_avg_c": 24.4,
+    "clay_pct": 26.0,
+    "management_code": 1,
+    "yield_kg_ha": 2592.1,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 316.7,
+    "temp_avg_c": 22.0,
+    "clay_pct": 31.7,
+    "management_code": 2,
+    "yield_kg_ha": 3652.0,
+    "soc_change_t_ha": 1.29
+  },
+  {
+    "precip_mm": 417.2,
+    "temp_avg_c": 22.6,
+    "clay_pct": 39.5,
+    "management_code": 0,
+    "yield_kg_ha": 3084.0,
+    "soc_change_t_ha": 1.05
+  },
+  {
+    "precip_mm": 264.1,
+    "temp_avg_c": 23.7,
+    "clay_pct": 21.6,
+    "management_code": 0,
+    "yield_kg_ha": 2355.0,
+    "soc_change_t_ha": 0.63
+  },
+  {
+    "precip_mm": 438.9,
+    "temp_avg_c": 17.2,
+    "clay_pct": 20.7,
+    "management_code": 0,
+    "yield_kg_ha": 3396.4,
+    "soc_change_t_ha": 0.6
+  },
+  {
+    "precip_mm": 448.0,
+    "temp_avg_c": 17.3,
+    "clay_pct": 35.3,
+    "management_code": 0,
+    "yield_kg_ha": 3352.5,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 382.9,
+    "temp_avg_c": 23.2,
+    "clay_pct": 37.3,
+    "management_code": 0,
+    "yield_kg_ha": 3507.6,
+    "soc_change_t_ha": 0.56
+  },
+  {
+    "precip_mm": 255.1,
+    "temp_avg_c": 24.6,
+    "clay_pct": 23.7,
+    "management_code": 1,
+    "yield_kg_ha": 2725.5,
+    "soc_change_t_ha": 1.1
+  },
+  {
+    "precip_mm": 272.2,
+    "temp_avg_c": 18.3,
+    "clay_pct": 18.5,
+    "management_code": 1,
+    "yield_kg_ha": 2880.0,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 479.4,
+    "temp_avg_c": 17.9,
+    "clay_pct": 19.3,
+    "management_code": 0,
+    "yield_kg_ha": 3405.7,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 413.6,
+    "temp_avg_c": 20.9,
+    "clay_pct": 30.5,
+    "management_code": 1,
+    "yield_kg_ha": 3584.7,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 467.5,
+    "temp_avg_c": 20.9,
+    "clay_pct": 27.8,
+    "management_code": 0,
+    "yield_kg_ha": 2980.5,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 273.7,
+    "temp_avg_c": 19.4,
+    "clay_pct": 25.8,
+    "management_code": 0,
+    "yield_kg_ha": 2725.7,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 353.0,
+    "temp_avg_c": 21.6,
+    "clay_pct": 31.1,
+    "management_code": 2,
+    "yield_kg_ha": 3799.9,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 287.0,
+    "temp_avg_c": 23.9,
+    "clay_pct": 28.4,
+    "management_code": 1,
+    "yield_kg_ha": 2770.7,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 331.1,
+    "temp_avg_c": 16.9,
+    "clay_pct": 25.9,
+    "management_code": 0,
+    "yield_kg_ha": 2912.5,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 429.0,
+    "temp_avg_c": 19.8,
+    "clay_pct": 29.8,
+    "management_code": 1,
+    "yield_kg_ha": 3133.9,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 224.1,
+    "temp_avg_c": 20.3,
+    "clay_pct": 23.1,
+    "management_code": 0,
+    "yield_kg_ha": 2307.4,
+    "soc_change_t_ha": 0.74
+  },
+  {
+    "precip_mm": 383.8,
+    "temp_avg_c": 22.0,
+    "clay_pct": 24.0,
+    "management_code": 1,
+    "yield_kg_ha": 3333.1,
+    "soc_change_t_ha": 1.05
+  },
+  {
+    "precip_mm": 403.5,
+    "temp_avg_c": 20.3,
+    "clay_pct": 28.5,
+    "management_code": 1,
+    "yield_kg_ha": 3640.5,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 428.1,
+    "temp_avg_c": 18.6,
+    "clay_pct": 30.2,
+    "management_code": 0,
+    "yield_kg_ha": 2810.9,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 240.3,
+    "temp_avg_c": 20.0,
+    "clay_pct": 17.0,
+    "management_code": 2,
+    "yield_kg_ha": 3383.0,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 432.4,
+    "temp_avg_c": 23.5,
+    "clay_pct": 35.1,
+    "management_code": 1,
+    "yield_kg_ha": 3833.8,
+    "soc_change_t_ha": 1.06
+  },
+  {
+    "precip_mm": 490.8,
+    "temp_avg_c": 18.2,
+    "clay_pct": 17.1,
+    "management_code": 2,
+    "yield_kg_ha": 3649.1,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 440.2,
+    "temp_avg_c": 16.3,
+    "clay_pct": 23.4,
+    "management_code": 1,
+    "yield_kg_ha": 3516.4,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 224.8,
+    "temp_avg_c": 22.9,
+    "clay_pct": 16.1,
+    "management_code": 0,
+    "yield_kg_ha": 2547.7,
+    "soc_change_t_ha": 1.24
+  },
+  {
+    "precip_mm": 327.4,
+    "temp_avg_c": 24.8,
+    "clay_pct": 36.5,
+    "management_code": 2,
+    "yield_kg_ha": 3450.0,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 291.2,
+    "temp_avg_c": 23.6,
+    "clay_pct": 28.8,
+    "management_code": 2,
+    "yield_kg_ha": 3599.0,
+    "soc_change_t_ha": 0.74
+  },
+  {
+    "precip_mm": 425.7,
+    "temp_avg_c": 20.0,
+    "clay_pct": 20.2,
+    "management_code": 2,
+    "yield_kg_ha": 3521.4,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 392.3,
+    "temp_avg_c": 16.9,
+    "clay_pct": 36.0,
+    "management_code": 2,
+    "yield_kg_ha": 3589.0,
+    "soc_change_t_ha": 1.2
+  },
+  {
+    "precip_mm": 275.9,
+    "temp_avg_c": 17.2,
+    "clay_pct": 22.1,
+    "management_code": 1,
+    "yield_kg_ha": 3084.3,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 449.9,
+    "temp_avg_c": 22.6,
+    "clay_pct": 24.0,
+    "management_code": 0,
+    "yield_kg_ha": 2852.7,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 273.0,
+    "temp_avg_c": 21.4,
+    "clay_pct": 33.5,
+    "management_code": 2,
+    "yield_kg_ha": 2947.6,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 390.7,
+    "temp_avg_c": 15.5,
+    "clay_pct": 30.8,
+    "management_code": 1,
+    "yield_kg_ha": 3058.9,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 412.4,
+    "temp_avg_c": 15.3,
+    "clay_pct": 27.9,
+    "management_code": 1,
+    "yield_kg_ha": 3583.3,
+    "soc_change_t_ha": 0.78
+  },
+  {
+    "precip_mm": 391.7,
+    "temp_avg_c": 16.6,
+    "clay_pct": 16.7,
+    "management_code": 2,
+    "yield_kg_ha": 3484.8,
+    "soc_change_t_ha": 1.3
+  },
+  {
+    "precip_mm": 350.8,
+    "temp_avg_c": 22.1,
+    "clay_pct": 28.4,
+    "management_code": 1,
+    "yield_kg_ha": 3325.6,
+    "soc_change_t_ha": 1.18
+  },
+  {
+    "precip_mm": 284.5,
+    "temp_avg_c": 19.9,
+    "clay_pct": 34.4,
+    "management_code": 1,
+    "yield_kg_ha": 3003.8,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 468.7,
+    "temp_avg_c": 21.7,
+    "clay_pct": 29.6,
+    "management_code": 1,
+    "yield_kg_ha": 3684.8,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 299.9,
+    "temp_avg_c": 15.4,
+    "clay_pct": 18.8,
+    "management_code": 1,
+    "yield_kg_ha": 2925.6,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 337.2,
+    "temp_avg_c": 24.0,
+    "clay_pct": 19.8,
+    "management_code": 0,
+    "yield_kg_ha": 2427.2,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 267.2,
+    "temp_avg_c": 20.1,
+    "clay_pct": 25.3,
+    "management_code": 1,
+    "yield_kg_ha": 2861.5,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 380.1,
+    "temp_avg_c": 17.7,
+    "clay_pct": 33.2,
+    "management_code": 0,
+    "yield_kg_ha": 3265.9,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 244.1,
+    "temp_avg_c": 22.0,
+    "clay_pct": 17.1,
+    "management_code": 1,
+    "yield_kg_ha": 2761.5,
+    "soc_change_t_ha": 0.52
+  },
+  {
+    "precip_mm": 265.7,
+    "temp_avg_c": 18.1,
+    "clay_pct": 35.4,
+    "management_code": 2,
+    "yield_kg_ha": 3253.2,
+    "soc_change_t_ha": 1.22
+  },
+  {
+    "precip_mm": 309.5,
+    "temp_avg_c": 23.9,
+    "clay_pct": 35.9,
+    "management_code": 1,
+    "yield_kg_ha": 3240.3,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 209.2,
+    "temp_avg_c": 18.0,
+    "clay_pct": 25.2,
+    "management_code": 2,
+    "yield_kg_ha": 3001.9,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 475.4,
+    "temp_avg_c": 18.4,
+    "clay_pct": 34.8,
+    "management_code": 0,
+    "yield_kg_ha": 3702.8,
+    "soc_change_t_ha": 1.14
+  },
+  {
+    "precip_mm": 290.6,
+    "temp_avg_c": 23.0,
+    "clay_pct": 16.8,
+    "management_code": 2,
+    "yield_kg_ha": 2920.0,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 218.9,
+    "temp_avg_c": 19.7,
+    "clay_pct": 22.1,
+    "management_code": 1,
+    "yield_kg_ha": 2717.5,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 253.6,
+    "temp_avg_c": 15.1,
+    "clay_pct": 22.1,
+    "management_code": 2,
+    "yield_kg_ha": 3080.1,
+    "soc_change_t_ha": 1.21
+  },
+  {
+    "precip_mm": 319.8,
+    "temp_avg_c": 21.8,
+    "clay_pct": 27.7,
+    "management_code": 2,
+    "yield_kg_ha": 3496.2,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 416.9,
+    "temp_avg_c": 24.9,
+    "clay_pct": 19.6,
+    "management_code": 0,
+    "yield_kg_ha": 2818.9,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 395.6,
+    "temp_avg_c": 21.6,
+    "clay_pct": 20.2,
+    "management_code": 1,
+    "yield_kg_ha": 3392.7,
+    "soc_change_t_ha": 0.6
+  },
+  {
+    "precip_mm": 290.6,
+    "temp_avg_c": 22.9,
+    "clay_pct": 26.9,
+    "management_code": 1,
+    "yield_kg_ha": 3183.0,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 232.9,
+    "temp_avg_c": 18.1,
+    "clay_pct": 31.7,
+    "management_code": 2,
+    "yield_kg_ha": 3152.5,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 225.9,
+    "temp_avg_c": 22.1,
+    "clay_pct": 15.7,
+    "management_code": 0,
+    "yield_kg_ha": 2275.2,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 440.8,
+    "temp_avg_c": 21.8,
+    "clay_pct": 38.9,
+    "management_code": 2,
+    "yield_kg_ha": 3844.5,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 412.0,
+    "temp_avg_c": 19.3,
+    "clay_pct": 27.5,
+    "management_code": 2,
+    "yield_kg_ha": 3718.5,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 211.7,
+    "temp_avg_c": 17.0,
+    "clay_pct": 29.7,
+    "management_code": 1,
+    "yield_kg_ha": 2837.9,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 317.7,
+    "temp_avg_c": 18.8,
+    "clay_pct": 15.4,
+    "management_code": 2,
+    "yield_kg_ha": 3192.3,
+    "soc_change_t_ha": 1.25
+  },
+  {
+    "precip_mm": 478.3,
+    "temp_avg_c": 23.9,
+    "clay_pct": 28.2,
+    "management_code": 1,
+    "yield_kg_ha": 3548.4,
+    "soc_change_t_ha": 0.99
+  },
+  {
+    "precip_mm": 421.1,
+    "temp_avg_c": 24.5,
+    "clay_pct": 25.7,
+    "management_code": 2,
+    "yield_kg_ha": 3940.5,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 375.5,
+    "temp_avg_c": 17.7,
+    "clay_pct": 32.3,
+    "management_code": 0,
+    "yield_kg_ha": 3199.7,
+    "soc_change_t_ha": 0.58
+  },
+  {
+    "precip_mm": 244.8,
+    "temp_avg_c": 20.6,
+    "clay_pct": 20.2,
+    "management_code": 1,
+    "yield_kg_ha": 2916.2,
+    "soc_change_t_ha": 0.31
+  },
+  {
+    "precip_mm": 353.9,
+    "temp_avg_c": 20.8,
+    "clay_pct": 36.7,
+    "management_code": 0,
+    "yield_kg_ha": 3136.9,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 449.0,
+    "temp_avg_c": 17.5,
+    "clay_pct": 15.5,
+    "management_code": 0,
+    "yield_kg_ha": 3171.7,
+    "soc_change_t_ha": 0.66
+  },
+  {
+    "precip_mm": 295.3,
+    "temp_avg_c": 17.7,
+    "clay_pct": 32.7,
+    "management_code": 2,
+    "yield_kg_ha": 3787.6,
+    "soc_change_t_ha": 0.93
+  },
+  {
+    "precip_mm": 313.7,
+    "temp_avg_c": 18.2,
+    "clay_pct": 23.0,
+    "management_code": 2,
+    "yield_kg_ha": 3435.7,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 374.8,
+    "temp_avg_c": 16.7,
+    "clay_pct": 24.9,
+    "management_code": 1,
+    "yield_kg_ha": 3381.3,
+    "soc_change_t_ha": 0.74
+  },
+  {
+    "precip_mm": 343.1,
+    "temp_avg_c": 24.8,
+    "clay_pct": 34.0,
+    "management_code": 0,
+    "yield_kg_ha": 2844.0,
+    "soc_change_t_ha": 0.95
+  },
+  {
+    "precip_mm": 291.4,
+    "temp_avg_c": 15.1,
+    "clay_pct": 31.0,
+    "management_code": 2,
+    "yield_kg_ha": 3330.3,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 216.6,
+    "temp_avg_c": 15.6,
+    "clay_pct": 16.3,
+    "management_code": 0,
+    "yield_kg_ha": 2354.0,
+    "soc_change_t_ha": 0.66
+  },
+  {
+    "precip_mm": 269.8,
+    "temp_avg_c": 22.0,
+    "clay_pct": 30.5,
+    "management_code": 0,
+    "yield_kg_ha": 2723.9,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 447.6,
+    "temp_avg_c": 15.5,
+    "clay_pct": 30.2,
+    "management_code": 1,
+    "yield_kg_ha": 3206.8,
+    "soc_change_t_ha": 1.05
+  },
+  {
+    "precip_mm": 356.8,
+    "temp_avg_c": 22.1,
+    "clay_pct": 21.6,
+    "management_code": 1,
+    "yield_kg_ha": 3374.4,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 450.2,
+    "temp_avg_c": 15.7,
+    "clay_pct": 32.5,
+    "management_code": 0,
+    "yield_kg_ha": 3379.9,
+    "soc_change_t_ha": 0.57
+  },
+  {
+    "precip_mm": 341.7,
+    "temp_avg_c": 24.2,
+    "clay_pct": 26.1,
+    "management_code": 0,
+    "yield_kg_ha": 2716.2,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 256.5,
+    "temp_avg_c": 20.1,
+    "clay_pct": 35.6,
+    "management_code": 0,
+    "yield_kg_ha": 2397.7,
+    "soc_change_t_ha": 1.08
+  },
+  {
+    "precip_mm": 440.7,
+    "temp_avg_c": 24.7,
+    "clay_pct": 20.5,
+    "management_code": 0,
+    "yield_kg_ha": 2780.9,
+    "soc_change_t_ha": 0.78
+  },
+  {
+    "precip_mm": 391.1,
+    "temp_avg_c": 19.2,
+    "clay_pct": 32.4,
+    "management_code": 2,
+    "yield_kg_ha": 3545.7,
+    "soc_change_t_ha": 1.05
+  },
+  {
+    "precip_mm": 416.5,
+    "temp_avg_c": 19.1,
+    "clay_pct": 16.7,
+    "management_code": 2,
+    "yield_kg_ha": 3761.2,
+    "soc_change_t_ha": 0.74
+  },
+  {
+    "precip_mm": 460.7,
+    "temp_avg_c": 21.8,
+    "clay_pct": 25.2,
+    "management_code": 2,
+    "yield_kg_ha": 3834.0,
+    "soc_change_t_ha": 1.19
+  },
+  {
+    "precip_mm": 307.3,
+    "temp_avg_c": 24.1,
+    "clay_pct": 35.5,
+    "management_code": 2,
+    "yield_kg_ha": 3607.7,
+    "soc_change_t_ha": 1.4
+  },
+  {
+    "precip_mm": 417.5,
+    "temp_avg_c": 24.5,
+    "clay_pct": 31.2,
+    "management_code": 1,
+    "yield_kg_ha": 3198.2,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 466.5,
+    "temp_avg_c": 18.4,
+    "clay_pct": 19.5,
+    "management_code": 2,
+    "yield_kg_ha": 3767.6,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 341.2,
+    "temp_avg_c": 15.9,
+    "clay_pct": 33.0,
+    "management_code": 0,
+    "yield_kg_ha": 3075.4,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 250.0,
+    "temp_avg_c": 17.6,
+    "clay_pct": 32.3,
+    "management_code": 0,
+    "yield_kg_ha": 3244.0,
+    "soc_change_t_ha": 1.15
+  },
+  {
+    "precip_mm": 235.7,
+    "temp_avg_c": 23.9,
+    "clay_pct": 31.6,
+    "management_code": 0,
+    "yield_kg_ha": 2556.2,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 427.5,
+    "temp_avg_c": 18.9,
+    "clay_pct": 19.3,
+    "management_code": 0,
+    "yield_kg_ha": 3201.7,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 396.7,
+    "temp_avg_c": 16.0,
+    "clay_pct": 30.3,
+    "management_code": 1,
+    "yield_kg_ha": 3477.1,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 495.2,
+    "temp_avg_c": 21.7,
+    "clay_pct": 23.0,
+    "management_code": 0,
+    "yield_kg_ha": 3655.0,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 436.6,
+    "temp_avg_c": 18.9,
+    "clay_pct": 30.8,
+    "management_code": 1,
+    "yield_kg_ha": 3698.3,
+    "soc_change_t_ha": 1.18
+  },
+  {
+    "precip_mm": 446.6,
+    "temp_avg_c": 22.9,
+    "clay_pct": 20.9,
+    "management_code": 2,
+    "yield_kg_ha": 3457.0,
+    "soc_change_t_ha": 0.66
+  },
+  {
+    "precip_mm": 277.0,
+    "temp_avg_c": 17.6,
+    "clay_pct": 27.8,
+    "management_code": 0,
+    "yield_kg_ha": 2707.1,
+    "soc_change_t_ha": 0.34
+  },
+  {
+    "precip_mm": 482.4,
+    "temp_avg_c": 21.6,
+    "clay_pct": 34.0,
+    "management_code": 1,
+    "yield_kg_ha": 3622.4,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 354.4,
+    "temp_avg_c": 16.8,
+    "clay_pct": 36.1,
+    "management_code": 1,
+    "yield_kg_ha": 3685.9,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 451.9,
+    "temp_avg_c": 22.7,
+    "clay_pct": 27.6,
+    "management_code": 2,
+    "yield_kg_ha": 4125.7,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 445.9,
+    "temp_avg_c": 16.2,
+    "clay_pct": 32.5,
+    "management_code": 2,
+    "yield_kg_ha": 3590.6,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 430.4,
+    "temp_avg_c": 22.1,
+    "clay_pct": 35.8,
+    "management_code": 1,
+    "yield_kg_ha": 3176.3,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 220.8,
+    "temp_avg_c": 15.5,
+    "clay_pct": 18.2,
+    "management_code": 0,
+    "yield_kg_ha": 2473.3,
+    "soc_change_t_ha": 0.32
+  },
+  {
+    "precip_mm": 467.8,
+    "temp_avg_c": 15.8,
+    "clay_pct": 21.8,
+    "management_code": 1,
+    "yield_kg_ha": 3785.1,
+    "soc_change_t_ha": 0.54
+  },
+  {
+    "precip_mm": 468.9,
+    "temp_avg_c": 19.3,
+    "clay_pct": 34.9,
+    "management_code": 1,
+    "yield_kg_ha": 3645.9,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 450.5,
+    "temp_avg_c": 15.6,
+    "clay_pct": 28.3,
+    "management_code": 2,
+    "yield_kg_ha": 3990.9,
+    "soc_change_t_ha": 1.38
+  },
+  {
+    "precip_mm": 416.1,
+    "temp_avg_c": 17.8,
+    "clay_pct": 27.9,
+    "management_code": 0,
+    "yield_kg_ha": 3046.5,
+    "soc_change_t_ha": 0.57
+  },
+  {
+    "precip_mm": 339.0,
+    "temp_avg_c": 21.2,
+    "clay_pct": 22.6,
+    "management_code": 0,
+    "yield_kg_ha": 2781.8,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 480.4,
+    "temp_avg_c": 20.8,
+    "clay_pct": 36.2,
+    "management_code": 1,
+    "yield_kg_ha": 3744.6,
+    "soc_change_t_ha": 1.19
+  },
+  {
+    "precip_mm": 334.7,
+    "temp_avg_c": 18.2,
+    "clay_pct": 37.7,
+    "management_code": 2,
+    "yield_kg_ha": 3618.0,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 490.8,
+    "temp_avg_c": 17.0,
+    "clay_pct": 16.1,
+    "management_code": 0,
+    "yield_kg_ha": 3288.6,
+    "soc_change_t_ha": 0.77
+  },
+  {
+    "precip_mm": 428.3,
+    "temp_avg_c": 20.3,
+    "clay_pct": 24.3,
+    "management_code": 2,
+    "yield_kg_ha": 3579.0,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 298.6,
+    "temp_avg_c": 19.3,
+    "clay_pct": 36.3,
+    "management_code": 1,
+    "yield_kg_ha": 3433.6,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 246.8,
+    "temp_avg_c": 17.3,
+    "clay_pct": 34.4,
+    "management_code": 1,
+    "yield_kg_ha": 2952.2,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 422.7,
+    "temp_avg_c": 15.6,
+    "clay_pct": 23.7,
+    "management_code": 1,
+    "yield_kg_ha": 3692.6,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 263.8,
+    "temp_avg_c": 21.6,
+    "clay_pct": 35.1,
+    "management_code": 0,
+    "yield_kg_ha": 2886.7,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 393.0,
+    "temp_avg_c": 15.1,
+    "clay_pct": 15.5,
+    "management_code": 0,
+    "yield_kg_ha": 3220.7,
+    "soc_change_t_ha": 0.71
+  },
+  {
+    "precip_mm": 327.0,
+    "temp_avg_c": 16.0,
+    "clay_pct": 35.6,
+    "management_code": 1,
+    "yield_kg_ha": 3490.3,
+    "soc_change_t_ha": 1.09
+  },
+  {
+    "precip_mm": 372.1,
+    "temp_avg_c": 19.0,
+    "clay_pct": 37.0,
+    "management_code": 0,
+    "yield_kg_ha": 2918.4,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 293.8,
+    "temp_avg_c": 23.3,
+    "clay_pct": 22.3,
+    "management_code": 2,
+    "yield_kg_ha": 3244.4,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 378.2,
+    "temp_avg_c": 16.0,
+    "clay_pct": 29.5,
+    "management_code": 0,
+    "yield_kg_ha": 3058.1,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 482.0,
+    "temp_avg_c": 17.1,
+    "clay_pct": 33.7,
+    "management_code": 2,
+    "yield_kg_ha": 4069.6,
+    "soc_change_t_ha": 1.31
+  },
+  {
+    "precip_mm": 256.9,
+    "temp_avg_c": 19.0,
+    "clay_pct": 31.0,
+    "management_code": 1,
+    "yield_kg_ha": 2882.0,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 364.1,
+    "temp_avg_c": 20.9,
+    "clay_pct": 27.2,
+    "management_code": 0,
+    "yield_kg_ha": 3289.3,
+    "soc_change_t_ha": 0.56
+  },
+  {
+    "precip_mm": 253.6,
+    "temp_avg_c": 16.1,
+    "clay_pct": 30.5,
+    "management_code": 0,
+    "yield_kg_ha": 3021.6,
+    "soc_change_t_ha": 0.7
+  },
+  {
+    "precip_mm": 402.6,
+    "temp_avg_c": 20.5,
+    "clay_pct": 34.8,
+    "management_code": 0,
+    "yield_kg_ha": 3058.0,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 430.3,
+    "temp_avg_c": 17.2,
+    "clay_pct": 35.5,
+    "management_code": 2,
+    "yield_kg_ha": 3905.3,
+    "soc_change_t_ha": 0.93
+  },
+  {
+    "precip_mm": 459.2,
+    "temp_avg_c": 22.8,
+    "clay_pct": 20.2,
+    "management_code": 0,
+    "yield_kg_ha": 2921.0,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 465.5,
+    "temp_avg_c": 16.6,
+    "clay_pct": 37.4,
+    "management_code": 1,
+    "yield_kg_ha": 4073.4,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 271.4,
+    "temp_avg_c": 21.7,
+    "clay_pct": 22.2,
+    "management_code": 1,
+    "yield_kg_ha": 2851.3,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 230.0,
+    "temp_avg_c": 20.8,
+    "clay_pct": 16.1,
+    "management_code": 2,
+    "yield_kg_ha": 3224.6,
+    "soc_change_t_ha": 1.18
+  },
+  {
+    "precip_mm": 237.7,
+    "temp_avg_c": 17.1,
+    "clay_pct": 29.4,
+    "management_code": 2,
+    "yield_kg_ha": 3187.0,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 239.8,
+    "temp_avg_c": 19.4,
+    "clay_pct": 18.5,
+    "management_code": 1,
+    "yield_kg_ha": 2499.4,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 329.4,
+    "temp_avg_c": 16.3,
+    "clay_pct": 37.4,
+    "management_code": 1,
+    "yield_kg_ha": 3503.2,
+    "soc_change_t_ha": 0.42
+  },
+  {
+    "precip_mm": 254.3,
+    "temp_avg_c": 19.5,
+    "clay_pct": 31.3,
+    "management_code": 2,
+    "yield_kg_ha": 3323.0,
+    "soc_change_t_ha": 1.52
+  },
+  {
+    "precip_mm": 383.1,
+    "temp_avg_c": 16.9,
+    "clay_pct": 27.7,
+    "management_code": 0,
+    "yield_kg_ha": 3116.0,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 301.3,
+    "temp_avg_c": 20.2,
+    "clay_pct": 37.5,
+    "management_code": 0,
+    "yield_kg_ha": 2501.9,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 297.6,
+    "temp_avg_c": 21.4,
+    "clay_pct": 31.5,
+    "management_code": 2,
+    "yield_kg_ha": 3236.0,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 339.8,
+    "temp_avg_c": 20.3,
+    "clay_pct": 22.9,
+    "management_code": 2,
+    "yield_kg_ha": 3697.5,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 343.1,
+    "temp_avg_c": 21.1,
+    "clay_pct": 32.5,
+    "management_code": 2,
+    "yield_kg_ha": 3569.7,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 378.2,
+    "temp_avg_c": 15.4,
+    "clay_pct": 18.9,
+    "management_code": 2,
+    "yield_kg_ha": 3401.9,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 226.8,
+    "temp_avg_c": 20.1,
+    "clay_pct": 32.2,
+    "management_code": 0,
+    "yield_kg_ha": 2357.2,
+    "soc_change_t_ha": 0.77
+  },
+  {
+    "precip_mm": 466.9,
+    "temp_avg_c": 18.7,
+    "clay_pct": 32.0,
+    "management_code": 0,
+    "yield_kg_ha": 3100.4,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 202.5,
+    "temp_avg_c": 19.0,
+    "clay_pct": 24.2,
+    "management_code": 0,
+    "yield_kg_ha": 2593.8,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 368.8,
+    "temp_avg_c": 22.2,
+    "clay_pct": 23.4,
+    "management_code": 2,
+    "yield_kg_ha": 3524.2,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 308.0,
+    "temp_avg_c": 15.5,
+    "clay_pct": 31.7,
+    "management_code": 2,
+    "yield_kg_ha": 3438.3,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 297.4,
+    "temp_avg_c": 23.2,
+    "clay_pct": 36.9,
+    "management_code": 2,
+    "yield_kg_ha": 3548.8,
+    "soc_change_t_ha": 1.23
+  },
+  {
+    "precip_mm": 297.8,
+    "temp_avg_c": 18.3,
+    "clay_pct": 30.6,
+    "management_code": 1,
+    "yield_kg_ha": 3346.2,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 378.1,
+    "temp_avg_c": 17.1,
+    "clay_pct": 27.6,
+    "management_code": 1,
+    "yield_kg_ha": 3481.0,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 375.8,
+    "temp_avg_c": 16.9,
+    "clay_pct": 22.5,
+    "management_code": 0,
+    "yield_kg_ha": 2765.5,
+    "soc_change_t_ha": 0.48
+  },
+  {
+    "precip_mm": 304.8,
+    "temp_avg_c": 23.3,
+    "clay_pct": 31.0,
+    "management_code": 1,
+    "yield_kg_ha": 3047.1,
+    "soc_change_t_ha": 0.74
+  },
+  {
+    "precip_mm": 338.1,
+    "temp_avg_c": 20.5,
+    "clay_pct": 23.0,
+    "management_code": 1,
+    "yield_kg_ha": 3553.5,
+    "soc_change_t_ha": 0.84
+  },
+  {
+    "precip_mm": 278.2,
+    "temp_avg_c": 20.1,
+    "clay_pct": 23.4,
+    "management_code": 2,
+    "yield_kg_ha": 3351.2,
+    "soc_change_t_ha": 1.14
+  },
+  {
+    "precip_mm": 352.9,
+    "temp_avg_c": 21.5,
+    "clay_pct": 29.7,
+    "management_code": 2,
+    "yield_kg_ha": 3409.0,
+    "soc_change_t_ha": 0.58
+  },
+  {
+    "precip_mm": 445.8,
+    "temp_avg_c": 21.1,
+    "clay_pct": 29.7,
+    "management_code": 2,
+    "yield_kg_ha": 4099.9,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 271.3,
+    "temp_avg_c": 20.6,
+    "clay_pct": 32.5,
+    "management_code": 2,
+    "yield_kg_ha": 3280.8,
+    "soc_change_t_ha": 1.1
+  },
+  {
+    "precip_mm": 476.1,
+    "temp_avg_c": 18.0,
+    "clay_pct": 26.5,
+    "management_code": 0,
+    "yield_kg_ha": 3121.7,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 357.9,
+    "temp_avg_c": 19.5,
+    "clay_pct": 22.0,
+    "management_code": 2,
+    "yield_kg_ha": 3219.1,
+    "soc_change_t_ha": 1.0
+  },
+  {
+    "precip_mm": 457.0,
+    "temp_avg_c": 23.9,
+    "clay_pct": 19.7,
+    "management_code": 1,
+    "yield_kg_ha": 3161.8,
+    "soc_change_t_ha": 0.92
+  },
+  {
+    "precip_mm": 278.9,
+    "temp_avg_c": 20.3,
+    "clay_pct": 33.0,
+    "management_code": 2,
+    "yield_kg_ha": 3428.8,
+    "soc_change_t_ha": 1.48
+  },
+  {
+    "precip_mm": 206.5,
+    "temp_avg_c": 16.3,
+    "clay_pct": 33.5,
+    "management_code": 2,
+    "yield_kg_ha": 3518.7,
+    "soc_change_t_ha": 0.78
+  },
+  {
+    "precip_mm": 353.2,
+    "temp_avg_c": 17.7,
+    "clay_pct": 20.1,
+    "management_code": 0,
+    "yield_kg_ha": 2827.0,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 324.3,
+    "temp_avg_c": 17.2,
+    "clay_pct": 27.9,
+    "management_code": 1,
+    "yield_kg_ha": 3160.2,
+    "soc_change_t_ha": 0.53
+  },
+  {
+    "precip_mm": 481.3,
+    "temp_avg_c": 22.4,
+    "clay_pct": 27.5,
+    "management_code": 2,
+    "yield_kg_ha": 3481.2,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 261.7,
+    "temp_avg_c": 18.4,
+    "clay_pct": 19.6,
+    "management_code": 1,
+    "yield_kg_ha": 2950.7,
+    "soc_change_t_ha": 0.5
+  },
+  {
+    "precip_mm": 219.4,
+    "temp_avg_c": 23.9,
+    "clay_pct": 32.9,
+    "management_code": 1,
+    "yield_kg_ha": 2778.3,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 451.1,
+    "temp_avg_c": 15.7,
+    "clay_pct": 20.3,
+    "management_code": 2,
+    "yield_kg_ha": 3923.1,
+    "soc_change_t_ha": 0.51
+  },
+  {
+    "precip_mm": 457.4,
+    "temp_avg_c": 15.3,
+    "clay_pct": 23.2,
+    "management_code": 1,
+    "yield_kg_ha": 3678.8,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 333.4,
+    "temp_avg_c": 23.9,
+    "clay_pct": 36.4,
+    "management_code": 2,
+    "yield_kg_ha": 3419.2,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 484.7,
+    "temp_avg_c": 18.0,
+    "clay_pct": 36.2,
+    "management_code": 1,
+    "yield_kg_ha": 3480.2,
+    "soc_change_t_ha": 1.08
+  },
+  {
+    "precip_mm": 295.6,
+    "temp_avg_c": 17.2,
+    "clay_pct": 33.0,
+    "management_code": 0,
+    "yield_kg_ha": 2948.4,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 204.9,
+    "temp_avg_c": 22.8,
+    "clay_pct": 30.7,
+    "management_code": 0,
+    "yield_kg_ha": 2512.7,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 391.7,
+    "temp_avg_c": 16.3,
+    "clay_pct": 24.8,
+    "management_code": 1,
+    "yield_kg_ha": 3510.1,
+    "soc_change_t_ha": 0.5
+  },
+  {
+    "precip_mm": 496.4,
+    "temp_avg_c": 20.8,
+    "clay_pct": 23.4,
+    "management_code": 2,
+    "yield_kg_ha": 4113.8,
+    "soc_change_t_ha": 1.31
+  },
+  {
+    "precip_mm": 250.7,
+    "temp_avg_c": 15.5,
+    "clay_pct": 33.1,
+    "management_code": 0,
+    "yield_kg_ha": 2706.2,
+    "soc_change_t_ha": 0.7
+  },
+  {
+    "precip_mm": 401.2,
+    "temp_avg_c": 17.5,
+    "clay_pct": 37.2,
+    "management_code": 2,
+    "yield_kg_ha": 4014.6,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 396.7,
+    "temp_avg_c": 20.7,
+    "clay_pct": 33.1,
+    "management_code": 0,
+    "yield_kg_ha": 3023.3,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 496.9,
+    "temp_avg_c": 23.7,
+    "clay_pct": 25.0,
+    "management_code": 2,
+    "yield_kg_ha": 4006.3,
+    "soc_change_t_ha": 0.49
+  },
+  {
+    "precip_mm": 254.3,
+    "temp_avg_c": 17.8,
+    "clay_pct": 32.1,
+    "management_code": 0,
+    "yield_kg_ha": 2731.7,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 371.9,
+    "temp_avg_c": 15.2,
+    "clay_pct": 29.7,
+    "management_code": 2,
+    "yield_kg_ha": 3445.5,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 408.1,
+    "temp_avg_c": 24.6,
+    "clay_pct": 25.7,
+    "management_code": 2,
+    "yield_kg_ha": 3822.8,
+    "soc_change_t_ha": 1.15
+  },
+  {
+    "precip_mm": 231.3,
+    "temp_avg_c": 18.2,
+    "clay_pct": 33.0,
+    "management_code": 1,
+    "yield_kg_ha": 3012.3,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 487.2,
+    "temp_avg_c": 16.1,
+    "clay_pct": 39.6,
+    "management_code": 0,
+    "yield_kg_ha": 3664.2,
+    "soc_change_t_ha": 1.03
+  },
+  {
+    "precip_mm": 258.5,
+    "temp_avg_c": 22.1,
+    "clay_pct": 26.1,
+    "management_code": 1,
+    "yield_kg_ha": 3010.2,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 498.0,
+    "temp_avg_c": 24.3,
+    "clay_pct": 16.5,
+    "management_code": 1,
+    "yield_kg_ha": 3147.1,
+    "soc_change_t_ha": 0.6
+  },
+  {
+    "precip_mm": 276.2,
+    "temp_avg_c": 24.7,
+    "clay_pct": 37.7,
+    "management_code": 0,
+    "yield_kg_ha": 2752.3,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 366.1,
+    "temp_avg_c": 19.8,
+    "clay_pct": 37.7,
+    "management_code": 1,
+    "yield_kg_ha": 3318.2,
+    "soc_change_t_ha": 1.15
+  },
+  {
+    "precip_mm": 444.3,
+    "temp_avg_c": 19.6,
+    "clay_pct": 39.2,
+    "management_code": 2,
+    "yield_kg_ha": 3876.1,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 261.9,
+    "temp_avg_c": 24.1,
+    "clay_pct": 32.3,
+    "management_code": 2,
+    "yield_kg_ha": 3203.1,
+    "soc_change_t_ha": 1.09
+  },
+  {
+    "precip_mm": 488.9,
+    "temp_avg_c": 18.2,
+    "clay_pct": 22.2,
+    "management_code": 2,
+    "yield_kg_ha": 3813.7,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 267.6,
+    "temp_avg_c": 17.0,
+    "clay_pct": 18.4,
+    "management_code": 1,
+    "yield_kg_ha": 2746.6,
+    "soc_change_t_ha": 0.49
+  },
+  {
+    "precip_mm": 221.1,
+    "temp_avg_c": 22.3,
+    "clay_pct": 20.8,
+    "management_code": 2,
+    "yield_kg_ha": 3215.3,
+    "soc_change_t_ha": 0.84
+  },
+  {
+    "precip_mm": 387.4,
+    "temp_avg_c": 15.5,
+    "clay_pct": 32.7,
+    "management_code": 0,
+    "yield_kg_ha": 2999.8,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 399.9,
+    "temp_avg_c": 20.0,
+    "clay_pct": 31.2,
+    "management_code": 1,
+    "yield_kg_ha": 3783.2,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 239.4,
+    "temp_avg_c": 25.0,
+    "clay_pct": 36.9,
+    "management_code": 0,
+    "yield_kg_ha": 2469.6,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 494.5,
+    "temp_avg_c": 23.9,
+    "clay_pct": 35.6,
+    "management_code": 0,
+    "yield_kg_ha": 2918.5,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 362.4,
+    "temp_avg_c": 18.6,
+    "clay_pct": 27.2,
+    "management_code": 2,
+    "yield_kg_ha": 3615.6,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 372.1,
+    "temp_avg_c": 15.1,
+    "clay_pct": 38.5,
+    "management_code": 0,
+    "yield_kg_ha": 3451.9,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 420.1,
+    "temp_avg_c": 24.1,
+    "clay_pct": 17.1,
+    "management_code": 2,
+    "yield_kg_ha": 3522.8,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 376.6,
+    "temp_avg_c": 20.1,
+    "clay_pct": 21.8,
+    "management_code": 1,
+    "yield_kg_ha": 3307.3,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 251.0,
+    "temp_avg_c": 20.4,
+    "clay_pct": 36.7,
+    "management_code": 0,
+    "yield_kg_ha": 2775.2,
+    "soc_change_t_ha": 0.99
+  },
+  {
+    "precip_mm": 279.7,
+    "temp_avg_c": 22.6,
+    "clay_pct": 29.9,
+    "management_code": 0,
+    "yield_kg_ha": 2513.9,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 462.8,
+    "temp_avg_c": 20.5,
+    "clay_pct": 16.2,
+    "management_code": 0,
+    "yield_kg_ha": 3006.5,
+    "soc_change_t_ha": 0.78
+  },
+  {
+    "precip_mm": 395.0,
+    "temp_avg_c": 18.3,
+    "clay_pct": 36.2,
+    "management_code": 1,
+    "yield_kg_ha": 3597.7,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 371.1,
+    "temp_avg_c": 18.8,
+    "clay_pct": 16.3,
+    "management_code": 0,
+    "yield_kg_ha": 2771.2,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 385.2,
+    "temp_avg_c": 17.3,
+    "clay_pct": 32.5,
+    "management_code": 2,
+    "yield_kg_ha": 3732.1,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 200.5,
+    "temp_avg_c": 18.6,
+    "clay_pct": 31.5,
+    "management_code": 1,
+    "yield_kg_ha": 3025.8,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 455.4,
+    "temp_avg_c": 17.6,
+    "clay_pct": 15.4,
+    "management_code": 0,
+    "yield_kg_ha": 3328.1,
+    "soc_change_t_ha": 0.35
+  },
+  {
+    "precip_mm": 425.6,
+    "temp_avg_c": 22.0,
+    "clay_pct": 28.7,
+    "management_code": 0,
+    "yield_kg_ha": 3540.7,
+    "soc_change_t_ha": 0.57
+  },
+  {
+    "precip_mm": 275.9,
+    "temp_avg_c": 16.4,
+    "clay_pct": 32.9,
+    "management_code": 1,
+    "yield_kg_ha": 3046.4,
+    "soc_change_t_ha": 1.25
+  },
+  {
+    "precip_mm": 363.6,
+    "temp_avg_c": 21.8,
+    "clay_pct": 22.1,
+    "management_code": 0,
+    "yield_kg_ha": 3036.5,
+    "soc_change_t_ha": 0.68
+  },
+  {
+    "precip_mm": 334.3,
+    "temp_avg_c": 20.3,
+    "clay_pct": 30.5,
+    "management_code": 2,
+    "yield_kg_ha": 3828.1,
+    "soc_change_t_ha": 0.99
+  },
+  {
+    "precip_mm": 461.4,
+    "temp_avg_c": 21.8,
+    "clay_pct": 22.4,
+    "management_code": 2,
+    "yield_kg_ha": 3705.0,
+    "soc_change_t_ha": 0.49
+  },
+  {
+    "precip_mm": 366.6,
+    "temp_avg_c": 16.0,
+    "clay_pct": 21.4,
+    "management_code": 1,
+    "yield_kg_ha": 3246.6,
+    "soc_change_t_ha": 0.71
+  },
+  {
+    "precip_mm": 342.1,
+    "temp_avg_c": 22.4,
+    "clay_pct": 31.7,
+    "management_code": 2,
+    "yield_kg_ha": 3667.4,
+    "soc_change_t_ha": 1.21
+  },
+  {
+    "precip_mm": 398.2,
+    "temp_avg_c": 22.2,
+    "clay_pct": 32.5,
+    "management_code": 0,
+    "yield_kg_ha": 3351.8,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 321.3,
+    "temp_avg_c": 23.8,
+    "clay_pct": 33.2,
+    "management_code": 0,
+    "yield_kg_ha": 2747.2,
+    "soc_change_t_ha": 0.58
+  },
+  {
+    "precip_mm": 368.3,
+    "temp_avg_c": 23.3,
+    "clay_pct": 20.8,
+    "management_code": 1,
+    "yield_kg_ha": 2964.3,
+    "soc_change_t_ha": 0.55
+  },
+  {
+    "precip_mm": 390.3,
+    "temp_avg_c": 21.8,
+    "clay_pct": 15.6,
+    "management_code": 2,
+    "yield_kg_ha": 3418.2,
+    "soc_change_t_ha": 0.52
+  },
+  {
+    "precip_mm": 447.3,
+    "temp_avg_c": 24.9,
+    "clay_pct": 22.3,
+    "management_code": 1,
+    "yield_kg_ha": 3692.2,
+    "soc_change_t_ha": 1.09
+  },
+  {
+    "precip_mm": 358.0,
+    "temp_avg_c": 20.2,
+    "clay_pct": 24.2,
+    "management_code": 2,
+    "yield_kg_ha": 3481.3,
+    "soc_change_t_ha": 1.22
+  },
+  {
+    "precip_mm": 261.3,
+    "temp_avg_c": 23.4,
+    "clay_pct": 36.1,
+    "management_code": 0,
+    "yield_kg_ha": 2992.9,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 357.0,
+    "temp_avg_c": 23.8,
+    "clay_pct": 21.5,
+    "management_code": 0,
+    "yield_kg_ha": 3028.0,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 260.3,
+    "temp_avg_c": 19.7,
+    "clay_pct": 29.0,
+    "management_code": 0,
+    "yield_kg_ha": 2336.5,
+    "soc_change_t_ha": 1.08
+  },
+  {
+    "precip_mm": 427.5,
+    "temp_avg_c": 22.0,
+    "clay_pct": 28.6,
+    "management_code": 2,
+    "yield_kg_ha": 3806.1,
+    "soc_change_t_ha": 1.21
+  },
+  {
+    "precip_mm": 275.5,
+    "temp_avg_c": 19.1,
+    "clay_pct": 19.1,
+    "management_code": 0,
+    "yield_kg_ha": 2842.2,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 238.8,
+    "temp_avg_c": 17.2,
+    "clay_pct": 39.9,
+    "management_code": 0,
+    "yield_kg_ha": 2741.0,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 377.7,
+    "temp_avg_c": 20.7,
+    "clay_pct": 19.8,
+    "management_code": 2,
+    "yield_kg_ha": 3742.4,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 430.3,
+    "temp_avg_c": 23.7,
+    "clay_pct": 36.2,
+    "management_code": 0,
+    "yield_kg_ha": 3486.7,
+    "soc_change_t_ha": 0.5
+  },
+  {
+    "precip_mm": 335.1,
+    "temp_avg_c": 18.2,
+    "clay_pct": 24.8,
+    "management_code": 1,
+    "yield_kg_ha": 3011.8,
+    "soc_change_t_ha": 0.7
+  },
+  {
+    "precip_mm": 306.6,
+    "temp_avg_c": 18.6,
+    "clay_pct": 32.5,
+    "management_code": 0,
+    "yield_kg_ha": 3087.9,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 270.4,
+    "temp_avg_c": 22.9,
+    "clay_pct": 15.7,
+    "management_code": 1,
+    "yield_kg_ha": 2359.3,
+    "soc_change_t_ha": 1.11
+  },
+  {
+    "precip_mm": 277.9,
+    "temp_avg_c": 17.1,
+    "clay_pct": 26.7,
+    "management_code": 2,
+    "yield_kg_ha": 3352.5,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 433.0,
+    "temp_avg_c": 24.5,
+    "clay_pct": 33.0,
+    "management_code": 2,
+    "yield_kg_ha": 4039.8,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 337.7,
+    "temp_avg_c": 17.1,
+    "clay_pct": 15.5,
+    "management_code": 1,
+    "yield_kg_ha": 2853.7,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 443.8,
+    "temp_avg_c": 16.7,
+    "clay_pct": 30.9,
+    "management_code": 0,
+    "yield_kg_ha": 3214.3,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 297.3,
+    "temp_avg_c": 22.5,
+    "clay_pct": 15.3,
+    "management_code": 1,
+    "yield_kg_ha": 2815.3,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 478.4,
+    "temp_avg_c": 17.9,
+    "clay_pct": 35.5,
+    "management_code": 0,
+    "yield_kg_ha": 3553.6,
+    "soc_change_t_ha": 0.76
+  },
+  {
+    "precip_mm": 330.6,
+    "temp_avg_c": 19.9,
+    "clay_pct": 16.6,
+    "management_code": 1,
+    "yield_kg_ha": 2840.6,
+    "soc_change_t_ha": 0.92
+  },
+  {
+    "precip_mm": 486.5,
+    "temp_avg_c": 18.0,
+    "clay_pct": 26.3,
+    "management_code": 2,
+    "yield_kg_ha": 4504.0,
+    "soc_change_t_ha": 1.45
+  },
+  {
+    "precip_mm": 258.5,
+    "temp_avg_c": 17.4,
+    "clay_pct": 24.6,
+    "management_code": 1,
+    "yield_kg_ha": 3108.5,
+    "soc_change_t_ha": 0.92
+  },
+  {
+    "precip_mm": 249.2,
+    "temp_avg_c": 20.5,
+    "clay_pct": 24.3,
+    "management_code": 2,
+    "yield_kg_ha": 2814.2,
+    "soc_change_t_ha": 0.64
+  },
+  {
+    "precip_mm": 328.8,
+    "temp_avg_c": 17.7,
+    "clay_pct": 36.9,
+    "management_code": 1,
+    "yield_kg_ha": 3061.4,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 440.8,
+    "temp_avg_c": 17.5,
+    "clay_pct": 34.2,
+    "management_code": 2,
+    "yield_kg_ha": 3776.4,
+    "soc_change_t_ha": 1.15
+  },
+  {
+    "precip_mm": 251.4,
+    "temp_avg_c": 17.2,
+    "clay_pct": 27.7,
+    "management_code": 2,
+    "yield_kg_ha": 2973.9,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 231.1,
+    "temp_avg_c": 18.5,
+    "clay_pct": 31.2,
+    "management_code": 2,
+    "yield_kg_ha": 3205.6,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 461.8,
+    "temp_avg_c": 17.0,
+    "clay_pct": 34.0,
+    "management_code": 0,
+    "yield_kg_ha": 3581.4,
+    "soc_change_t_ha": 1.22
+  },
+  {
+    "precip_mm": 456.8,
+    "temp_avg_c": 21.7,
+    "clay_pct": 18.8,
+    "management_code": 2,
+    "yield_kg_ha": 3748.8,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 410.5,
+    "temp_avg_c": 24.0,
+    "clay_pct": 24.4,
+    "management_code": 2,
+    "yield_kg_ha": 3507.1,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 446.1,
+    "temp_avg_c": 21.6,
+    "clay_pct": 20.7,
+    "management_code": 2,
+    "yield_kg_ha": 4135.4,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 230.1,
+    "temp_avg_c": 24.7,
+    "clay_pct": 38.4,
+    "management_code": 2,
+    "yield_kg_ha": 3024.6,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 427.6,
+    "temp_avg_c": 22.7,
+    "clay_pct": 29.4,
+    "management_code": 2,
+    "yield_kg_ha": 3837.4,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 401.3,
+    "temp_avg_c": 21.7,
+    "clay_pct": 20.2,
+    "management_code": 1,
+    "yield_kg_ha": 3589.3,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 317.7,
+    "temp_avg_c": 19.2,
+    "clay_pct": 19.7,
+    "management_code": 1,
+    "yield_kg_ha": 3135.6,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 426.4,
+    "temp_avg_c": 17.9,
+    "clay_pct": 25.7,
+    "management_code": 0,
+    "yield_kg_ha": 3136.3,
+    "soc_change_t_ha": 1.07
+  },
+  {
+    "precip_mm": 479.9,
+    "temp_avg_c": 18.2,
+    "clay_pct": 21.5,
+    "management_code": 2,
+    "yield_kg_ha": 3829.4,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 470.0,
+    "temp_avg_c": 23.0,
+    "clay_pct": 27.0,
+    "management_code": 2,
+    "yield_kg_ha": 3566.2,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 220.9,
+    "temp_avg_c": 23.2,
+    "clay_pct": 39.2,
+    "management_code": 1,
+    "yield_kg_ha": 2574.5,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 463.6,
+    "temp_avg_c": 16.4,
+    "clay_pct": 17.7,
+    "management_code": 1,
+    "yield_kg_ha": 3697.0,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 487.9,
+    "temp_avg_c": 17.5,
+    "clay_pct": 18.4,
+    "management_code": 1,
+    "yield_kg_ha": 3850.1,
+    "soc_change_t_ha": 0.77
+  },
+  {
+    "precip_mm": 326.9,
+    "temp_avg_c": 21.0,
+    "clay_pct": 29.8,
+    "management_code": 2,
+    "yield_kg_ha": 3374.1,
+    "soc_change_t_ha": 0.9
+  },
+  {
+    "precip_mm": 447.5,
+    "temp_avg_c": 24.9,
+    "clay_pct": 32.1,
+    "management_code": 0,
+    "yield_kg_ha": 2905.2,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 421.2,
+    "temp_avg_c": 19.0,
+    "clay_pct": 16.5,
+    "management_code": 2,
+    "yield_kg_ha": 3614.8,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 293.8,
+    "temp_avg_c": 20.1,
+    "clay_pct": 33.6,
+    "management_code": 1,
+    "yield_kg_ha": 3417.2,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 360.0,
+    "temp_avg_c": 17.0,
+    "clay_pct": 31.6,
+    "management_code": 1,
+    "yield_kg_ha": 3370.5,
+    "soc_change_t_ha": 0.79
+  },
+  {
+    "precip_mm": 421.8,
+    "temp_avg_c": 20.7,
+    "clay_pct": 38.3,
+    "management_code": 2,
+    "yield_kg_ha": 3871.4,
+    "soc_change_t_ha": 1.12
+  },
+  {
+    "precip_mm": 473.5,
+    "temp_avg_c": 16.9,
+    "clay_pct": 22.6,
+    "management_code": 2,
+    "yield_kg_ha": 3998.4,
+    "soc_change_t_ha": 1.14
+  },
+  {
+    "precip_mm": 246.0,
+    "temp_avg_c": 15.9,
+    "clay_pct": 19.6,
+    "management_code": 0,
+    "yield_kg_ha": 2242.9,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 277.5,
+    "temp_avg_c": 24.9,
+    "clay_pct": 38.5,
+    "management_code": 2,
+    "yield_kg_ha": 2918.0,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 337.4,
+    "temp_avg_c": 15.8,
+    "clay_pct": 30.9,
+    "management_code": 1,
+    "yield_kg_ha": 3058.1,
+    "soc_change_t_ha": 0.35
+  },
+  {
+    "precip_mm": 498.6,
+    "temp_avg_c": 17.8,
+    "clay_pct": 33.0,
+    "management_code": 2,
+    "yield_kg_ha": 4147.7,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 204.5,
+    "temp_avg_c": 15.5,
+    "clay_pct": 36.2,
+    "management_code": 0,
+    "yield_kg_ha": 2971.5,
+    "soc_change_t_ha": 1.3
+  },
+  {
+    "precip_mm": 330.2,
+    "temp_avg_c": 21.0,
+    "clay_pct": 38.9,
+    "management_code": 2,
+    "yield_kg_ha": 3682.6,
+    "soc_change_t_ha": 1.19
+  },
+  {
+    "precip_mm": 369.3,
+    "temp_avg_c": 19.0,
+    "clay_pct": 40.0,
+    "management_code": 0,
+    "yield_kg_ha": 3097.3,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 406.8,
+    "temp_avg_c": 18.7,
+    "clay_pct": 29.0,
+    "management_code": 1,
+    "yield_kg_ha": 3166.6,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 299.2,
+    "temp_avg_c": 22.6,
+    "clay_pct": 34.5,
+    "management_code": 2,
+    "yield_kg_ha": 3538.1,
+    "soc_change_t_ha": 0.98
+  },
+  {
+    "precip_mm": 400.1,
+    "temp_avg_c": 15.7,
+    "clay_pct": 27.3,
+    "management_code": 0,
+    "yield_kg_ha": 3099.0,
+    "soc_change_t_ha": 0.95
+  },
+  {
+    "precip_mm": 485.5,
+    "temp_avg_c": 22.4,
+    "clay_pct": 35.1,
+    "management_code": 1,
+    "yield_kg_ha": 3718.5,
+    "soc_change_t_ha": 0.52
+  },
+  {
+    "precip_mm": 352.8,
+    "temp_avg_c": 18.3,
+    "clay_pct": 33.1,
+    "management_code": 2,
+    "yield_kg_ha": 3728.1,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 273.2,
+    "temp_avg_c": 24.8,
+    "clay_pct": 22.0,
+    "management_code": 2,
+    "yield_kg_ha": 3161.7,
+    "soc_change_t_ha": 0.99
+  },
+  {
+    "precip_mm": 484.8,
+    "temp_avg_c": 15.2,
+    "clay_pct": 38.7,
+    "management_code": 1,
+    "yield_kg_ha": 3534.2,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 267.6,
+    "temp_avg_c": 22.8,
+    "clay_pct": 31.3,
+    "management_code": 2,
+    "yield_kg_ha": 3373.4,
+    "soc_change_t_ha": 0.95
+  },
+  {
+    "precip_mm": 210.5,
+    "temp_avg_c": 23.9,
+    "clay_pct": 33.5,
+    "management_code": 1,
+    "yield_kg_ha": 2547.9,
+    "soc_change_t_ha": 1.3
+  },
+  {
+    "precip_mm": 239.2,
+    "temp_avg_c": 18.4,
+    "clay_pct": 15.8,
+    "management_code": 1,
+    "yield_kg_ha": 2747.7,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 344.1,
+    "temp_avg_c": 19.8,
+    "clay_pct": 33.1,
+    "management_code": 2,
+    "yield_kg_ha": 3617.1,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 494.6,
+    "temp_avg_c": 16.1,
+    "clay_pct": 18.6,
+    "management_code": 2,
+    "yield_kg_ha": 3683.5,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 331.4,
+    "temp_avg_c": 15.9,
+    "clay_pct": 34.6,
+    "management_code": 2,
+    "yield_kg_ha": 3593.6,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 416.4,
+    "temp_avg_c": 24.0,
+    "clay_pct": 24.3,
+    "management_code": 1,
+    "yield_kg_ha": 3321.2,
+    "soc_change_t_ha": 0.35
+  },
+  {
+    "precip_mm": 395.9,
+    "temp_avg_c": 22.4,
+    "clay_pct": 33.4,
+    "management_code": 2,
+    "yield_kg_ha": 3818.7,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 483.9,
+    "temp_avg_c": 21.2,
+    "clay_pct": 28.3,
+    "management_code": 1,
+    "yield_kg_ha": 3558.6,
+    "soc_change_t_ha": 0.73
+  },
+  {
+    "precip_mm": 393.4,
+    "temp_avg_c": 19.0,
+    "clay_pct": 39.1,
+    "management_code": 0,
+    "yield_kg_ha": 3128.1,
+    "soc_change_t_ha": 1.28
+  },
+  {
+    "precip_mm": 362.0,
+    "temp_avg_c": 23.2,
+    "clay_pct": 37.8,
+    "management_code": 2,
+    "yield_kg_ha": 3798.9,
+    "soc_change_t_ha": 0.88
+  },
+  {
+    "precip_mm": 426.0,
+    "temp_avg_c": 21.7,
+    "clay_pct": 31.5,
+    "management_code": 1,
+    "yield_kg_ha": 3509.4,
+    "soc_change_t_ha": 1.1
+  },
+  {
+    "precip_mm": 401.4,
+    "temp_avg_c": 17.5,
+    "clay_pct": 36.2,
+    "management_code": 1,
+    "yield_kg_ha": 3522.7,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 459.2,
+    "temp_avg_c": 21.5,
+    "clay_pct": 30.8,
+    "management_code": 2,
+    "yield_kg_ha": 4086.1,
+    "soc_change_t_ha": 1.14
+  },
+  {
+    "precip_mm": 227.5,
+    "temp_avg_c": 18.6,
+    "clay_pct": 20.0,
+    "management_code": 0,
+    "yield_kg_ha": 2404.1,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 487.9,
+    "temp_avg_c": 15.1,
+    "clay_pct": 33.5,
+    "management_code": 1,
+    "yield_kg_ha": 3562.7,
+    "soc_change_t_ha": 0.91
+  },
+  {
+    "precip_mm": 498.4,
+    "temp_avg_c": 23.9,
+    "clay_pct": 27.3,
+    "management_code": 1,
+    "yield_kg_ha": 3180.5,
+    "soc_change_t_ha": 1.01
+  },
+  {
+    "precip_mm": 373.6,
+    "temp_avg_c": 15.1,
+    "clay_pct": 33.2,
+    "management_code": 1,
+    "yield_kg_ha": 3505.5,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 379.3,
+    "temp_avg_c": 17.7,
+    "clay_pct": 18.7,
+    "management_code": 1,
+    "yield_kg_ha": 2848.9,
+    "soc_change_t_ha": 0.67
+  },
+  {
+    "precip_mm": 338.1,
+    "temp_avg_c": 20.1,
+    "clay_pct": 27.6,
+    "management_code": 1,
+    "yield_kg_ha": 2967.9,
+    "soc_change_t_ha": 0.96
+  },
+  {
+    "precip_mm": 377.4,
+    "temp_avg_c": 22.4,
+    "clay_pct": 38.9,
+    "management_code": 2,
+    "yield_kg_ha": 3409.5,
+    "soc_change_t_ha": 0.83
+  },
+  {
+    "precip_mm": 426.6,
+    "temp_avg_c": 19.4,
+    "clay_pct": 35.6,
+    "management_code": 1,
+    "yield_kg_ha": 3602.6,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 229.1,
+    "temp_avg_c": 22.9,
+    "clay_pct": 16.3,
+    "management_code": 0,
+    "yield_kg_ha": 2048.8,
+    "soc_change_t_ha": 0.39
+  },
+  {
+    "precip_mm": 468.9,
+    "temp_avg_c": 21.8,
+    "clay_pct": 37.9,
+    "management_code": 2,
+    "yield_kg_ha": 4009.3,
+    "soc_change_t_ha": 1.1
+  },
+  {
+    "precip_mm": 398.7,
+    "temp_avg_c": 15.8,
+    "clay_pct": 22.6,
+    "management_code": 2,
+    "yield_kg_ha": 3703.9,
+    "soc_change_t_ha": 0.95
+  },
+  {
+    "precip_mm": 380.9,
+    "temp_avg_c": 22.5,
+    "clay_pct": 17.9,
+    "management_code": 0,
+    "yield_kg_ha": 2784.2,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 387.6,
+    "temp_avg_c": 23.0,
+    "clay_pct": 37.0,
+    "management_code": 1,
+    "yield_kg_ha": 3584.6,
+    "soc_change_t_ha": 0.77
+  },
+  {
+    "precip_mm": 362.7,
+    "temp_avg_c": 22.1,
+    "clay_pct": 19.0,
+    "management_code": 0,
+    "yield_kg_ha": 2780.5,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 294.0,
+    "temp_avg_c": 18.5,
+    "clay_pct": 32.8,
+    "management_code": 1,
+    "yield_kg_ha": 3117.0,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 262.4,
+    "temp_avg_c": 21.7,
+    "clay_pct": 39.8,
+    "management_code": 1,
+    "yield_kg_ha": 3191.2,
+    "soc_change_t_ha": 1.18
+  },
+  {
+    "precip_mm": 306.8,
+    "temp_avg_c": 18.1,
+    "clay_pct": 25.0,
+    "management_code": 2,
+    "yield_kg_ha": 3303.1,
+    "soc_change_t_ha": 1.09
+  },
+  {
+    "precip_mm": 323.4,
+    "temp_avg_c": 20.5,
+    "clay_pct": 33.6,
+    "management_code": 1,
+    "yield_kg_ha": 3506.0,
+    "soc_change_t_ha": 0.85
+  },
+  {
+    "precip_mm": 265.8,
+    "temp_avg_c": 17.6,
+    "clay_pct": 15.6,
+    "management_code": 1,
+    "yield_kg_ha": 2585.7,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 498.0,
+    "temp_avg_c": 20.0,
+    "clay_pct": 39.0,
+    "management_code": 1,
+    "yield_kg_ha": 3871.5,
+    "soc_change_t_ha": 1.35
+  },
+  {
+    "precip_mm": 464.0,
+    "temp_avg_c": 15.3,
+    "clay_pct": 22.1,
+    "management_code": 2,
+    "yield_kg_ha": 3720.7,
+    "soc_change_t_ha": 0.7
+  },
+  {
+    "precip_mm": 398.2,
+    "temp_avg_c": 22.5,
+    "clay_pct": 35.7,
+    "management_code": 1,
+    "yield_kg_ha": 3605.6,
+    "soc_change_t_ha": 1.09
+  },
+  {
+    "precip_mm": 345.5,
+    "temp_avg_c": 22.9,
+    "clay_pct": 32.1,
+    "management_code": 2,
+    "yield_kg_ha": 3775.1,
+    "soc_change_t_ha": 1.13
+  },
+  {
+    "precip_mm": 219.2,
+    "temp_avg_c": 18.5,
+    "clay_pct": 20.0,
+    "management_code": 1,
+    "yield_kg_ha": 2544.4,
+    "soc_change_t_ha": 1.19
+  },
+  {
+    "precip_mm": 370.2,
+    "temp_avg_c": 18.7,
+    "clay_pct": 30.8,
+    "management_code": 2,
+    "yield_kg_ha": 3492.4,
+    "soc_change_t_ha": 1.33
+  },
+  {
+    "precip_mm": 239.3,
+    "temp_avg_c": 23.0,
+    "clay_pct": 37.4,
+    "management_code": 0,
+    "yield_kg_ha": 2556.8,
+    "soc_change_t_ha": 0.89
+  },
+  {
+    "precip_mm": 299.1,
+    "temp_avg_c": 16.2,
+    "clay_pct": 31.2,
+    "management_code": 1,
+    "yield_kg_ha": 2832.1,
+    "soc_change_t_ha": 0.86
+  },
+  {
+    "precip_mm": 208.7,
+    "temp_avg_c": 16.1,
+    "clay_pct": 27.1,
+    "management_code": 1,
+    "yield_kg_ha": 2815.2,
+    "soc_change_t_ha": 1.18
+  },
+  {
+    "precip_mm": 395.6,
+    "temp_avg_c": 18.1,
+    "clay_pct": 20.2,
+    "management_code": 1,
+    "yield_kg_ha": 3099.3,
+    "soc_change_t_ha": 0.97
+  },
+  {
+    "precip_mm": 373.6,
+    "temp_avg_c": 23.6,
+    "clay_pct": 30.5,
+    "management_code": 0,
+    "yield_kg_ha": 3184.9,
+    "soc_change_t_ha": 0.49
+  },
+  {
+    "precip_mm": 287.6,
+    "temp_avg_c": 24.1,
+    "clay_pct": 18.8,
+    "management_code": 2,
+    "yield_kg_ha": 3227.4,
+    "soc_change_t_ha": 1.4
+  },
+  {
+    "precip_mm": 296.0,
+    "temp_avg_c": 21.4,
+    "clay_pct": 31.9,
+    "management_code": 1,
+    "yield_kg_ha": 3301.7,
+    "soc_change_t_ha": 0.82
+  },
+  {
+    "precip_mm": 360.1,
+    "temp_avg_c": 18.6,
+    "clay_pct": 25.4,
+    "management_code": 1,
+    "yield_kg_ha": 3245.3,
+    "soc_change_t_ha": 0.63
+  },
+  {
+    "precip_mm": 273.4,
+    "temp_avg_c": 22.8,
+    "clay_pct": 25.8,
+    "management_code": 1,
+    "yield_kg_ha": 2972.3,
+    "soc_change_t_ha": 1.09
+  },
+  {
+    "precip_mm": 303.2,
+    "temp_avg_c": 24.2,
+    "clay_pct": 39.0,
+    "management_code": 1,
+    "yield_kg_ha": 2949.6,
+    "soc_change_t_ha": 1.02
+  },
+  {
+    "precip_mm": 440.1,
+    "temp_avg_c": 19.7,
+    "clay_pct": 28.2,
+    "management_code": 0,
+    "yield_kg_ha": 3207.0,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 336.9,
+    "temp_avg_c": 22.0,
+    "clay_pct": 23.3,
+    "management_code": 2,
+    "yield_kg_ha": 3346.2,
+    "soc_change_t_ha": 0.81
+  },
+  {
+    "precip_mm": 454.1,
+    "temp_avg_c": 24.3,
+    "clay_pct": 18.6,
+    "management_code": 1,
+    "yield_kg_ha": 3492.5,
+    "soc_change_t_ha": 0.59
+  },
+  {
+    "precip_mm": 245.8,
+    "temp_avg_c": 20.9,
+    "clay_pct": 24.1,
+    "management_code": 2,
+    "yield_kg_ha": 3584.1,
+    "soc_change_t_ha": 0.87
+  },
+  {
+    "precip_mm": 294.8,
+    "temp_avg_c": 19.7,
+    "clay_pct": 19.7,
+    "management_code": 1,
+    "yield_kg_ha": 2969.5,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 201.4,
+    "temp_avg_c": 17.2,
+    "clay_pct": 30.5,
+    "management_code": 2,
+    "yield_kg_ha": 2959.1,
+    "soc_change_t_ha": 0.72
+  },
+  {
+    "precip_mm": 307.3,
+    "temp_avg_c": 23.5,
+    "clay_pct": 26.4,
+    "management_code": 0,
+    "yield_kg_ha": 2918.8,
+    "soc_change_t_ha": 0.65
+  },
+  {
+    "precip_mm": 496.3,
+    "temp_avg_c": 18.5,
+    "clay_pct": 33.9,
+    "management_code": 2,
+    "yield_kg_ha": 4186.5,
+    "soc_change_t_ha": 1.16
+  },
+  {
+    "precip_mm": 370.1,
+    "temp_avg_c": 22.4,
+    "clay_pct": 21.4,
+    "management_code": 0,
+    "yield_kg_ha": 2814.4,
+    "soc_change_t_ha": 0.94
+  },
+  {
+    "precip_mm": 300.9,
+    "temp_avg_c": 17.1,
+    "clay_pct": 20.8,
+    "management_code": 1,
+    "yield_kg_ha": 3166.0,
+    "soc_change_t_ha": 0.8
+  },
+  {
+    "precip_mm": 225.1,
+    "temp_avg_c": 23.2,
+    "clay_pct": 29.7,
+    "management_code": 0,
+    "yield_kg_ha": 2571.3,
+    "soc_change_t_ha": 0.75
+  },
+  {
+    "precip_mm": 343.9,
+    "temp_avg_c": 19.8,
+    "clay_pct": 29.0,
+    "management_code": 1,
+    "yield_kg_ha": 3302.2,
+    "soc_change_t_ha": 0.69
+  },
+  {
+    "precip_mm": 249.9,
+    "temp_avg_c": 22.8,
+    "clay_pct": 29.4,
+    "management_code": 0,
+    "yield_kg_ha": 3010.6,
+    "soc_change_t_ha": 0.61
+  }
+]

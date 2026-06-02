@@ -1,0 +1,119 @@
+{
+  "common": {
+    "appName": "Econojin",
+    "tagline": "Научная углеродная платформа",
+    "home": "Главная",
+    "dashboard": "Панель",
+    "calculator": "Калькулятор",
+    "map": "Карта",
+    "shop": "Магазин",
+    "library": "Библиотека",
+    "about": "О нас",
+    "contact": "Контакты",
+    "login": "Войти",
+    "logout": "Выйти",
+    "register": "Регистрация",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "privacy": "Конфиденциальность",
+    "terms": "Условия",
+    "policy": "Политика",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "search": "Поиск",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "language": "Язык",
+    "theme": "Тема",
+    "dark": "Тёмная",
+    "light": "Светлая"
+  },
+  "auth": {
+    "welcomeBack": "С возвращением",
+    "loginSubtitle": "Войдите, чтобы продолжить",
+    "registerSubtitle": "Создать новый аккаунт",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "fullName": "Полное имя",
+    "forgotPassword": "Забыли пароль?",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "loginButton": "Войти",
+    "registerButton": "Создать аккаунт",
+    "orContinueWith": "Или продолжить с",
+    "wallet": "Кошелёк"
+  },
+  "maahak": {
+    "title": "Умная консоль Маахак",
+    "subtitle": "ИИ-ассистент Econojin",
+    "greeting": "Привет! Я Маахак",
+    "helpText": "Чем я могу помочь сегодня?",
+    "askQuestion": "Спросите меня что угодно...",
+    "systemStatus": "Статус системы",
+    "allSystemsNormal": "Все системы в норме",
+    "alerts": "Оповещения",
+    "tasks": "Задачи",
+    "insights": "Аналитика"
+  },
+  "pages": {
+    "about": {
+      "title": "О Econojin",
+      "mission": "Наша Миссия",
+      "vision": "Наше Видение",
+      "team": "Наша Команда",
+      "story": "Наша История"
+    },
+    "contact": {
+      "title": "Свяжитесь с нами",
+      "subtitle": "Мы будем рады услышать вас",
+      "formTitle": "Отправить сообщение",
+      "name": "Ваше имя",
+      "email": "Эл. почта",
+      "subject": "Тема",
+      "message": "Сообщение",
+      "send": "Отправить"
+    },
+    "privacy": {
+      "title": "Политика конфиденциальности",
+      "lastUpdated": "Последнее обновление"
+    },
+    "terms": {
+      "title": "Условия использования",
+      "acceptance": "Принятие условий"
+    },
+    "policy": {
+      "title": "Наша политика",
+      "sustainability": "Устойчивость",
+      "transparency": "Прозрачность"
+    }
+  },
+  "sentinel": {
+    "title": "Спутниковая верификация Sentinel-2"
+  },
+  "security": {
+    "title": "Панель безопасности"
+  },
+  "inventory": {
+    "title": "Управление запасами"
+  },
+  "accounting": {
+    "title": "Бухгалтерская система"
+  },
+  "carbon": {
+    "title": "Калькулятор углерода"
+  },
+  "dashboard": {
+    "title": "Панель"
+  },
+  "shop": {
+    "title": "Магазин Econojin"
+  },
+  "library": {
+    "title": "Цифровая библиотека"
+  }
+}
