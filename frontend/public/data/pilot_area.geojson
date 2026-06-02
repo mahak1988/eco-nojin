@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pilot Subbasin 001",
+        "area_ha": 1000,
+        "soil_type": "loam"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              51.2,
+              35.5
+            ],
+            [
+              51.3,
+              35.5
+            ],
+            [
+              51.3,
+              35.6
+            ],
+            [
+              51.2,
+              35.6
+            ],
+            [
+              51.2,
+              35.5
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

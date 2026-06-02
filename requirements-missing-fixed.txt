@@ -1,0 +1,9 @@
+# پکیج‌های مورد نیاز (اصلاح‌شده)
+# برای نصب: pip install -r requirements-missing-fixed.txt
+
+git+https://github.com/KUL-RSDA/AquaCrop.git
+cdsapi
+rioxarray
+geoalchemy2
+prometheus-client
+structlog

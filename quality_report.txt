@@ -1,0 +1,35 @@
+Code Quality Report
+======================================================================
+Your code has been rated at 10.00/10
+
+Statistics:
+  Total lines: 2519
+  Code lines: 1860
+  Comment lines: 200
+  Blank lines: 459
+
+Total Issues: 10
+======================================================================
+
+backend\integrations\sentinel_client.py:
+  Line 129: [WARNING] Function too long (56 lines)
+
+backend\models\carbon\rothc_model.py:
+  Line 103: [WARNING] Function too long (106 lines)
+
+backend\models\crop\aquacrop_integration.py:
+  Line 199: [WARNING] Line too long (122 > 120 characters)
+  Line 202: [WARNING] Function too long (85 lines)
+
+backend\models\erosion\rusle_model.py:
+  Line 123: [WARNING] Function too long (61 lines)
+  Line 186: [WARNING] Function too long (56 lines)
+
+backend\models\hydrology\gr4j_model.py:
+  Line 88: [WARNING] Line too long (123 > 120 characters)
+  Line 48: [WARNING] Function too long (57 lines)
+
+backend\models\soil_water\richards_solver.py:
+  Line 148: [WARNING] Function too long (110 lines)
+  Line 282: [WARNING] Function too long (63 lines)
+

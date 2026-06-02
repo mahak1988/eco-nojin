@@ -1,0 +1,23 @@
+﻿version: "3.9"
+services:
+  postgis:
+    image: postgis/postgis:17-3.5
+    container_name: econojin-postgis
+    environment:
+      POSTGRES_DB: econojin
+      POSTGRES_USER: econojin
+      POSTGRES_PASSWORD: econojin_secret_2026
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U econojin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgis_data:

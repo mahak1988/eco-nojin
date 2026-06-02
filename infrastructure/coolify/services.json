@@ -1,0 +1,26 @@
+{
+  "services": [
+    {
+      "name": "web",
+      "type": "dockerfile",
+      "dockerfile_location": "/apps/web/Dockerfile",
+      "ports": [
+        {
+          "port": 3000,
+          "host": 80
+        }
+      ],
+      "environment_variables": {
+        "NEXT_PUBLIC_SUPABASE_URL": "${SUPABASE_URL}",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}",
+        "NEXT_PUBLIC_STRAPI_URL": "${STRAPI_URL}"
+      },
+      "domains": [
+        {
+          "domain": "yourdomain.com",
+          "https": true
+        }
+      ]
+    }
+  ]
+}

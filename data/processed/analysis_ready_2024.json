@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "created": "2026-05-27T06:12:56.091098",
+    "source_era5": "ERA5-Land (mock/real)",
+    "source_sentinel": "Sentinel-2 (mock query)",
+    "bbox": [
+      51.2,
+      35.5,
+      51.3,
+      35.6
+    ],
+    "period": "2020-2024"
+  },
+  "climate": {
+    "records": []
+  },
+  "imagery": {
+    "scenes_count": 3,
+    "low_cloud_scenes": [
+      "S2A_MSIL2A_20240702_N0510_R079",
+      "S2A_MSIL2A_20241212_N0510_R079",
+      "S2A_MSIL2A_20240216_N0510_R066"
+    ]
+  },
+  "ready_for_models": true
+}

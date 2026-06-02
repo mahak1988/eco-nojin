@@ -1,0 +1,8 @@
+# پکیج‌های مورد نیاز که نصب نشده‌اند
+# برای نصب: pip install -r requirements-missing.txt
+
+aquacrop
+prometheus-client
+rioxarray
+rothc
+structlog

@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  api:
+    build: .
+    image: economugin/api:latest
+    container_name: economugin-api
+    ports: ["${API_PORT:-8000}:8000"]
+    environment:
+      - DB_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+    env_file: .env.production
+    volumes: ["./data:/app/data", "./logs:/app/logs"]
+    depends_on: {db: {condition: service_healthy}, redis: {condition: service_started}}
+    restart: unless-stopped
+
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: economugin-db
+    environment:
+      - POSTGRES_DB=${DB_NAME:-economugin}
+      - POSTGRES_USER=${DB_USER:-economugin}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes: ["pgdata:/var/lib/postgresql/data", "./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro"]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-economugin}"], interval: "10s", timeout: "5s", retries: 5}
+
+  redis:
+    image: redis:7-alpine
+    container_name: economugin-redis
+    command: redis-server --appendonly yes --maxmemory 256mb
+    volumes: ["redisdata:/data"]
+
+volumes: {pgdata: {}, redisdata: {}}

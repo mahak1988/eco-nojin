@@ -1,0 +1,20 @@
+{
+  "app.title": "اکو نوژین",
+  "nav.dashboard": "داشبورد",
+  "nav.login": "ورود",
+  "nav.logout": "خروج",
+  "calendar.title": "تقویم",
+  "calendar.new": "رویداد جدید",
+  "calendar.save": "ذخیره رویداد",
+  "gis.title": "نقشه GIS",
+  "chat.placeholder": "سوال خود را بپرسید...",
+  "chat.send": "ارسال",
+  "simulation.run": "اجرای شبیه‌سازی",
+  "admin.title": "پنل مدیریت",
+  "otp.request": "دریافت کد",
+  "otp.verify": "تأیید و ورود",
+  "common.refresh": "بروزرسانی",
+  "common.export": "خروجی JSON",
+  "common.new": "جدید",
+  "common.search": "جستجو"
+}

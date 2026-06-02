@@ -1,0 +1,163 @@
+version: "3.9"
+
+services:
+  # PostgreSQL + PostGIS
+  db:
+    image: postgis/postgis:17-3.5
+    container_name: econojin-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: econojin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: econojin_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - econet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis برای Celery و کش
+  redis:
+    image: redis:7-alpine
+    container_name: econojin-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - econet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO برای ذخیره‌سازی فایل‌های حجیم
+  minio:
+    image: minio/minio:latest
+    container_name: econojin-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: econojin
+      MINIO_ROOT_PASSWORD: econojin_secret_2026
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    volumes:
+      - miniodata:/data
+    networks:
+      - econet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: econojin-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:econojin_pass@db:5432/econojin
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=econojin
+      - MINIO_SECRET_KEY=econojin_secret_2026
+      - ENABLE_DATABASE=true
+      - DEBUG=false
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      minio: { condition: service_healthy }
+    networks:
+      - econet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Celery Worker برای وظایف پس‌زمینه
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: econojin-celery
+    restart: unless-stopped
+    command: celery -A core.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:econojin_pass@db:5432/econojin
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=econojin
+      - MINIO_SECRET_KEY=econojin_secret_2026
+    depends_on:
+      backend: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    networks:
+      - econet
+
+  # Celery Beat برای وظایف زمان‌بندی‌شده (مثل NDVI هر ۵ روز)
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: econojin-celery-beat
+    restart: unless-stopped
+    command: celery -A core.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:econojin_pass@db:5432/econojin
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis: { condition: service_healthy }
+    networks:
+      - econet
+
+  # Frontend React + Nginx
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: econojin-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend: { condition: service_healthy }
+    networks:
+      - econet
+
+  # Nginx به عنوان Reverse Proxy (اختیاری - اگر بخواهید همه چیز روی یک پورت باشد)
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: econojin-nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - backend
+  #     - frontend
+  #   networks:
+  #     - econet
+
+networks:
+  econet:
+    driver: bridge
+
+volumes:
+  pgdata:
+  miniodata:

@@ -1,0 +1,9 @@
+packages:
+  - '.'
+
+allowBuilds:
+  sharp: set this to true or false
+
+# اجازه به sharp برای اجرای build scripts
+onlyBuiltDependencies:
+  - sharp

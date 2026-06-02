@@ -1,0 +1,121 @@
+{
+  "common": {
+    "appName": "إكونوجين",
+    "tagline": "منصة الكربون العلمية",
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "calculator": "الحاسبة",
+    "map": "الخريطة",
+    "shop": "المتجر",
+    "library": "المكتبة",
+    "about": "من نحن",
+    "contact": "اتصل بنا",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "إنشاء حساب",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
+    "policy": "السياسة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "language": "اللغة",
+    "theme": "السمة",
+    "dark": "داكن",
+    "light": "فاتح"
+  },
+  "auth": {
+    "welcomeBack": "مرحباً بعودتك",
+    "loginSubtitle": "سجل الدخول للمتابعة",
+    "registerSubtitle": "أنشئ حساباً جديداً",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "loginButton": "تسجيل الدخول",
+    "registerButton": "إنشاء حساب",
+    "orContinueWith": "أو تابع مع",
+    "wallet": "المحفظة"
+  },
+  "maahak": {
+    "title": "وحدة ماهك الذكية",
+    "subtitle": "مساعد الذكاء الاصطناعي",
+    "greeting": "مرحباً! أنا ماهك",
+    "helpText": "كيف يمكنني مساعدتك اليوم؟",
+    "askQuestion": "اسألني أي شيء...",
+    "systemStatus": "حالة النظام",
+    "allSystemsNormal": "جميع الأنظمة طبيعية",
+    "alerts": "التنبيهات",
+    "tasks": "المهام",
+    "insights": "الرؤى"
+  },
+  "pages": {
+    "about": {
+      "title": "عن إكونوجين",
+      "mission": "مهمتنا",
+      "vision": "رؤيتنا",
+      "team": "فريقنا",
+      "story": "قصتنا"
+    },
+    "contact": {
+      "title": "اتصل بنا",
+      "subtitle": "يسعدنا سماع رأيك",
+      "formTitle": "أرسل رسالة",
+      "name": "اسمك",
+      "email": "البريد",
+      "subject": "الموضوع",
+      "message": "الرسالة",
+      "send": "إرسال"
+    },
+    "privacy": {
+      "title": "سياسة الخصوصية",
+      "lastUpdated": "آخر تحديث"
+    },
+    "terms": {
+      "title": "الشروط والأحكام",
+      "acceptance": "قبول الشروط"
+    },
+    "policy": {
+      "title": "سياستنا",
+      "sustainability": "الاستدامة",
+      "transparency": "الشفافية"
+    }
+  },
+  "sentinel": {
+    "title": "التحقق بالأقمار الصناعية",
+    "subtitle": "التحقق من الأنشطة بالصور الفضائية"
+  },
+  "security": {
+    "title": "لوحة الأمان",
+    "subtitle": "مراقبة أمان المنصة"
+  },
+  "inventory": {
+    "title": "إدارة المخزون"
+  },
+  "accounting": {
+    "title": "نظام المحاسبة"
+  },
+  "carbon": {
+    "title": "حاسبة الكربون"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم"
+  },
+  "shop": {
+    "title": "متجر إكونوجين"
+  },
+  "library": {
+    "title": "المكتبة الرقمية"
+  }
+}

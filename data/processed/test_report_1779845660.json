@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-05-27T05:04:20.772009",
+  "tests": [
+    {
+      "name": "health",
+      "status": 200,
+      "time_ms": 4.8,
+      "passed": true
+    },
+    {
+      "name": "models",
+      "status": 200,
+      "time_ms": 2.3,
+      "passed": true
+    },
+    {
+      "name": "register",
+      "status": 200,
+      "time_ms": 2.7,
+      "passed": true
+    },
+    {
+      "name": "simulate",
+      "status": 200,
+      "time_ms": 3.0,
+      "passed": true
+    },
+    {
+      "name": "irrigation",
+      "status": 200,
+      "time_ms": 2.5,
+      "passed": true
+    }
+  ]
+}

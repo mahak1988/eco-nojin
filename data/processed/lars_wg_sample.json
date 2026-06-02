@@ -1,0 +1,11 @@
+{
+  "model": "LARS-WG",
+  "records": 30,
+  "sample": {
+    "date": "2024-01-01",
+    "temp_max": 19.7,
+    "temp_min": 10.1,
+    "precip_mm": 6.3,
+    "solar_rad": 13.6
+  }
+}

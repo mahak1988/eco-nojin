@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  openvpn:
+    image: kylemanna/openvpn:latest
+    container_name: openvpn
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "1194:1194/udp"
+    volumes:
+      - ./ovpn-data:/etc/openvpn
+      - ./server.conf:/etc/openvpn/server.conf:ro
+    environment:
+      - OVPN_SERVER=udp://0.0.0.0:1194
+      - OVPN_NETWORK=10.8.0.0/24
+      - OVPN_PROTO=udp
+      - OVPN_DNS=1.1.1.1
+      - OVPN_DEFROUTE=1
+      - OVPN_NAT=1

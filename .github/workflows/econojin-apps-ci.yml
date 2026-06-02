@@ -1,0 +1,65 @@
+name: Econojin Apps CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: pytest tests/test_api_core.py -v
+        env:
+          REQUIRE_AUTH_FOR_WRITES: "false"
+
+  web-typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile || pnpm install
+        working-directory: .
+      - run: pnpm --filter @econojin/web type-check
+
+  playwright:
+    runs-on: ubuntu-latest
+    needs: [api-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: uvicorn api.main:app --host 127.0.0.1 --port 8000 &
+        env:
+          REQUIRE_AUTH_FOR_WRITES: "false"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: pnpm install
+      - run: pnpm --filter @econojin/web exec playwright install chromium --with-deps
+        continue-on-error: true
+      - run: pnpm --filter @econojin/web test:e2e
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        continue-on-error: true

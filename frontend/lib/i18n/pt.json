@@ -1,0 +1,119 @@
+{
+  "common": {
+    "appName": "Econojin",
+    "tagline": "Plataforma Científica de Carbono",
+    "home": "Início",
+    "dashboard": "Painel",
+    "calculator": "Calculadora",
+    "map": "Mapa",
+    "shop": "Loja",
+    "library": "Biblioteca",
+    "about": "Sobre",
+    "contact": "Contato",
+    "login": "Entrar",
+    "logout": "Sair",
+    "register": "Registrar",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "policy": "Política",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Pesquisar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "language": "Idioma",
+    "theme": "Tema",
+    "dark": "Escuro",
+    "light": "Claro"
+  },
+  "auth": {
+    "welcomeBack": "Bem-vindo de volta",
+    "loginSubtitle": "Entre para continuar",
+    "registerSubtitle": "Criar nova conta",
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "fullName": "Nome completo",
+    "forgotPassword": "Esqueceu a senha?",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?",
+    "loginButton": "Entrar",
+    "registerButton": "Criar conta",
+    "orContinueWith": "Ou continue com",
+    "wallet": "Carteira"
+  },
+  "maahak": {
+    "title": "Console Inteligente Maahak",
+    "subtitle": "Assistente IA Econojin",
+    "greeting": "Olá! Eu sou Maahak",
+    "helpText": "Como posso ajudar hoje?",
+    "askQuestion": "Pergunte-me qualquer coisa...",
+    "systemStatus": "Status do sistema",
+    "allSystemsNormal": "Todos os sistemas normais",
+    "alerts": "Alertas",
+    "tasks": "Tarefas",
+    "insights": "Insights"
+  },
+  "pages": {
+    "about": {
+      "title": "Sobre a Econojin",
+      "mission": "Nossa Missão",
+      "vision": "Nossa Visão",
+      "team": "Nossa Equipe",
+      "story": "Nossa História"
+    },
+    "contact": {
+      "title": "Fale Conosco",
+      "subtitle": "Adoraríamos ouvir de você",
+      "formTitle": "Enviar Mensagem",
+      "name": "Seu Nome",
+      "email": "E-mail",
+      "subject": "Assunto",
+      "message": "Mensagem",
+      "send": "Enviar"
+    },
+    "privacy": {
+      "title": "Política de Privacidade",
+      "lastUpdated": "Última Atualização"
+    },
+    "terms": {
+      "title": "Termos e Condições",
+      "acceptance": "Aceitação dos Termos"
+    },
+    "policy": {
+      "title": "Nossa Política",
+      "sustainability": "Sustentabilidade",
+      "transparency": "Transparência"
+    }
+  },
+  "sentinel": {
+    "title": "Verificação Satelital Sentinel-2"
+  },
+  "security": {
+    "title": "Painel de Segurança"
+  },
+  "inventory": {
+    "title": "Gestão de Inventário"
+  },
+  "accounting": {
+    "title": "Sistema de Contabilidade"
+  },
+  "carbon": {
+    "title": "Calculadora de Carbono"
+  },
+  "dashboard": {
+    "title": "Painel"
+  },
+  "shop": {
+    "title": "Loja Econojin"
+  },
+  "library": {
+    "title": "Biblioteca Digital"
+  }
+}
