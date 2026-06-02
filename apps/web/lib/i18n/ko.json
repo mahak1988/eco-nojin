@@ -1,0 +1,119 @@
+{
+  "common": {
+    "appName": "Econojin",
+    "tagline": "과학적 탄소 플랫폼",
+    "home": "홈",
+    "dashboard": "대시보드",
+    "calculator": "계산기",
+    "map": "지도",
+    "shop": "상점",
+    "library": "도서관",
+    "about": "소개",
+    "contact": "연락처",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "register": "회원가입",
+    "profile": "프로필",
+    "settings": "설정",
+    "privacy": "개인정보",
+    "terms": "약관",
+    "policy": "정책",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "create": "생성",
+    "search": "검색",
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "language": "언어",
+    "theme": "테마",
+    "dark": "다크",
+    "light": "라이트"
+  },
+  "auth": {
+    "welcomeBack": "다시 오신 것을 환영합니다",
+    "loginSubtitle": "계속하려면 로그인하세요",
+    "registerSubtitle": "새 계정 만들기",
+    "email": "이메일",
+    "password": "비밀번호",
+    "confirmPassword": "비밀번호 확인",
+    "fullName": "성명",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "noAccount": "계정이 없으신가요?",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "loginButton": "로그인",
+    "registerButton": "계정 만들기",
+    "orContinueWith": "또는 계속하기",
+    "wallet": "지갑"
+  },
+  "maahak": {
+    "title": "마학 스마트 콘솔",
+    "subtitle": "Econojin AI 어시스턴트",
+    "greeting": "안녕하세요! 마학입니다",
+    "helpText": "오늘 무엇을 도와드릴까요?",
+    "askQuestion": "무엇이든 물어보세요...",
+    "systemStatus": "시스템 상태",
+    "allSystemsNormal": "모든 시스템 정상",
+    "alerts": "알림",
+    "tasks": "작업",
+    "insights": "인사이트"
+  },
+  "pages": {
+    "about": {
+      "title": "Econojin 소개",
+      "mission": "우리의 미션",
+      "vision": "우리의 비전",
+      "team": "우리 팀",
+      "story": "우리의 이야기"
+    },
+    "contact": {
+      "title": "연락처",
+      "subtitle": "여러분의 의견을 듣고 싶습니다",
+      "formTitle": "메시지 보내기",
+      "name": "이름",
+      "email": "이메일",
+      "subject": "제목",
+      "message": "메시지",
+      "send": "보내기"
+    },
+    "privacy": {
+      "title": "개인정보 보호정책",
+      "lastUpdated": "마지막 업데이트"
+    },
+    "terms": {
+      "title": "이용약관",
+      "acceptance": "약관 동의"
+    },
+    "policy": {
+      "title": "우리의 정책",
+      "sustainability": "지속가능성",
+      "transparency": "투명성"
+    }
+  },
+  "sentinel": {
+    "title": "Sentinel-2 위성 검증"
+  },
+  "security": {
+    "title": "보안 대시보드"
+  },
+  "inventory": {
+    "title": "재고 관리"
+  },
+  "accounting": {
+    "title": "회계 시스템"
+  },
+  "carbon": {
+    "title": "탄소 계산기"
+  },
+  "dashboard": {
+    "title": "대시보드"
+  },
+  "shop": {
+    "title": "Econojin 상점"
+  },
+  "library": {
+    "title": "디지털 도서관"
+  }
+}
