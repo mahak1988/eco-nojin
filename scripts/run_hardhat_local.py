@@ -6,12 +6,13 @@ r"""
 
 import subprocess
 import sys
-import time
 import threading
+import time
 from pathlib import Path
 
 PROJECT_ROOT = Path(r"D:\econojin.com")
 CONTRACTS_DIR = PROJECT_ROOT / "contracts"
+
 
 def run_node():
     """اجرای hardhat node در پس‌زمینه"""
@@ -19,32 +20,33 @@ def run_node():
     subprocess.run(
         ["npx", "hardhat", "node"],
         cwd=CONTRACTS_DIR,
-    # SECURITY WARNING: Consider shell=False for better security
+        # SECURITY WARNING: Consider shell=False for better security
         shell=True,
     )
 
+
 def main():
-    print("="*70)
+    print("=" * 70)
     print("⛓️ Hardhat Local Deployment")
-    print("="*70)
-    
+    print("=" * 70)
+
     # Start node in background
     node_thread = threading.Thread(target=run_node, daemon=True)
     node_thread.start()
-    
+
     # Wait for node to start
     print("\n⏳ Waiting for node to start...")
     time.sleep(5)
-    
+
     # Deploy contracts
     print("\n📦 Deploying contracts...")
     result = subprocess.run(
         ["npx", "hardhat", "run", "scripts/deploy_local.js", "--network", "localhost"],
         cwd=CONTRACTS_DIR,
-    # SECURITY WARNING: Consider shell=False for better security
+        # SECURITY WARNING: Consider shell=False for better security
         shell=True,
     )
-    
+
     if result.returncode == 0:
         print("\n✅ Deployment successful!")
         print("\n🎯 Next steps:")
@@ -55,6 +57,7 @@ def main():
     else:
         print("\n❌ Deployment failed!")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

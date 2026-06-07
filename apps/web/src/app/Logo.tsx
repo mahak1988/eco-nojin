@@ -1,3 +1,4 @@
+import React from 'react';
 import Link from 'next/link';
 
 interface LogoProps {
@@ -6,7 +7,7 @@ interface LogoProps {
   showTagline?: boolean;
 }
 
-export default function Logo({ locale = 'fa', size = 'md', showTagline = false }: LogoProps) {
+function Logo({ locale = 'fa', size = 'md', showTagline = false }: LogoProps) {
   const sizes = {
     sm: { text: 'text-2xl', tag: 'text-xs', icon: 'w-6 h-6' },
     md: { text: 'text-3xl', tag: 'text-sm', icon: 'w-8 h-8' },
@@ -63,3 +64,6 @@ export default function Logo({ locale = 'fa', size = 'md', showTagline = false }
     </Link>
   );
 }
+
+
+export default React.memo(Logo);

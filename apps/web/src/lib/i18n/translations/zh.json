@@ -1,0 +1,47 @@
+{
+  "common": {
+    "home": "首页",
+    "about": "关于",
+    "contact": "联系",
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出",
+    "search": "搜索",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "submit": "提交",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步"
+  },
+  "navbar": {
+    "home": "首页",
+    "academy": "学院",
+    "gis": "地理信息系统",
+    "weather": "天气",
+    "drought": "干旱",
+    "iot": "物联网",
+    "ecocoin": "EcoCoin",
+    "mrv": "MRV",
+    "soil_water": "土壤与水",
+    "sentinel": "卫星",
+    "ai": "AI助手"
+  },
+  "weather": {
+    "title": "天气与气候",
+    "subtitle": "天气预报和气候数据分析",
+    "current_weather": "当前天气",
+    "forecast_7days": "7天预报",
+    "temperature": "温度",
+    "humidity": "湿度",
+    "wind_speed": "风速",
+    "precipitation": "降水量",
+    "cloud_cover": "云量",
+    "pressure": "气压"
+  }
+}

@@ -7,15 +7,17 @@ Supports wflow, GR4J, and other open-source models.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Optional
+
 import numpy as np
 import xarray as xr
-from pathlib import Path
 
 
 @dataclass
 class BasinConfig:
     """Configuration for basin hydrology model"""
+
     basin_id: str
     dem_path: str  # DEM file path
     soil_path: str  # Soil properties file
@@ -23,16 +25,17 @@ class BasinConfig:
     climate_source: str  # 'era5', 'chirps', etc.
     start_date: str
     end_date: str
-    timestep: str = '1D'  # '1H', '1D', '1M'
+    timestep: str = "1D"  # '1H', '1D', '1M'
 
     # Model parameters
-    model_type: str = 'wflow'  # 'wflow', 'gr4j', 'hbv'
+    model_type: str = "wflow"  # 'wflow', 'gr4j', 'hbv'
     calibration_params: Optional[Dict] = None
 
 
 @dataclass
 class HydrologyOutput:
     """Standardized output from hydrology model"""
+
     basin_id: str
     model_type: str
     start_date: str
@@ -66,10 +69,7 @@ class BasinModel(ABC):
 
     @abstractmethod
     def calibrate(
-        self,
-        observed_discharge: np.ndarray,
-        param_bounds: Dict[str, tuple],
-        metric: str = 'NSE'
+        self, observed_discharge: np.ndarray, param_bounds: Dict[str, tuple], metric: str = "NSE"
     ) -> Dict[str, float]:
         """Calibrate model parameters against observations"""
         pass
@@ -102,33 +102,33 @@ class WflowModel(BasinModel):
         self.config = config
 
         try:
-            from hydromt_wflow import WflowModel as HydroMTWflow
             from hydromt.data_catalog import DataCatalog
+            from hydromt_wflow import WflowModel as HydroMTWflow
 
             # Initialize data catalog with open data sources
-            data_catalog = DataCatalog(data_libs=['artifact_data'])
+            data_catalog = DataCatalog(data_libs=["artifact_data"])
 
             # Build model from static and dynamic data
             self.model = HydroMTWflow(
-                root=config.dem_path.replace('/dem.nc', ''),
-                mode='w',
-                data_libs=['wflow', 'artifact_data']
+                root=config.dem_path.replace("/dem.nc", ""),
+                mode="w",
+                data_libs=["wflow", "artifact_data"],
             )
 
             # Setup model geometry from DEM
             self.model.setup_basemaps(
                 basin_idx=config.basin_id,
-                hydrography_fn='merit_hydro',
-                basin_index_fn='merit_hydro_index'
+                hydrography_fn="merit_hydro",
+                basin_index_fn="merit_hydro_index",
             )
 
             # Add static maps (soil, landcover)
-            self.model.setup_soilmaps(soilgrids_fn='soilgrids')
-            self.model.setup_landuse(landuse_fn='globcover')
+            self.model.setup_soilmaps(soilgrids_fn="soilgrids")
+            self.model.setup_landuse(landuse_fn="globcover")
 
             # Add climate forcing
             self.model.setup_precip_forcing(precip_fn=config.climate_source)
-            self.model.setup_temp_forcing(temp_fn='era5')
+            self.model.setup_temp_forcing(temp_fn="era5")
 
             # Set model parameters
             if config.calibration_params:
@@ -142,9 +142,8 @@ class WflowModel(BasinModel):
     def _setup_gr4j_fallback(self, config: BasinConfig) -> None:
         """Fallback setup using GR4J conceptual model"""
         from .gr4j_model import GR4JModel
-        self.model = GR4JModel(
-            x1=300, x2=0.5, x3=20, x4=1.5  # Default GR4J parameters
-        )
+
+        self.model = GR4JModel(x1=300, x2=0.5, x3=20, x4=1.5)  # Default GR4J parameters
         self.config = config
 
     def run(self) -> HydrologyOutput:
@@ -153,7 +152,7 @@ class WflowModel(BasinModel):
             raise RuntimeError("Model not setup. Call setup() first.")
 
         # Run wflow or fallback GR4J
-        if hasattr(self.model, 'run_model'):
+        if hasattr(self.model, "run_model"):
             # wflow execution
             self.model.run_model()
             results = self.model.results
@@ -163,7 +162,7 @@ class WflowModel(BasinModel):
                 precip=self._load_precip(),
                 pet=self._load_pet(),
                 start_date=self.config.start_date,
-                end_date=self.config.end_date
+                end_date=self.config.end_date,
             )
 
         return HydrologyOutput(
@@ -171,13 +170,13 @@ class WflowModel(BasinModel):
             model_type=self.config.model_type,
             start_date=self.config.start_date,
             end_date=self.config.end_date,
-            discharge=results.get('discharge', np.array([])),
-            evapotranspiration=results.get('et', np.array([])),
-            soil_moisture=results.get('soil_moisture', np.array([])),
-            metrics=results.get('metrics', {})
+            discharge=results.get("discharge", np.array([])),
+            evapotranspiration=results.get("et", np.array([])),
+            soil_moisture=results.get("soil_moisture", np.array([])),
+            metrics=results.get("metrics", {}),
         )
 
-    def calibrate(self, observed_discharge, param_bounds, metric='NSE'):
+    def calibrate(self, observed_discharge, param_bounds, metric="NSE"):
         """Calibrate model using scipy optimization"""
         from scipy.optimize import differential_evolution
 
@@ -189,9 +188,9 @@ class WflowModel(BasinModel):
             output = self.run()
 
             # Calculate metric
-            if metric == 'NSE':
+            if metric == "NSE":
                 return -self._calculate_nse(output.discharge, observed_discharge)
-            elif metric == 'RMSE':
+            elif metric == "RMSE":
                 return self._calculate_rmse(output.discharge, observed_discharge)
             else:
                 return -self._calculate_nse(output.discharge, observed_discharge)
@@ -205,11 +204,11 @@ class WflowModel(BasinModel):
     def _calculate_nse(self, simulated, observed):
         """Calculate Nash-Sutcliffe Efficiency"""
         obs_mean = np.mean(observed)
-        return 1 - np.sum((simulated - observed)**2) / np.sum((observed - obs_mean)**2)
+        return 1 - np.sum((simulated - observed) ** 2) / np.sum((observed - obs_mean) ** 2)
 
     def _calculate_rmse(self, simulated, observed):
         """Calculate Root Mean Square Error"""
-        return np.sqrt(np.mean((simulated - observed)**2))
+        return np.sqrt(np.mean((simulated - observed) ** 2))
 
     def _load_precip(self):
         """Load precipitation data from configured source"""
@@ -222,6 +221,6 @@ class WflowModel(BasinModel):
 
     def get_spatial_output(self, variable: str):
         """Get spatial output raster"""
-        if self.model and hasattr(self.model, 'results'):
+        if self.model and hasattr(self.model, "results"):
             return self.model.results.get(variable)
         return None

@@ -1,12 +1,15 @@
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.modules.store.models import StoreItem
 from api.modules.store.schemas import StoreItemCreate, StoreItemUpdate
 
 
 async def list_items(db: AsyncSession, skip: int = 0, limit: int = 50):
     total = (await db.execute(select(func.count()).select_from(StoreItem))).scalar_one()
-    result = await db.execute(select(StoreItem).offset(skip).limit(limit).order_by(StoreItem.id.desc()))
+    result = await db.execute(
+        select(StoreItem).offset(skip).limit(limit).order_by(StoreItem.id.desc())
+    )
     return list(result.scalars().all()), total
 
 

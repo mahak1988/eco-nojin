@@ -5,9 +5,9 @@ Scientific platform for ecological modeling + Gaia Protocol integration
 """
 
 import sys
-from pathlib import Path
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 
 # افزودن مسیر پروژه به sys.path
 _project_root = Path(__file__).parent.parent.parent
@@ -19,21 +19,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 # Import routers
-from scripts.api.routers import auth, farmer
-from scripts.api.routers import gaia
+from scripts.api.routers import auth, farmer, gaia
 
 # Import logger
 try:
     from scripts.core.logger import UnifiedLogger
+
     logger = UnifiedLogger.get_logger(__name__)
 except Exception:
     import logging
+
     logger = logging.getLogger(__name__)
 
 
 # ============================================================================
 # Lifespan (startup/shutdown events)
 # ============================================================================
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -124,6 +126,7 @@ app.add_middleware(
 # Global Exception Handler
 # ============================================================================
 
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """مدیریت خطاهای پیش‌بینی نشده"""
@@ -133,7 +136,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={
             "detail": "Internal server error",
             "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
+        },
     )
 
 
@@ -154,6 +157,7 @@ app.include_router(gaia.router, tags=["Gaia Protocol"])
 # ============================================================================
 # Root & Health Endpoints
 # ============================================================================
+
 
 @app.get("/", tags=["default"])
 async def root():
@@ -224,6 +228,7 @@ async def list_models():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "scripts.api.main:app",
         host="0.0.0.0",

@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "badge": "土地恢复科学平台",
+    "title": "Econojin",
+    "subtitle": "综合智能管理",
+    "description": "通过水文学、碳建模、遥感和人工智能恢复干旱和半干旱景观",
+    "startSimulation": "开始模拟",
+    "freeEducation": "免费教育",
+    "userRating": "用户评分",
+    "activeUsers": "活跃用户",
+    "secure": "安全可靠"
+  },
+  "stats": {
+    "hectares": "监测公顷",
+    "carbon": "吸收二氧化碳吨",
+    "farmers": "活跃农民",
+    "basins": "流域盆地"
+  },
+  "modules": {
+    "scientific": "科学模块",
+    "scientificDesc": "干旱和半干旱土地恢复的专业工具",
+    "community": "社区与服务",
+    "communityDesc": "可持续农民所需的一切",
+    "details": "查看详情",
+    "projects": "成功项目",
+    "projectsDesc": "干旱土地恢复示例"
+  },
+  "features": {
+    "free": "免费开放",
+    "freeDesc": "所有科学服务免费",
+    "ai": "人工智能",
+    "aiDesc": "先进模型的智能分析",
+    "secure": "安全可靠",
+    "secureDesc": "保护您的研究数据",
+    "global": "全球访问",
+    "globalDesc": "从世界任何地方访问"
+  },
+  "nav": {
+    "home": "首页",
+    "scientific": "科学模块",
+    "community": "社区服务",
+    "education": "教育",
+    "about": "关于",
+    "contact": "联系",
+    "login": "登录",
+    "register": "免费注册",
+    "language": "语言"
+  }
+}

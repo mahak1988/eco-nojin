@@ -1,10 +1,13 @@
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.modules.farmer.models import Farmer
 from api.modules.farmer.schemas import FarmerCreate, FarmerUpdate
 
 
-async def list_farmers(db: AsyncSession, skip: int = 0, limit: int = 100) -> tuple[list[Farmer], int]:
+async def list_farmers(
+    db: AsyncSession, skip: int = 0, limit: int = 100
+) -> tuple[list[Farmer], int]:
     count_result = await db.execute(select(func.count()).select_from(Farmer))
     total = count_result.scalar_one()
     result = await db.execute(select(Farmer).offset(skip).limit(limit).order_by(Farmer.id.desc()))

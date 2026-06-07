@@ -9,19 +9,22 @@ Reference: Renard et al. (1997), "Predicting soil erosion by water"
 
 import numpy as np
 import xarray as xr
+
 try:
     import rioxarray as rxr
+
     GIS_AVAILABLE = True
 except ImportError:
     GIS_AVAILABLE = False
+import warnings
 from pathlib import Path
 from typing import Dict, Optional, Tuple
-import warnings
 
 # Optional GIS dependencies
 try:
     import geopandas as gpd
     from rasterio import features
+
     GIS_AVAILABLE = True
 except ImportError:
     GIS_AVAILABLE = False
@@ -33,8 +36,7 @@ class RUSLEFactors:
 
     @staticmethod
     def calculate_r_factor(
-        precip_data: xr.DataArray,  # Monthly precipitation [mm]
-        method: str = 'arnoldus'
+        precip_data: xr.DataArray, method: str = "arnoldus"  # Monthly precipitation [mm]
     ) -> xr.DataArray:
         """
         Calculate rainfall erosivity factor R [MJ mm / ha h yr].
@@ -51,30 +53,29 @@ class RUSLEFactors:
         r_factor : xr.DataArray
             R factor map [MJ mm / ha h yr]
         """
-        if method == 'arnoldus':
+        if method == "arnoldus":
             # Arnoldus (1977) method for monthly data
             # R = sum(1.735 * 10^(1.5*log10(Pi^2/P) - 0.8188))
             monthly = precip_data
-            annual = monthly.sum(dim='time')
+            annual = monthly.sum(dim="time")
 
             r_monthly = 1.735 * 10 ** (1.5 * np.log10(monthly**2 / annual) - 0.8188)
-            return r_monthly.sum(dim='time').clip(0)
+            return r_monthly.sum(dim="time").clip(0)
 
-        elif method == 'yu_rosewell':
+        elif method == "yu_rosewell":
             # Yu & Rosewell (1996) for daily data
             # R = alpha * sum(Pi^1.5) where Pi is daily rainfall
             daily = precip_data
-            return (1.5 * (daily ** 1.5)).sum(dim='time') * 0.394
+            return (1.5 * (daily**1.5)).sum(dim="time") * 0.394
 
         else:  # simple
             # Simplified: R = 0.01 * P^1.5 where P is annual precip
-            annual = precip_data.sum(dim='time')
-            return 0.01 * annual ** 1.5
+            annual = precip_data.sum(dim="time")
+            return 0.01 * annual**1.5
 
     @staticmethod
     def calculate_k_factor(
-        soil_data: xr.Dataset,  # From SoilGrids
-        method: str = 'erosion_nomograph'
+        soil_data: xr.Dataset, method: str = "erosion_nomograph"  # From SoilGrids
     ) -> xr.DataArray:
         """
         Calculate soil erodibility factor K [t ha h / ha MJ mm].
@@ -92,12 +93,12 @@ class RUSLEFactors:
             K factor map
         """
         # Extract soil properties (convert to % if needed)
-        sand = soil_data['sand_percent']  # %
-        silt = soil_data['silt_percent']  # %
-        clay = soil_data['clay_percent']  # %
-        soc = soil_data['soc_percent']    # %
+        sand = soil_data["sand_percent"]  # %
+        silt = soil_data["silt_percent"]  # %
+        clay = soil_data["clay_percent"]  # %
+        soc = soil_data["soc_percent"]  # %
 
-        if method == 'erosion_nomograph':
+        if method == "erosion_nomograph":
             # Wischmeier & Smith (1978) nomograph equation
             # Simplified for Python implementation
 
@@ -105,9 +106,11 @@ class RUSLEFactors:
             m = (silt + sand * 0.1) * (100 - clay)
 
             # K calculation
-            k = (2.1e-4 * m**1.14 * (12 - soc) +
-                 3.25 * (2 - soil_structure_code) +
-                 2.5 * (permeability_code - 3)) / 100
+            k = (
+                2.1e-4 * m**1.14 * (12 - soc)
+                + 3.25 * (2 - soil_structure_code)
+                + 2.5 * (permeability_code - 3)
+            ) / 100
 
             # Convert to SI units if needed
             return k.clip(0, 0.7)
@@ -123,7 +126,7 @@ class RUSLEFactors:
     def calculate_ls_factor(
         dem: xr.DataArray,  # Digital elevation model [m]
         resolution_m: float,  # Pixel resolution [m]
-        method: str = 'desmet_govers'
+        method: str = "desmet_govers",
     ) -> xr.DataArray:
         """
         Calculate slope length-steepness factor LS.
@@ -147,7 +150,7 @@ class RUSLEFactors:
         slope_rad = np.arctan(np.sqrt(dx**2 + dy**2))
         slope_deg = np.degrees(slope_rad)
 
-        if method == 'desmet_govers':
+        if method == "desmet_govers":
             # Desmet & Govers (1996) for complex terrain
 
             # Calculate flow accumulation (simplified)
@@ -158,12 +161,13 @@ class RUSLEFactors:
             lambda_val = flow_acc * resolution_m
 
             # Exponent m based on slope
-            beta = (np.sin(slope_rad) / 0.0896) / (3 * np.sin(slope_rad)**0.8 + 0.56)
+            beta = (np.sin(slope_rad) / 0.0896) / (3 * np.sin(slope_rad) ** 0.8 + 0.56)
             m = beta / (1 + beta)
 
             # LS calculation
-            ls = (lambda_val / 22.13)**m * (65.41 * np.sin(slope_rad)**2 +
-                                            4.56 * np.sin(slope_rad) + 0.065)
+            ls = (lambda_val / 22.13) ** m * (
+                65.41 * np.sin(slope_rad) ** 2 + 4.56 * np.sin(slope_rad) + 0.065
+            )
 
             return xr.DataArray(ls, coords=dem.coords, dims=dem.dims)
 
@@ -186,7 +190,7 @@ class RUSLEFactors:
     def calculate_c_factor(
         landcover: xr.DataArray,
         ndvi: Optional[xr.DataArray] = None,
-        crop_type: Optional[str] = None
+        crop_type: Optional[str] = None,
     ) -> xr.DataArray:
         """
         Calculate cover-management factor C.
@@ -207,12 +211,12 @@ class RUSLEFactors:
         """
         # Default C values by land cover class
         c_defaults = {
-            'forest': 0.01,
-            'grassland': 0.05,
-            'cropland': 0.3,
-            'bare_soil': 0.8,
-            'urban': 0.01,
-            'water': 0.0
+            "forest": 0.01,
+            "grassland": 0.05,
+            "cropland": 0.3,
+            "bare_soil": 0.8,
+            "urban": 0.01,
+            "water": 0.0,
         }
 
         if ndvi is not None:
@@ -225,11 +229,11 @@ class RUSLEFactors:
         elif crop_type:
             # Crop-specific C factor
             crop_c = {
-                'wheat': 0.35,
-                'maize': 0.30,
-                'alfalfa': 0.05,
-                'fallow': 0.80,
-                'cover_crop': 0.10
+                "wheat": 0.35,
+                "maize": 0.30,
+                "alfalfa": 0.05,
+                "fallow": 0.80,
+                "cover_crop": 0.10,
             }
             return xr.full_like(landcover, crop_c.get(crop_type, 0.3))
 
@@ -243,7 +247,7 @@ class RUSLEFactors:
     @staticmethod
     def calculate_p_factor(
         interventions: xr.DataArray,  # Conservation practice map
-        slope: xr.DataArray  # Slope [degrees]
+        slope: xr.DataArray,  # Slope [degrees]
     ) -> xr.DataArray:
         """
         Calculate support practice factor P.
@@ -262,12 +266,12 @@ class RUSLEFactors:
         """
         # Default P values by practice
         p_defaults = {
-            'none': 1.0,
-            'contour': 0.5,
-            'terraces': 0.2,
-            'strip_cropping': 0.4,
-            'grassed_waterway': 0.3,
-            'check_dam': 0.1
+            "none": 1.0,
+            "contour": 0.5,
+            "terraces": 0.2,
+            "strip_cropping": 0.4,
+            "grassed_waterway": 0.3,
+            "check_dam": 0.1,
         }
 
         p_map = xr.full_like(interventions, 1.0, dtype=float)
@@ -275,9 +279,9 @@ class RUSLEFactors:
             p_map = p_map.where(interventions != practice, p_val)
 
         # Slope adjustment for contouring
-        slope_adj = xr.where(slope < 5, 1.0,
-                           xr.where(slope < 10, 0.8,
-                                  xr.where(slope < 20, 0.6, 0.5)))
+        slope_adj = xr.where(
+            slope < 5, 1.0, xr.where(slope < 10, 0.8, xr.where(slope < 20, 0.6, 0.5))
+        )
 
         return p_map * slope_adj
 
@@ -292,37 +296,39 @@ class RUSLEModel:
     def __init__(self):
         self.factors = {}
 
-    def setup(self,
-              precip: xr.DataArray,
-              soil: xr.Dataset,
-              dem: xr.DataArray,
-              landcover: xr.DataArray,
-              interventions: Optional[xr.DataArray] = None,
-              resolution_m: float = 30) -> None:
+    def setup(
+        self,
+        precip: xr.DataArray,
+        soil: xr.Dataset,
+        dem: xr.DataArray,
+        landcover: xr.DataArray,
+        interventions: Optional[xr.DataArray] = None,
+        resolution_m: float = 30,
+    ) -> None:
         """
         Setup RUSLE model with input data.
 
         All inputs should be spatially aligned rasters.
         """
         # Calculate R factor
-        self.factors['R'] = RUSLEFactors.calculate_r_factor(precip)
+        self.factors["R"] = RUSLEFactors.calculate_r_factor(precip)
 
         # Calculate K factor
-        self.factors['K'] = RUSLEFactors.calculate_k_factor(soil)
+        self.factors["K"] = RUSLEFactors.calculate_k_factor(soil)
 
         # Calculate LS factor
-        self.factors['LS'] = RUSLEFactors.calculate_ls_factor(dem, resolution_m)
+        self.factors["LS"] = RUSLEFactors.calculate_ls_factor(dem, resolution_m)
 
         # Calculate C factor
-        self.factors['C'] = RUSLEFactors.calculate_c_factor(landcover)
+        self.factors["C"] = RUSLEFactors.calculate_c_factor(landcover)
 
         # Calculate P factor
         if interventions is not None:
-            slope = np.arctan(np.gradient(dem, resolution_m)[0]) * 180/np.pi
+            slope = np.arctan(np.gradient(dem, resolution_m)[0]) * 180 / np.pi
             slope_xr = xr.DataArray(slope, coords=dem.coords)
-            self.factors['P'] = RUSLEFactors.calculate_p_factor(interventions, slope_xr)
+            self.factors["P"] = RUSLEFactors.calculate_p_factor(interventions, slope_xr)
         else:
-            self.factors['P'] = xr.full_like(landcover, 1.0)
+            self.factors["P"] = xr.full_like(landcover, 1.0)
 
     def run(self) -> xr.DataArray:
         """
@@ -335,11 +341,11 @@ class RUSLEModel:
         """
         # A = R * K * LS * C * P
         soil_loss = (
-            self.factors['R'] *
-            self.factors['K'] *
-            self.factors['LS'] *
-            self.factors['C'] *
-            self.factors['P']
+            self.factors["R"]
+            * self.factors["K"]
+            * self.factors["LS"]
+            * self.factors["C"]
+            * self.factors["P"]
         )
 
         return soil_loss.clip(0)  # No negative erosion
@@ -365,7 +371,7 @@ class RUSLEModel:
         self,
         baseline_interventions: xr.DataArray,
         project_interventions: xr.DataArray,
-        area_ha: float
+        area_ha: float,
     ) -> Dict:
         """
         Estimate erosion reduction from conservation project.
@@ -385,16 +391,14 @@ class RUSLEModel:
             Erosion reduction estimates
         """
         # Run baseline
-        self.factors['P'] = RUSLEFactors.calculate_p_factor(
-            baseline_interventions,
-            self.factors.get('slope', None)
+        self.factors["P"] = RUSLEFactors.calculate_p_factor(
+            baseline_interventions, self.factors.get("slope", None)
         )
         baseline_loss = self.run()
 
         # Run project scenario
-        self.factors['P'] = RUSLEFactors.calculate_p_factor(
-            project_interventions,
-            self.factors.get('slope', None)
+        self.factors["P"] = RUSLEFactors.calculate_p_factor(
+            project_interventions, self.factors.get("slope", None)
         )
         project_loss = self.run()
 
@@ -403,11 +407,13 @@ class RUSLEModel:
         total_reduction_t = (reduction * area_ha / reduction.size).sum().item()
 
         return {
-            'baseline_erosion_t_ha_yr': round(baseline_loss.mean().item(), 2),
-            'project_erosion_t_ha_yr': round(project_loss.mean().item(), 2),
-            'reduction_t_ha_yr': round(reduction.mean().item(), 2),
-            'total_reduction_t_yr': round(total_reduction_t, 1),
-            'reduction_percentage': round(100 * (1 - project_loss.mean()/baseline_loss.mean()), 1)
+            "baseline_erosion_t_ha_yr": round(baseline_loss.mean().item(), 2),
+            "project_erosion_t_ha_yr": round(project_loss.mean().item(), 2),
+            "reduction_t_ha_yr": round(reduction.mean().item(), 2),
+            "total_reduction_t_yr": round(total_reduction_t, 1),
+            "reduction_percentage": round(
+                100 * (1 - project_loss.mean() / baseline_loss.mean()), 1
+            ),
         }
 
 

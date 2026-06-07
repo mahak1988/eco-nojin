@@ -5,24 +5,26 @@ Contracts Builder Module
 Generates Solidity smart contracts and secure Hardhat configuration.
 """
 import logging
-from .base_builder import BaseBuilder, CONTRACTS_DIR
+
+from .base_builder import CONTRACTS_DIR, BaseBuilder
 
 logger = logging.getLogger(__name__)
+
 
 class ContractsBuilder(BaseBuilder):
     def __init__(self):
         super().__init__("contracts")
-    
+
     def build(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("📜 Building Smart Contracts")
-        logger.info("="*70)
-        
+        logger.info("=" * 70)
+
         self._create_seed_token()
         self._create_gaia_certificate()
         self._create_hardhat_config()
         return self.get_stats()
-    
+
     def _create_seed_token(self):
         content = """// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
@@ -42,7 +44,7 @@ contract SeedToken is ERC20, Ownable {
 """
         path = CONTRACTS_DIR / "contracts" / "SeedToken.sol"
         self.write(path, content)
-    
+
     def _create_gaia_certificate(self):
         content = """// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
@@ -63,7 +65,7 @@ contract GaiaCertificate is ERC721 {
 """
         path = CONTRACTS_DIR / "contracts" / "GaiaCertificate.sol"
         self.write(path, content)
-    
+
     def _create_hardhat_config(self):
         # تقویت امنیت: ارائه الگوی امن برای استفاده از متغیرهای محیطی
         content = """require("@nomicfoundation/hardhat-toolbox");

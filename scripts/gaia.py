@@ -3,29 +3,27 @@
 Gaia API Router - REST endpoints برای اتصال به Gaia Protocol
 """
 
-from fastapi import APIRouter, HTTPException, status, BackgroundTasks
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
-from datetime import datetime, timezone
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Dict, List, Optional
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException, status
+from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from scripts.core.logger import UnifiedLogger
-from core.gaia.calculator import (
-    CarbonCalculator, ActivityType, TreeSpecies, Location, ClimateData
-)
-from core.gaia.oracle import GaiaOracle
+from core.gaia.calculator import ActivityType, CarbonCalculator, ClimateData, Location, TreeSpecies
 from core.gaia.certificates import CertificateGenerator
+from core.gaia.oracle import GaiaOracle
 from core.gaia.verification import ScientificVerifier
+
+from scripts.core.logger import UnifiedLogger
 
 logger = UnifiedLogger.get_logger(__name__)
 
 router = APIRouter(
-    prefix="/gaia",
-    tags=["Gaia Protocol"],
-    responses={404: {"description": "Not found"}}
+    prefix="/gaia", tags=["Gaia Protocol"], responses={404: {"description": "Not found"}}
 )
 
 # نمونه‌های سراسری
@@ -39,8 +37,10 @@ verifier = ScientificVerifier()
 # Pydantic Models
 # ============================================================================
 
+
 class CalculateCarbonRequest(BaseModel):
     """درخواست محاسبه کربن"""
+
     activity_type: str = Field(..., example="tree_planting")
     latitude: float = Field(..., example=35.6892)
     longitude: float = Field(..., example=51.3890)
@@ -54,6 +54,7 @@ class CalculateCarbonRequest(BaseModel):
 
 class CarbonResultResponse(BaseModel):
     """پاسخ محاسبه کربن"""
+
     activity_type: str
     carbon_absorbed_kg: float
     carbon_absorbed_tons: float
@@ -68,6 +69,7 @@ class CarbonResultResponse(BaseModel):
 
 class RegisterActivityRequest(BaseModel):
     """ثبت فعالیت اکوسیستمی"""
+
     miner_address: str = Field(..., example="0x1234...abcd")
     activity_type: str
     latitude: float
@@ -79,6 +81,7 @@ class RegisterActivityRequest(BaseModel):
 
 class RegisterActivityResponse(BaseModel):
     """پاسخ ثبت فعالیت"""
+
     success: bool
     proof_id: str
     carbon_kg: float
@@ -91,6 +94,7 @@ class RegisterActivityResponse(BaseModel):
 
 class CertificateResponse(BaseModel):
     """پاسخ گواهی"""
+
     token_id: int
     owner: str
     activity_type: str
@@ -104,6 +108,7 @@ class CertificateResponse(BaseModel):
 
 class PortfolioResponse(BaseModel):
     """پاسخ پورتفولیو"""
+
     owner: str
     total_certificates: int
     total_carbon_kg: float
@@ -116,11 +121,12 @@ class PortfolioResponse(BaseModel):
 # Endpoints
 # ============================================================================
 
+
 @router.post("/calculate", response_model=CarbonResultResponse)
 async def calculate_carbon(request: CalculateCarbonRequest):
     """
     محاسبه کربن جذب شده برای یک فعالیت اکوسیستمی
-    
+
     از مدل‌های علمی RothC، AquaCrop و IPCC استفاده می‌کند
     """
     try:
@@ -128,24 +134,24 @@ async def calculate_carbon(request: CalculateCarbonRequest):
             latitude=request.latitude,
             longitude=request.longitude,
         )
-        
+
         climate = ClimateData(
             annual_rainfall_mm=request.annual_rainfall_mm,
             avg_temperature_c=request.avg_temperature_c,
             min_temperature_c=request.avg_temperature_c - 10,
             max_temperature_c=request.avg_temperature_c + 10,
         )
-        
+
         try:
             activity = ActivityType(request.activity_type)
         except ValueError:
             raise HTTPException(400, f"Invalid activity type: {request.activity_type}")
-        
+
         try:
             species = TreeSpecies(request.species)
         except ValueError:
             species = TreeSpecies.OAK_PERSIAN
-        
+
         result = calculator.calculate(
             activity_type=activity,
             location=location,
@@ -155,7 +161,7 @@ async def calculate_carbon(request: CalculateCarbonRequest):
             species=species,
             duration_years=request.duration_years,
         )
-        
+
         return CarbonResultResponse(
             activity_type=result.activity_type.value,
             carbon_absorbed_kg=result.carbon_absorbed_kg,
@@ -168,7 +174,7 @@ async def calculate_carbon(request: CalculateCarbonRequest):
             seed_tokens_earned=result.to_seed_tokens(),
             estimated_gaia_value_usd=result.to_gaia_value(),
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -177,13 +183,10 @@ async def calculate_carbon(request: CalculateCarbonRequest):
 
 
 @router.post("/register-activity", response_model=RegisterActivityResponse)
-async def register_activity(
-    request: RegisterActivityRequest,
-    background_tasks: BackgroundTasks
-):
+async def register_activity(request: RegisterActivityRequest, background_tasks: BackgroundTasks):
     """
     ثبت یک فعالیت اکوسیستمی واقعی
-    
+
     شامل:
     1. محاسبه علمی کربن
     2. اعتبارسنجی چندلایه
@@ -198,19 +201,19 @@ async def register_activity(
         }
         location = Location(request.latitude, request.longitude)
         climate = ClimateData(400, 18, 8, 28)
-        
+
         try:
             activity = ActivityType(request.activity_type)
         except ValueError:
             raise HTTPException(400, f"Invalid activity: {request.activity_type}")
-        
+
         carbon_result = calculator.calculate(
             activity_type=activity,
             location=location,
             climate=climate,
             area_hectares=request.area_hectares,
         )
-        
+
         # 2) اعتبارسنجی
         verification = await verifier.verify_activity(
             activity_type=request.activity_type,
@@ -218,13 +221,12 @@ async def register_activity(
             claimed_carbon_kg=carbon_result.carbon_absorbed_kg,
             evidence_data=request.evidence_data,
         )
-        
+
         if not verification.verified:
             raise HTTPException(
-                400,
-                f"Activity not verified. Confidence: {verification.confidence:.2f}"
+                400, f"Activity not verified. Confidence: {verification.confidence:.2f}"
             )
-        
+
         # 3) ایجاد Proof
         proof = oracle.create_proof(
             miner_address=request.miner_address,
@@ -243,15 +245,15 @@ async def register_activity(
                     "evidence": verification.evidence,
                 },
                 "user_evidence": request.evidence_data,
-            }
+            },
         )
-        
+
         # 4) امضای Proof
         oracle.sign_proof(proof)
-        
+
         # 5) ارسال به blockchain (در background)
         background_tasks.add_task(oracle.submit_to_blockchain, proof)
-        
+
         # 6) تولید NFT Certificate
         cert = cert_gen.generate_certificate(
             owner=request.miner_address,
@@ -261,7 +263,7 @@ async def register_activity(
             proof_id=proof.proof_id,
             species=request.species,
         )
-        
+
         return RegisterActivityResponse(
             success=True,
             proof_id=proof.proof_id,
@@ -272,7 +274,7 @@ async def register_activity(
             verified=verification.verified,
             confidence=verification.confidence,
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -286,7 +288,7 @@ async def get_certificate(token_id: int):
     cert = cert_gen.get_certificate(token_id)
     if not cert:
         raise HTTPException(404, f"Certificate #{token_id} not found")
-    
+
     verified_sources = []
     if cert.satellite_verified:
         verified_sources.append("satellite")
@@ -294,7 +296,7 @@ async def get_certificate(token_id: int):
         verified_sources.append("iot")
     if cert.community_verified:
         verified_sources.append("community")
-    
+
     return CertificateResponse(
         token_id=cert.token_id,
         owner=cert.owner,
@@ -312,7 +314,7 @@ async def get_certificate(token_id: int):
 async def get_portfolio(owner_address: str):
     """دریافت پورتفولیو NFT های یک کاربر"""
     certs = cert_gen.list_certificates(owner=owner_address)
-    
+
     if not certs:
         return PortfolioResponse(
             owner=owner_address,
@@ -322,9 +324,9 @@ async def get_portfolio(owner_address: str):
             estimated_value_usd=0,
             certificates=[],
         )
-    
+
     total_carbon = sum(c.current_carbon_kg for c in certs)
-    
+
     cert_responses = []
     for cert in certs:
         verified_sources = []
@@ -334,19 +336,21 @@ async def get_portfolio(owner_address: str):
             verified_sources.append("iot")
         if cert.community_verified:
             verified_sources.append("community")
-        
-        cert_responses.append(CertificateResponse(
-            token_id=cert.token_id,
-            owner=cert.owner,
-            activity_type=cert.activity_type,
-            species=cert.species,
-            carbon_kg=cert.current_carbon_kg,
-            health_score=cert.health_score,
-            growth_stage=cert.growth_stage,
-            verified_sources=verified_sources,
-            metadata=cert.to_metadata().to_dict(),
-        ))
-    
+
+        cert_responses.append(
+            CertificateResponse(
+                token_id=cert.token_id,
+                owner=cert.owner,
+                activity_type=cert.activity_type,
+                species=cert.species,
+                carbon_kg=cert.current_carbon_kg,
+                health_score=cert.health_score,
+                growth_stage=cert.growth_stage,
+                verified_sources=verified_sources,
+                metadata=cert.to_metadata().to_dict(),
+            )
+        )
+
     return PortfolioResponse(
         owner=owner_address,
         total_certificates=len(certs),
@@ -361,18 +365,21 @@ async def get_portfolio(owner_address: str):
 async def get_global_stats():
     """آمار کلی پلتفرم Gaia"""
     all_certs = cert_gen.list_certificates()
-    
+
     total_carbon = sum(c.current_carbon_kg for c in all_certs)
-    
+
     by_activity = {}
     for cert in all_certs:
-        by_activity.setdefault(cert.activity_type, {
-            "count": 0,
-            "carbon_kg": 0,
-        })
+        by_activity.setdefault(
+            cert.activity_type,
+            {
+                "count": 0,
+                "carbon_kg": 0,
+            },
+        )
         by_activity[cert.activity_type]["count"] += 1
         by_activity[cert.activity_type]["carbon_kg"] += cert.current_carbon_kg
-    
+
     return {
         "total_activities": len(all_certs),
         "total_carbon_kg": total_carbon,

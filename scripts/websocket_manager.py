@@ -1,12 +1,13 @@
 """
 مدیریت WebSocket connections برای streaming بلادرنگ
 """
-from fastapi import WebSocket
-from typing import Dict, List, Set
 import asyncio
 import json
-import structlog
 from datetime import datetime
+from typing import Dict, List, Set
+
+import structlog
+from fastapi import WebSocket
 
 logger = structlog.get_logger()
 
@@ -24,9 +25,11 @@ class ConnectionManager:
         if session_id not in self.active_connections:
             self.active_connections[session_id] = set()
         self.active_connections[session_id].add(websocket)
-        self.logger.info("client_connected",
-                         session_id=session_id,
-                         total_clients=len(self.active_connections[session_id]))
+        self.logger.info(
+            "client_connected",
+            session_id=session_id,
+            total_clients=len(self.active_connections[session_id]),
+        )
 
     def disconnect(self, websocket: WebSocket, session_id: str):
         """قطع اتصال یک کلاینت"""
@@ -41,10 +44,7 @@ class ConnectionManager:
         if session_id not in self.active_connections:
             return
 
-        event_with_timestamp = {
-            **event,
-            "timestamp": datetime.now().isoformat()
-        }
+        event_with_timestamp = {**event, "timestamp": datetime.now().isoformat()}
 
         # ارسال به همه کلاینت‌های متصل
         disconnected = set()
@@ -66,10 +66,7 @@ class ConnectionManager:
 
     def get_active_sessions(self) -> Dict[str, int]:
         """دریافت لیست sessionهای فعال و تعداد کلاینت‌های هرکدام"""
-        return {
-            session_id: len(clients)
-            for session_id, clients in self.active_connections.items()
-        }
+        return {session_id: len(clients) for session_id, clients in self.active_connections.items()}
 
 
 # Singleton instance

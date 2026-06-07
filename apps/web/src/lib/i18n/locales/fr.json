@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "badge": "Plateforme Scientifique de Restauration",
+    "title": "Econojin",
+    "subtitle": "Gestion Intelligente Intégrée",
+    "description": "Restauration des paysages arides et semi-arides par l'hydrologie, la modélisation carbone, la télédétection et l'IA",
+    "startSimulation": "Démarrer la Simulation",
+    "freeEducation": "Éducation Gratuite",
+    "userRating": "Évaluation",
+    "activeUsers": "Utilisateurs Actifs",
+    "secure": "Sécurisé et Fiable"
+  },
+  "stats": {
+    "hectares": "Hectares Surveillés",
+    "carbon": "Tonnes CO₂ Absorbées",
+    "farmers": "Agriculteurs Actifs",
+    "basins": "Bassins Versants"
+  },
+  "modules": {
+    "scientific": "Modules Scientifiques",
+    "scientificDesc": "Outils spécialisés pour la restauration des terres arides",
+    "community": "Communauté et Services",
+    "communityDesc": "Tout ce dont un agriculteur durable a besoin",
+    "details": "Voir Détails",
+    "projects": "Projets Réussis",
+    "projectsDesc": "Exemples de restauration de terres"
+  },
+  "features": {
+    "free": "Gratuit et Ouvert",
+    "freeDesc": "Tous les services scientifiques sans frais",
+    "ai": "Intelligence Artificielle",
+    "aiDesc": "Analyse intelligente avec modèles avancés",
+    "secure": "Sécurisé et Fiable",
+    "secureDesc": "Protection de vos données de recherche",
+    "global": "Accès Mondial",
+    "globalDesc": "Accessible depuis n'importe où dans le monde"
+  },
+  "nav": {
+    "home": "Accueil",
+    "scientific": "Modules Scientifiques",
+    "community": "Communauté",
+    "education": "Éducation",
+    "about": "À propos",
+    "contact": "Contact",
+    "login": "Connexion",
+    "register": "Inscription Gratuite",
+    "language": "Langue"
+  }
+}

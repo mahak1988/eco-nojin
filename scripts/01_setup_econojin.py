@@ -4,10 +4,10 @@
 🌍 Econojin Super-Platform - Setup Script
 ایجاد ساختار پروژه، نصب وابستگی‌ها و مستندات
 """
-import os
-import sys
-import subprocess
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 PROJECT = Path(__file__).parent / "econojin-super-platform"

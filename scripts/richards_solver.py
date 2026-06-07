@@ -9,28 +9,30 @@ References:
 - Richards (1931): "Capillary conduction of liquids through porous mediums"
 """
 
-import numpy as np
-from scipy.optimize import newton
-from scipy.integrate import solve_ivp
+import warnings
 from dataclasses import dataclass
 from typing import Optional, Tuple
-import warnings
+
+import numpy as np
+from scipy.integrate import solve_ivp
+from scipy.optimize import newton
 
 
 @dataclass
 class VanGenuchtenParams:
     """van Genuchten-Mualem soil hydraulic parameters"""
+
     theta_r: float  # Residual water content [m³/m³]
     theta_s: float  # Saturated water content [m³/m³]
-    alpha: float    # Inverse of air entry suction [1/cm]
-    n: float        # Pore-size distribution index [-]
-    K_s: float      # Saturated hydraulic conductivity [cm/day]
+    alpha: float  # Inverse of air entry suction [1/cm]
+    n: float  # Pore-size distribution index [-]
+    K_s: float  # Saturated hydraulic conductivity [cm/day]
     l: float = 0.5  # Pore connectivity parameter [-]
 
     @property
     def m(self) -> float:
         """Calculate m = 1 - 1/n"""
-        return 1 - 1/self.n
+        return 1 - 1 / self.n
 
 
 class VanGenuchtenModel:
@@ -83,7 +85,7 @@ class VanGenuchtenModel:
         theta = np.clip(theta, p.theta_r + 1e-6, p.theta_s - 1e-6)
 
         Se = (theta - p.theta_r) / (p.theta_s - p.theta_r)
-        return -((Se ** (-1/p.m) - 1) ** (1/p.n)) / p.alpha
+        return -((Se ** (-1 / p.m) - 1) ** (1 / p.n)) / p.alpha
 
     def K(self, h: np.ndarray) -> np.ndarray:
         """
@@ -103,7 +105,7 @@ class VanGenuchtenModel:
         h = np.asarray(h)
 
         Se = (1 + np.abs(p.alpha * h) ** p.n) ** (-p.m)
-        return p.K_s * Se ** p.l * (1 - (1 - Se ** (1/p.m)) ** p.m) ** 2
+        return p.K_s * Se**p.l * (1 - (1 - Se ** (1 / p.m)) ** p.m) ** 2
 
     def C(self, h: np.ndarray) -> np.ndarray:
         """
@@ -136,22 +138,26 @@ class RichardsEquation1D:
     Uses implicit time stepping for stability.
     """
 
-    def __init__(self, vg_params: VanGenuchtenParams,
-                 dz: float = 1.0,  # Spatial step [cm]
-                 max_depth: float = 200.0):  # Domain depth [cm]
-
+    def __init__(
+        self,
+        vg_params: VanGenuchtenParams,
+        dz: float = 1.0,  # Spatial step [cm]
+        max_depth: float = 200.0,
+    ):  # Domain depth [cm]
         self.vg = VanGenuchtenModel(vg_params)
         self.dz = dz
         self.z = np.arange(0, max_depth + dz, dz)  # Depth grid [cm]
         self.n_nodes = len(self.z)
 
-    def solve(self,
-              initial_theta: np.ndarray,
-              boundary_conditions: dict,
-              time_span: Tuple[float, float],
-              time_step: float = 3600,  # seconds
-              rainfall: Optional[np.ndarray] = None,
-              et: Optional[np.ndarray] = None) -> dict:
+    def solve(
+        self,
+        initial_theta: np.ndarray,
+        boundary_conditions: dict,
+        time_span: Tuple[float, float],
+        time_step: float = 3600,  # seconds
+        rainfall: Optional[np.ndarray] = None,
+        et: Optional[np.ndarray] = None,
+    ) -> dict:
         """
         Solve 1D Richards equation.
 
@@ -200,15 +206,15 @@ class RichardsEquation1D:
             dh_dz[1:-1] = (h_profile[2:] - h_profile[:-2]) / (2 * self.dz)
 
             # Boundary conditions for gradient
-            if boundary_conditions.get('top') == 'flux':
+            if boundary_conditions.get("top") == "flux":
                 # Neumann BC at top
-                q_top = boundary_conditions.get('top_flux', 0)
+                q_top = boundary_conditions.get("top_flux", 0)
                 dh_dz[0] = (q_top / K[0]) - 1
-            elif boundary_conditions.get('top') == 'head':
-                dh_dz[0] = (boundary_conditions['top_head'] - h_profile[0]) / self.dz
+            elif boundary_conditions.get("top") == "head":
+                dh_dz[0] = (boundary_conditions["top_head"] - h_profile[0]) / self.dz
 
-            if boundary_conditions.get('bottom') == 'head':
-                dh_dz[-1] = (boundary_conditions['bottom_head'] - h_profile[-1]) / self.dz
+            if boundary_conditions.get("bottom") == "head":
+                dh_dz[-1] = (boundary_conditions["bottom_head"] - h_profile[-1]) / self.dz
             # else: free drainage (dh/dz = 0) at bottom
 
             # Calculate K*(dh/dz + 1)
@@ -219,10 +225,10 @@ class RichardsEquation1D:
             dflux_dz[1:-1] = (flux[2:] - flux[:-2]) / (2 * self.dz)
 
             # Boundary fluxes
-            if boundary_conditions.get('top') == 'flux':
-                dflux_dz[0] = (flux[1] - boundary_conditions.get('top_flux', 0)) / self.dz
-            if boundary_conditions.get('bottom') == 'head':
-                dflux_dz[-1] = (boundary_conditions.get('bottom_flux', 0) - flux[-2]) / self.dz
+            if boundary_conditions.get("top") == "flux":
+                dflux_dz[0] = (flux[1] - boundary_conditions.get("top_flux", 0)) / self.dz
+            if boundary_conditions.get("bottom") == "head":
+                dflux_dz[-1] = (boundary_conditions.get("bottom_flux", 0) - flux[-2]) / self.dz
 
             # Richards equation: d(theta)/dt = d/dz[K*(dh/dz + 1)]
             # Using chain rule: d(theta)/dt = C * dh/dt
@@ -235,9 +241,9 @@ class RichardsEquation1D:
             rhs,
             time_span,
             h_initial,
-            method='BDF',  # Implicit for stiffness
+            method="BDF",  # Implicit for stiffness
             t_eval=t_eval / 86400,  # Convert to days
-            vectorized=False
+            vectorized=False,
         )
 
         if not sol.success:
@@ -245,20 +251,20 @@ class RichardsEquation1D:
 
         # Post-process results
         results = {
-            'time': sol.t * 86400,  # Convert back to seconds
-            'h': sol.y.T,  # [time, depth]
-            'theta': self.vg.theta(sol.y.T),
-            'K': self.vg.K(sol.y.T)
+            "time": sol.t * 86400,  # Convert back to seconds
+            "h": sol.y.T,  # [time, depth]
+            "theta": self.vg.theta(sol.y.T),
+            "K": self.vg.K(sol.y.T),
         }
 
         # Calculate fluxes
-        results['flux'] = self._calculate_fluxes(results['h'], rainfall, et)
+        results["flux"] = self._calculate_fluxes(results["h"], rainfall, et)
 
         return results
 
-    def _calculate_fluxes(self, h_profile: np.ndarray,
-                         rainfall: Optional[np.ndarray],
-                         et: Optional[np.ndarray]) -> np.ndarray:
+    def _calculate_fluxes(
+        self, h_profile: np.ndarray, rainfall: Optional[np.ndarray], et: Optional[np.ndarray]
+    ) -> np.ndarray:
         """Calculate vertical water fluxes"""
         n_time, n_depth = h_profile.shape
         flux = np.zeros((n_time, n_depth))
@@ -280,9 +286,7 @@ class SoilWaterCalibrator:
 
     @staticmethod
     def calibrate_from_tdr(
-        observed_theta: np.ndarray,
-        observed_h: np.ndarray,
-        initial_guess: VanGenuchtenParams
+        observed_theta: np.ndarray, observed_h: np.ndarray, initial_guess: VanGenuchtenParams
     ) -> VanGenuchtenParams:
         """
         Calibrate van Genuchten parameters against TDR measurements.
@@ -317,7 +321,7 @@ class SoilWaterCalibrator:
         # Parameter bounds (physically realistic)
         bounds = (
             [0.0, 0.2, 0.001, 1.1, 0.1, 0.0],  # Lower bounds
-            [0.2, 0.6, 0.1, 5.0, 1000, 1.0]     # Upper bounds
+            [0.2, 0.6, 0.1, 5.0, 1000, 1.0],  # Upper bounds
         )
 
         # Initial guess as array
@@ -327,16 +331,11 @@ class SoilWaterCalibrator:
             initial_guess.alpha,
             initial_guess.n,
             initial_guess.K_s,
-            initial_guess.l
+            initial_guess.l,
         ]
 
         # Optimize
-        result = least_squares(
-            residuals,
-            x0,
-            bounds=bounds,
-            method='trf'
-        )
+        result = least_squares(residuals, x0, bounds=bounds, method="trf")
 
         if not result.success:
             warnings.warn(f"Calibration warning: {result.message}")

@@ -1,6 +1,9 @@
 """PostgreSQL Connection Setup"""
-import os, sys
+import os
+import sys
+
 from scripts.core.logger import UnifiedLogger
+
 logger = UnifiedLogger.get_logger(__name__)
 
 
@@ -9,6 +12,7 @@ sys.path.insert(0, PROJECT)
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv(os.path.join(PROJECT, ".env"))
 except Exception as e:
     pass
@@ -18,19 +22,21 @@ DB = {
     "port": os.getenv("DB_PORT", "5432"),
     "database": os.getenv("DB_NAME", "economugin"),
     "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "")
+    "password": os.getenv("DB_PASSWORD", ""),
 }
+
 
 def test_connection():
     logger.info(f"[INFO] Testing connection to {DB['database']}@{DB['host']}")
     try:
         import psycopg2
+
         conn = psycopg2.connect(
             host=DB["host"],
             port=DB["port"],
             database="postgres",
             user=DB["user"],
-            password=DB["password"]
+            password=DB["password"],
         )
         cur = conn.cursor()
         cur.execute("SELECT version()")
@@ -46,16 +52,18 @@ def test_connection():
         logger.error(f"[ERROR] Connection failed: {str(e)[:150]}")
         return False
 
+
 def create_database():
     logger.info(f"[INFO] Creating database '{DB['database']}'...")
     try:
         import psycopg2
+
         conn = psycopg2.connect(
             host=DB["host"],
             port=DB["port"],
             database="postgres",
             user=DB["user"],
-            password=DB["password"]
+            password=DB["password"],
         )
         conn.autocommit = True
         cur = conn.cursor()
@@ -72,8 +80,11 @@ def create_database():
         logger.error(f"[ERROR] {e}")
         return False
 
+
 if __name__ == "__main__":
     logger.info("=== PostgreSQL Setup ===")
     ok1 = test_connection()
     ok2 = create_database() if ok1 else False
-    logger.error(f"\n{'OK' if ok1 and ok2 else 'WARN'}: {'Ready' if ok1 and ok2 else 'Check errors above'}")
+    logger.error(
+        f"\n{'OK' if ok1 and ok2 else 'WARN'}: {'Ready' if ok1 and ok2 else 'Check errors above'}"
+    )

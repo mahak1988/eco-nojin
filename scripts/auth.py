@@ -1,23 +1,29 @@
 # scripts/api/routers/auth.py
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field
+import hashlib
+import os
 from datetime import datetime, timedelta, timezone
-import jwt, os, hashlib
+
+import jwt
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 security = HTTPBearer()
 SECRET_KEY = os.getenv("JWT_SECRET", "dev-secret-change-in-prod")
 ALGORITHM = "HS256"
 
+
 class LoginReq(BaseModel):
     fid: str = Field(..., min_length=3, max_length=20)
     phone: str = Field(..., pattern=r"^\+?[0-9]{10,15}$")
+
 
 class TokenRes(BaseModel):
     access_token: str
     token_type: str = "bearer"
     farmer_id: str
+
 
 class ProfileRes(BaseModel):
     fid: str
@@ -26,10 +32,12 @@ class ProfileRes(BaseModel):
     registered_at: str
     wallet_address: str | None = None
 
+
 def create_token(fid: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(days=7)
     payload = {"sub": fid, "exp": expire, "type": "access"}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
     try:
@@ -40,6 +48,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
+
 @router.post("/login", response_model=TokenRes)
 async def login(req: LoginReq):
     # In production: verify phone via OTP, check DB
@@ -49,6 +58,7 @@ async def login(req: LoginReq):
     token = create_token(req.fid)
     return TokenRes(access_token=token, farmer_id=req.fid)
 
+
 @router.get("/profile", response_model=ProfileRes)
 async def get_profile(fid: str = Depends(verify_token)):
     # In production: fetch from DB
@@ -57,8 +67,9 @@ async def get_profile(fid: str = Depends(verify_token)):
         name="Demo Farmer",
         phone="+989123456789",
         registered_at=datetime.now(timezone.utc).isoformat(),
-        wallet_address=None
+        wallet_address=None,
     )
+
 
 @router.post("/profile/wallet")
 async def link_wallet(wallet: str, fid: str = Depends(verify_token)):

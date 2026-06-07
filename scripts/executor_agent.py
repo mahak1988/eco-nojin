@@ -4,18 +4,25 @@ Executor Agent واقعی برای Econojin
 """
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from typing import Dict, Any, Optional, List
-import structlog
 import asyncio
+from typing import Any, Dict, List, Optional
 
+import structlog
 from agents.core.planner_agent import Task
+from agents.policies.policy_engine import PolicyAction, PolicyEngine
+
 from agents.tools import (
-    OpenMeteoTool, GEENdviTool, RUSLETool, AquaCropTool,
-    SoilGridsTool, ToolResult, get_tool
+    AquaCropTool,
+    GEENdviTool,
+    OpenMeteoTool,
+    RUSLETool,
+    SoilGridsTool,
+    ToolResult,
+    get_tool,
 )
-from agents.policies.policy_engine import PolicyEngine, PolicyAction
 
 logger = structlog.get_logger()
 
@@ -26,10 +33,19 @@ class ExecutorAgent:
     # نگاشت ابزارها به کلمات کلیدی در task (fallback)
     TOOL_KEYWORDS = {
         "gee_ndvi": ["ndvi", "پوشش گیاهی", "ماهواره", "sentinel", "شاخص گیاهی", "vegetation"],
-        "open_meteo": ["هوا", "بارش", "دما", "weather", "rainfall", "temperature", "آب و هوا", "اقلیم"],
+        "open_meteo": [
+            "هوا",
+            "بارش",
+            "دما",
+            "weather",
+            "rainfall",
+            "temperature",
+            "آب و هوا",
+            "اقلیم",
+        ],
         "rusle": ["فرسایش", "erosion", "خاک", "شیب", "sediment"],
         "aquacrop": ["محصول", "crop", "عملکرد", "yield", "گندم", "wheat", "کشت"],
-        "soil_grids": ["خاک", "soil", "بافت", "کربن", "ph"]
+        "soil_grids": ["خاک", "soil", "بافت", "کربن", "ph"],
     }
 
     # موقعیت‌های پیش‌فرض برای مناطق ایران
@@ -50,7 +66,7 @@ class ExecutorAgent:
             "gee_ndvi": GEENdviTool(),
             "rusle": RUSLETool(),
             "aquacrop": AquaCropTool(),
-            "soil_grids": SoilGridsTool()
+            "soil_grids": SoilGridsTool(),
         }
 
     def _detect_location(self, text: str) -> Dict[str, float]:
@@ -74,8 +90,9 @@ class ExecutorAgent:
 
         return detected or ["open_meteo"]
 
-    async def execute_task(self, task: Task, user_request: str,
-                           context: List[Dict] = None) -> ToolResult:
+    async def execute_task(
+        self, task: Task, user_request: str, context: List[Dict] = None
+    ) -> ToolResult:
         """اجرای یک task با ابزارهای مرتبط"""
 
         location = self._detect_location(user_request)
@@ -88,25 +105,18 @@ class ExecutorAgent:
             # اولویت ۲: تشخیص خودکار از description
             tool_names = self._detect_tools(task)
 
-        self.logger.info("executing_task",
-                         task_id=task.id,
-                         tools=tool_names,
-                         location=location)
+        self.logger.info("executing_task", task_id=task.id, tools=tool_names, location=location)
 
         results = {}
         for tool_name in tool_names:
             # بررسی Policy
             action = self.policy_engine.validate_tool_call(
-                tool_name,
-                {"task": task.description, "location": location}
+                tool_name, {"task": task.description, "location": location}
             )
 
             if action == PolicyAction.DENY:
                 self.logger.warning("tool_blocked_by_policy", tool=tool_name)
-                results[tool_name] = {
-                    "success": False,
-                    "error": "Blocked by policy"
-                }
+                results[tool_name] = {"success": False, "error": "Blocked by policy"}
                 continue
 
             # اجرای ابزار با پارامترهای مناسب
@@ -118,13 +128,11 @@ class ExecutorAgent:
                         latitude=location["lat"],
                         longitude=location["lon"],
                         days=30,
-                        historical=True
+                        historical=True,
                     )
                 elif tool_name == "gee_ndvi":
                     result = tool.execute(
-                        latitude=location["lat"],
-                        longitude=location["lon"],
-                        ecosystem="cropland"
+                        latitude=location["lat"], longitude=location["lon"], ecosystem="cropland"
                     )
                 elif tool_name == "rusle":
                     rainfall = 250
@@ -139,7 +147,7 @@ class ExecutorAgent:
                         annual_rainfall_mm=rainfall,
                         slope_percent=8,
                         soil_type="loam",
-                        land_cover="cropland"
+                        land_cover="cropland",
                     )
                 elif tool_name == "aquacrop":
                     rainfall = 250
@@ -150,16 +158,9 @@ class ExecutorAgent:
                         except:
                             pass
 
-                    result = tool.execute(
-                        crop="wheat",
-                        rainfall_mm=rainfall,
-                        temperature_avg=18
-                    )
+                    result = tool.execute(crop="wheat", rainfall_mm=rainfall, temperature_avg=18)
                 elif tool_name == "soil_grids":
-                    result = tool.execute(
-                        latitude=location["lat"],
-                        longitude=location["lon"]
-                    )
+                    result = tool.execute(latitude=location["lat"], longitude=location["lon"])
                 else:
                     continue
 
@@ -167,20 +168,19 @@ class ExecutorAgent:
                     "success": result.success,
                     "data": result.data,
                     "error": result.error,
-                    "execution_time_ms": result.execution_time_ms
+                    "execution_time_ms": result.execution_time_ms,
                 }
 
-                self.logger.info("tool_executed",
-                                 tool=tool_name,
-                                 success=result.success,
-                                 exec_ms=round(result.execution_time_ms, 2))
+                self.logger.info(
+                    "tool_executed",
+                    tool=tool_name,
+                    success=result.success,
+                    exec_ms=round(result.execution_time_ms, 2),
+                )
 
             except Exception as e:
                 self.logger.error("tool_error", tool=tool_name, error=str(e))
-                results[tool_name] = {
-                    "success": False,
-                    "error": str(e)
-                }
+                results[tool_name] = {"success": False, "error": str(e)}
 
         # خلاصه‌سازی نتایج
         summary = self._summarize_results(task, results, location)
@@ -194,8 +194,8 @@ class ExecutorAgent:
                 "location": location,
                 "tools_used": tool_names,
                 "results": results,
-                "summary": summary
-            }
+                "summary": summary,
+            },
         )
 
     def _summarize_results(self, task: Task, results: Dict, location: Dict) -> str:
@@ -210,11 +210,15 @@ class ExecutorAgent:
 
         if "gee_ndvi" in results and results["gee_ndvi"].get("success"):
             ndvi = results["gee_ndvi"]["data"]
-            parts.append(f"🛰️ شاخص پوشش گیاهی (NDVI): {ndvi['ndvi']['average']} - وضعیت {ndvi['health_fa']}")
+            parts.append(
+                f"🛰️ شاخص پوشش گیاهی (NDVI): {ndvi['ndvi']['average']} - وضعیت {ndvi['health_fa']}"
+            )
 
         if "rusle" in results and results["rusle"].get("success"):
             r = results["rusle"]["data"]
-            parts.append(f"🌍 نرخ فرسایش خاک: {r['erosion_rate_t_ha_y']} تن/هکتار/سال ({r['severity_fa']})")
+            parts.append(
+                f"🌍 نرخ فرسایش خاک: {r['erosion_rate_t_ha_y']} تن/هکتار/سال ({r['severity_fa']})"
+            )
             for rec in r.get("recommendations", []):
                 parts.append(f"💡 {rec}")
 
@@ -225,16 +229,18 @@ class ExecutorAgent:
 
         if "soil_grids" in results and results["soil_grids"].get("success"):
             s = results["soil_grids"]["data"]
-            parts.append(f"🔬 بافت خاک: {s['soil_type']}, pH: {s['ph']}, کربن آلی: {s['organic_carbon_pct']}%")
+            parts.append(
+                f"🔬 بافت خاک: {s['soil_type']}, pH: {s['ph']}, کربن آلی: {s['organic_carbon_pct']}%"
+            )
 
         return "\n".join(parts) if parts else "نتیجه‌ای تولید نشد"
 
 
 async def test_executor():
     """تست Executor واقعی"""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("🤖 تست Executor Agent واقعی - Econojin")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     executor = ExecutorAgent()
 
@@ -244,7 +250,7 @@ async def test_executor():
         priority=5,
         dependencies=[],
         estimated_time=15,
-        required_tools=["gee_ndvi", "open_meteo", "soil_grids"]
+        required_tools=["gee_ndvi", "open_meteo", "soil_grids"],
     )
 
     user_request = "تحلیل داده‌های ماهواره‌ای NDVI برای منطقه خراسان در ۶ ماه گذشته"
@@ -254,9 +260,9 @@ async def test_executor():
 
     result = await executor.execute_task(task, user_request)
 
-    print("="*70)
+    print("=" * 70)
     print("📊 نتایج اجرای Executor:")
-    print("="*70)
+    print("=" * 70)
 
     if result.success:
         data = result.data
@@ -266,7 +272,7 @@ async def test_executor():
     else:
         print(f"❌ خطا در اجرا")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
+import React from 'react';
 import Link from 'next/link';
 import Logo from './Logo';
 import { getDictionary, type Locale } from '@/lib/i18n';
 
-export default function Footer({ locale }: { locale: Locale }) {
+function Footer({ locale }: { locale: Locale }) {
   const dict = getDictionary(locale);
   const isPersian = locale === 'fa';
 
@@ -53,3 +54,6 @@ export default function Footer({ locale }: { locale: Locale }) {
     </footer>
   );
 }
+
+
+export default React.memo(Footer);

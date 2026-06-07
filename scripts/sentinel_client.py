@@ -7,12 +7,13 @@ Open data, free access.
 Reference: https://sentinel.esa.int/
 """
 
-import pystac_client
-import odc.stac
-import xarray as xr
-from pathlib import Path
-from typing import List, Optional, Dict
 import warnings
+from pathlib import Path
+from typing import Dict, List, Optional
+
+import odc.stac
+import pystac_client
+import xarray as xr
 
 
 class SentinelClient:
@@ -49,7 +50,7 @@ class SentinelClient:
         start_date: str,
         end_date: str,
         cloud_max: float = 20,
-        bands: List[str] = None
+        bands: List[str] = None,
     ) -> pystac_client.ItemSearch:
         """
         Search Sentinel-2 items matching criteria.
@@ -70,23 +71,19 @@ class SentinelClient:
         search : ItemSearch
             STAC search object
         """
-        bands = bands or ['B02', 'B03', 'B04', 'B08']  # RGB + NIR
+        bands = bands or ["B02", "B03", "B04", "B08"]  # RGB + NIR
 
         search = self.stac_client.search(
-            collections=['sentinel-2-l2a'],
+            collections=["sentinel-2-l2a"],
             bbox=bbox,
             datetime=f"{start_date}/{end_date}",
-            query={"eo:cloud_cover": {"lt": cloud_max}}
+            query={"eo:cloud_cover": {"lt": cloud_max}},
         )
 
         return search
 
     def download_ndvi(
-        self,
-        bbox: List[float],
-        date: str,
-        output_path: Path,
-        cloud_max: float = 20
+        self, bbox: List[float], date: str, output_path: Path, cloud_max: float = 20
     ) -> Path:
         """
         Download and compute NDVI from Sentinel-2.
@@ -99,7 +96,7 @@ class SentinelClient:
             start_date=date,
             end_date=date,
             cloud_max=cloud_max,
-            bands=['B04', 'B08']  # Red, NIR
+            bands=["B04", "B08"],  # Red, NIR
         )
 
         items = list(search.items())
@@ -108,19 +105,15 @@ class SentinelClient:
 
         # Load data using odc.stac
         ds = odc.stac.load(
-            items,
-            bands=['B04', 'B08'],
-            bbox=bbox,
-            resolution=10,  # 10m resolution
-            crs="EPSG:4326"
+            items, bands=["B04", "B08"], bbox=bbox, resolution=10, crs="EPSG:4326"  # 10m resolution
         )
 
         # Calculate NDVI
-        nir = ds['B08']
-        red = ds['B04']
+        nir = ds["B08"]
+        red = ds["B04"]
         ndvi = (nir - red) / (nir + red + 1e-10)  # Avoid division by zero
         ndvi = ndvi.clip(-1, 1)
-        ndvi.attrs['long_name'] = 'Normalized Difference Vegetation Index'
+        ndvi.attrs["long_name"] = "Normalized Difference Vegetation Index"
 
         # Save
         ndvi.to_netcdf(output_path)
@@ -133,7 +126,7 @@ class SentinelClient:
         end_date: str,
         point_lon: float,
         point_lat: float,
-        cloud_max: float = 20
+        cloud_max: float = 20,
     ) -> xr.DataArray:
         """
         Extract NDVI time series for a point location.
@@ -145,7 +138,7 @@ class SentinelClient:
             start_date=start_date,
             end_date=end_date,
             cloud_max=cloud_max,
-            bands=['B04', 'B08']
+            bands=["B04", "B08"],
         )
 
         # Load and compute NDVI for each scene
@@ -154,15 +147,10 @@ class SentinelClient:
 
         for item in search.items():
             try:
-                ds = odc.stac.load(
-                    [item],
-                    bands=['B04', 'B08'],
-                    resolution=10,
-                    crs="EPSG:4326"
-                )
+                ds = odc.stac.load([item], bands=["B04", "B08"], resolution=10, crs="EPSG:4326")
 
-                nir = ds['B08'].sel(latitude=point_lat, longitude=point_lon, method='nearest')
-                red = ds['B04'].sel(latitude=point_lat, longitude=point_lon, method='nearest')
+                nir = ds["B08"].sel(latitude=point_lat, longitude=point_lon, method="nearest")
+                red = ds["B04"].sel(latitude=point_lat, longitude=point_lon, method="nearest")
 
                 ndvi = (nir - red) / (nir + red + 1e-10)
                 ndvi_series.append(ndvi.item())
@@ -178,7 +166,7 @@ class SentinelClient:
         # Create time series
         return xr.DataArray(
             ndvi_series,
-            coords={'time': dates},
-            dims=['time'],
-            attrs={'long_name': 'NDVI time series', 'location': f"{point_lat}, {point_lon}"}
+            coords={"time": dates},
+            dims=["time"],
+            attrs={"long_name": "NDVI time series", "location": f"{point_lat}, {point_lon}"},
         )

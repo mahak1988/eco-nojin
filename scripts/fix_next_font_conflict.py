@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 - حفظ .babelrc (برای fallback از SWC)
 r"""
 
-import sys
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 PROJECT_ROOT = Path(r"D:\econojin.com")
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
@@ -22,7 +22,7 @@ FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
 class NextFontFixer:
     def __init__(self):
-        self.backup_dir = FRONTEND_DIR / '.font_fix_backup'
+        self.backup_dir = FRONTEND_DIR / ".font_fix_backup"
         self.backup_dir.mkdir(exist_ok=True)
 
     def backup(self, path: Path):
@@ -31,16 +31,16 @@ class NextFontFixer:
         rel = path.relative_to(FRONTEND_DIR)
         dest = self.backup_dir / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_path = dest.parent / f"{dest.stem}_{ts}{dest.suffix}"
         shutil.copy2(path, backup_path)
         logger.info(f"  💾 Backup: {backup_path.relative_to(FRONTEND_DIR)}")
 
     def fix_layout(self):
         """حذف next/font و استفاده از CSS font"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🔤 Step 1: Fix layout.tsx (remove next/font)")
-        print("="*70)
+        print("=" * 70)
 
         layout_file = FRONTEND_DIR / "app" / "layout.tsx"
         if not layout_file.exists():
@@ -92,7 +92,7 @@ export default function RootLayout({
 }
 """
 
-        layout_file.write_text(new_content, encoding='utf-8')
+        layout_file.write_text(new_content, encoding="utf-8")
         logger.info("  ✅ layout.tsx updated (next/font removed)")
         logger.info("     • Using Google Fonts Inter via CDN")
         logger.info("     • Compatible with Babel (no SWC needed)")
@@ -100,9 +100,9 @@ export default function RootLayout({
 
     def fix_globals_css(self):
         """به‌روزرسانی globals.css با font-family صحیح"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🎨 Step 2: Update globals.css with Inter font")
-        print("="*70)
+        print("=" * 70)
 
         css_file = FRONTEND_DIR / "app" / "globals.css"
         if not css_file.exists():
@@ -215,15 +215,15 @@ export default function RootLayout({
 }
 """
 
-        css_file.write_text(new_css, encoding='utf-8')
+        css_file.write_text(new_css, encoding="utf-8")
         logger.info("  ✅ globals.css updated with Inter font")
         return True
 
     def update_tailwind_config(self):
         """به‌روزرسانی tailwind.config.js با fontFamily Inter"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("⚙️  Step 3: Update tailwind.config.js")
-        print("="*70)
+        print("=" * 70)
 
         config_file = FRONTEND_DIR / "tailwind.config.js"
         self.backup(config_file)
@@ -271,15 +271,15 @@ module.exports = {
 }
 """
 
-        config_file.write_text(new_config, encoding='utf-8')
+        config_file.write_text(new_config, encoding="utf-8")
         logger.info("  ✅ tailwind.config.js updated with Inter font family")
         return True
 
     def clear_cache(self):
         """پاک کردن cache"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🧹 Step 4: Clear Next.js Cache")
-        print("="*70)
+        print("=" * 70)
 
         next_dir = FRONTEND_DIR / ".next"
         if next_dir.exists():
@@ -289,10 +289,11 @@ module.exports = {
             logger.info("  ⏭️  .next not found (already clean)")
 
     def generate_report(self):
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("✅ FIX COMPLETE")
-        print("="*70)
-        print(r"""
+        print("=" * 70)
+        print(
+            r"""
 🎯 Changes Applied:
    • Removed next/font import from layout.tsx
    • Added Inter font via Google Fonts CDN
@@ -326,24 +327,21 @@ module.exports = {
    • Next.js 15.0.5 (CVE-2025-66478 PATCHED)
    • Babel compiler (SWC fallback)
    • Google Fonts via HTTPS
-r""")
-        print("="*70)
+r"""
+        )
+        print("=" * 70)
 
     def run_all(self):
-        print("="*70)
+        print("=" * 70)
         logger.info("🔧 NEXT/FONT + BABEL CONFLICT FIXER")
-        print("="*70)
+        print("=" * 70)
         logger.info(f"📁 Frontend: {FRONTEND_DIR}")
 
         if not FRONTEND_DIR.exists():
             logger.info(f"❌ Frontend directory not found")
             return False
 
-        success = (
-            self.fix_layout() and
-            self.fix_globals_css() and
-            self.update_tailwind_config()
-        )
+        success = self.fix_layout() and self.fix_globals_css() and self.update_tailwind_config()
 
         self.clear_cache()
 
@@ -364,9 +362,10 @@ def main():
     except Exception as e:
         logger.info(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

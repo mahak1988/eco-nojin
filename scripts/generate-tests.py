@@ -26,6 +26,7 @@
 
 import json
 
+
 class NoIndent(object):
     def __init__(self, value):
         self.value = value
@@ -36,13 +37,15 @@ def default(o, encoder=json.JSONEncoder()):
     return encoder.default(o)
 
 
-import os, time
+import os
+import time
 
 Tests = []
 
 # compare against a known working implementation
 from Crypto.Cipher import AES as KAES
 from Crypto.Util import Counter as KCounter
+
 for mode in [ 'CBC', 'CTR',  'CFB', 'ECB', 'OFB' ]:
 
     (tt_ksetup, tt_kencrypt, tt_kdecrypt) = (0.0, 0.0, 0.0)

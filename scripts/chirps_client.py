@@ -7,12 +7,13 @@ Open data, no API key required.
 Reference: https://www.chc.ucsb.edu/data/chirps
 """
 
+import warnings
+from pathlib import Path
+from typing import Optional, Tuple
+
+import numpy as np
 import requests
 import xarray as xr
-import numpy as np
-from pathlib import Path
-from typing import Tuple, Optional
-import warnings
 
 
 class CHIRPSClient:
@@ -34,7 +35,7 @@ class CHIRPSClient:
         bbox: Tuple[float, float, float, float],  # [min_lat, min_lon, max_lat, max_lon]
         start_date: str,
         end_date: str,
-        output_path: Path
+        output_path: Path,
     ) -> Path:
         """
         Download daily CHIRPS data.
@@ -52,7 +53,7 @@ class CHIRPSClient:
             response = self.session.get(url, stream=True)
             response.raise_for_status()
 
-            with open(temp_file, 'wb') as f:
+            with open(temp_file, "wb") as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
 
@@ -73,7 +74,7 @@ class CHIRPSClient:
         bbox: Tuple[float, float, float, float],
         start_date: str,
         end_date: str,
-        output_path: Path
+        output_path: Path,
     ) -> Path:
         """Download monthly CHIRPS data (recommended for most applications)"""
         years = self._get_year_range(start_date, end_date)
@@ -86,7 +87,7 @@ class CHIRPSClient:
             response = self.session.get(url, stream=True)
             response.raise_for_status()
 
-            with open(temp_file, 'wb') as f:
+            with open(temp_file, "wb") as f:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
 
@@ -106,14 +107,14 @@ class CHIRPSClient:
         files: List[Path],
         bbox: Tuple[float, float, float, float],
         start_date: str,
-        end_date: str
+        end_date: str,
     ) -> xr.Dataset:
         """Merge multiple files and clip to spatial-temporal bounds"""
         import pandas as pd
 
         # Open and concatenate
         datasets = [xr.open_dataset(f) for f in files]
-        merged = xr.concat(datasets, dim='time')
+        merged = xr.concat(datasets, dim="time")
 
         # Clip time
         start = pd.to_datetime(start_date)
@@ -121,10 +122,10 @@ class CHIRPSClient:
         merged = merged.sel(time=slice(start, end))
 
         # Clip spatial (if coordinates available)
-        if 'latitude' in merged.coords and 'longitude' in merged.coords:
+        if "latitude" in merged.coords and "longitude" in merged.coords:
             merged = merged.sel(
                 latitude=slice(bbox[2], bbox[0]),  # Note: lat goes from N to S
-                longitude=slice(bbox[1], bbox[3])
+                longitude=slice(bbox[1], bbox[3]),
             )
 
         return merged
@@ -133,6 +134,7 @@ class CHIRPSClient:
     def _get_year_range(start: str, end: str) -> List[str]:
         """Extract years from date range"""
         import pandas as pd
+
         start_year = pd.to_datetime(start).year
         end_year = pd.to_datetime(end).year
         return [str(y) for y in range(start_year, end_year + 1)]

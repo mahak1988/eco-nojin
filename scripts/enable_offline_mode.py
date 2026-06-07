@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 وقتی Backend در دسترس نیست، از داده‌های mock استفاده می‌کند
 r"""
 
-import sys
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 PROJECT_ROOT = Path(r"D:\econojin.com")
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
@@ -20,7 +20,7 @@ FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
 class OfflineModeEnabler:
     def __init__(self):
-        self.backup_dir = FRONTEND_DIR / '.offline_mode_backup'
+        self.backup_dir = FRONTEND_DIR / ".offline_mode_backup"
         self.backup_dir.mkdir(exist_ok=True)
 
     def backup(self, path: Path):
@@ -29,21 +29,21 @@ class OfflineModeEnabler:
         rel = path.relative_to(FRONTEND_DIR)
         dest = self.backup_dir / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_path = dest.parent / f"{dest.stem}_{ts}{dest.suffix}"
         shutil.copy2(path, backup_path)
         logger.info(f"  💾 Backup: {backup_path.relative_to(FRONTEND_DIR)}")
 
     def update_api_client(self):
         """به‌روزرسانی API client برای پشتیبانی از حالت آفلاین"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🔌 Step 1: Update API Client with Offline Mode")
-        print("="*70)
+        print("=" * 70)
 
         api_file = FRONTEND_DIR / "lib" / "api.ts"
         self.backup(api_file)
 
-        new_content = '''import axios from 'axios';
+        new_content = """import axios from 'axios';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -321,9 +321,9 @@ export const healthApi = {
 };
 
 export default api;
-'''
+"""
 
-        api_file.write_text(new_content, encoding='utf-8')
+        api_file.write_text(new_content, encoding="utf-8")
         logger.info("  ✅ api.ts updated with offline mode support")
         logger.info("     • Mock data for stats, farmers, models")
         logger.info("     • Automatic backend detection")
@@ -331,9 +331,9 @@ export default api;
 
     def update_admin_page(self):
         """به‌روزرسانی صفحه Admin برای استفاده از healthApi"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("⚙️  Step 2: Update Admin Page")
-        print("="*70)
+        print("=" * 70)
 
         admin_file = FRONTEND_DIR / "app" / "admin" / "page.tsx"
         if not admin_file.exists():
@@ -342,28 +342,25 @@ export default api;
 
         self.backup(admin_file)
 
-        content = admin_file.read_text(encoding='utf-8')
-        
+        content = admin_file.read_text(encoding="utf-8")
+
         # جایگزینی import
         content = content.replace(
             "import { api, gaiaApi, modelsApi } from '@/lib/api';",
-            "import { api, gaiaApi, modelsApi, healthApi } from '@/lib/api';"
-        )
-        
-        # جایگزینی healthRes
-        content = content.replace(
-            "api.get('/health')",
-            "healthApi.check()"
+            "import { api, gaiaApi, modelsApi, healthApi } from '@/lib/api';",
         )
 
-        admin_file.write_text(content, encoding='utf-8')
+        # جایگزینی healthRes
+        content = content.replace("api.get('/health')", "healthApi.check()")
+
+        admin_file.write_text(content, encoding="utf-8")
         logger.info("  ✅ Admin page updated to use healthApi with fallback")
 
     def clear_cache(self):
         """پاک کردن cache"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🧹 Step 3: Clear Cache")
-        print("="*70)
+        print("=" * 70)
 
         next_dir = FRONTEND_DIR / ".next"
         if next_dir.exists():
@@ -371,10 +368,11 @@ export default api;
             logger.info("  ✓ Removed .next folder")
 
     def generate_report(self):
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("✅ OFFLINE MODE ENABLED")
-        print("="*70)
-        print(r"""
+        print("=" * 70)
+        print(
+            r"""
 🎯 What Changed:
 
 1. API Client (lib/api.ts):
@@ -429,13 +427,14 @@ OPTION B - Full Stack (Production):
    • /admin - Admin panel with mock health
    • /map - Map (works independently)
    • /calculate - Calculator with mock formula
-r""")
-        print("="*70)
+r"""
+        )
+        print("=" * 70)
 
     def run_all(self):
-        print("="*70)
+        print("=" * 70)
         logger.info("🔌 OFFLINE MODE ENABLER")
-        print("="*70)
+        print("=" * 70)
         logger.info(f"📁 Frontend: {FRONTEND_DIR}")
 
         if not FRONTEND_DIR.exists():
@@ -460,9 +459,10 @@ def main():
     except Exception as e:
         logger.info(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

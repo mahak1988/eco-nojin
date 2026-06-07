@@ -4,8 +4,9 @@ Econojin API Server Runner
 """
 
 import sys
-import uvicorn
 from pathlib import Path
+
+import uvicorn
 
 # Add project root to path
 _project_root = Path(__file__).parent.parent.parent
@@ -14,9 +15,11 @@ if str(_project_root) not in sys.path:
 
 try:
     from scripts.core.logger import UnifiedLogger
+
     logger = UnifiedLogger.get_logger(__name__)
 except Exception:
     import logging
+
     logger = logging.getLogger(__name__)
 
 
@@ -31,6 +34,7 @@ def load_config(config_path: Path) -> dict:
         }
 
     import importlib.util
+
     spec = importlib.util.spec_from_file_location("config", config_path)
     if spec is None or spec.loader is None:
         return {"HOST": "0.0.0.0", "PORT": 8000, "RELOAD": True}
@@ -39,8 +43,9 @@ def load_config(config_path: Path) -> dict:
     spec.loader.exec_module(config_module)
 
     return {
-        key: value for key, value in vars(config_module).items()
-        if not key.startswith('_') and not callable(value)
+        key: value
+        for key, value in vars(config_module).items()
+        if not key.startswith("_") and not callable(value)
     }
 
 

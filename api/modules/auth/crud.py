@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.modules.auth.models import UserAccount
 from api.modules.auth.schemas import LoginRequest
 
