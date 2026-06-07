@@ -6,25 +6,30 @@ Update Navbar & Homepage - Fixed Version (No f-string issues)
 r"""
 
 import shutil
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 FRONTEND_DIR = Path(r"D:\econojin.com\frontend")
 BACKUP_DIR = FRONTEND_DIR.parent / ".navbar_fix_backup" / datetime.now().strftime("%Y%m%d_%H%M%S")
+
 
 def print_header(title):
     print(f"\n{'='*70}")
     print(f"  {title}")
     print(f"{'='*70}\n")
 
+
 def print_success(msg):
     print(f"✓ {msg}")
+
 
 def print_error(msg):
     print(f"✗ {msg}")
 
+
 def print_info(msg):
     print(f"ℹ {msg}")
+
 
 def backup_file(path):
     if path.exists():
@@ -33,24 +38,27 @@ def backup_file(path):
         backup_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(path, backup_path)
 
+
 def write_file(path, content):
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     print_success(f"Created: {path.relative_to(FRONTEND_DIR)}")
+
 
 # ============================================================================
 # FIX: Update Navbar - با رشته معمولی، نه f-string
 # ============================================================================
 
+
 def update_navbar():
     print_header("🧭 Update Navbar Component")
-    
+
     navbar_path = FRONTEND_DIR / "components" / "Navbar.tsx"
-    
+
     if navbar_path.exists():
         backup_file(navbar_path)
-    
+
     # ✅ نکته کلیدی: استفاده از """...""" معمولی، نه f"""..."""
     # برای متغیرهای پایتون از .replace() استفاده می‌کنیم
     content = """'use client';
@@ -226,22 +234,24 @@ export default function Navbar({ locale }: { locale: Locale }) {
   );
 }
 """
-    
+
     write_file(navbar_path, content)
     return True
+
 
 # ============================================================================
 # FIX: Update Homepage - با رشته معمولی
 # ============================================================================
 
+
 def update_homepage():
     print_header("🏠 Update Homepage")
-    
+
     page_path = FRONTEND_DIR / "app" / "[locale]" / "page.tsx"
-    
+
     if page_path.exists():
         backup_file(page_path)
-    
+
     # ✅ رشته معمولی، نه f-string
     content = """'use client';
 
@@ -421,26 +431,38 @@ export default function HomePage() {
   );
 }
 """
-    
+
     write_file(page_path, content)
     return True
+
 
 # ============================================================================
 # FIX: Create simple module pages
 # ============================================================================
 
+
 def create_module_pages():
     print_header("📄 Create Module Pages")
-    
-    modules = ['hydrology', 'soil-water', 'crop', 'carbon', 'erosion', 'halls', 'advisors', 'webinars', 'wallet']
-    
+
+    modules = [
+        "hydrology",
+        "soil-water",
+        "crop",
+        "carbon",
+        "erosion",
+        "halls",
+        "advisors",
+        "webinars",
+        "wallet",
+    ]
+
     for module in modules:
         page_path = FRONTEND_DIR / "app" / "[locale]" / module / "page.tsx"
-        
+
         if page_path.exists():
             print_info(f"Exists: {module}")
             continue
-        
+
         # ✅ رشته معمولی + .replace() برای متغیرها
         content = """'use client';
 
@@ -492,30 +514,32 @@ export default function Page() {
 r"""
         # جایگزینی MODULE_NAME با نام ماژول فعلی
         content = content.replace("'MODULE_NAME'", f"'{module}'")
-        
+
         page_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(page_path, 'w', encoding='utf-8') as f:
+        with open(page_path, "w", encoding="utf-8") as f:
             f.write(content)
-        
+
         print_success(f"Created: app/[locale]/{module}/page.tsx")
-    
+
     return True
+
 
 # ============================================================================
 # MAIN
 # ============================================================================
 
+
 def main():
     print_header("🔄 UPDATE NAVBAR & HOMEPAGE - FIXED")
-    
+
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     fixes = [
         ("Update Navbar", update_navbar),
         ("Update Homepage", update_homepage),
         ("Create Module Pages", create_module_pages),
     ]
-    
+
     results = []
     for name, func in fixes:
         try:
@@ -525,12 +549,12 @@ def main():
         except Exception as e:
             print_error(f"Failed: {name} - {e}")
             results.append((name, False))
-    
+
     print_header("📊 SUMMARY")
-    
+
     for name, success in results:
         print(f"{'✓' if success else '✗'} {name}")
-    
+
     if all(s for _, s in results):
         print_success("✅ بروزرسانی کامل شد!")
         print_info(f"\n💾 Backup: {BACKUP_DIR}")
@@ -539,11 +563,13 @@ def main():
         print("  npm run dev")
     else:
         print_error("برخی موارد نیاز به بررسی دارند")
-    
+
     return 0
+
 
 if __name__ == "__main__":
     import sys
+
     try:
         sys.exit(main())
     except KeyboardInterrupt:
@@ -552,5 +578,6 @@ if __name__ == "__main__":
     except Exception as e:
         print_error(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

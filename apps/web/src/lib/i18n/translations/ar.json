@@ -1,0 +1,50 @@
+{
+  "common": {
+    "home": "الرئيسية",
+    "about": "حول",
+    "contact": "اتصل",
+    "login": "تسجيل الدخول",
+    "register": "تسجيل",
+    "logout": "خروج",
+    "search": "بحث",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تحرير",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "submit": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق"
+  },
+  "navbar": {
+    "home": "الرئيسية",
+    "academy": "الأكاديمية",
+    "gis": "نظم المعلومات الجغرافية",
+    "weather": "الطقس",
+    "drought": "الجفاف",
+    "iot": "إنترنت الأشياء",
+    "ecocoin": "EcoCoin",
+    "mrv": "MRV",
+    "soil_water": "التربة والمياه",
+    "sentinel": "القمر الصناعي",
+    "ai": "الذكاء الاصطناعي"
+  },
+  "weather": {
+    "title": "الطقس والمناخ",
+    "subtitle": "توقعات الطقس وتحليل بيانات المناخ",
+    "current_weather": "الطقس الحالي",
+    "forecast_7days": "توقعات 7 أيام",
+    "temperature": "درجة الحرارة",
+    "humidity": "الرطوبة",
+    "wind_speed": "سرعة الرياح",
+    "precipitation": "هطول الأمطار",
+    "cloud_cover": "الغطاء السحابي",
+    "pressure": "الضغط",
+    "location_search": "البحث عن الموقع",
+    "latitude": "خط العرض",
+    "longitude": "خط الطول"
+  }
+}

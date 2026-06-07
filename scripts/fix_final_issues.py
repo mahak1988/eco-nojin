@@ -7,10 +7,10 @@
 - رفع خطای border-border در Tailwind
 r"""
 
-import sys
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 PROJECT_ROOT = Path(r"D:\econojin.com")
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
@@ -19,7 +19,7 @@ BACKEND_DIR = PROJECT_ROOT / "scripts" / "api"
 
 class FinalFixer:
     def __init__(self):
-        self.backup_dir = PROJECT_ROOT / '.final_fix_backup'
+        self.backup_dir = PROJECT_ROOT / ".final_fix_backup"
         self.backup_dir.mkdir(exist_ok=True)
 
     def backup(self, path: Path):
@@ -28,7 +28,7 @@ class FinalFixer:
         rel = path.relative_to(PROJECT_ROOT)
         dest = self.backup_dir / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_path = dest.parent / f"{dest.stem}_{ts}{dest.suffix}"
         shutil.copy2(path, backup_path)
         logger.info(f"  💾 Backup: {backup_path.relative_to(PROJECT_ROOT)}")
@@ -38,12 +38,12 @@ class FinalFixer:
     # =========================================================================
     def create_backend_config(self):
         """ایجاد فایل config.py برای Backend"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("⚙️  Backend Fix 1: Create config.py")
-        print("="*70)
+        print("=" * 70)
 
         config_file = BACKEND_DIR / "config.py"
-        
+
         if config_file.exists():
             self.backup(config_file)
 
@@ -108,7 +108,7 @@ DATA_DIR.mkdir(exist_ok=True)
 UPLOAD_DIR.mkdir(exist_ok=True)
 '''
 
-        config_file.write_text(content, encoding='utf-8')
+        config_file.write_text(content, encoding="utf-8")
         logger.info(f"  ✅ Created: {config_file.relative_to(PROJECT_ROOT)}")
         logger.info("     • HOST: 0.0.0.0")
         logger.info("     • PORT: 8000")
@@ -116,42 +116,38 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 
     def fix_run_server_logger(self):
         """رفع خطای logger.error(file=...) در run_server.py"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🔧 Backend Fix 2: Fix logger.error() in run_server.py")
-        print("="*70)
+        print("=" * 70)
 
         run_server = BACKEND_DIR / "run_server.py"
-        
+
         if not run_server.exists():
             logger.info(f"  ❌ File not found: {run_server}")
             return False
 
         self.backup(run_server)
 
-        content = run_server.read_text(encoding='utf-8')
+        content = run_server.read_text(encoding="utf-8")
         original = content
 
         # رفع logger.error(f"...", file=sys.stderr)
         # تبدیل به logger.error(f"...") بدون file parameter
         content = content.replace(
-            'logger.error(f"Error: {e}", file=sys.stderr)',
-            'logger.error(f"Error: {e}")'
-        )
-        
-        # همچنین logger.info(str(..., file=sys.stderr)) برای logger
-        content = content.replace(
-            'logger.error("Error", file=sys.stderr)',
-            'logger.error("Error")'
+            'logger.error(f"Error: {e}", file=sys.stderr)', 'logger.error(f"Error: {e}")'
         )
 
+        # همچنین logger.info(str(..., file=sys.stderr)) برای logger
+        content = content.replace('logger.error("Error", file=sys.stderr)', 'logger.error("Error")')
+
         if content != original:
-            run_server.write_text(content, encoding='utf-8')
+            run_server.write_text(content, encoding="utf-8")
             print("  ✅ Fixed logger.error() - removed invalid 'file' parameter")
             return True
         else:
             # اگر الگوی خاص نبود، بازنویسی کل تابع main
             logger.info("  ℹ️  Pattern not found, rewriting run_server.py safely...")
-            
+
             new_content = '''# -*- coding: utf-8 -*-
 """
 Econojin API Server Runner
@@ -231,7 +227,7 @@ def main():
 if __name__ == "__main__":
     main()
 '''
-            run_server.write_text(new_content, encoding='utf-8')
+            run_server.write_text(new_content, encoding="utf-8")
             logger.info("  ✅ Rewrote run_server.py with safe implementation")
             return True
 
@@ -240,9 +236,9 @@ if __name__ == "__main__":
     # =========================================================================
     def fix_globals_css(self):
         """رفع خطای border-border در globals.css"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🎨 Frontend Fix 1: Fix globals.css (border-border error)")
-        print("="*70)
+        print("=" * 70)
 
         css_file = FRONTEND_DIR / "app" / "globals.css"
         self.backup(css_file)
@@ -350,16 +346,16 @@ if __name__ == "__main__":
 }
 """
 
-        css_file.write_text(new_css, encoding='utf-8')
+        css_file.write_text(new_css, encoding="utf-8")
         logger.info("  ✅ globals.css fixed (removed border-border)")
         logger.info("     • Simplified without shadcn/ui dependencies")
         logger.info("     • Inter font configured")
 
     def fix_tailwind_config(self):
         """رفع tailwind.config.js"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("⚙️  Frontend Fix 2: Fix tailwind.config.js")
-        print("="*70)
+        print("=" * 70)
 
         config_file = FRONTEND_DIR / "tailwind.config.js"
         self.backup(config_file)
@@ -438,16 +434,16 @@ module.exports = {
 }
 """
 
-        config_file.write_text(new_config, encoding='utf-8')
+        config_file.write_text(new_config, encoding="utf-8")
         logger.info("  ✅ tailwind.config.js fixed")
         logger.info("     • Removed tailwindcss-animate plugin requirement")
         logger.info("     • Added border color definition")
 
     def clear_cache(self):
         """پاک کردن Next.js cache"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("🧹 Clear Cache")
-        print("="*70)
+        print("=" * 70)
 
         next_dir = FRONTEND_DIR / ".next"
         if next_dir.exists():
@@ -457,10 +453,11 @@ module.exports = {
             logger.info("  ⏭️  .next not found")
 
     def generate_report(self):
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         logger.info("✅ ALL FIXES COMPLETE")
-        print("="*70)
-        print(r"""
+        print("=" * 70)
+        print(
+            r"""
 🎯 Changes Applied:
 
 Backend (scripts/api/):
@@ -505,13 +502,14 @@ Terminal 2 (Frontend):
 🔒 Security:
    • Next.js 15.0.5 (CVE-2025-66478 PATCHED)
    • Babel compiler active
-r""")
-        print("="*70)
+r"""
+        )
+        print("=" * 70)
 
     def run_all(self):
-        print("="*70)
+        print("=" * 70)
         logger.info("🔧 FINAL ISSUES FIXER (Backend + Frontend)")
-        print("="*70)
+        print("=" * 70)
         logger.info(f"📁 Project: {PROJECT_ROOT}")
 
         # Backend fixes
@@ -538,9 +536,10 @@ def main():
     except Exception as e:
         logger.info(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

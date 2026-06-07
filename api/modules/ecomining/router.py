@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Query, Body
+from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
+from typing import Dict, Any
+from fastapi import APIRouter, Body, Query
 
 router = APIRouter()
 
-@router.get("/balance")
+
+@router.get("/balance", response_model=Dict[str, Any])
 async def get_balance():
     return {"balance": 1250, "eco_coins": 1250, "currency": "ECO"}
 
-@router.post("/mine")
+
+@router.post("/mine", response_model=Dict[str, Any])
 async def mine(
     action_type: str = "green_action",
     amount: float = 10,
@@ -25,22 +29,27 @@ async def mine(
     )
     return {"success": True, "location": location, **result}
 
-@router.get("/")
+
+@router.get("/", response_model=Dict[str, Any])
 async def list_ecomining():
     return {"items": [], "total": 0, "module": "ecomining"}
 
-@router.get("/{id}")
+
+@router.get("/{id}", response_model=Dict[str, Any])
 async def get_ecomining(id: str):
     return {"id": id, "name": "نمونه EcoCoin", "status": "active"}
 
-@router.post("/")
+
+@router.post("/", response_model=Dict[str, Any])
 async def create_ecomining(data: dict = Body(...)):
     return {"id": "new_123", "message": "با موفقیت ایجاد شد", **data}
 
-@router.put("/{id}")
+
+@router.put("/{id}", response_model=IDResponse)
 async def update_ecomining(id: str, data: dict = Body(...)):
     return {"id": id, "message": "با موفقیت به‌روز شد", **data}
 
-@router.delete("/{id}")
+
+@router.delete("/{id}", response_model=SuccessResponse)
 async def delete_ecomining(id: str):
     return {"id": id, "message": "با موفقیت حذف شد"}

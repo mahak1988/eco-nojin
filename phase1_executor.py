@@ -6,21 +6,17 @@
 """
 import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
+
 
 def run_command(cmd: str, cwd: Path = ROOT) -> bool:
     """اجرای دستور shell"""
     try:
         result = subprocess.run(
-            cmd, 
-            shell=True, 
-            cwd=cwd, 
-            capture_output=True, 
-            text=True,
-            timeout=300
+            cmd, shell=True, cwd=cwd, capture_output=True, text=True, timeout=300
         )
         if result.returncode != 0:
             print(f"⚠️ Warning: {result.stderr}")
@@ -30,11 +26,12 @@ def run_command(cmd: str, cwd: Path = ROOT) -> bool:
         print(f"❌ Error: {e}")
         return False
 
+
 def update_gitignore():
     """به‌روزرسانی فایل .gitignore"""
     print("\n[1/6] Updating .gitignore...")
     gitignore = ROOT / ".gitignore"
-    
+
     additions = """
 # === Econojin Security & Optimization ===
 
@@ -74,7 +71,7 @@ build/
 *.bak
 *.tmp
 """
-    
+
     if gitignore.exists():
         content = gitignore.read_text(encoding="utf-8")
         if "Econojin Security" not in content:
@@ -87,12 +84,13 @@ build/
         gitignore.write_text(additions, encoding="utf-8")
         print("✅ .gitignore created")
 
+
 def create_model_downloader():
     """ایجاد اسکریپت دانلود مدل"""
     print("\n[2/6] Creating model downloader...")
     script_path = ROOT / "scripts" / "download_model.py"
     script_path.parent.mkdir(exist_ok=True)
-    
+
     content = '''#!/usr/bin/env python3
 """Download ML model from Hugging Face Hub at runtime"""
 from huggingface_hub import snapshot_download
@@ -114,45 +112,49 @@ def download_model():
 if __name__ == "__main__":
     download_model()
 '''
-    
+
     script_path.write_text(content, encoding="utf-8")
     print(f"✅ Created: {script_path}")
+
 
 def remove_large_files_from_git():
     """خارج‌سازی فایل‌های بزرگ از Git"""
     print("\n[3/6] Removing large files from Git tracking...")
-    
+
     large_files = [
         "models/all-MiniLM-L6-v2/model.safetensors",
     ]
-    
+
     for file_path in large_files:
         full_path = ROOT / file_path
         if full_path.exists():
             run_command(f'git rm --cached "{file_path}"')
             print(f"✅ Removed from Git: {file_path}")
-    
+
     run_command('git commit -m "chore: remove large model files from Git tracking"')
+
 
 def cleanup_backup_files():
     """پاک‌سازی فایل‌های بک‌آپ قدیمی"""
     print("\n[4/6] Cleaning up old backup files...")
-    
+
     backup_dirs = list(ROOT.glob("*_backup_*"))
     removed = 0
-    
+
     for backup_dir in backup_dirs:
         if backup_dir.is_dir():
             mtime = datetime.fromtimestamp(backup_dir.stat().st_mtime)
             age_days = (datetime.now() - mtime).days
-            
+
             if age_days > 30:
                 import shutil
+
                 shutil.rmtree(backup_dir)
                 print(f"🗑️ Removed: {backup_dir.name} ({age_days} days old)")
                 removed += 1
-    
+
     print(f"✅ Removed {removed} old backup directories")
+
 
 def cleanup_pnpm_cache():
     """پاک‌سازی کش pnpm"""
@@ -160,11 +162,12 @@ def cleanup_pnpm_cache():
     run_command("pnpm store prune")
     print("✅ pnpm cache cleaned")
 
+
 def create_env_example():
     """ایجاد فایل .env.example"""
     print("\n[6/6] Creating .env.example...")
     env_example = ROOT / ".env.example"
-    
+
     if not env_example.exists():
         content = """# Econojin Environment Variables Template
 # Copy this file to .env and fill in your actual values
@@ -201,21 +204,22 @@ PORT=8000
     else:
         print("ℹ️ .env.example already exists")
 
+
 def main():
     print("🚀 Econojin Phase 1 Executor")
     print("=" * 60)
     print("This script will execute Phase 1 actions (0-1 week)")
     print("=" * 60)
-    
+
     # تأیید کاربر
     print("\n⚠️ This will modify your project files.")
     print("   Make sure you have committed your current work.")
     confirm = input("\n   Continue? (yes/no): ").strip().lower()
-    
+
     if confirm != "yes":
         print("\n❌ Cancelled by user")
         return 1
-    
+
     # اجرای اقدامات
     update_gitignore()
     create_model_downloader()
@@ -223,7 +227,7 @@ def main():
     cleanup_backup_files()
     cleanup_pnpm_cache()
     create_env_example()
-    
+
     # خلاصه
     print("\n" + "=" * 60)
     print("✅ Phase 1 actions completed!")
@@ -234,8 +238,9 @@ def main():
     print("   4. Fill in actual values in .env")
     print("   5. Enable GitHub Secret Scanning in repository settings")
     print("=" * 60)
-    
+
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

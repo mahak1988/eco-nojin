@@ -11,14 +11,85 @@ ROOT = Path(__file__).parent.resolve()
 WEB = ROOT / "apps" / "web" / "src"
 
 MODULES = [
-    {"id": "calendar", "name": "تقویم", "icon": "Calendar", "color": "#3b82f6", "desc": "مدیریت رویدادها", "chart": "bar", "data": "events", "xKey": "start", "yKey": "title"},
-    {"id": "weather", "name": "هواشناسی", "icon": "CloudSun", "color": "#0ea5e9", "desc": "پیش‌بینی کشاورزی", "chart": "line", "data": "forecast", "xKey": "day", "yKey": "temp"},
-    {"id": "accounting", "name": "حسابداری", "icon": "Wallet", "color": "#10b981", "desc": "مدیریت مالی", "chart": "pie", "data": "expenses", "xKey": "name", "yKey": "value"},
-    {"id": "gis", "name": "GIS", "icon": "Map", "color": "#8b5cf6", "desc": "نقشه و تحلیل", "chart": "scatter", "data": "coordinates", "xKey": "x", "yKey": "ndvi"},
-    {"id": "education", "name": "آموزش", "icon": "GraduationCap", "color": "#f59e0b", "desc": "کلاس‌های آنلاین", "chart": "radar", "data": "progress", "xKey": "skill", "yKey": "level"},
-    {"id": "psychology", "name": "روانشناسی", "icon": "Brain", "color": "#ec4899", "desc": "سلامت روان", "chart": "area", "data": "mood", "xKey": "date", "yKey": "score"},
-    {"id": "ecomining", "name": "EcoCoin", "icon": "Leaf", "color": "#22c55e", "desc": "ماینینگ سبز", "chart": "line", "data": "price", "xKey": "time", "yKey": "close"},
+    {
+        "id": "calendar",
+        "name": "تقویم",
+        "icon": "Calendar",
+        "color": "#3b82f6",
+        "desc": "مدیریت رویدادها",
+        "chart": "bar",
+        "data": "events",
+        "xKey": "start",
+        "yKey": "title",
+    },
+    {
+        "id": "weather",
+        "name": "هواشناسی",
+        "icon": "CloudSun",
+        "color": "#0ea5e9",
+        "desc": "پیش‌بینی کشاورزی",
+        "chart": "line",
+        "data": "forecast",
+        "xKey": "day",
+        "yKey": "temp",
+    },
+    {
+        "id": "accounting",
+        "name": "حسابداری",
+        "icon": "Wallet",
+        "color": "#10b981",
+        "desc": "مدیریت مالی",
+        "chart": "pie",
+        "data": "expenses",
+        "xKey": "name",
+        "yKey": "value",
+    },
+    {
+        "id": "gis",
+        "name": "GIS",
+        "icon": "Map",
+        "color": "#8b5cf6",
+        "desc": "نقشه و تحلیل",
+        "chart": "scatter",
+        "data": "coordinates",
+        "xKey": "x",
+        "yKey": "ndvi",
+    },
+    {
+        "id": "education",
+        "name": "آموزش",
+        "icon": "GraduationCap",
+        "color": "#f59e0b",
+        "desc": "کلاس‌های آنلاین",
+        "chart": "radar",
+        "data": "progress",
+        "xKey": "skill",
+        "yKey": "level",
+    },
+    {
+        "id": "psychology",
+        "name": "روانشناسی",
+        "icon": "Brain",
+        "color": "#ec4899",
+        "desc": "سلامت روان",
+        "chart": "area",
+        "data": "mood",
+        "xKey": "date",
+        "yKey": "score",
+    },
+    {
+        "id": "ecomining",
+        "name": "EcoCoin",
+        "icon": "Leaf",
+        "color": "#22c55e",
+        "desc": "ماینینگ سبز",
+        "chart": "line",
+        "data": "price",
+        "xKey": "time",
+        "yKey": "close",
+    },
 ]
+
 
 def write_file(filepath, content):
     fp = Path(filepath)
@@ -26,6 +97,7 @@ def write_file(filepath, content):
     fp.write_text(content, encoding="utf-8")
     rel = str(fp).replace(str(ROOT.parent.parent) + "\\", "")
     print(f"✅ {rel}")
+
 
 # ========== کامپوننت‌های مشترک (بدون f-string) ==========
 CHART_CARD = '''"""use client";
@@ -241,11 +313,20 @@ export default function __NAME_CAP__Page() {
 }
 '''
 
+
 def create_module_page(mod):
     """ایجاد صفحه ماژول با جایگزینی ساده"""
     name_cap = mod["name"].replace(" ", "")
-    x_label = {"start":"زمان","day":"روز","name":"نام","x":"مختصات","skill":"مهارت","date":"تاریخ","time":"ساعت"}.get(mod["xKey"], "مقدار")
-    
+    x_label = {
+        "start": "زمان",
+        "day": "روز",
+        "name": "نام",
+        "x": "مختصات",
+        "skill": "مهارت",
+        "date": "تاریخ",
+        "time": "ساعت",
+    }.get(mod["xKey"], "مقدار")
+
     content = PAGE_TEMPLATE
     content = content.replace("__ICON__", mod["icon"])
     content = content.replace("__NAME_CAP__", name_cap)
@@ -260,16 +341,17 @@ def create_module_page(mod):
     content = content.replace("__XLABEL__", x_label)
     return content
 
+
 def main():
     print("🎨 Econojin Frontend Generator")
     print("=" * 50)
-    
+
     print("\n[1/3] Creating shared components...")
     write_file(WEB / "components" / "ui" / "ChartCard.tsx", CHART_CARD)
     write_file(WEB / "components" / "ui" / "DataTable.tsx", DATA_TABLE)
     write_file(WEB / "components" / "ui" / "AnimatedStatCard.tsx", ANIMATED_STAT)
     print("✅ Shared components created")
-    
+
     print("\n[2/3] Creating module pages...")
     for mod in MODULES:
         page_dir = WEB / "app" / mod["id"]
@@ -293,7 +375,7 @@ export function {mod["name"].replace(" ", "")}Card({{ title, value, icon, color 
 }}
 '''
         write_file(comp_dir / "ModuleCard.tsx", mod_card)
-    
+
     print("\n[3/3] Updating sidebar...")
     sidebar = WEB / "components" / "layout" / "sidebar.tsx"
     if sidebar.exists():
@@ -302,10 +384,12 @@ export function {mod["name"].replace(" ", "")}Card({{ title, value, icon, color 
             if f'id: "{mod["id"]}"' not in content:
                 entry = f'  {{ id: "{mod["id"]}", name: "{mod["name"]}", icon: {mod["icon"]}, href: "/{mod["id"]}" }},'
                 if "const modules = [" in content:
-                    content = content.replace("const modules = [", f"const modules = [\n{entry}\n  ")
+                    content = content.replace(
+                        "const modules = [", f"const modules = [\n{entry}\n  "
+                    )
         sidebar.write_text(content, encoding="utf-8")
         print("✅ Sidebar updated")
-    
+
     print("\n" + "=" * 50)
     print(f"✅ Created {len(MODULES)} module pages")
     print("📊 Charts: Recharts | ✨ Animations: Framer Motion")
@@ -313,6 +397,7 @@ export function {mod["name"].replace(" ", "")}Card({{ title, value, icon, color 
     print(f"\n🚀 Test: http://localhost:3001/{{module-id}}")
     print("=" * 50)
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

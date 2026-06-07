@@ -4,7 +4,10 @@
 🚀 Econojin Quick Setup - همه‌کاره
 این اسکریپت: ۱) پکیج‌ها را نصب می‌کند ۲) فایل‌ها را می‌سازد ۳) پروژه را تست می‌کند
 """
-import os, sys, subprocess, json
+import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
@@ -23,7 +26,9 @@ except:
     print("   ⚠️ pip not found, trying to bootstrap...")
     # تلاش برای نصب pip اگر نیست
     try:
-        subprocess.run([python_exe, "-m", "ensurepip", "--upgrade"], check=True, capture_output=True)
+        subprocess.run(
+            [python_exe, "-m", "ensurepip", "--upgrade"], check=True, capture_output=True
+        )
         print("   ✅ pip bootstrapped")
     except:
         print("   ❌ Could not bootstrap pip. Using system packages only.")
@@ -31,14 +36,35 @@ except:
 # ========== ۲. نصب پکیج‌های ضروری ==========
 print("\n[2/4] Installing required packages...")
 packages = [
-    "fastapi", "uvicorn", "pydantic", "pydantic-settings",
-    "python-dotenv", "httpx", "sqlalchemy", "aiosqlite", "structlog"
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pydantic-settings",
+    "python-dotenv",
+    "httpx",
+    "sqlalchemy",
+    "aiosqlite",
+    "structlog",
 ]
 for pkg in packages:
     try:
-        subprocess.run([python_exe, "-m", "pip", "install", pkg, "--quiet", 
-                       "--trusted-host", "pypi.org", "--trusted-host", "files.pythonhosted.org"], 
-                      check=True, capture_output=True, timeout=120)
+        subprocess.run(
+            [
+                python_exe,
+                "-m",
+                "pip",
+                "install",
+                pkg,
+                "--quiet",
+                "--trusted-host",
+                "pypi.org",
+                "--trusted-host",
+                "files.pythonhosted.org",
+            ],
+            check=True,
+            capture_output=True,
+            timeout=120,
+        )
         print(f"   ✅ {pkg}")
     except Exception as e:
         print(f"   ⚠️ {pkg}: {str(e)[:50]}")
@@ -46,10 +72,12 @@ for pkg in packages:
 # ========== ۳. ایجاد ساختار فایل‌ها ==========
 print("\n[3/4] Creating project files...")
 
+
 def write_file(path: Path, content: str):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     print(f"   ✅ {path.relative_to(ROOT)}")
+
 
 # api/__init__.py
 write_file(ROOT / "api" / "__init__.py", "# Econojin API\n")
@@ -58,7 +86,9 @@ write_file(ROOT / "api" / "__init__.py", "# Econojin API\n")
 write_file(ROOT / "api" / "core" / "__init__.py", "# Core module\n")
 
 # api/core/config.py
-write_file(ROOT / "api" / "core" / "config.py", '''from pydantic_settings import BaseSettings
+write_file(
+    ROOT / "api" / "core" / "config.py",
+    """from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     APP_NAME: str = "Econojin"
     APP_VERSION: str = "2.0.0"
@@ -70,10 +100,13 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 settings = Settings()
-''')
+""",
+)
 
 # api/core/database.py
-write_file(ROOT / "api" / "core" / "database.py", '''from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+write_file(
+    ROOT / "api" / "core" / "database.py",
+    """from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 Base = declarative_base()
 engine = None
@@ -91,11 +124,14 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         try: yield session
         finally: await session.close()
-''')
+""",
+)
 
 # api/modules/weather/router.py
 write_file(ROOT / "api" / "modules" / "weather" / "__init__.py", "# Weather module\n")
-write_file(ROOT / "api" / "modules" / "weather" / "router.py", '''from fastapi import APIRouter, Query
+write_file(
+    ROOT / "api" / "modules" / "weather" / "router.py",
+    """from fastapi import APIRouter, Query
 router = APIRouter()
 @router.get("/forecast")
 async def get_forecast(location: str = Query("تهران"), days: int = Query(7, ge=1, le=14)):
@@ -103,37 +139,49 @@ async def get_forecast(location: str = Query("تهران"), days: int = Query(7,
 @router.get("/alerts")
 async def get_alerts(region: str = Query("خراسان")):
     return {"region": region, "alerts": [{"type": "frost", "message": "احتمال یخبندان"}]}
-''')
+""",
+)
 
 # api/modules/accounting/router.py
 write_file(ROOT / "api" / "modules" / "accounting" / "__init__.py", "# Accounting module\n")
-write_file(ROOT / "api" / "modules" / "accounting" / "router.py", '''from fastapi import APIRouter
+write_file(
+    ROOT / "api" / "modules" / "accounting" / "router.py",
+    """from fastapi import APIRouter
 router = APIRouter()
 @router.get("/summary")
 async def get_summary():
     return {"total_income": 112400000, "total_expense": 48700000, "net_profit": 63700000, "currency": "IRR"}
-''')
+""",
+)
 
 # api/modules/gis/router.py
 write_file(ROOT / "api" / "modules" / "gis" / "__init__.py", "# GIS module\n")
-write_file(ROOT / "api" / "modules" / "gis" / "router.py", '''from fastapi import APIRouter, Body
+write_file(
+    ROOT / "api" / "modules" / "gis" / "router.py",
+    """from fastapi import APIRouter, Body
 router = APIRouter()
 @router.post("/calculate/area")
 async def calculate_area(coordinates: list[list[float]] = Body(...)):
     if len(coordinates) < 3: return {"error": "حداقل ۳ نقطه نیاز است"}
     area = sum(coordinates[i][0]*coordinates[(i+1)%len(coordinates)][1] - coordinates[(i+1)%len(coordinates)][0]*coordinates[i][1] for i in range(len(coordinates)))
     return {"area_km2": abs(area)/2/1_000_000}
-''')
+""",
+)
 
 # api/agents/orchestrator.py
 write_file(ROOT / "api" / "agents" / "__init__.py", "# Agents module\n")
-write_file(ROOT / "api" / "agents" / "orchestrator.py", '''class EconojinOrchestrator:
+write_file(
+    ROOT / "api" / "agents" / "orchestrator.py",
+    """class EconojinOrchestrator:
     async def process_request(self, request: str, context: dict):
         return {"status": "processed", "response": "OK", "context": context}
-''')
+""",
+)
 
 # api/main.py - فایل اصلی
-write_file(ROOT / "api" / "main.py", '''#!/usr/bin/env python3
+write_file(
+    ROOT / "api" / "main.py",
+    '''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """🛰️ Econojin Backend"""
 import sys
@@ -185,7 +233,8 @@ async def global_error(request, exc: Exception):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("api.main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG)
-''')
+''',
+)
 
 # ========== ۴. تست و گزارش نهایی ==========
 print("\n[4/4] Testing setup...")

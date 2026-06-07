@@ -2,17 +2,19 @@
 توابع کمکی برای main.py
 جداسازی برای جلوگیری از circular imports
 """
-import sys
 import re
+import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 import structlog
 
-from api.schemas import AnalysisRequest
 from api.database import async_session_maker
 from api.repository import AnalysisRepository
+from api.schemas import AnalysisRequest
 
 logger = structlog.get_logger()
 
@@ -32,45 +34,45 @@ def extract_metrics_from_response(tasks: Dict[str, Any]) -> Dict[str, Any]:
     """استخراج شاخص‌های کلیدی از نتیجه workflow با regex"""
     metrics = {}
     tools_used = set()
-    
+
     for task_id, task in tasks.items():
         output = task.get("output", "")
         task_tools = task.get("tools_used", [])
         tools_used.update(task_tools)
-        
+
         # استخراج NDVI
         ndvi_match = re.search(r"NDVI[^\d]*(\d+\.\d+)", output)
         if ndvi_match:
             metrics["ndvi_avg"] = float(ndvi_match.group(1))
-        
+
         health_match = re.search(r"وضعیت\s+(\S+)", output)
         if health_match:
             metrics["ndvi_health"] = health_match.group(1)
-        
+
         # استخراج فرسایش
         erosion_match = re.search(r"فرسایش خاک[^\d]*(\d+\.\d+)", output)
         if erosion_match:
             metrics["erosion_rate"] = float(erosion_match.group(1))
-        
+
         severity_match = re.search(r"فرسایش خاک[^\(]*\(([^)]+)\)", output)
         if severity_match:
             metrics["erosion_severity"] = severity_match.group(1)
-        
+
         # استخراج بارش
         rain_match = re.search(r"بارش[^\d]*(\d+\.\d+)", output)
         if rain_match:
             metrics["rainfall_30d"] = float(rain_match.group(1))
-        
+
         # استخراج عملکرد
         yield_match = re.search(r"عملکرد[^\d]*(\d+\.\d+)", output)
         if yield_match:
             metrics["predicted_yield"] = float(yield_match.group(1))
-        
+
         # استخراج نیاز آبیاری
         irr_match = re.search(r"آبیاری[^\d]*(\d+)", output)
         if irr_match:
             metrics["irrigation_need"] = float(irr_match.group(1))
-    
+
     metrics["tools_used"] = list(tools_used)
     return metrics
 
@@ -83,13 +85,12 @@ async def extract_and_save_analysis(
     """استخراج و ذخیره نتیجه تحلیل در دیتابیس"""
     try:
         metrics = extract_metrics_from_response(result["tasks"])
-        
+
         # موقعیت منطقه
         region_coords = REGION_COORDINATES.get(
-            request.region.value,
-            {"lat": 35.6892, "lon": 51.3890}
+            request.region.value, {"lat": 35.6892, "lon": 51.3890}
         )
-        
+
         save_data = {
             "session_id": session_id,
             "region": request.region.value,
@@ -101,18 +102,18 @@ async def extract_and_save_analysis(
             "full_response": result.get("final_response", ""),
             **metrics,
         }
-        
+
         async with async_session_maker() as session:
             repo = AnalysisRepository(session)
             await repo.save_analysis(save_data)
             await session.commit()
-        
+
         logger.info(
             "analysis_saved",
             session_id=session_id,
             region=request.region.value,
         )
-    
+
     except Exception as e:
         logger.error(
             "extract_and_save_failed",

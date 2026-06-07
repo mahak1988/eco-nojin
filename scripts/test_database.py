@@ -1,19 +1,33 @@
 """Test database models (mock or real)"""
-import sys, os
+import os
+import sys
+
 from backend.core.logger import UnifiedLogger
+
 logger = UnifiedLogger.get_logger(__name__)
 
 sys.path.insert(0, r"D:\\econojin.com")
 
+
 def test_models_import():
     """Test that models can be imported"""
     try:
-        from scripts.db.models import Base, User, Subbasin, WeatherData, SoilProfile, Sensor, SensorData
+        from scripts.db.models import (
+            Base,
+            Sensor,
+            SensorData,
+            SoilProfile,
+            Subbasin,
+            User,
+            WeatherData,
+        )
+
         logger.info("✓ All ORM models imported successfully")
         return True
     except ImportError as e:
         logger.error(f"✗ Import failed: {e}")
         return False
+
 
 def test_mock_registration():
     """Test farmer registration in mock mode"""
@@ -26,6 +40,7 @@ def test_mock_registration():
     except Exception as e:
         logger.error(f"✗ Mock test failed: {e}")
         return False
+
 
 if __name__ == "__main__":
     logger.info("\n=== Database Test Suite ===")

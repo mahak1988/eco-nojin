@@ -1,10 +1,13 @@
+from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
+from typing import Dict, Any
 from fastapi import APIRouter, Body
-from api.services.simulation_engine import simulate_rothc, simulate_aquacrop, simulate_coupling
+
+from api.services.simulation_engine import simulate_aquacrop, simulate_coupling, simulate_rothc
 
 router = APIRouter(tags=["Simulation"])
 
 
-@router.post("/rothc")
+@router.post("/rothc", response_model=Dict[str, Any])
 async def run_rothc(data: dict = Body(...)):
     return simulate_rothc(
         initial_soc=float(data.get("initial_soc", 50)),
@@ -15,7 +18,7 @@ async def run_rothc(data: dict = Body(...)):
     )
 
 
-@router.post("/aquacrop")
+@router.post("/aquacrop", response_model=Dict[str, Any])
 async def run_aquacrop(data: dict = Body(...)):
     return simulate_aquacrop(
         crop=str(data.get("crop", "wheat")),
@@ -25,6 +28,6 @@ async def run_aquacrop(data: dict = Body(...)):
     )
 
 
-@router.post("/coupling")
+@router.post("/coupling", response_model=Dict[str, Any])
 async def run_coupling(data: dict = Body(...)):
     return simulate_coupling(data.get("modules", []))

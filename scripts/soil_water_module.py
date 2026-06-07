@@ -11,12 +11,14 @@ from pathlib import Path
 PROJECT_ROOT = Path(r"D:\econojin.com")
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
+
 def write_file(path, content):
     """نوشتن فایل"""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"✓ Created: {path.relative_to(PROJECT_ROOT)}")
+
 
 # ============================================================================
 # صفحه اصلی Soil Water
@@ -483,7 +485,9 @@ export default function SoilParametersForm({ params, onChange, isRTL }: SoilPara
 }
 """
 
-write_file(FRONTEND_DIR / "components" / "soil-water" / "SoilParametersForm.tsx", soil_parameters_form)
+write_file(
+    FRONTEND_DIR / "components" / "soil-water" / "SoilParametersForm.tsx", soil_parameters_form
+)
 
 # ============================================================================
 # کامپوننت نمودار پروفیل رطوبت
@@ -587,7 +591,9 @@ export default function MoistureProfileChart({ data, soilParams, isRTL }: Moistu
 }
 """
 
-write_file(FRONTEND_DIR / "components" / "soil-water" / "MoistureProfileChart.tsx", moisture_profile_chart)
+write_file(
+    FRONTEND_DIR / "components" / "soil-water" / "MoistureProfileChart.tsx", moisture_profile_chart
+)
 
 # ============================================================================
 # کامپوننت نمودار هدایت هیدرولیکی
@@ -706,7 +712,10 @@ export default function HydraulicConductivityChart({ data, soilParams, isRTL }: 
 }
 """
 
-write_file(FRONTEND_DIR / "components" / "soil-water" / "HydraulicConductivityChart.tsx", hydraulic_conductivity_chart)
+write_file(
+    FRONTEND_DIR / "components" / "soil-water" / "HydraulicConductivityChart.tsx",
+    hydraulic_conductivity_chart,
+)
 
 # ============================================================================
 # کامپوننت نمودار تراز آب
@@ -833,7 +842,9 @@ export default function WaterBalanceChart({ data, isRTL }: WaterBalanceChartProp
 }
 """
 
-write_file(FRONTEND_DIR / "components" / "soil-water" / "WaterBalanceChart.tsx", water_balance_chart)
+write_file(
+    FRONTEND_DIR / "components" / "soil-water" / "WaterBalanceChart.tsx", water_balance_chart
+)
 
 # ============================================================================
 # کامپوننت جدول نتایج
@@ -955,7 +966,10 @@ export default function SimulationResultsTable({ data, soilParams, isRTL }: Simu
 }
 """
 
-write_file(FRONTEND_DIR / "components" / "soil-water" / "SimulationResultsTable.tsx", simulation_results_table)
+write_file(
+    FRONTEND_DIR / "components" / "soil-water" / "SimulationResultsTable.tsx",
+    simulation_results_table,
+)
 
 # ============================================================================
 # کامپوننت کنترل‌های شبیه‌سازی
@@ -1094,11 +1108,13 @@ export default function SimulationControls({
 }
 r"""
 
-write_file(FRONTEND_DIR / "components" / "soil-water" / "SimulationControls.tsx", simulation_controls)
+write_file(
+    FRONTEND_DIR / "components" / "soil-water" / "SimulationControls.tsx", simulation_controls
+)
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("✅ ماژول Soil Water با موفقیت ایجاد شد!")
-print("="*70)
+print("=" * 70)
 print("\n📋 فایل‌های ایجاد شده:")
 print("  • app/[locale]/soil-water/page.tsx")
 print("  • components/soil-water/SoilParametersForm.tsx")

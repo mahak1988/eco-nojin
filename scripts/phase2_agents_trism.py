@@ -13,16 +13,16 @@ import os
 import re
 import sys
 import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("Phase3BlockchainToken")
 
@@ -58,13 +58,48 @@ class BaseChecker(abc.ABC):
         self.root = root.resolve()
         self.cfg = cfg
         self.ignore = {
-            ".git", ".venv", "venv", "env", ".env", "__pycache__",
-            "tutorial_env", "node_modules", ".next", "dist", "build",
-            "out", ".pnpm-store", ".cache", ".vscode", ".idea",
-            ".pytest_cache", "site-packages", "_vendor", ".eggs",
-            "coverage", "htmlcov", ".mypy_cache", "logs", "temp", "artifacts", "cache"
+            ".git",
+            ".venv",
+            "venv",
+            "env",
+            ".env",
+            "__pycache__",
+            "tutorial_env",
+            "node_modules",
+            ".next",
+            "dist",
+            "build",
+            "out",
+            ".pnpm-store",
+            ".cache",
+            ".vscode",
+            ".idea",
+            ".pytest_cache",
+            "site-packages",
+            "_vendor",
+            ".eggs",
+            "coverage",
+            "htmlcov",
+            ".mypy_cache",
+            "logs",
+            "temp",
+            "artifacts",
+            "cache",
         }
-        self.target_ext = {'.py', '.js', '.ts', '.jsx', '.tsx', '.json', '.yaml', '.yml', '.toml', '.sol', '.rs', '.cairo'}
+        self.target_ext = {
+            ".py",
+            ".js",
+            ".ts",
+            ".jsx",
+            ".tsx",
+            ".json",
+            ".yaml",
+            ".yml",
+            ".toml",
+            ".sol",
+            ".rs",
+            ".cairo",
+        }
         self.max_files = 100
         self.max_file_size = 250 * 1024
 
@@ -85,11 +120,13 @@ class BaseChecker(abc.ABC):
         except Exception:
             return True
 
-    def _scan_patterns(self, patterns: Dict[str, List[re.Pattern]], limit_files: Optional[int] = None) -> Tuple[Dict[str, int], int]:
+    def _scan_patterns(
+        self, patterns: Dict[str, List[re.Pattern]], limit_files: Optional[int] = None
+    ) -> Tuple[Dict[str, int], int]:
         counts = {k: 0 for k in patterns}
         scanned = 0
         max_files = limit_files or self.max_files
-        
+
         for fp in self.root.rglob("*"):
             if scanned >= max_files:
                 break
@@ -123,144 +160,232 @@ class L2ScalabilityChecker(BaseChecker):
     def run(self) -> Result:
         patterns = {
             "RollupArchitecture": [
-                re.compile(r'\b(zk_rollup|zk_evm|optimistic_rollup|validium|plasma)\b', re.I),
-                re.compile(r'da_layer|data_availability|batch_submission', re.I)
+                re.compile(r"\b(zk_rollup|zk_evm|optimistic_rollup|validium|plasma)\b", re.I),
+                re.compile(r"da_layer|data_availability|batch_submission", re.I),
             ],
             "ConsensusOptimization": [
-                re.compile(r'consensus_mech|pbft_opt|dag_consensus|gossipsub', re.I),
-                re.compile(r'finality_target|block_time_ms|tps_target', re.I)
+                re.compile(r"consensus_mech|pbft_opt|dag_consensus|gossipsub", re.I),
+                re.compile(r"finality_target|block_time_ms|tps_target", re.I),
             ],
             "StateManagement": [
-                re.compile(r'state_root|merkle_patricia|sparse_merkle', re.I),
-                re.compile(r'state_sync|snap_sync|archive_node', re.I)
+                re.compile(r"state_root|merkle_patricia|sparse_merkle", re.I),
+                re.compile(r"state_sync|snap_sync|archive_node", re.I),
             ],
             "BridgeInterop": [
-                re.compile(r'cross_chain|bridge_protocol|message_passing', re.I),
-                re.compile(r'interop_layer|l2_router|canonical_bridge', re.I)
-            ]
+                re.compile(r"cross_chain|bridge_protocol|message_passing", re.I),
+                re.compile(r"interop_layer|l2_router|canonical_bridge", re.I),
+            ],
         }
         counts, scanned = self._scan_patterns(patterns, limit_files=50)
         total = len(patterns)
         found = sum(1 for v in counts.values() if v > 0)
         score, status = self._calc_score(found, total)
-        
+
         findings = []
         if counts["RollupArchitecture"] == 0:
-            findings.append(Finding("MEDIUM", "Missing", "No L2/Rollup architecture pattern detected", None, None, "Define ZK or Optimistic Rollup strategy for L2 scaling"))
+            findings.append(
+                Finding(
+                    "MEDIUM",
+                    "Missing",
+                    "No L2/Rollup architecture pattern detected",
+                    None,
+                    None,
+                    "Define ZK or Optimistic Rollup strategy for L2 scaling",
+                )
+            )
         if counts["ConsensusOptimization"] == 0:
-            findings.append(Finding("LOW", "Missing", "No consensus or TPS optimization targets found", None, None, "Set explicit finality (<2s) and throughput (>10k TPS) targets"))
-        
-        return Result("L2Scalability", status, score, findings, {
-            "scanned": scanned, "indicators_found": found, "details": counts
-        })
+            findings.append(
+                Finding(
+                    "LOW",
+                    "Missing",
+                    "No consensus or TPS optimization targets found",
+                    None,
+                    None,
+                    "Set explicit finality (<2s) and throughput (>10k TPS) targets",
+                )
+            )
+
+        return Result(
+            "L2Scalability",
+            status,
+            score,
+            findings,
+            {"scanned": scanned, "indicators_found": found, "details": counts},
+        )
 
 
 class TokenEconomyChecker(BaseChecker):
     def run(self) -> Result:
         patterns = {
             "TokenomicsDesign": [
-                re.compile(r'\b(token_economy|tokenomics|supply_schedule|vesting_cliff)\b', re.I),
-                re.compile(r'mint_burn|inflation_rate|staking_yield', re.I)
+                re.compile(r"\b(token_economy|tokenomics|supply_schedule|vesting_cliff)\b", re.I),
+                re.compile(r"mint_burn|inflation_rate|staking_yield", re.I),
             ],
             "AgentPayments": [
-                re.compile(r'micro_payment|agent_reward|service_fee|compute_credit', re.I),
-                re.compile(r'erc4337|account_abstraction|paymaster', re.I)
+                re.compile(r"micro_payment|agent_reward|service_fee|compute_credit", re.I),
+                re.compile(r"erc4337|account_abstraction|paymaster", re.I),
             ],
             "IncentiveMechanism": [
-                re.compile(r'liquidity_mining|reward_pool|bounty_system', re.I),
-                re.compile(r'slashing_condition|bond_requirement|dispute_resolution', re.I)
+                re.compile(r"liquidity_mining|reward_pool|bounty_system", re.I),
+                re.compile(r"slashing_condition|bond_requirement|dispute_resolution", re.I),
             ],
             "Governance": [
-                re.compile(r'proposal_system|voting_weight|quorum_requirement', re.I),
-                re.compile(r'dao_framework|treasury_multi_sig|snapshot_integration', re.I)
-            ]
+                re.compile(r"proposal_system|voting_weight|quorum_requirement", re.I),
+                re.compile(r"dao_framework|treasury_multi_sig|snapshot_integration", re.I),
+            ],
         }
         counts, scanned = self._scan_patterns(patterns, limit_files=50)
         total = len(patterns)
         found = sum(1 for v in counts.values() if v > 0)
         score, status = self._calc_score(found, total)
-        
+
         findings = []
         if counts["AgentPayments"] == 0:
-            findings.append(Finding("MEDIUM", "Missing", "No agent payment or microtransaction pattern detected", None, None, "Implement ERC-4337/Account Abstraction for seamless agent-to-agent payments"))
+            findings.append(
+                Finding(
+                    "MEDIUM",
+                    "Missing",
+                    "No agent payment or microtransaction pattern detected",
+                    None,
+                    None,
+                    "Implement ERC-4337/Account Abstraction for seamless agent-to-agent payments",
+                )
+            )
         if counts["TokenomicsDesign"] == 0:
-            findings.append(Finding("LOW", "Missing", "No token supply or economic model pattern found", None, None, "Define clear minting, burning, and vesting schedules"))
-        
-        return Result("TokenEconomy", status, score, findings, {
-            "scanned": scanned, "indicators_found": found, "details": counts
-        })
+            findings.append(
+                Finding(
+                    "LOW",
+                    "Missing",
+                    "No token supply or economic model pattern found",
+                    None,
+                    None,
+                    "Define clear minting, burning, and vesting schedules",
+                )
+            )
+
+        return Result(
+            "TokenEconomy",
+            status,
+            score,
+            findings,
+            {"scanned": scanned, "indicators_found": found, "details": counts},
+        )
 
 
 class SmartContractSecurityChecker(BaseChecker):
     def run(self) -> Result:
         patterns = {
             "AccessControl": [
-                re.compile(r'only_owner|access_control|role_based|permission_guard', re.I),
-                re.compile(r'multi_sig|timelock|upgrade_proxy', re.I)
+                re.compile(r"only_owner|access_control|role_based|permission_guard", re.I),
+                re.compile(r"multi_sig|timelock|upgrade_proxy", re.I),
             ],
             "VulnerabilityProtection": [
-                re.compile(r'reentrancy_guard|non_reentrant|checks_effects_interactions', re.I),
-                re.compile(r'integer_overflow|safe_math|bounds_check', re.I)
+                re.compile(r"reentrancy_guard|non_reentrant|checks_effects_interactions", re.I),
+                re.compile(r"integer_overflow|safe_math|bounds_check", re.I),
             ],
             "AuditAutomation": [
-                re.compile(r'slither|foundry_test|echidna|formal_verif', re.I),
-                re.compile(r'invariant_test|fuzz_target|coverage_report', re.I)
+                re.compile(r"slither|foundry_test|echidna|formal_verif", re.I),
+                re.compile(r"invariant_test|fuzz_target|coverage_report", re.I),
             ],
             "EmergencyStop": [
-                re.compile(r'pausable|circuit_breaker|emergency_pause', re.I),
-                re.compile(r'admin_override|pause_guard|rescue_fund', re.I)
-            ]
+                re.compile(r"pausable|circuit_breaker|emergency_pause", re.I),
+                re.compile(r"admin_override|pause_guard|rescue_fund", re.I),
+            ],
         }
         counts, scanned = self._scan_patterns(patterns, limit_files=50)
         total = len(patterns)
         found = sum(1 for v in counts.values() if v > 0)
         score, status = self._calc_score(found, total)
-        
+
         findings = []
         if counts["VulnerabilityProtection"] == 0:
-            findings.append(Finding("HIGH", "Missing", "No reentrancy or overflow protection pattern detected", None, None, "Implement ReentrancyGuard and SafeMath/built-in overflow checks"))
+            findings.append(
+                Finding(
+                    "HIGH",
+                    "Missing",
+                    "No reentrancy or overflow protection pattern detected",
+                    None,
+                    None,
+                    "Implement ReentrancyGuard and SafeMath/built-in overflow checks",
+                )
+            )
         if counts["AuditAutomation"] == 0:
-            findings.append(Finding("MEDIUM", "Missing", "No automated audit or formal verification pattern found", None, None, "Integrate Slither/Foundry fuzzing into CI/CD pipeline"))
-        
-        return Result("SmartContractSecurity", status, score, findings, {
-            "scanned": scanned, "indicators_found": found, "details": counts
-        })
+            findings.append(
+                Finding(
+                    "MEDIUM",
+                    "Missing",
+                    "No automated audit or formal verification pattern found",
+                    None,
+                    None,
+                    "Integrate Slither/Foundry fuzzing into CI/CD pipeline",
+                )
+            )
+
+        return Result(
+            "SmartContractSecurity",
+            status,
+            score,
+            findings,
+            {"scanned": scanned, "indicators_found": found, "details": counts},
+        )
 
 
 class PQCReadinessChecker(BaseChecker):
     def run(self) -> Result:
         patterns = {
             "KyberKEM": [
-                re.compile(r'\b(kyber|ml_kem|crystals_kem)\b', re.I),
-                re.compile(r'key_encapsulation|kem_encrypt|pqc_kem', re.I)
+                re.compile(r"\b(kyber|ml_kem|crystals_kem)\b", re.I),
+                re.compile(r"key_encapsulation|kem_encrypt|pqc_kem", re.I),
             ],
             "DilithiumSig": [
-                re.compile(r'\b(dilithium|ml_dsa|crystals_sig)\b', re.I),
-                re.compile(r'digital_signature|pqc_sign|lattice_sig', re.I)
+                re.compile(r"\b(dilithium|ml_dsa|crystals_sig)\b", re.I),
+                re.compile(r"digital_signature|pqc_sign|lattice_sig", re.I),
             ],
             "CryptoAgility": [
-                re.compile(r'crypto_agility|algorithm_switch|hybrid_cipher', re.I),
-                re.compile(r'key_rotation|cipher_suite|pqc_migration', re.I)
+                re.compile(r"crypto_agility|algorithm_switch|hybrid_cipher", re.I),
+                re.compile(r"key_rotation|cipher_suite|pqc_migration", re.I),
             ],
             "KeyManagement": [
-                re.compile(r'key_lifecycle|hsm_integration|secure_enclave', re.I),
-                re.compile(r'key_derivation|hd_wallet|threshold_sig', re.I)
-            ]
+                re.compile(r"key_lifecycle|hsm_integration|secure_enclave", re.I),
+                re.compile(r"key_derivation|hd_wallet|threshold_sig", re.I),
+            ],
         }
         counts, scanned = self._scan_patterns(patterns, limit_files=50)
         total = len(patterns)
         found = sum(1 for v in counts.values() if v > 0)
         score, status = self._calc_score(found, total)
-        
+
         findings = []
         if counts["KyberKEM"] == 0 and counts["DilithiumSig"] == 0:
-            findings.append(Finding("HIGH", "Missing", "No Post-Quantum Cryptography patterns detected", None, None, "Plan migration to Kyber (KEM) and Dilithium (Signatures) per NIST 2026 standards"))
+            findings.append(
+                Finding(
+                    "HIGH",
+                    "Missing",
+                    "No Post-Quantum Cryptography patterns detected",
+                    None,
+                    None,
+                    "Plan migration to Kyber (KEM) and Dilithium (Signatures) per NIST 2026 standards",
+                )
+            )
         if counts["CryptoAgility"] == 0:
-            findings.append(Finding("MEDIUM", "Missing", "No crypto-agility or hybrid cipher pattern found", None, None, "Implement hybrid classical/PQC signature scheme for transition period"))
-        
-        return Result("PQCReadiness", status, score, findings, {
-            "scanned": scanned, "indicators_found": found, "details": counts
-        })
+            findings.append(
+                Finding(
+                    "MEDIUM",
+                    "Missing",
+                    "No crypto-agility or hybrid cipher pattern found",
+                    None,
+                    None,
+                    "Implement hybrid classical/PQC signature scheme for transition period",
+                )
+            )
+
+        return Result(
+            "PQCReadiness",
+            status,
+            score,
+            findings,
+            {"scanned": scanned, "indicators_found": found, "details": counts},
+        )
 
 
 class Pipeline:
@@ -271,7 +396,7 @@ class Pipeline:
             L2ScalabilityChecker(self.root, {}),
             TokenEconomyChecker(self.root, {}),
             SmartContractSecurityChecker(self.root, {}),
-            PQCReadinessChecker(self.root, {})
+            PQCReadinessChecker(self.root, {}),
         ]
 
     def run(self) -> Dict:
@@ -279,7 +404,7 @@ class Pipeline:
         results = []
         has_crit = False
         t0 = time.time()
-        
+
         for chk in self.checks:
             nm = chk.__class__.__name__
             logger.info(f"Running check: {nm}")
@@ -293,30 +418,46 @@ class Pipeline:
                     has_crit = True
             except Exception as e:
                 logger.error(f"Error in {nm}: {type(e).__name__}: {e}")
-                results.append(asdict(Result(
-                    nm, "FAIL", 0.0,
-                    [Finding("CRITICAL", "PipelineError", f"{type(e).__name__}: {e}")]
-                )))
+                results.append(
+                    asdict(
+                        Result(
+                            nm,
+                            "FAIL",
+                            0.0,
+                            [Finding("CRITICAL", "PipelineError", f"{type(e).__name__}: {e}")],
+                        )
+                    )
+                )
                 has_crit = True
-        
+
         elapsed = time.time() - t0
         overall = sum(r["score"] for r in results) / len(results) if results else 0.0
-        
+
         report = {
             "version": "3.0-final",
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "overall_score": round(overall, 3),
-            "status": "PASS" if not has_crit else ("WARN" if any(r["status"] == "WARN" for r in results) else "FAIL"),
+            "status": "PASS"
+            if not has_crit
+            else ("WARN" if any(r["status"] == "WARN" for r in results) else "FAIL"),
             "time_sec": round(elapsed, 2),
             "checks": results,
             "blockchain_readiness": "PRODUCTION_READY" if overall >= 0.8 else "DEVELOPMENT_PHASE",
             "next": (
-                [f"Implement: {r['findings'][0]['recommendation']}" for r in results if r["status"] == "FAIL"] or
-                [f"Optimize: {r['findings'][0]['recommendation']}" for r in results if r["status"] == "WARN"] or
-                ["System fully assessed. Ready for deployment & monitoring phase."]
-            )
+                [
+                    f"Implement: {r['findings'][0]['recommendation']}"
+                    for r in results
+                    if r["status"] == "FAIL"
+                ]
+                or [
+                    f"Optimize: {r['findings'][0]['recommendation']}"
+                    for r in results
+                    if r["status"] == "WARN"
+                ]
+                or ["System fully assessed. Ready for deployment & monitoring phase."]
+            ),
         }
-        
+
         rp = self.root / "phase3_blockchain_token_report.json"
         try:
             with open(rp, "w", encoding="utf-8") as f:
@@ -324,29 +465,34 @@ class Pipeline:
             logger.info(f"Report saved: {rp}")
         except Exception as e:
             logger.error(f"Failed to save report: {e}")
-        
+
         if self.fail_on_critical and has_crit:
             logger.error("Critical finding detected - pipeline stopped")
             sys.exit(1)
-        
-        logger.info(f"Pipeline complete | Score: {overall:.2f} | Status: {report['status']} | Readiness: {report['blockchain_readiness']}")
+
+        logger.info(
+            f"Pipeline complete | Score: {overall:.2f} | Status: {report['status']} | Readiness: {report['blockchain_readiness']}"
+        )
         return report
 
 
 def main():
     import argparse
-    ap = argparse.ArgumentParser(description="Phase 3 Blockchain & Token Economy Readiness Assessment")
+
+    ap = argparse.ArgumentParser(
+        description="Phase 3 Blockchain & Token Economy Readiness Assessment"
+    )
     ap.add_argument("--root", type=Path, default=Path("."), help="Project root path")
     ap.add_argument("--allow-warnings", action="store_true", help="Stop only on CRITICAL, not WARN")
     ap.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
     args = ap.parse_args()
-    
+
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
     if not args.root.exists():
         logger.error(f"Path does not exist: {args.root.absolute()}")
         sys.exit(2)
-    
+
     Pipeline(args.root.resolve(), fail_on_critical=not args.allow_warnings).run()
 
 

@@ -1,5 +1,7 @@
+from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.core.database import get_db
 from api.core.deps import require_write_auth
 from api.modules.farmer import crud, schemas
@@ -43,7 +45,7 @@ async def update_farmer(
     return updated
 
 
-@router.delete("/{farmer_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{farmer_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=IDResponse)
 async def delete_farmer(
     farmer_id: int,
     db: AsyncSession = Depends(get_db),
@@ -53,7 +55,7 @@ async def delete_farmer(
         raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
 
 
-@router.get("/{farmer_id}/activities")
+@router.get("/{farmer_id}/activities", response_model=SuccessResponse)
 async def get_farmer_activities(farmer_id: int, db: AsyncSession = Depends(get_db)):
     farmer = await crud.get_farmer(db, farmer_id)
     if not farmer:

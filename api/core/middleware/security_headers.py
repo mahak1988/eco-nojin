@@ -15,7 +15,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
         if not settings.DEBUG:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; frame-ancestors 'none'; base-uri 'self'"
-        )
+        response.headers[
+            "Content-Security-Policy"
+        ] = "default-src 'self'; frame-ancestors 'none'; base-uri 'self'"
         return response

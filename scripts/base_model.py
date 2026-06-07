@@ -14,11 +14,11 @@ from core.safety import SafeModuleLoader
 def load_model_class(module_name: str, class_name: str):
     """
     بارگذاری امن کلاس مدل
-    
+
     Args:
         module_name: نام ماژول (مثلاً 'scripts.models.soil_carbon.rothc')
         class_name: نام کلاس (مثلاً 'RothCModel')
-    
+
     Returns:
         کلاس درخواستی
     """
@@ -27,9 +27,9 @@ def load_model_class(module_name: str, class_name: str):
 
 class BaseModel:
     """کلاس پایه برای همه مدل‌ها"""
-    
+
     def __init__(self, **kwargs):
         self.config = kwargs
-    
+
     def run(self):
         raise NotImplementedError("Subclasses must implement run()")

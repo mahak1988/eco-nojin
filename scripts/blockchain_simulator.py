@@ -4,12 +4,12 @@ Blockchain Simulator for Testing
 Simulates Polygon blockchain interactions without real network
 """
 
-import json
 import hashlib
+import json
 import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -65,11 +65,13 @@ class BlockchainSimulator:
             timestamp=int(time.time()),
             transactions=[],
             previous_hash="0" * 64,
-            hash=self._calculate_hash(0, int(time.time()), [], "0" * 64, 0)
+            hash=self._calculate_hash(0, int(time.time()), [], "0" * 64, 0),
         )
         self.blocks.append(genesis)
 
-    def _calculate_hash(self, number: int, timestamp: int, txs: List[Dict], prev_hash: str, nonce: int) -> str:
+    def _calculate_hash(
+        self, number: int, timestamp: int, txs: List[Dict], prev_hash: str, nonce: int
+    ) -> str:
         data = f"{number}{timestamp}{json.dumps(txs)}{prev_hash}{nonce}"
         return hashlib.sha256(data.encode()).hexdigest()
 
@@ -80,18 +82,20 @@ class BlockchainSimulator:
 
         # Simple mining (no real PoW)
         nonce = 0
-        new_hash = self._calculate_hash(self.current_block,
+        new_hash = self._calculate_hash(
+            self.current_block,
             int(time.time()),
             [asdict(tx) for tx in self.pending_txs],
             prev_block.hash,
-            nonce)
+            nonce,
+        )
         block = Block(
             number=self.current_block,
             timestamp=int(time.time()),
             transactions=[asdict(tx) for tx in self.pending_txs],
             previous_hash=prev_block.hash,
             hash=new_hash,
-            nonce=nonce
+            nonce=nonce,
         )
 
         # Update transaction block numbers
@@ -103,9 +107,13 @@ class BlockchainSimulator:
 
         return block
 
-    def send_transaction(self, from_addr: str, to_addr: str, value: int, data: str = "") -> Transaction:
+    def send_transaction(
+        self, from_addr: str, to_addr: str, value: int, data: str = ""
+    ) -> Transaction:
         """Send a transaction"""
-        tx_hash = hashlib.sha256(f"{from_addr}{to_addr}{value}{data}{time.time()}".encode()).hexdigest()
+        tx_hash = hashlib.sha256(
+            f"{from_addr}{to_addr}{value}{data}{time.time()}".encode()
+        ).hexdigest()
 
         tx = Transaction(
             tx_hash=tx_hash,
@@ -113,7 +121,7 @@ class BlockchainSimulator:
             to_address=to_addr,
             value=value,
             data=data,
-            timestamp=int(time.time())
+            timestamp=int(time.time()),
         )
 
         self.pending_txs.append(tx)
@@ -134,7 +142,7 @@ class BlockchainSimulator:
             contract_address=contract_address,
             metadata_uri=metadata_uri,
             minted_at=int(time.time()),
-            last_update=int(time.time())
+            last_update=int(time.time()),
         )
 
         self.nfts[token_id] = nft
@@ -144,7 +152,7 @@ class BlockchainSimulator:
             from_addr="0x0000000000000000000000000000000000000000",
             to_addr=contract_address,
             value=0,
-            data=json.dumps({"type": "mint", "token_id": token_id, "owner": owner})
+            data=json.dumps({"type": "mint", "token_id": token_id, "owner": owner}),
         )
 
         return nft
@@ -169,7 +177,7 @@ class BlockchainSimulator:
     def get_transaction(self, tx_hash: str) -> Optional[Transaction]:
         for block in self.blocks:
             for tx in block.transactions:
-                if tx['tx_hash'] == tx_hash:
+                if tx["tx_hash"] == tx_hash:
                     return Transaction(**tx)
         return None
 
@@ -180,15 +188,17 @@ class BlockchainSimulator:
             "total_transactions": sum(len(b.transactions) for b in self.blocks),
             "total_nfts": len(self.nfts),
             "latest_block_hash": self.blocks[-1].hash,
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
 
 # Global simulator instance
 _simulator = BlockchainSimulator()
 
+
 def get_simulator() -> BlockchainSimulator:
     return _simulator
+
 
 def reset_simulator():
     global _simulator

@@ -7,25 +7,30 @@ Fix Homepage - Corrected Version
 r"""
 
 import shutil
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 FRONTEND_DIR = Path(r"D:\econojin.com\frontend")
 BACKUP_DIR = FRONTEND_DIR.parent / ".homepage_fix_backup" / datetime.now().strftime("%Y%m%d_%H%M%S")
+
 
 def print_header(title):
     print(f"\n{'='*70}")
     print(f"  {title}")
     print(f"{'='*70}\n")
 
+
 def print_success(msg):
     print(f"✓ {msg}")
+
 
 def print_error(msg):
     print(f"✗ {msg}")
 
+
 def print_info(msg):
     print(f"ℹ {msg}")
+
 
 def backup_file(path):
     if path.exists():
@@ -35,18 +40,19 @@ def backup_file(path):
         shutil.copy2(path, backup_path)
         print_info(f"Backup: {backup_path.relative_to(FRONTEND_DIR.parent)}")
 
+
 def fix_homepage():
     """ایجاد صفحه اصلی با سینتکس صحیح"""
     print_header("🏠 Fix Homepage (app/[locale]/page.tsx)")
-    
+
     page_path = FRONTEND_DIR / "app" / "[locale]" / "page.tsx"
-    
+
     if page_path.exists():
         backup_file(page_path)
-    
+
     # ✅ نکته کلیدی: استفاده از رشته معمولی """...""" نه f"""..."""
     # زیرا JSX شامل {} است که با f-string تداخل دارد
-    
+
     content = """'use client';
 
 import { useState } from 'react';
@@ -264,42 +270,44 @@ export default function HomePage() {
   );
 }
 """
-    
+
     # ✅ نکته: استفاده از write_text با رشته معمولی، نه f-string
-    page_path.write_text(content, encoding='utf-8')
-    
+    page_path.write_text(content, encoding="utf-8")
+
     print_success(f"Created/Fixed: {page_path.relative_to(FRONTEND_DIR)}")
     print_info("✅ 'use client' در خط اول")
     print_info("✅ JSX با رشته معمولی نوشته شده (نه f-string)")
     print_info("✅ useParams بدون React.use() - مستقیم استفاده شده")
     return True
 
+
 def clean_cache():
     """پاکسازی cache"""
     print_header("🧹 Clean Cache")
-    
+
     dirs = [
         FRONTEND_DIR / ".next",
         FRONTEND_DIR / "node_modules" / ".cache",
     ]
-    
+
     for d in dirs:
         if d.exists():
             shutil.rmtree(d, ignore_errors=True)
             print_success(f"Cleaned: {d.relative_to(FRONTEND_DIR)}")
-    
+
     return True
+
 
 def main():
     print_header("🛠️ FIX HOMEPAGE - Corrected Syntax")
-    
+
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     fixes = [
         ("Homepage (page.tsx)", fix_homepage),
         ("Clean Cache", clean_cache),
     ]
-    
+
     results = []
     for name, func in fixes:
         try:
@@ -310,23 +318,24 @@ def main():
             print_error(f"Failed: {name}")
             print_error(f"Error: {e}")
             import traceback
+
             traceback.print_exc()
             results.append((name, False))
-    
+
     # Summary
     print_header("📊 SUMMARY")
-    
+
     success_count = sum(1 for _, s in results if s)
     total = len(results)
-    
+
     for name, success in results:
         if success:
             print_success(name)
         else:
             print_error(name)
-    
+
     print(f"\nنتیجه: {success_count}/{total} موفق")
-    
+
     if success_count == total:
         print_success("✅ تمام اصلاحات انجام شد!")
         print_info("\n📋 مراحل بعدی:")
@@ -337,20 +346,25 @@ def main():
         print(f"\n💾 Backup: {BACKUP_DIR}")
     else:
         print_warning(f"{total - success_count} مورد نیاز به بررسی دارد")
-    
+
     return 0 if success_count == total else 1
+
 
 if __name__ == "__main__":
     try:
         import sys
+
         sys.exit(main())
     except KeyboardInterrupt:
         print_warning("\nمتوقف شد")
         import sys
+
         sys.exit(1)
     except Exception as e:
         print_error(f"خطا: {e}")
         import traceback
+
         traceback.print_exc()
         import sys
+
         sys.exit(1)

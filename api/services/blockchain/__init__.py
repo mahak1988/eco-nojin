@@ -1,0 +1,1 @@
+from .blockchain import ecocoin_contract, EcoCoinContract

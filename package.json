@@ -19,7 +19,12 @@
     "format": "pnpm --filter @econojin/web format"
   },
   "devDependencies": {
-    "turbo": "^1.9.0",
-    "pnpm": "^8.8.0"
+    "openapi-typescript-codegen": "^0.30.0",
+    "pnpm": "^8.8.0",
+    "turbo": "^1.9.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.0",
+    "axios": "^1.17.0"
   }
 }

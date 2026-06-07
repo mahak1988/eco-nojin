@@ -1,18 +1,22 @@
-﻿from pydantic import BaseModel, Field, field_validator
-from datetime import datetime
-from typing import Optional, List
+﻿from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel, Field, field_validator
+
 
 class EventReminderCreate(BaseModel):
     reminder_time: datetime
     method: str = "notification"
 
+
 class EventReminder(EventReminderCreate):
     id: int
     is_sent: bool
     event_id: int
-    
+
     class Config:
         from_attributes = True
+
 
 class CalendarEventCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
@@ -26,7 +30,7 @@ class CalendarEventCreate(BaseModel):
     recurrence_rule: Optional[str] = None
     color: str = "#3b82f6"
     reminders: Optional[List[EventReminderCreate]] = None
-    
+
     @field_validator("end_time")
     @classmethod
     def end_after_start(cls, v, info):
@@ -35,15 +39,17 @@ class CalendarEventCreate(BaseModel):
             raise ValueError("end_time must be after start_time")
         return v
 
+
 class CalendarEvent(CalendarEventCreate):
     id: int
     user_id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
     reminders: List[EventReminder] = []
-    
+
     class Config:
         from_attributes = True
+
 
 class CalendarEventUpdate(BaseModel):
     title: Optional[str] = None
@@ -56,6 +62,7 @@ class CalendarEventUpdate(BaseModel):
     is_recurring: Optional[bool] = None
     recurrence_rule: Optional[str] = None
     color: Optional[str] = None
+
 
 class EventListResponse(BaseModel):
     items: List[CalendarEvent]

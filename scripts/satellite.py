@@ -4,14 +4,14 @@ Sentinel-2 Satellite Integration
 استفاده از Copernicus API برای اعتبارسنجی ماهواره‌ای فعالیت‌ها
 """
 
-import os
 import json
-import tempfile
-from pathlib import Path
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta, timezone
+import os
 import sys
+import tempfile
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -23,6 +23,7 @@ logger = UnifiedLogger.get_logger(__name__)
 @dataclass
 class SatelliteVerification:
     """نتیجه اعتبارسنجی ماهواره‌ای"""
+
     verified: bool
     ndvi_before: Optional[float]
     ndvi_after: Optional[float]
@@ -67,7 +68,11 @@ class Sentinel2Client:
         if self.simulation_mode:
             return
 
-        if self.access_token and self.token_expires and datetime.now(timezone.utc) < self.token_expires:
+        if (
+            self.access_token
+            and self.token_expires
+            and datetime.now(timezone.utc) < self.token_expires
+        ):
             return
 
         try:
@@ -142,13 +147,15 @@ class Sentinel2Client:
                     if attr.get("Name") == "cloudCover":
                         cloud_cover = attr.get("Value", 0)
 
-                images.append({
-                    "id": product["Id"],
-                    "name": product["Name"],
-                    "date": product["ContentDate"]["Start"],
-                    "cloud_cover": cloud_cover,
-                    "download_url": f"{self.COPERNICUS_API}/Products({product['Id']})/$value",
-                })
+                images.append(
+                    {
+                        "id": product["Id"],
+                        "name": product["Name"],
+                        "date": product["ContentDate"]["Start"],
+                        "cloud_cover": cloud_cover,
+                        "download_url": f"{self.COPERNICUS_API}/Products({product['Id']})/$value",
+                    }
+                )
 
             logger.info(f"🛰️ Found {len(images)} Sentinel-2 images")
             return images
@@ -201,26 +208,25 @@ class Sentinel2Client:
                 "input": {
                     "bounds": {
                         "bbox": bbox,
-                        "properties": {"crs": "http://www.opengis.net/def/crs/EPSG/0/4326"}
+                        "properties": {"crs": "http://www.opengis.net/def/crs/EPSG/0/4326"},
                     },
-                    "data": [{
-                        "dataFilter": {
-                            "timeRange": {
-                                "from": (date - timedelta(days=3)).isoformat() + "Z",
-                                "to": (date + timedelta(days=3)).isoformat() + "Z",
+                    "data": [
+                        {
+                            "dataFilter": {
+                                "timeRange": {
+                                    "from": (date - timedelta(days=3)).isoformat() + "Z",
+                                    "to": (date + timedelta(days=3)).isoformat() + "Z",
+                                },
+                                "mosaickingOrder": "leastCC",
                             },
-                            "mosaickingOrder": "leastCC",
-                        },
-                        "type": "sentinel-2-l2a",
-                    }]
+                            "type": "sentinel-2-l2a",
+                        }
+                    ],
                 },
                 "output": {
                     "width": 50,
                     "height": 50,
-                    "responses": [{
-                        "identifier": "default",
-                        "format": {"type": "image/tiff"}
-                    }]
+                    "responses": [{"identifier": "default", "format": {"type": "image/tiff"}}],
                 },
                 "evalscript": evalscript,
             }
@@ -342,13 +348,15 @@ class Sentinel2Client:
         end_date: datetime,
     ) -> List[Dict]:
         """شبیه‌سازی جستجو برای تست"""
-        return [{
-            "id": "simulated_001",
-            "name": f"S2A_MSIL2A_{end_date.strftime('%Y%m%d')}",
-            "date": end_date.isoformat(),
-            "cloud_cover": 5.0,
-            "simulation": True,
-        }]
+        return [
+            {
+                "id": "simulated_001",
+                "name": f"S2A_MSIL2A_{end_date.strftime('%Y%m%d')}",
+                "date": end_date.isoformat(),
+                "cloud_cover": 5.0,
+                "simulation": True,
+            }
+        ]
 
     def _simulate_ndvi(
         self,

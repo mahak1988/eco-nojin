@@ -6,12 +6,12 @@ Econojin Simple Fix Script - No f-string issues
 این اسکریپت تمام تنظیمات را بدون مشکل سینتکس انجام می‌دهد.
 r"""
 
-import os
-import sys
-import shutil
 import json
-from pathlib import Path
+import os
+import shutil
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # تنظیمات مسیرها
 PROJECT_ROOT = Path(r"D:\econojin.com")
@@ -19,19 +19,24 @@ FRONTEND_DIR = PROJECT_ROOT / "frontend"
 CONTRACTS_DIR = PROJECT_ROOT / "contracts"
 BACKUP_DIR = PROJECT_ROOT / ".simple_fix_backup" / datetime.now().strftime("%Y%m%d_%H%M%S")
 
+
 def print_header(title):
     print(f"\n{'='*70}")
     print(f"  {title}")
     print(f"{'='*70}\n")
 
+
 def print_success(msg):
     print(f"✓ {msg}")
+
 
 def print_error(msg):
     print(f"✗ {msg}")
 
+
 def print_info(msg):
     print(f"ℹ {msg}")
+
 
 def backup_file(path):
     if path.exists():
@@ -40,22 +45,25 @@ def backup_file(path):
         backup_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(path, backup_path)
 
+
 def write_file(path, content):
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     print_success(f"Created: {path.relative_to(PROJECT_ROOT)}")
+
 
 # ============================================================================
 # FIX 1: next.config.js - نسخه صحیح
 # ============================================================================
 
+
 def fix_next_config():
     print_header("⚙️ Fix: next.config.js")
-    
+
     config_path = FRONTEND_DIR / "next.config.js"
     backup_file(config_path)
-    
+
     # ✅ نکته: استفاده از رشته معمولی، نه f-string
     content = """/** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -87,19 +95,21 @@ const nextConfig = {
 
 module.exports = nextConfig;
 """
-    
+
     write_file(config_path, content)
     return True
+
 
 # ============================================================================
 # FIX 2: .npmrc برای رفع هشدارها
 # ============================================================================
 
+
 def fix_npmrc():
     print_header("📦 Fix: .npmrc")
-    
+
     npmrc_path = PROJECT_ROOT / ".npmrc"
-    
+
     content = """# Econojin npm configuration
 shamefully-hoist=false
 strict-peer-dependencies=false
@@ -110,38 +120,40 @@ registry=https://registry.npmjs.org/
 save-exact=true
 optional=true
 """
-    
+
     write_file(npmrc_path, content)
     return True
+
 
 # ============================================================================
 # FIX 3: Polygon RPC URLs
 # ============================================================================
 
+
 def fix_polygon_rpc():
     print_header("🔗 Fix: Polygon RPC Configuration")
-    
+
     rpc_url = "https://polygon-bor-rpc.publicnode.com"
-    
+
     files_to_update = [
         PROJECT_ROOT / ".env.example",
         FRONTEND_DIR / ".env.example",
         FRONTEND_DIR / ".env.local",
         CONTRACTS_DIR / ".env.example",
     ]
-    
+
     for file_path in files_to_update:
         if not file_path.exists():
             continue
-        
+
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
-            
+
             # جایگزینی RPCهای قدیمی
             content = content.replace("https://polygon-rpc.com", rpc_url)
             content = content.replace("https://rpc-mainnet.matic.vigil.sh", rpc_url)
-            
+
             # اضافه کردن توضیحات اگر وجود نداشت
             if "# Polygon RPC" not in content:
                 content += f"""
@@ -149,26 +161,28 @@ def fix_polygon_rpc():
 POLYGON_RPC_URL={rpc_url}
 NEXT_PUBLIC_POLYGON_RPC_URL={rpc_url}
 """
-            
+
             backup_file(file_path)
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             print_success(f"Updated: {file_path.relative_to(PROJECT_ROOT)}")
         except Exception as e:
             print_error(f"Error: {file_path}: {e}")
-    
+
     return True
+
 
 # ============================================================================
 # FIX 4: hardhat.config.js برای Polygon Amoy
 # ============================================================================
 
+
 def fix_hardhat_config():
     print_header("⛓️ Fix: hardhat.config.js")
-    
+
     config_path = CONTRACTS_DIR / "hardhat.config.js"
     config_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     content = """require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
@@ -193,20 +207,22 @@ module.exports = {
   },
 };
 """
-    
+
     write_file(config_path, content)
     return True
+
 
 # ============================================================================
 # FIX 5: Root Layout (فقط این فایل باید html/body داشته باشد)
 # ============================================================================
 
+
 def fix_root_layout():
     print_header("🏗️ Fix: Root Layout (app/layout.tsx)")
-    
+
     layout_path = FRONTEND_DIR / "app" / "layout.tsx"
     layout_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # ✅ نکته: رشته معمولی، نه f-string
     content = """import './globals.css';
 import type { Metadata } from 'next';
@@ -234,19 +250,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 """
-    
+
     write_file(layout_path, content)
     return True
+
 
 # ============================================================================
 # FIX 6: Locale Layout (نباید html/body داشته باشد)
 # ============================================================================
 
+
 def fix_locale_layout():
     print_header("🌍 Fix: Locale Layout (app/[locale]/layout.tsx)")
-    
+
     layout_path = FRONTEND_DIR / "app" / "[locale]" / "layout.tsx"
-    
+
     # ✅ نکته: فقط div، بدون html/body
     content = """import type { Locale } from '@/lib/i18n';
 import { AuthProvider } from '@/components/providers/AuthProvider';
@@ -277,19 +295,21 @@ export default async function LocaleLayout({
   );
 }
 """
-    
+
     write_file(layout_path, content)
     return True
+
 
 # ============================================================================
 # FIX 7: Home Page با سینتکس صحیح
 # ============================================================================
 
+
 def fix_home_page():
     print_header("🏠 Fix: Home Page")
-    
+
     page_path = FRONTEND_DIR / "app" / "[locale]" / "page.tsx"
-    
+
     # ✅ نکته: 'use client' در خط اول، قبل از همه importها
     content = """'use client';
 
@@ -377,20 +397,22 @@ export default function HomePage() {
   );
 }
 """
-    
+
     write_file(page_path, content)
     return True
+
 
 # ============================================================================
 # FIX 8: Dashboard Page با مدیریت خطای ایمن
 # ============================================================================
 
+
 def fix_dashboard_page():
     print_header("📊 Fix: Dashboard Page")
-    
+
     page_path = FRONTEND_DIR / "app" / "[locale]" / "dashboard" / "page.tsx"
     page_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # ✅ نکته: console.warn به جای console.error + fallback data
     content = """'use client';
 
@@ -486,38 +508,42 @@ export default function DashboardPage() {
   );
 }
 r"""
-    
+
     write_file(page_path, content)
     return True
+
 
 # ============================================================================
 # FIX 9: پاکسازی cache
 # ============================================================================
 
+
 def clean_cache():
     print_header("🧹 Clean Cache")
-    
+
     dirs = [
         FRONTEND_DIR / ".next",
         FRONTEND_DIR / "node_modules" / ".cache",
     ]
-    
+
     for d in dirs:
         if d.exists():
             shutil.rmtree(d, ignore_errors=True)
             print_success(f"Cleaned: {d.relative_to(FRONTEND_DIR)}")
-    
+
     return True
+
 
 # ============================================================================
 # MAIN
 # ============================================================================
 
+
 def main():
     print_header("🛠️ ECONOJIN SIMPLE FIX SCRIPT")
-    
+
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     fixes = [
         ("next.config.js", fix_next_config),
         (".npmrc", fix_npmrc),
@@ -529,7 +555,7 @@ def main():
         ("Dashboard Page", fix_dashboard_page),
         ("Clean Cache", clean_cache),
     ]
-    
+
     results = []
     for name, func in fixes:
         try:
@@ -539,17 +565,17 @@ def main():
         except Exception as e:
             print_error(f"Failed: {name} - {e}")
             results.append((name, False))
-    
+
     print_header("📊 SUMMARY")
-    
+
     success_count = sum(1 for _, s in results if s)
     total = len(results)
-    
+
     for name, success in results:
         print(f"{'✓' if success else '✗'} {name}")
-    
+
     print(f"\nنتیجه: {success_count}/{total} موفق")
-    
+
     if success_count == total:
         print_success("✅ تمام اصلاحات انجام شد!")
         print_info("\n📋 مراحل بعدی:")
@@ -560,8 +586,9 @@ def main():
         print(f"\n💾 Backup: {BACKUP_DIR}")
     else:
         print_error(f"{total - success_count} مورد نیاز به بررسی دارد")
-    
+
     return 0 if success_count == total else 1
+
 
 if __name__ == "__main__":
     try:
@@ -572,5 +599,6 @@ if __name__ == "__main__":
     except Exception as e:
         print_error(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

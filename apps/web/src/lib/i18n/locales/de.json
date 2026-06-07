@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "badge": "Wissenschaftliche Restaurierungsplattform",
+    "title": "Econojin",
+    "subtitle": "Integriertes Intelligentes Management",
+    "description": "Restaurierung arider und semiarider Landschaften durch Hydrologie, Kohlenstoffmodellierung, Fernerkundung und KI",
+    "startSimulation": "Simulation Starten",
+    "freeEducation": "Kostenlose Bildung",
+    "userRating": "Benutzerbewertung",
+    "activeUsers": "Aktive Benutzer",
+    "secure": "Sicher und Zuverlässig"
+  },
+  "stats": {
+    "hectares": "Überwachte Hektar",
+    "carbon": "Tonnen CO₂ Absorbiert",
+    "farmers": "Aktive Landwirte",
+    "basins": "Wassereinzugsgebiete"
+  },
+  "modules": {
+    "scientific": "Wissenschaftliche Module",
+    "scientificDesc": "Spezialisierte Werkzeuge für aride Landrestaurierung",
+    "community": "Gemeinschaft & Dienste",
+    "communityDesc": "Alles was ein nachhaltiger Landwirt braucht",
+    "details": "Details Anzeigen",
+    "projects": "Erfolgreiche Projekte",
+    "projectsDesc": "Beispiele der Landrestaurierung"
+  },
+  "features": {
+    "free": "Kostenlos und Offen",
+    "freeDesc": "Alle wissenschaftlichen Dienste kostenlos",
+    "ai": "Künstliche Intelligenz",
+    "aiDesc": "Intelligente Analyse mit fortschrittlichen Modellen",
+    "secure": "Sicher und Zuverlässig",
+    "secureDesc": "Schutz Ihrer Forschungsdaten",
+    "global": "Globaler Zugang",
+    "globalDesc": "Von überall auf der Welt zugänglich"
+  },
+  "nav": {
+    "home": "Startseite",
+    "scientific": "Wissenschaftliche Module",
+    "community": "Gemeinschaft",
+    "education": "Bildung",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "login": "Anmelden",
+    "register": "Kostenlos Registrieren",
+    "language": "Sprache"
+  }
+}

@@ -2,9 +2,9 @@
 """
 Complete rebuild - creates both files from scratch
 """
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 ROOT = Path(r"D:\econojin.com")
 

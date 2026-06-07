@@ -4,10 +4,9 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Dict, Literal, Optional, Tuple
 
+from scripts.models.hydrology.swat_plus import SWATPlusModel
 from scripts.models.soil_carbon.aquacrop import AquaCropModel
 from scripts.models.soil_carbon.rothc import RothCModel
-from scripts.models.hydrology.swat_plus import SWATPlusModel
-
 
 IrrigationMethod = Literal["drip", "sprinkler", "flood"]
 
@@ -62,9 +61,7 @@ class SimulationService:
         weather = {"temp_avg_c": temp_avg_c, "precip_mm": precip_mm}
         soil_for_aquacrop = {"field_capacity": field_capacity}
         crop_for_aquacrop = {"crop_type": crop_type, "growing_days": 120}
-        return self.aquacrop.run(
-            weather=weather, soil=soil_for_aquacrop, crop=crop_for_aquacrop
-        )
+        return self.aquacrop.run(weather=weather, soil=soil_for_aquacrop, crop=crop_for_aquacrop)
 
     @lru_cache(maxsize=256)
     def _run_rothc_cached(
@@ -102,9 +99,7 @@ class SimulationService:
 
     def simulate(self, inp: FarmerSimulationInput) -> Dict[str, Any]:
         # Map irrigation to a simple multiplier (kept for API compatibility)
-        irr_mult = {"drip": 0.8, "sprinkler": 1.0, "flood": 0.95}.get(
-            inp.irrigation_method, 1.0
-        )
+        irr_mult = {"drip": 0.8, "sprinkler": 1.0, "flood": 0.95}.get(inp.irrigation_method, 1.0)
 
         # Run models using cached pure-input computation
         yield_result = self._run_aquacrop_cached(
@@ -148,7 +143,11 @@ class SimulationService:
 
         return {
             "success": True,
-            "model_outputs": {"aquacrop": yield_result, "rothc": soc_result, "swat_plus": swat_result},
+            "model_outputs": {
+                "aquacrop": yield_result,
+                "rothc": soc_result,
+                "swat_plus": swat_result,
+            },
             "estimated_yield_kg_ha": estimated_yield_kg_ha,
             "water_need_total_mm": water_need_total_mm,
             "soc_change_t_ha": soc_result.get("soc_change_t_ha"),
@@ -159,4 +158,3 @@ class SimulationService:
             },
             "recommendations": recommendations,
         }
-

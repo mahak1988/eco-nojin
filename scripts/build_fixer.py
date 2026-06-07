@@ -1,7 +1,7 @@
 # ... (بخش‌های اولیه بیلدر بدون تغییر) ...
 
 # ✅ افزودن فاز امنیتی Phase 1 Security Hardening به بیلدر
-PHASE_SECURITY_TPAF = '''
+PHASE_SECURITY_TPAF = """
 def phase_run_security_scan():
     R.section("Phase 0: Run TPAF Security Scan (Shift-Left)")
     security_script = ROOT / "phase1_security_v1.0.3.py"
@@ -42,11 +42,11 @@ def phase_run_security_scan():
     except Exception as e:
         R.err("Security scan error: " + str(e))
         return False
-'''
+"""
 
 # ... (در بخش MAIN_FUNC، افزودن فاز امنیتی به ابتدای results) ...
 
-MAIN_FUNC = '''
+MAIN_FUNC = """
 def main():
     print(C.BOLD + C.CYAN)
     print("=" * 62)
@@ -67,7 +67,7 @@ def main():
         "guardian": phase_run_guardian(),
     }
     # ... (بقیه کد گزارش‌دهی بدون تغییر) ...
-'''
+"""
 
 # ✅ در بخش نهایی بیلدر، افزودن فاز جدید به لیست L:
 L.append(PHASE_SECURITY_TPAF)  # قبل از PHASE_INIT

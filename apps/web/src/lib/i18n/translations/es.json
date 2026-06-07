@@ -1,0 +1,47 @@
+{
+  "common": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "search": "Buscar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "submit": "Enviar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
+  "navbar": {
+    "home": "Inicio",
+    "academy": "Academia",
+    "gis": "SIG",
+    "weather": "Clima",
+    "drought": "Sequía",
+    "iot": "IoT",
+    "ecocoin": "EcoCoin",
+    "mrv": "MRV",
+    "soil_water": "Suelo y Agua",
+    "sentinel": "Satélite",
+    "ai": "Asistente IA"
+  },
+  "weather": {
+    "title": "Clima y Clima",
+    "subtitle": "Pronóstico del tiempo y análisis de datos climáticos",
+    "current_weather": "Clima Actual",
+    "forecast_7days": "Pronóstico de 7 Días",
+    "temperature": "Temperatura",
+    "humidity": "Humedad",
+    "wind_speed": "Velocidad del Viento",
+    "precipitation": "Precipitación",
+    "cloud_cover": "Cobertura Nubosa",
+    "pressure": "Presión"
+  }
+}

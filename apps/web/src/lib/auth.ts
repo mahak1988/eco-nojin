@@ -1,47 +1,35 @@
-const TOKEN_KEY = "econojin_token";
-const USER_KEY = "econojin_user";
-
-export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+// src/lib/auth.ts
+export interface User {
+  name: string;
+  email: string;
+  token: string;
 }
 
-function setAuthCookie(token: string) {
-  const maxAge = 60 * 60 * 24 * 7;
-  document.cookie = `econojin_token=${encodeURIComponent(token)}; path=/; max-age=${maxAge}; SameSite=Lax`;
-}
+export const login = (email: string, name: string) => {
+  const user: User = { 
+    email, 
+    name, 
+    token: "mock-jwt-token-" + Date.now() 
+  };
+  localStorage.setItem("econojin_user", JSON.stringify(user));
+  window.dispatchEvent(new Event("storage")); // Trigger UI update across components
+  return user;
+};
 
-export function setSession(token: string, user: { fid: string; name?: string; phone?: string }) {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
-  setAuthCookie(token);
-}
+export const register = (name: string, email: string, password: string) => {
+  // In a real app, this would call an API
+  return login(email, name);
+};
 
-export function clearSession() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-  document.cookie = "econojin_token=; path=/; max-age=0";
-}
+export const logout = () => {
+  localStorage.removeItem("econojin_user");
+  window.dispatchEvent(new Event("storage"));
+};
 
-export function getStoredUser(): { fid: string; name?: string; phone?: string } | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(USER_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
+export const getUser = (): User | null => {
+  if (typeof window !== "undefined") {
+    const userStr = localStorage.getItem("econojin_user");
+    return userStr ? JSON.parse(userStr) : null;
   }
-}
-
-export const PROTECTED_PREFIXES = [
-  "/farmers",
-  "/accounting",
-  "/calendar",
-  "/settings",
-  "/ecomining",
-];
-
-export function isProtectedPath(pathname: string): boolean {
-  return PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-}
+  return null;
+};

@@ -9,9 +9,9 @@ Setup Development Tools with Mirror Fallback
 3. ابزارهای جایگزین داخلی ارائه می‌دهد
 r"""
 
+import json
 import subprocess
 import sys
-import json
 import time
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -23,123 +23,112 @@ PROJECT_ROOT = Path(r"D:\econojin.com")
 # ============================================================================
 
 PIP_MIRRORS = [
+    {"name": "PyPI Official", "url": "https://pypi.org/simple/", "trusted": False},
     {
-        'name': 'PyPI Official',
-        'url': 'https://pypi.org/simple/',
-        'trusted': False
+        "name": "Tsinghua (China)",
+        "url": "https://pypi.tuna.tsinghua.edu.cn/simple/",
+        "trusted": True,
     },
-    {
-        'name': 'Tsinghua (China)',
-        'url': 'https://pypi.tuna.tsinghua.edu.cn/simple/',
-        'trusted': True
-    },
-    {
-        'name': 'Aliyun (China)',
-        'url': 'https://mirrors.aliyun.com/pypi/simple/',
-        'trusted': True
-    },
-    {
-        'name': 'Douban (China)',
-        'url': 'https://pypi.doubanio.com/simple/',
-        'trusted': True
-    },
-    {
-        'name': 'Google',
-        'url': 'https://mirror.google.com/pypi/simple/',
-        'trusted': False
-    },
+    {"name": "Aliyun (China)", "url": "https://mirrors.aliyun.com/pypi/simple/", "trusted": True},
+    {"name": "Douban (China)", "url": "https://pypi.doubanio.com/simple/", "trusted": True},
+    {"name": "Google", "url": "https://mirror.google.com/pypi/simple/", "trusted": False},
 ]
 
 # ============================================================================
 # Utility Functions
 # ============================================================================
 
+
 def print_header(title):
     print(f"\n{'='*70}")
     print(f"  {title}")
     print(f"{'='*70}\n")
 
+
 def print_success(msg):
     print(f"✓ {msg}")
+
 
 def print_error(msg):
     print(f"✗ {msg}")
 
+
 def print_warning(msg):
     print(f"⚠ {msg}")
 
+
 def print_info(msg):
     print(f"ℹ {msg}")
+
 
 def test_mirror(mirror: dict, timeout: int = 10) -> bool:
     """تست اتصال به mirror"""
     try:
         cmd = [
-            sys.executable, '-m', 'pip', 'install', 
-            '--dry-run', '--no-deps',
-            '--index-url', mirror['url']
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--dry-run",
+            "--no-deps",
+            "--index-url",
+            mirror["url"],
         ]
-        if mirror['trusted']:
-            cmd.extend(['--trusted-host', mirror['url'].split('/')[2]])
-        cmd.append('pip')
-        
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout
-        )
+        if mirror["trusted"]:
+            cmd.extend(["--trusted-host", mirror["url"].split("/")[2]])
+        cmd.append("pip")
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         return result.returncode == 0
     except subprocess.TimeoutExpired:
         return False
     except Exception:
         return False
 
+
 def find_working_mirror() -> Optional[dict]:
     """پیدا کردن mirror فعال"""
     print_info("در حال تست mirror ها...")
-    
+
     for mirror in PIP_MIRRORS:
-        print(f"  تست: {mirror['name']}...", end=' ')
+        print(f"  تست: {mirror['name']}...", end=" ")
         if test_mirror(mirror):
             print("✓ فعال")
             return mirror
         else:
             print("✗ غیرفعال")
-    
+
     return None
+
 
 def install_package(package: str, mirror: Optional[dict] = None) -> bool:
     """نصب پکیج با mirror مشخص"""
-    cmd = [sys.executable, '-m', 'pip', 'install']
-    
+    cmd = [sys.executable, "-m", "pip", "install"]
+
     if mirror:
-        cmd.extend(['--index-url', mirror['url']])
-        if mirror['trusted']:
-            cmd.extend(['--trusted-host', mirror['url'].split('/')[2]])
-    
+        cmd.extend(["--index-url", mirror["url"]])
+        if mirror["trusted"]:
+            cmd.extend(["--trusted-host", mirror["url"].split("/")[2]])
+
     cmd.append(package)
-    
+
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=300
-        )
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
         return result.returncode == 0
     except Exception as e:
         print_error(f"Error installing {package}: {e}")
         return False
 
+
 # ============================================================================
 # Alternative Tools (Internal Implementations)
 # ============================================================================
 
+
 def create_security_scanner():
     """ایجاد اسکنر امنیتی داخلی (جایگزین bandit)"""
     print_header("🔒 Creating Internal Security Scanner")
-    
+
     scanner_code = '''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -315,16 +304,17 @@ def main():
 if __name__ == '__main__':
     main()
 '''
-    
+
     scanner_path = PROJECT_ROOT / "scripts" / "security_scanner.py"
-    scanner_path.write_text(scanner_code, encoding='utf-8')
+    scanner_path.write_text(scanner_code, encoding="utf-8")
     print_success(f"Created: {scanner_path.relative_to(PROJECT_ROOT)}")
     return scanner_path
+
 
 def create_code_quality_checker():
     """ایجاد بررسی‌کننده کیفیت کد داخلی (جایگزین pylint)"""
     print_header("📊 Creating Internal Code Quality Checker")
-    
+
     checker_code = '''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -502,16 +492,17 @@ def main():
 if __name__ == '__main__':
     main()
 '''
-    
+
     checker_path = PROJECT_ROOT / "scripts" / "code_quality_checker.py"
-    checker_path.write_text(checker_code, encoding='utf-8')
+    checker_path.write_text(checker_code, encoding="utf-8")
     print_success(f"Created: {checker_path.relative_to(PROJECT_ROOT)}")
     return checker_path
+
 
 def create_coverage_analyzer():
     """ایجاد تحلیل‌گر پوشش تست داخلی (جایگزین pytest-cov)"""
     print_header("📈 Creating Internal Coverage Analyzer")
-    
+
     analyzer_code = '''#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -636,41 +627,38 @@ def main():
 if __name__ == '__main__':
     main()
 '''
-    
+
     analyzer_path = PROJECT_ROOT / "scripts" / "coverage_analyzer.py"
-    analyzer_path.write_text(analyzer_code, encoding='utf-8')
+    analyzer_path.write_text(analyzer_code, encoding="utf-8")
     print_success(f"Created: {analyzer_path.relative_to(PROJECT_ROOT)}")
     return analyzer_path
+
 
 # ============================================================================
 # Main Installation Function
 # ============================================================================
 
+
 def install_dev_tools():
     """نصب ابزارهای توسعه"""
     print_header("🔧 Installing Development Tools")
-    
+
     # Find working mirror
     mirror = find_working_mirror()
-    
+
     if not mirror:
         print_error("هیچ mirror فعالی یافت نشد!")
         print_warning("از ابزارهای داخلی استفاده خواهد شد")
         return False
-    
+
     print_success(f"Mirror فعال: {mirror['name']}")
-    
+
     # Packages to install
-    packages = [
-        'bandit',
-        'pylint',
-        'pytest-cov',
-        'pre-commit'
-    ]
-    
+    packages = ["bandit", "pylint", "pytest-cov", "pre-commit"]
+
     installed = []
     failed = []
-    
+
     for package in packages:
         print(f"\\nنصب {package}...")
         if install_package(package, mirror):
@@ -679,46 +667,49 @@ def install_dev_tools():
         else:
             print_error(f"{package} نصب نشد")
             failed.append(package)
-    
+
     return len(failed) == 0
+
 
 # ============================================================================
 # Main Function
 # ============================================================================
 
+
 def main():
     print_header("🛠️ SETUP DEVELOPMENT TOOLS")
-    
+
     # Try to install tools
     success = install_dev_tools()
-    
+
     if not success:
         print_warning("برخی ابزارها نصب نشدند. ایجاد ابزارهای جایگزین...")
-        
+
         # Create internal tools
         scanner_path = create_security_scanner()
         checker_path = create_code_quality_checker()
         analyzer_path = create_coverage_analyzer()
-        
+
         print_header("📋 USAGE GUIDE")
         print("ابزارهای جایگزین ایجاد شدند:\\n")
-        
+
         print("1️⃣  Security Scanner (جایگزین bandit):")
         print(f"   python {scanner_path} backend/ security_report.json\\n")
-        
+
         print("2️⃣  Code Quality Checker (جایگزین pylint):")
         print(f"   python {checker_path} backend/\\n")
-        
+
         print("3️⃣  Coverage Analyzer (جایگزین pytest-cov):")
         print(f"   python {analyzer_path} backend/ tests/\\n")
-        
+
         print("4️⃣  Run Tests:")
         print("   pytest tests/ -v\\n")
-    
+
     print_header("✅ SETUP COMPLETE")
     print("تمام ابزارها آماده استفاده هستند!")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
@@ -727,5 +718,6 @@ if __name__ == '__main__':
     except Exception as e:
         print_error(f"خطا: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

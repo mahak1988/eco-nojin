@@ -6,14 +6,15 @@ Advanced simulation of RothC, AquaCrop, and carbon sequestration models
 
 import math
 import random
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
 
 
 @dataclass
 class SoilCarbonPool:
     """RothC soil carbon pools"""
+
     dpm: float  # Decomposable Plant Material
     rpm: float  # Resistant Plant Material
     bio: float  # Microbial Biomass
@@ -28,6 +29,7 @@ class SoilCarbonPool:
 @dataclass
 class CropGrowth:
     """AquaCrop crop growth parameters"""
+
     canopy_cover: float  # 0-1
     biomass: float  # kg/ha
     yield_kg: float  # kg/ha
@@ -40,24 +42,24 @@ class CarbonModelSimulator:
 
     # RothC decomposition rate constants (per year)
     RATE_CONSTANTS = {
-        'dpm': 10.0,
-        'rpm': 0.3,
-        'bio': 0.66,
-        'hum': 0.02,
+        "dpm": 10.0,
+        "rpm": 0.3,
+        "bio": 0.66,
+        "hum": 0.02,
     }
 
     # Clay content affects decomposition
     CLAY_FACTORS = {
-        'sandy': 1.2,
-        'loamy': 1.0,
-        'clay': 0.8,
+        "sandy": 1.2,
+        "loamy": 1.0,
+        "clay": 0.8,
     }
 
     def __init__(
         self,
         latitude: float = 35.6892,
         longitude: float = 51.3890,
-        soil_type: str = 'loamy',
+        soil_type: str = "loamy",
         initial_soc: float = 20.0,  # tons C/ha
         clay_content: float = 25.0,  # %
     ):
@@ -81,7 +83,7 @@ class CarbonModelSimulator:
             biomass=0.0,
             yield_kg=0.0,
             water_use_efficiency=15.0,
-            growth_stage='germination'
+            growth_stage="germination",
         )
 
     def _temperature_factor(self, temp_c: float) -> float:
@@ -127,10 +129,10 @@ class CarbonModelSimulator:
         rate_mod = temp_mod * moist_mod * plant_mod * clay_mod
 
         # Decomposition
-        dpm_decomp = self.pools.dpm * self.RATE_CONSTANTS['dpm'] * rate_mod * time_step
-        rpm_decomp = self.pools.rpm * self.RATE_CONSTANTS['rpm'] * rate_mod * time_step
-        bio_decomp = self.pools.bio * self.RATE_CONSTANTS['bio'] * rate_mod * time_step
-        hum_decomp = self.pools.hum * self.RATE_CONSTANTS['hum'] * rate_mod * time_step
+        dpm_decomp = self.pools.dpm * self.RATE_CONSTANTS["dpm"] * rate_mod * time_step
+        rpm_decomp = self.pools.rpm * self.RATE_CONSTANTS["rpm"] * rate_mod * time_step
+        bio_decomp = self.pools.bio * self.RATE_CONSTANTS["bio"] * rate_mod * time_step
+        hum_decomp = self.pools.hum * self.RATE_CONSTANTS["hum"] * rate_mod * time_step
 
         # Update pools
         self.pools.dpm = max(0, self.pools.dpm - dpm_decomp + plant_input * 0.5)
@@ -147,16 +149,16 @@ class CarbonModelSimulator:
         co2_released = (dpm_decomp + rpm_decomp + bio_decomp + hum_decomp) * 3.67  # C to CO2
 
         return {
-            'pools': {
-                'dpm': round(self.pools.dpm, 3),
-                'rpm': round(self.pools.rpm, 3),
-                'bio': round(self.pools.bio, 3),
-                'hum': round(self.pools.hum, 3),
-                'iom': round(self.pools.iom, 3),
-                'total': round(self.pools.total, 3),
+            "pools": {
+                "dpm": round(self.pools.dpm, 3),
+                "rpm": round(self.pools.rpm, 3),
+                "bio": round(self.pools.bio, 3),
+                "hum": round(self.pools.hum, 3),
+                "iom": round(self.pools.iom, 3),
+                "total": round(self.pools.total, 3),
             },
-            'co2_released_tons': round(co2_released, 3),
-            'rate_modifier': round(rate_mod, 3),
+            "co2_released_tons": round(co2_released, 3),
+            "rate_modifier": round(rate_mod, 3),
         }
 
     def simulate_aquacrop_growth(
@@ -174,16 +176,16 @@ class CarbonModelSimulator:
         for day in range(days):
             # Growth stages
             if day < 15:
-                stage = 'germination'
+                stage = "germination"
                 canopy_growth = 0.02
             elif day < 45:
-                stage = 'vegetative'
+                stage = "vegetative"
                 canopy_growth = 0.03
             elif day < 75:
-                stage = 'flowering'
+                stage = "flowering"
                 canopy_growth = 0.01
             else:
-                stage = 'maturity'
+                stage = "maturity"
                 canopy_growth = -0.005  # Senescence
 
             # Canopy development
@@ -199,24 +201,26 @@ class CarbonModelSimulator:
                 biomass_increment = 0
 
             # Yield formation (after flowering)
-            if stage in ['flowering', 'maturity']:
+            if stage in ["flowering", "maturity"]:
                 yield_kg = biomass * 0.4  # 40% harvest index
             else:
                 yield_kg = 0
 
-            growth_data.append({
-                'day': day,
-                'stage': stage,
-                'canopy_cover': round(canopy, 3),
-                'biomass_kg_ha': round(biomass, 2),
-                'yield_kg_ha': round(yield_kg, 2),
-                'biomass_increment': round(biomass_increment, 2),
-                'timestamp': (datetime.now(timezone.utc) + timedelta(days=day)).isoformat(),
-            })
+            growth_data.append(
+                {
+                    "day": day,
+                    "stage": stage,
+                    "canopy_cover": round(canopy, 3),
+                    "biomass_kg_ha": round(biomass, 2),
+                    "yield_kg_ha": round(yield_kg, 2),
+                    "biomass_increment": round(biomass_increment, 2),
+                    "timestamp": (datetime.now(timezone.utc) + timedelta(days=day)).isoformat(),
+                }
+            )
 
         self.crop.canopy_cover = canopy
         self.crop.biomass = biomass
-        self.crop.yield_kg = yield_kg if 'yield_kg' in locals() else 0
+        self.crop.yield_kg = yield_kg if "yield_kg" in locals() else 0
 
         return growth_data
 
@@ -224,17 +228,17 @@ class CarbonModelSimulator:
         self,
         years: int = 10,
         tree_count: int = 1000,
-        species: str = 'quercus_persica',
+        species: str = "quercus_persica",
     ) -> Dict:
         """Simulate annual carbon sequestration"""
 
         # Species-specific carbon sequestration rates (kg CO2/tree/year)
         species_rates = {
-            'quercus_persica': 22.0,  # Persian Oak
-            'eucalyptus': 45.0,
-            'populus': 35.0,
-            'pistacia_atlantica': 18.0,
-            'amygdalus_scoparia': 15.0,
+            "quercus_persica": 22.0,  # Persian Oak
+            "eucalyptus": 45.0,
+            "populus": 35.0,
+            "pistacia_atlantica": 18.0,
+            "amygdalus_scoparia": 15.0,
         }
 
         base_rate = species_rates.get(species, 22.0)
@@ -272,77 +276,71 @@ class CarbonModelSimulator:
                 temp_c=avg_temp,
                 moisture=avg_moisture,
                 plant_input=plant_input,
-                canopy_cover=min(1, year / 10)
+                canopy_cover=min(1, year / 10),
             )
 
-            annual_data.append({
-                'year': year,
-                'carbon_per_tree_kg': round(annual_per_tree, 2),
-                'carbon_total_kg': round(annual_total_kg, 2),
-                'carbon_total_tons': round(annual_total_tons, 2),
-                'cumulative_tons': round(cumulative_carbon, 2),
-                'soil_carbon_tons': rothc_result['pools']['total'],
-                'co2_released_tons': rothc_result['co2_released_tons'],
-                'growth_factor': round(growth_factor, 3),
-            })
+            annual_data.append(
+                {
+                    "year": year,
+                    "carbon_per_tree_kg": round(annual_per_tree, 2),
+                    "carbon_total_kg": round(annual_total_kg, 2),
+                    "carbon_total_tons": round(annual_total_tons, 2),
+                    "cumulative_tons": round(cumulative_carbon, 2),
+                    "soil_carbon_tons": rothc_result["pools"]["total"],
+                    "co2_released_tons": rothc_result["co2_released_tons"],
+                    "growth_factor": round(growth_factor, 3),
+                }
+            )
 
         return {
-            'species': species,
-            'tree_count': tree_count,
-            'years_simulated': years,
-            'total_carbon_tons': round(cumulative_carbon, 2),
-            'annual_average_tons': round(cumulative_carbon / years, 2),
-            'final_soil_carbon_tons': round(self.pools.total, 2),
-            'annual_data': annual_data,
-            'confidence': 0.85,
-            'methodology': 'RothC + AquaCrop + Species-Specific Growth Curves',
+            "species": species,
+            "tree_count": tree_count,
+            "years_simulated": years,
+            "total_carbon_tons": round(cumulative_carbon, 2),
+            "annual_average_tons": round(cumulative_carbon / years, 2),
+            "final_soil_carbon_tons": round(self.pools.total, 2),
+            "annual_data": annual_data,
+            "confidence": 0.85,
+            "methodology": "RothC + AquaCrop + Species-Specific Growth Curves",
         }
 
     def simulate_project_impact(
-        self,
-        activity_type: str,
-        area_hectares: float,
-        duration_years: int,
-        **kwargs
+        self, activity_type: str, area_hectares: float, duration_years: int, **kwargs
     ) -> Dict:
         """Simulate complete project impact"""
 
-        if activity_type == 'tree_planting':
-            tree_count = kwargs.get('tree_count', int(area_hectares * 1000))
-            species = kwargs.get('species', 'quercus_persica')
+        if activity_type == "tree_planting":
+            tree_count = kwargs.get("tree_count", int(area_hectares * 1000))
+            species = kwargs.get("species", "quercus_persica")
 
             result = self.simulate_annual_carbon(
-                years=duration_years,
-                tree_count=tree_count,
-                species=species
+                years=duration_years, tree_count=tree_count, species=species
             )
 
             # Add crop growth simulation
             crop_growth = self.simulate_aquacrop_growth(
-                days=min(365, duration_years * 365),
-                water_available_mm=400,
-                temp_avg_c=18
+                days=min(365, duration_years * 365), water_available_mm=400, temp_avg_c=18
             )
 
-            result['crop_growth_sample'] = crop_growth[-10:]  # Last 10 days
-            result['activity_type'] = activity_type
-            result['area_hectares'] = area_hectares
+            result["crop_growth_sample"] = crop_growth[-10:]  # Last 10 days
+            result["activity_type"] = activity_type
+            result["area_hectares"] = area_hectares
 
             return result
 
-        elif activity_type == 'soil_regeneration':
+        elif activity_type == "soil_regeneration":
             # Simulate soil carbon increase
             annual_increase = 0.5  # tons C/ha/year
             total_carbon = annual_increase * area_hectares * duration_years * 3.67
 
             return {
-                'activity_type': activity_type,
-                'area_hectares': area_hectares,
-                'duration_years': duration_years,
-                'total_carbon_tons': round(total_carbon, 2),
-                'annual_increase_per_ha': annual_increase,
-                'methodology': 'RothC Soil Carbon Model',
-                'confidence': 0.80,
+                "activity_type": activity_type,
+                "area_hectares": area_hectares,
+                "duration_years": duration_years,
+                "total_carbon_tons": round(total_carbon, 2),
+                "annual_increase_per_ha": annual_increase,
+                "methodology": "RothC Soil Carbon Model",
+                "confidence": 0.80,
             }
 
         else:
@@ -351,23 +349,25 @@ class CarbonModelSimulator:
             total = rate * area_hectares * duration_years
 
             return {
-                'activity_type': activity_type,
-                'area_hectares': area_hectares,
-                'duration_years': duration_years,
-                'total_carbon_tons': round(total, 2),
-                'methodology': 'Generic Ecosystem Model',
-                'confidence': 0.70,
+                "activity_type": activity_type,
+                "area_hectares": area_hectares,
+                "duration_years": duration_years,
+                "total_carbon_tons": round(total, 2),
+                "methodology": "Generic Ecosystem Model",
+                "confidence": 0.70,
             }
 
 
 # Global simulator
 _simulator = None
 
+
 def get_simulator(**kwargs) -> CarbonModelSimulator:
     global _simulator
     if _simulator is None:
         _simulator = CarbonModelSimulator(**kwargs)
     return _simulator
+
 
 def reset_simulator(**kwargs):
     global _simulator

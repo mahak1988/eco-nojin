@@ -1,3 +1,4 @@
+import React from 'react';
 import { MapContainer, TileLayer, Circle, Popup, Tooltip } from "react-leaflet";
 import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
@@ -23,7 +24,7 @@ const SUBZONES = [
 function getNdviColor(v: number) { return v > 0.5 ? "#10b981" : v > 0.3 ? "#f59e0b" : "#ef4444"; }
 function getErosionColor(v: number) { return v < 20 ? "#10b981" : v < 40 ? "#f59e0b" : "#ef4444"; }
 
-export default function MapPanel() {
+function MapPanel() {
   const [mode, setMode] = useState<"ndvi" | "erosion">("ndvi");
 
   return (
@@ -72,3 +73,5 @@ export default function MapPanel() {
     </div>
   );
 }
+
+export default React.memo(MapPanel);

@@ -4,20 +4,23 @@ Sentinel-2 Satellite Integration with Copernicus Data Space Ecosystem
 Real satellite imagery for ecosystem verification
 """
 
-import os
 import json
-import requests
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional
-from pathlib import Path
+import os
 import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Dict, Optional
+
+import requests
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 try:
     from scripts.core.logger import UnifiedLogger
+
     logger = UnifiedLogger.get_logger(__name__)
 except Exception as e:
     import logging
+
     logger = logging.getLogger(__name__)
 
 
@@ -29,7 +32,9 @@ class Sentinel2Client:
 
     CATALOG_URL = "https://catalogue.dataspace.copernicus.eu/odata/v1"
     PROCESS_URL = "https://sh.dataspace.copernicus.eu/api/v1/process"
-    TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    TOKEN_URL = (
+        "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
+    )
 
     def __init__(self, client_id: Optional[str] = None, client_secret: Optional[str] = None):
         self.client_id = client_id or os.getenv("COPERNICUS_CLIENT_ID", "")
@@ -48,19 +53,29 @@ class Sentinel2Client:
         if self.simulation_mode:
             return False
 
-        if self.access_token and self.token_expires and datetime.now(timezone.utc) < self.token_expires:
+        if (
+            self.access_token
+            and self.token_expires
+            and datetime.now(timezone.utc) < self.token_expires
+        ):
             return True
 
         try:
-            response = requests.post(self.TOKEN_URL, data={
-                "grant_type": "client_credentials",
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-            }, timeout=30)
+            response = requests.post(
+                self.TOKEN_URL,
+                data={
+                    "grant_type": "client_credentials",
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                },
+                timeout=30,
+            )
             response.raise_for_status()
             data = response.json()
             self.access_token = data["access_token"]
-            self.token_expires = datetime.now(timezone.utc) + timedelta(seconds=data.get("expires_in", 600) - 60)
+            self.token_expires = datetime.now(timezone.utc) + timedelta(
+                seconds=data.get("expires_in", 600) - 60
+            )
             logger.info("🔐 Sentinel-2: Authentication successful")
             return True
         except Exception as e:
@@ -73,7 +88,7 @@ class Sentinel2Client:
         lng: float,
         start_date: datetime,
         end_date: datetime,
-        max_cloud_cover: float = 20.0
+        max_cloud_cover: float = 20.0,
     ) -> list:
         """Search for Sentinel-2 images in an area"""
         if self.simulation_mode:
@@ -102,7 +117,7 @@ class Sentinel2Client:
             response = requests.get(
                 self.CATALOG_URL + query,
                 headers={"Authorization": f"Bearer {self.access_token}"},
-                timeout=30
+                timeout=30,
             )
             response.raise_for_status()
             data = response.json()
@@ -114,13 +129,15 @@ class Sentinel2Client:
                     if attr.get("Name") == "cloudCover":
                         cloud_cover = attr.get("Value", 0)
 
-                images.append({
-                    "id": product["Id"],
-                    "name": product["Name"],
-                    "date": product["ContentDate"]["Start"],
-                    "cloud_cover": cloud_cover,
-                    "download_url": f"{self.CATALOG_URL}/Products({product['Id']})/$value",
-                })
+                images.append(
+                    {
+                        "id": product["Id"],
+                        "name": product["Name"],
+                        "date": product["ContentDate"]["Start"],
+                        "cloud_cover": cloud_cover,
+                        "download_url": f"{self.CATALOG_URL}/Products({product['Id']})/$value",
+                    }
+                )
 
             logger.info(f"🛰️ Sentinel-2: Found {len(images)} images")
             return images
@@ -153,30 +170,37 @@ class Sentinel2Client:
                 "input": {
                     "bounds": {
                         "bbox": [lng - delta, lat - delta, lng + delta, lat + delta],
-                        "properties": {"crs": "http://www.opengis.net/def/crs/EPSG/0/4326"}
+                        "properties": {"crs": "http://www.opengis.net/def/crs/EPSG/0/4326"},
                     },
-                    "data": [{
-                        "dataFilter": {
-                            "timeRange": {
-                                "from": (date - timedelta(days=5)).isoformat() + "Z",
-                                "to": (date + timedelta(days=5)).isoformat() + "Z",
+                    "data": [
+                        {
+                            "dataFilter": {
+                                "timeRange": {
+                                    "from": (date - timedelta(days=5)).isoformat() + "Z",
+                                    "to": (date + timedelta(days=5)).isoformat() + "Z",
+                                },
+                                "mosaickingOrder": "leastCC",
                             },
-                            "mosaickingOrder": "leastCC",
-                        },
-                        "type": "sentinel-2-l2a",
-                    }]
+                            "type": "sentinel-2-l2a",
+                        }
+                    ],
                 },
                 "output": {
-                    "width": 10, "height": 10,
-                    "responses": [{"identifier": "default", "format": {"type": "image/tiff"}}]
+                    "width": 10,
+                    "height": 10,
+                    "responses": [{"identifier": "default", "format": {"type": "image/tiff"}}],
                 },
                 "evalscript": evalscript,
             }
 
             response = requests.post(
                 self.PROCESS_URL,
-                headers={"Authorization": f"Bearer {self.access_token}", "Content-Type": "application/json"},
-                json=payload, timeout=60
+                headers={
+                    "Authorization": f"Bearer {self.access_token}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=60,
             )
             response.raise_for_status()
 
@@ -188,11 +212,7 @@ class Sentinel2Client:
             return self._mock_ndvi(lat, lng, date)
 
     def verify_activity(
-        self,
-        lat: float,
-        lng: float,
-        activity_date: datetime,
-        activity_type: str = "tree_planting"
+        self, lat: float, lng: float, activity_date: datetime, activity_type: str = "tree_planting"
     ) -> Dict:
         """Verify an ecosystem activity using satellite imagery"""
         logger.info(f"🛰️ Sentinel-2: Verifying activity at ({lat}, {lng})")
@@ -240,10 +260,19 @@ class Sentinel2Client:
         return result
 
     def _mock_search(self, lat, lng, start, end):
-        return [{"id": "mock_1", "name": "S2A_MOCK", "date": end.isoformat(), "cloud_cover": 5.0, "simulation": True}]
+        return [
+            {
+                "id": "mock_1",
+                "name": "S2A_MOCK",
+                "date": end.isoformat(),
+                "cloud_cover": 5.0,
+                "simulation": True,
+            }
+        ]
 
     def _mock_ndvi(self, lat, lng, date):
         import random
+
         random.seed(hash((lat, lng, date.toordinal())) % (2**32))
         return round(0.3 + random.uniform(-0.1, 0.3), 3)
 

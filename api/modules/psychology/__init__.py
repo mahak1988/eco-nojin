@@ -1,1 +1,1 @@
-# روانشناسی Module
+from . import models, router

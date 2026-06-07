@@ -4,8 +4,8 @@
 ⚡ Econojin Module Generator (اصلاح‌شده)
 ایجاد سریع ماژول‌های جدید - نسخه بدون خطای f-string
 """
-import sys
 import argparse
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent.resolve()
@@ -13,19 +13,21 @@ WEB = ROOT / "apps" / "web"
 if not WEB.exists():
     WEB = ROOT / "web"
 
+
 def write_file(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     print(f"✅ {path.relative_to(ROOT)}")
 
+
 def create_module(module_id: str, module_name: str, icon: str, description: str):
     """ایجاد کامل یک ماژول جدید - با escape صحیح برای JSX"""
-    
+
     app_dir = WEB / "src" / "app" / module_id
     components_dir = WEB / "src" / "modules" / module_id
-    
+
     # نکته کلیدی: در f-string، {{ و }} برای نمایش { و } در JSX استفاده می‌شود
-    
+
     # ۱. صفحه اصلی ماژول
     page_content = f'''"""use client";
 
@@ -88,9 +90,9 @@ export default function {module_name.replace(" ", "")}Page() {{
 }}
 '''
     write_file(app_dir / "page.tsx", page_content)
-    
+
     # ۲. کامپوننت کارت ماژول
-    card_content = f'''import {{ Card, CardContent, CardHeader, CardTitle }} from "@/components/ui/card";
+    card_content = f"""import {{ Card, CardContent, CardHeader, CardTitle }} from "@/components/ui/card";
 import {{ Badge }} from "@/components/ui/badge";
 import {{ {icon} }} from "lucide-react";
 
@@ -125,10 +127,11 @@ export function {module_name.replace(" ", "")}Card({{ id, title, description, st
     </Card>
   );
 }}
-'''
+"""
     write_file(components_dir / f"{module_id}-card.tsx", card_content)
-    
+
     print(f"\n🎉 ماژول '{module_name}' ایجاد شد! 🔗 http://localhost:3000/{module_id}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="🚀 ایجاد ماژول جدید")
@@ -136,19 +139,20 @@ def main():
     parser.add_argument("name", help="نام فارسی: e.g., 'انبارداری'")
     parser.add_argument("icon", help="آیکون lucide-react: e.g., 'Package'")
     parser.add_argument("desc", help="توضیح: e.g., 'مدیریت موجودی'")
-    
+
     args = parser.parse_args()
-    
+
     print(f"⚡ Econojin Module Generator")
     print(f"   ماژول: {{args.name}} ({{args.id}})")
     print("=" * 50)
-    
+
     try:
         create_module(args.id, args.name, args.icon, args.desc)
         return 0
     except Exception as e:
         print(f"\n❌ خطا: {{e}}")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

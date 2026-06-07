@@ -1,7 +1,9 @@
 """LLM chat — OpenAI or Azure OpenAI via HTTP."""
 
 import logging
+
 import httpx
+
 from api.core.config import settings
 
 logger = logging.getLogger(__name__)

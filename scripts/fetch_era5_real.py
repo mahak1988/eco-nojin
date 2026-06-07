@@ -1,7 +1,12 @@
 """ERA5-Land Data Fetcher (Real or Simulated)"""
-import os, sys, json, random
+import json
+import os
+import random
+import sys
 from datetime import datetime
+
 from scripts.core.logger import UnifiedLogger
+
 logger = UnifiedLogger.get_logger(__name__)
 
 
@@ -10,6 +15,7 @@ sys.path.insert(0, PROJECT)
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv(os.path.join(PROJECT, ".env"))
 except Exception as e:
     pass
@@ -17,25 +23,24 @@ except Exception as e:
 BBOX = [51.2, 35.5, 51.3, 35.6]
 VARS = ["2m_temperature", "total_precipitation", "surface_net_solar_radiation"]
 
+
 def download_era5(start=2023, end=2023, out_dir=None):
     if out_dir is None:
         out_dir = os.path.join(PROJECT, "data", "raw", "era5")
     os.makedirs(out_dir, exist_ok=True)
     logger.info(f"[INFO] ERA5: {start}-{end} for BBOX {BBOX}")
-    
+
     uid = os.getenv("CDS_API_UID", "").strip()
     key = os.getenv("CDS_API_KEY", "").strip()
-    
+
     if not uid or not key or "your" in uid.lower():
         logger.info("[INFO] No CDS credentials - running SIMULATION mode")
         return _simulate(start, end, out_dir)
-    
+
     try:
         import cdsapi
-        client = cdsapi.Client(
-            url=os.getenv("CDS_API_URL"),
-            key=f"{uid}:{key}"
-        )
+
+        client = cdsapi.Client(url=os.getenv("CDS_API_URL"), key=f"{uid}:{key}")
         downloaded = []
         for year in range(start, end + 1):
             fn = f"era5_land_PILOT_{year}.nc"
@@ -48,7 +53,7 @@ def download_era5(start=2023, end=2023, out_dir=None):
                 "day": [f"{d:02d}" for d in range(1, 29)],
                 "time": ["00:00", "06:00", "12:00", "18:00"],
                 "area": BBOX,
-                "format": "netcdf"
+                "format": "netcdf",
             }
             logger.info(f"[INFO] Downloading {year}...")
             client.retrieve("reanalysis-era5-land", req, fp)
@@ -61,6 +66,7 @@ def download_era5(start=2023, end=2023, out_dir=None):
     except Exception as e:
         logger.error(f"[ERROR] {e}")
         return {"status": "error", "msg": str(e)}
+
 
 def _simulate(start, end, out_dir):
     simulated = []
@@ -80,6 +86,7 @@ def _simulate(start, end, out_dir):
         simulated.append({"file": fn, "size_kb": round(os.path.getsize(fp) / 1024, 1)})
         logger.info(f"[SIM] Created: {fn}")
     return {"status": "simulated", "count": len(simulated), "files": simulated}
+
 
 if __name__ == "__main__":
     logger.info("=== ERA5-Land Fetcher ===")

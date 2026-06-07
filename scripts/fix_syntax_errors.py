@@ -11,23 +11,24 @@
 # === Auto-added: Add project root to sys.path ===
 import sys
 from pathlib import Path as _Path
+
 _project_root = _Path(__file__).parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 # === End auto-added ===
 
-import sys
 import re
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 
 def backup_file(file_path: Path) -> Path:
     """ایجاد backup"""
-    backup_dir = file_path.parent / '.syntax_backup'
+    backup_dir = file_path.parent / ".syntax_backup"
     backup_dir.mkdir(exist_ok=True)
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = backup_dir / f"{file_path.stem}_{timestamp}{file_path.suffix}"
     shutil.copy2(file_path, backup_path)
     return backup_path
@@ -39,21 +40,21 @@ def backup_file(file_path: Path) -> Path:
 def fix_1_py(project_root: Path):
     """حذف یا بایگانی کردن 1.py"""
     logger.info("\n🔧 رفع 1.py...")
-    
-    file_path = project_root / '1.py'
+
+    file_path = project_root / "1.py"
     if not file_path.exists():
         # جستجو در سایر مسیرها
-        for p in project_root.rglob('1.py'):
-            if '.venv' not in str(p) and 'node_modules' not in str(p):
+        for p in project_root.rglob("1.py"):
+            if ".venv" not in str(p) and "node_modules" not in str(p):
                 file_path = p
                 break
-    
+
     if not file_path.exists():
         logger.info("  ℹ️  1.py یافت نشد")
         return
-    
+
     backup_file(file_path)
-    
+
     # بازنویسی به عنوان یک فایل ساده و سالم
     content = '''"""
 فایل تست/آزمایشی
@@ -68,7 +69,7 @@ def main():
 if __name__ == '__main__':
     main()
 '''
-    file_path.write_text(content, encoding='utf-8')
+    file_path.write_text(content, encoding="utf-8")
     logger.info(f"  ✅ {file_path.name} بازنویسی شد")
 
 
@@ -78,20 +79,20 @@ if __name__ == '__main__':
 def fix_farmer_py(project_root: Path):
     """بازنویسی farmer.py با template استاندارد FastAPI"""
     logger.info("\n🔧 رفع farmer.py...")
-    
-    file_path = project_root / 'scripts' / 'api' / 'routers' / 'farmer.py'
+
+    file_path = project_root / "scripts" / "api" / "routers" / "farmer.py"
     if not file_path.exists():
         logger.info(f"  ❌ فایل یافت نشد: {file_path}")
         return
-    
+
     backup_file(file_path)
-    
+
     # تلاش برای خواندن محتوای فعلی و استخراج endpointها
     try:
-        original_content = file_path.read_text(encoding='utf-8')
+        original_content = file_path.read_text(encoding="utf-8")
     except Exception:
         original_content = ""
-    
+
     # بازنویسی کامل با ساختار سالم
     content = '''"""
 Farmer Router - مسیرهای API برای ماژول کشاورز
@@ -264,8 +265,8 @@ async def get_farmer_activities(farmer_id: int):
         "activities": []
     }
 '''
-    
-    file_path.write_text(content, encoding='utf-8')
+
+    file_path.write_text(content, encoding="utf-8")
     logger.info(f"  ✅ farmer.py بازنویسی شد")
 
 
@@ -274,7 +275,7 @@ async def get_farmer_activities(farmer_id: int):
 # ============================================================================
 
 TEST_TEMPLATES = {
-    'test_base_model.py': '''"""
+    "test_base_model.py": '''"""
 Unit tests for BaseModel
 """
 
@@ -306,8 +307,7 @@ class TestBaseModel:
         repr_str = repr(model)
         assert isinstance(repr_str, str)
 ''',
-
-    'test_coupling.py': '''"""
+    "test_coupling.py": '''"""
 Unit tests for coupling module
 """
 
@@ -338,8 +338,7 @@ class TestCoupling:
         except ImportError:
             pytest.skip("coupling module not found")
 ''',
-
-    'test_coupling_engine.py': '''"""
+    "test_coupling_engine.py": '''"""
 Unit tests for Coupling Engine
 """
 
@@ -386,8 +385,7 @@ class TestCouplingEngine:
         # نباید crash کند
         assert engine is not None
 ''',
-
-    'test_swat_plus.py': '''"""
+    "test_swat_plus.py": '''"""
 Unit tests for SWAT+ hydrological model
 """
 
@@ -416,8 +414,7 @@ class TestSWATPlusModel:
         """تست وجود پیکربندی"""
         assert hasattr(model, 'config')
 ''',
-
-    'test_aquacrop.py': '''"""
+    "test_aquacrop.py": '''"""
 Unit tests for AquaCrop model
 """
 
@@ -465,8 +462,7 @@ class TestAquaCrop:
             model = model_class()
             assert model is not None
 ''',
-
-    'test_rothc.py': '''"""
+    "test_rothc.py": '''"""
 Unit tests for RothC soil carbon model
 """
 
@@ -516,8 +512,7 @@ class TestRothC:
             )
             assert isinstance(result, dict)
 ''',
-
-    'test_app_factory.py': '''"""
+    "test_app_factory.py": '''"""
 Unit tests for app factory
 """
 
@@ -558,8 +553,7 @@ class TestAppFactory:
         except Exception:
             pytest.skip("Cannot test routes")
 ''',
-
-    'test_run_server.py': '''"""
+    "test_run_server.py": '''"""
 Unit tests for run_server module
 """
 
@@ -598,8 +592,7 @@ class TestRunServer:
         except (ImportError, AttributeError):
             pytest.skip("load_config not available")
 ''',
-
-    'test_simulation_service.py': '''"""
+    "test_simulation_service.py": '''"""
 Unit tests for Simulation Service
 """
 
@@ -635,8 +628,7 @@ class TestSimulationService:
         # حداقل باید یک متد عمومی داشته باشد
         assert isinstance(methods, list)
 ''',
-
-    'test_daily_report.py': '''"""
+    "test_daily_report.py": '''"""
 Unit tests for daily report module
 """
 
@@ -679,8 +671,7 @@ class TestDailyReport:
         except Exception:
             pytest.skip("Cannot generate report with date")
 ''',
-
-    'test_auth.py': '''"""
+    "test_auth.py": '''"""
 Unit tests for authentication
 """
 
@@ -722,22 +713,22 @@ class TestAuth:
 def fix_all_test_files(project_root: Path):
     """بازنویسی همه فایل‌های تست"""
     logger.info("\n🔧 بازنویسی فایل‌های تست...")
-    
-    tests_dir = project_root / 'tests'
+
+    tests_dir = project_root / "tests"
     tests_dir.mkdir(exist_ok=True)
-    
+
     fixed_count = 0
-    
+
     for filename, template in TEST_TEMPLATES.items():
         file_path = tests_dir / filename
-        
+
         if file_path.exists():
             backup_file(file_path)
-        
-        file_path.write_text(template, encoding='utf-8')
+
+        file_path.write_text(template, encoding="utf-8")
         logger.info(f"  ✅ {filename}")
         fixed_count += 1
-    
+
     logger.info(f"  📊 {fixed_count} فایل تست بازنویسی شد")
 
 
@@ -747,102 +738,109 @@ def fix_all_test_files(project_root: Path):
 def fix_escape_sequences(project_root: Path):
     """رفع invalid escape sequences در همه فایل‌ها"""
     logger.info("\n🔧 رفع escape sequences...")
-    
+
     fixed_count = 0
-    
-    for py_file in project_root.rglob('*.py'):
+
+    for py_file in project_root.rglob("*.py"):
         # نادیده گرفتن پوشه‌های خاص
-        if any(part in str(py_file) for part in [
-            '.venv', 'node_modules', '__pycache__',
-            '.syntax_backup', '.backup', '.emergency_backup'
-        ]):
+        if any(
+            part in str(py_file)
+            for part in [
+                ".venv",
+                "node_modules",
+                "__pycache__",
+                ".syntax_backup",
+                ".backup",
+                ".emergency_backup",
+            ]
+        ):
             continue
-        
+
         try:
-            content = py_file.read_text(encoding='utf-8')
+            content = py_file.read_text(encoding="utf-8")
             original = content
-            
+
             # رفع مسیرهای Windows که در string معمولی هستند
             # D:\econojin -> D:\\econojin یا r"D:\\econojin"
-            
+
             # الگوهای مسیر Windows در string های معمولی
             # فقط در string literals که با " یا ' شروع می‌شوند
             patterns = [
                 # "C:\\path\to\file" -> "C:\\path\\to\\file"
-                (r'"([A-Za-z]:\\[^"\\\\]*(?:\\[^"\\\\]*)*)"', 
-                 lambda m: '"' + m.group(1).replace('\\', '\\\\') + '"'),
-                (r"'([A-Za-z]:\\[^'\\\\]*(?:\\[^'\\\\]*)*)'",
-                 lambda m: "'" + m.group(1).replace('\\', '\\\\') + "'"),
+                (
+                    r'"([A-Za-z]:\\[^"\\\\]*(?:\\[^"\\\\]*)*)"',
+                    lambda m: '"' + m.group(1).replace("\\", "\\\\") + '"',
+                ),
+                (
+                    r"'([A-Za-z]:\\[^'\\\\]*(?:\\[^'\\\\]*)*)'",
+                    lambda m: "'" + m.group(1).replace("\\", "\\\\") + "'",
+                ),
             ]
-            
+
             # فقط رفع \e, \a, \r, \n و غیره که در path هستند
             # روش ایمن‌تر: فقط در خطوطی که مسیر هستند
-            lines = content.split('\n')
+            lines = content.split("\n")
             new_lines = []
-            
+
             for line in lines:
                 # اگر خط شامل مسیر Windows است
-                if re.search(r'[A-Za-z]:\\', line):
+                if re.search(r"[A-Za-z]:\\", line):
                     # اگر raw string نیست، آن را raw کنیم
                     # یا backslash ها را double کنیم
                     # روش: جایگزینی \ با \\ فقط در مسیرها
                     # اما نه در escape sequences معتبر مثل \n \t
-                    
+
                     # استخراج مسیرها
                     def fix_path_in_string(match):
                         full_match = match.group(0)
                         quote = full_match[0]
                         path_content = full_match[1:-1]
-                        
+
                         # اگر raw string است، دست نزن
                         # (تشخیص سخت است، پس فقط backslash های مسیر را double می‌کنیم)
-                        
+
                         # escape sequences معتبر را محافظت کن
-                        valid_escapes = {'n', 't', 'r', '0', '\\', "'", '"', 'a', 'b', 'f', 'v'}
-                        
+                        valid_escapes = {"n", "t", "r", "0", "\\", "'", '"', "a", "b", "f", "v"}
+
                         new_content = []
                         i = 0
                         while i < len(path_content):
-                            if path_content[i] == '\\' and i + 1 < len(path_content):
+                            if path_content[i] == "\\" and i + 1 < len(path_content):
                                 next_char = path_content[i + 1]
                                 if next_char in valid_escapes:
                                     # escape معتبر، دست نزن
-                                    new_content.append(path_content[i:i+2])
+                                    new_content.append(path_content[i : i + 2])
                                     i += 2
-                                elif next_char == '\\':
+                                elif next_char == "\\":
                                     # double backslash
-                                    new_content.append('\\\\')
+                                    new_content.append("\\\\")
                                     i += 2
                                 else:
                                     # backslash در مسیر، double کن
-                                    new_content.append('\\\\')
+                                    new_content.append("\\\\")
                                     i += 1
                             else:
                                 new_content.append(path_content[i])
                                 i += 1
-                        
-                        return quote + ''.join(new_content) + quote
-                    
+
+                        return quote + "".join(new_content) + quote
+
                     # پیدا کردن string های شامل مسیر
-                    new_line = re.sub(
-                        r'["\'][A-Za-z]:\\[^"\']*["\']',
-                        fix_path_in_string,
-                        line
-                    )
+                    new_line = re.sub(r'["\'][A-Za-z]:\\[^"\']*["\']', fix_path_in_string, line)
                     new_lines.append(new_line)
                 else:
                     new_lines.append(line)
-            
-            content = '\n'.join(new_lines)
-            
+
+            content = "\n".join(new_lines)
+
             if content != original:
-                py_file.write_text(content, encoding='utf-8')
+                py_file.write_text(content, encoding="utf-8")
                 logger.info(f"  ✅ {py_file.name}")
                 fixed_count += 1
-        
+
         except Exception as e:
             logger.info(f"  ⚠️  خطا در {py_file.name}: {e}")
-    
+
     logger.info(f"  📊 {fixed_count} فایل اصلاح شد")
 
 
@@ -852,36 +850,44 @@ def fix_escape_sequences(project_root: Path):
 def verify_all_files(project_root: Path):
     """بررسی نهایی syntax همه فایل‌ها"""
     logger.info("\n🔍 بررسی نهایی Syntax...")
-    
+
     import ast
+
     errors = []
     checked = 0
-    
-    for py_file in project_root.rglob('*.py'):
-        if any(part in str(py_file) for part in [
-            '.venv', 'node_modules', '__pycache__',
-            '.syntax_backup', '.backup', '.emergency_backup'
-        ]):
+
+    for py_file in project_root.rglob("*.py"):
+        if any(
+            part in str(py_file)
+            for part in [
+                ".venv",
+                "node_modules",
+                "__pycache__",
+                ".syntax_backup",
+                ".backup",
+                ".emergency_backup",
+            ]
+        ):
             continue
-        
+
         checked += 1
         try:
-            content = py_file.read_text(encoding='utf-8')
+            content = py_file.read_text(encoding="utf-8")
             ast.parse(content)
         except SyntaxError as e:
             errors.append((py_file, str(e)))
         except Exception as e:
             errors.append((py_file, f"Read error: {e}"))
-    
+
     logger.info(f"  📊 بررسی شد: {checked} فایل")
     logger.info(f"  ✅ سالم: {checked - len(errors)} فایل")
     logger.info(f"  ❌ خطا: {len(errors)} فایل")
-    
+
     if errors:
         logger.info(f"\n  فایل‌های دارای خطا:")
         for path, error in errors[:20]:
             logger.info(f"    - {path.relative_to(project_root)}: {error}")
-    
+
     return errors
 
 
@@ -892,24 +898,24 @@ def main():
     logger.info("=" * 70)
     logger.info("🔧 SYNTAX FIX - رفع کامل همه خطاهای باقی‌مانده")
     logger.info("=" * 70)
-    
-    project_root = Path(r'D:\\econojin.com')
-    
+
+    project_root = Path(r"D:\\econojin.com")
+
     # مرحله 1: رفع 1.py
     fix_1_py(project_root)
-    
+
     # مرحله 2: رفع farmer.py
     fix_farmer_py(project_root)
-    
+
     # مرحله 3: بازنویسی فایل‌های تست
     fix_all_test_files(project_root)
-    
+
     # مرحله 4: رفع escape sequences
     fix_escape_sequences(project_root)
-    
+
     # مرحله 5: بررسی نهایی
     errors = verify_all_files(project_root)
-    
+
     logger.info("\n" + "=" * 70)
     if not errors:
         logger.info("🎉 همه فایل‌ها از نظر syntax سالم هستند!")
@@ -918,9 +924,9 @@ def main():
     else:
         logger.info(f"⚠️  {len(errors)} فایل هنوز دارای خطا هستند")
     logger.info("=" * 70)
-    
+
     return 0 if not errors else 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

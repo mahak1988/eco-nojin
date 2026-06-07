@@ -13,10 +13,7 @@ DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 RELOAD = os.getenv("RELOAD", "true").lower() == "true"
 
 # Database Configuration
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/econojin"
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/econojin")
 
 # Redis Configuration
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")

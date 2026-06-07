@@ -1,0 +1,54 @@
+{
+  "frontend": {
+    "keep": [
+      "components/ui/button.tsx",
+      "components/ui/card.tsx",
+      "components/ui/input.tsx",
+      "components/ui/label.tsx",
+      "components/ui/badge.tsx",
+      "components/ui/alert.tsx",
+      "lib/utils.ts"
+    ],
+    "review": [
+      "app/page.tsx",
+      "app/layout.tsx",
+      "lib/api.ts"
+    ],
+    "delete": [
+      "app\\layout.tsx.legacy-backup",
+      "app\\page.tsx.legacy-backup",
+      "lib\\api.ts.legacy-backup",
+      "lib\\utils.ts.legacy-backup",
+      "styles\\globals.css.legacy-backup",
+      "components\\ui\\button.tsx.legacy-backup",
+      "components\\ui\\card.tsx.legacy-backup",
+      "components\\ui\\input.tsx.legacy-backup"
+    ],
+    "missing": [
+      "app/login/page.tsx",
+      "app/register/page.tsx",
+      "app/profile/page.tsx",
+      "app/admin/page.tsx"
+    ]
+  },
+  "backend": {
+    "keep": [
+      "api/main.py",
+      "api/modules/weather",
+      "api/modules/gis",
+      "api/modules/auth",
+      "api/services/eco_miner.py",
+      "api/services/llm.py",
+      "api/services/rothc_full.py",
+      "api/services/simulation_engine.py",
+      "api/services/sms.py"
+    ],
+    "review": [],
+    "delete": [],
+    "missing": [
+      "api/modules/carbon",
+      "api/modules/hydrology",
+      "api/modules/shop"
+    ]
+  }
+}

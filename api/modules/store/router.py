@@ -1,53 +1,91 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+# api/modules/store/router.py
+from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
+from typing import Dict, Any, List
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from api.core.database import get_db
-from api.core.deps import require_write_auth
-from api.modules.store import crud, schemas
-
-router = APIRouter(tags=["Store"])
+from api.modules.store.models import Order, OrderStatus, Product, StoreWallet, TransactionType
 
 
-@router.get("/", response_model=schemas.StoreListResponse)
-async def list_store(skip: int = 0, limit: int = 50, db: AsyncSession = Depends(get_db)):
-    items, total = await crud.list_items(db, skip, limit)
-    return schemas.StoreListResponse(items=items, total=total)
+
+class ProductListResponse(BaseModel):
+    """Auto-generated response model for /products"""
+    products: List[Any] = []
+    total: int = 0
+    categories: List[str] = []
 
 
-@router.get("/{item_id}", response_model=schemas.StoreItemResponse)
-async def get_store(item_id: int, db: AsyncSession = Depends(get_db)):
-    item = await crud.get_item(db, item_id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
+router = APIRouter(prefix="/store", tags=["Store"])
 
 
-@router.post("/", response_model=schemas.StoreItemResponse, status_code=status.HTTP_201_CREATED)
-async def create_store(
-    data: schemas.StoreItemCreate,
-    db: AsyncSession = Depends(get_db),
-    _user: str = Depends(require_write_auth),
-):
-    return await crud.create_item(db, data)
+class OrderCreate(BaseModel):
+    user_id: int
+    items: List[dict]
 
 
-@router.put("/{item_id}", response_model=schemas.StoreItemResponse)
-async def update_store(
-    item_id: int,
-    data: schemas.StoreItemUpdate,
-    db: AsyncSession = Depends(get_db),
-    _user: str = Depends(require_write_auth),
-):
-    item = await crud.update_item(db, item_id, data)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
+class WalletDeposit(BaseModel):
+    user_id: int
+    amount: float
 
 
-@router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_store(
-    item_id: int,
-    db: AsyncSession = Depends(get_db),
-    _user: str = Depends(require_write_auth),
-):
-    if not await crud.delete_item(db, item_id):
-        raise HTTPException(status_code=404, detail="Item not found")
+@router.get("/products", response_model=ProductListResponse)
+async def get_products(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Product).where(Product.is_active == True))
+    products = result.scalars().all()
+    return {
+        "products": [
+            {
+                "id": p.id,
+                "name": p.name,
+                "price": p.price,
+                "discount_price": p.discount_price,
+                "images": p.images,
+                "stock_quantity": p.stock_quantity,
+            }
+            for p in products
+        ]
+    }
+
+
+@router.get("/StoreWallet/{user_id}", response_model=Dict[str, Any])
+async def get_wallet(user_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(StoreWallet).where(StoreWallet.user_id == user_id))
+    StoreWallet = result.scalar_one_or_none()
+    if not StoreWallet:
+        StoreWallet = StoreWallet(user_id=user_id, balance=0.0)
+        db.add(StoreWallet)
+        await db.commit()
+    return {"balance": StoreWallet.balance}
+
+
+@router.post("/StoreWallet/deposit", response_model=Dict[str, Any])
+async def deposit_wallet(data: WalletDeposit, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(StoreWallet).where(StoreWallet.user_id == data.user_id))
+    StoreWallet = result.scalar_one_or_none()
+    if not StoreWallet:
+        StoreWallet = StoreWallet(user_id=data.user_id, balance=0.0)
+        db.add(StoreWallet)
+    StoreWallet.balance += data.amount
+    await db.commit()
+    return {"status": "success", "new_balance": StoreWallet.balance}
+
+
+@router.post("/orders", response_model=Dict[str, Any])
+async def create_order(order_data: OrderCreate, db: AsyncSession = Depends(get_db)):
+    total_amount = sum(item.get("price", 0) * item.get("quantity", 1) for item in order_data.items)
+    result = await db.execute(select(StoreWallet).where(StoreWallet.user_id == order_data.user_id))
+    StoreWallet = result.scalar_one_or_none()
+    if not StoreWallet or StoreWallet.balance < total_amount:
+        raise HTTPException(400, "موجودی کیف پول کافی نیست")
+
+    StoreWallet.balance -= total_amount
+    new_order = Order(
+        user_id=order_data.user_id, total_amount=total_amount, status=OrderStatus.PAID
+    )
+    db.add(new_order)
+    await db.commit()
+    return {"status": "success", "order_id": new_order.id}

@@ -1,3 +1,4 @@
+import React from 'react';
 import { getActivityIcon, getActivityLabel, formatNumber } from '@/lib/utils';
 
 interface ActivityCardProps {
@@ -20,7 +21,7 @@ const stageColors: Record<string, string> = {
   old: 'bg-gray-100 text-gray-800',
 };
 
-export default function ActivityCard({ activity, onClick }: ActivityCardProps) {
+function ActivityCard({ activity, onClick }: ActivityCardProps) {
   return (
     <div
       onClick={onClick}
@@ -77,3 +78,6 @@ export default function ActivityCard({ activity, onClick }: ActivityCardProps) {
     </div>
   );
 }
+
+
+export default React.memo(ActivityCard);

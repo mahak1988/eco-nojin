@@ -11,7 +11,7 @@ interface CommentsSectionProps {
   resourceId: string;
 }
 
-export default function CommentsSection({ resourceId }: CommentsSectionProps) {
+function CommentsSection({ resourceId }: CommentsSectionProps) {
   const { comments, loading, addComment } = useComments(resourceId);
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(0);
@@ -98,11 +98,11 @@ export default function CommentsSection({ resourceId }: CommentsSectionProps) {
                         locale: faIR 
                       })}
                     </span>
-                    <button className="flex items-center gap-1 hover:text-green-600 transition">
+                    <button onClick={() => console.log("Button clicked")}  className="flex items-center gap-1 hover:text-green-600 transition">
                       <ThumbsUp className="w-4 h-4" />
                       {comment.likes_count}
                     </button>
-                    <button className="flex items-center gap-1 hover:text-green-600 transition">
+                    <button onClick={() => console.log("Button clicked")}  className="flex items-center gap-1 hover:text-green-600 transition">
                       <Reply className="w-4 h-4" />
                       پاسخ
                     </button>
@@ -116,3 +116,5 @@ export default function CommentsSection({ resourceId }: CommentsSectionProps) {
     </div>
   );
 }
+
+export default React.memo(CommentsSection);

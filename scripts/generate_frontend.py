@@ -4,8 +4,8 @@
 🎨 Econojin Frontend Generator
 تولید خودکار فرانت‌اند حرفه‌ای با طراحی یکپارچه، ماژولار و کاملاً فارسی
 """
-import os
 import json
+import os
 from pathlib import Path
 
 # مسیر ریشه پروژه
@@ -16,21 +16,26 @@ WEB = ROOT / "apps" / "web"  # یا ROOT / "web" اگر ساختار ساده ا
 if not (ROOT / "apps" / "web").exists():
     WEB = ROOT / "web"
 
+
 def write_file(path: Path, content: str) -> None:
     """نوشتن فایل با encoding UTF-8 و ایجاد پوشه‌های والد"""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     print(f"✅ ایجاد شد: {path.relative_to(ROOT)}")
 
+
 # ============================================================================
 # ۱. فایل‌های پیکربندی اصلی
 # ============================================================================
 
+
 def generate_config_files():
     """تولید فایل‌های پیکربندی Next.js و Tailwind"""
-    
+
     # next.config.js
-    write_file(WEB / "next.config.js", '''/** @type {import('next').NextConfig} */
+    write_file(
+        WEB / "next.config.js",
+        """/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -52,10 +57,13 @@ const nextConfig = {
   }
 };
 module.exports = nextConfig;
-''')
-    
+""",
+    )
+
     # tailwind.config.js
-    write_file(WEB / "tailwind.config.js", '''/** @type {import('tailwindcss').Config} */
+    write_file(
+        WEB / "tailwind.config.js",
+        """/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -97,47 +105,57 @@ module.exports = {
     require('@tailwindcss/typography'),
   ],
 }
-''')
-    
+""",
+    )
+
     # postcss.config.js
-    write_file(WEB / "postcss.config.js", '''module.exports = {
+    write_file(
+        WEB / "postcss.config.js",
+        """module.exports = {
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
   },
 }
-''')
-    
+""",
+    )
+
     # tsconfig.json
-    write_file(WEB / "tsconfig.json", json.dumps({
-        "compilerOptions": {
-            "target": "ES2020",
-            "lib": ["dom", "dom.iterable", "esnext"],
-            "allowJs": True,
-            "skipLibCheck": True,
-            "strict": True,
-            "noEmit": True,
-            "esModuleInterop": True,
-            "module": "esnext",
-            "moduleResolution": "bundler",
-            "resolveJsonModule": True,
-            "isolatedModules": True,
-            "jsx": "preserve",
-            "incremental": True,
-            "plugins": [{"name": "next"}],
-            "paths": {
-                "@/*": ["./src/*"],
-                "@/components/*": ["./src/components/*"],
-                "@/modules/*": ["./src/modules/*"],
-                "@/lib/*": ["./src/lib/*"],
-                "@/hooks/*": ["./src/hooks/*"],
-                "@/store/*": ["./src/store/*"],
-            }
-        },
-        "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-        "exclude": ["node_modules"]
-    }, indent=2))
-    
+    write_file(
+        WEB / "tsconfig.json",
+        json.dumps(
+            {
+                "compilerOptions": {
+                    "target": "ES2020",
+                    "lib": ["dom", "dom.iterable", "esnext"],
+                    "allowJs": True,
+                    "skipLibCheck": True,
+                    "strict": True,
+                    "noEmit": True,
+                    "esModuleInterop": True,
+                    "module": "esnext",
+                    "moduleResolution": "bundler",
+                    "resolveJsonModule": True,
+                    "isolatedModules": True,
+                    "jsx": "preserve",
+                    "incremental": True,
+                    "plugins": [{"name": "next"}],
+                    "paths": {
+                        "@/*": ["./src/*"],
+                        "@/components/*": ["./src/components/*"],
+                        "@/modules/*": ["./src/modules/*"],
+                        "@/lib/*": ["./src/lib/*"],
+                        "@/hooks/*": ["./src/hooks/*"],
+                        "@/store/*": ["./src/store/*"],
+                    },
+                },
+                "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+                "exclude": ["node_modules"],
+            },
+            indent=2,
+        ),
+    )
+
     # package.json به‌روز شده
     pkg = {
         "name": "@econojin/web",
@@ -149,7 +167,7 @@ module.exports = {
             "start": "next start",
             "lint": "next lint",
             "type-check": "tsc --noEmit",
-            "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+            "format": 'prettier --write "src/**/*.{ts,tsx,css}"',
         },
         "dependencies": {
             "next": "14.2.5",
@@ -172,7 +190,7 @@ module.exports = {
             "@hookform/resolvers": "^3.9.0",
             "zod": "^3.23.8",
             # RTL & i18n
-            "next-intl": "^3.17.0"
+            "next-intl": "^3.17.0",
         },
         "devDependencies": {
             "@types/node": "22.1.0",
@@ -187,22 +205,26 @@ module.exports = {
             "@tailwindcss/typography": "^0.5.13",
             "prettier": "^3.3.3",
             "eslint": "^8.57.0",
-            "eslint-config-next": "14.2.5"
-        }
+            "eslint-config-next": "14.2.5",
+        },
     }
     write_file(WEB / "package.json", json.dumps(pkg, indent=2, ensure_ascii=False))
-    
+
     print("✅ فایل‌های پیکربندی ایجاد شدند.")
+
 
 # ============================================================================
 # ۲. استایل‌های سراسری و فونت
 # ============================================================================
 
+
 def generate_styles():
     """تولید فایل‌های CSS و فونت"""
-    
+
     # globals.css
-    write_file(WEB / "src" / "styles" / "globals.css", '''@tailwind base;
+    write_file(
+        WEB / "src" / "styles" / "globals.css",
+        """@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -273,10 +295,13 @@ def generate_styles():
   .text-balance { text-wrap: balance; }
   .text-gradient { @apply bg-gradient-to-r from-primary-400 to-eco-400 bg-clip-text text-transparent; }
 }
-''')
-    
+""",
+    )
+
     # layout.tsx با فونت Vazirmatn
-    write_file(WEB / "src" / "app" / "layout.tsx", '''import "@/styles/globals.css";
+    write_file(
+        WEB / "src" / "app" / "layout.tsx",
+        """import "@/styles/globals.css";
 import { Vazirmatn } from "next/font/google";
 import { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -323,19 +348,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-''')
+""",
+    )
+
 
 # ============================================================================
 # ۳. کامپوننت‌های UI پایه (مشابه Shadcn/UI اما ساده‌شده)
 # ============================================================================
 
+
 def generate_ui_components():
     """تولید کتابخانه کامپوننت‌های UI"""
-    
+
     components_dir = WEB / "src" / "components" / "ui"
-    
+
     # Button
-    write_file(components_dir / "button.tsx", '''import * as React from "react";
+    write_file(
+        components_dir / "button.tsx",
+        """import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -392,10 +422,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
-''')
-    
+""",
+    )
+
     # Card
-    write_file(components_dir / "card.tsx", '''import * as React from "react";
+    write_file(
+        components_dir / "card.tsx",
+        """import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -441,10 +474,13 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 CardFooter.displayName = "CardFooter";
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
-''')
-    
+""",
+    )
+
     # Input
-    write_file(components_dir / "input.tsx", '''import * as React from "react";
+    write_file(
+        components_dir / "input.tsx",
+        """import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
@@ -467,10 +503,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 export { Input };
-''')
-    
+""",
+    )
+
     # Badge
-    write_file(components_dir / "badge.tsx", '''import * as React from "react";
+    write_file(
+        components_dir / "badge.tsx",
+        """import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -498,10 +537,13 @@ function Badge({ className, variant, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants };
-''')
-    
+""",
+    )
+
     # utils helper
-    write_file(WEB / "src" / "lib" / "utils.ts", '''import { type ClassValue, clsx } from "clsx";
+    write_file(
+        WEB / "src" / "lib" / "utils.ts",
+        """import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -530,22 +572,27 @@ export function formatDate(date: Date | string, format: "short" | "long" = "shor
     ...(format === "long" && { hour: "2-digit", minute: "2-digit" }),
   }).format(d);
 }
-''')
-    
+""",
+    )
+
     # clsx و tailwind-merge (وابستگی‌های لازم)
     # کاربر باید این‌ها را نصب کند: npm install clsx tailwind-merge
-    
+
     print("✅ کامپوننت‌های UI ایجاد شدند.")
+
 
 # ============================================================================
 # ۴. لایه سرویس API و مدیریت وضعیت
 # ============================================================================
 
+
 def generate_services_and_store():
     """تولید سرویس‌های API و Zustand store"""
-    
+
     # API service base
-    write_file(WEB / "src" / "lib" / "api.ts", '''import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+    write_file(
+        WEB / "src" / "lib" / "api.ts",
+        """import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 export interface ApiError {
   type: string;
@@ -647,10 +694,13 @@ export const ecominingService = {
     api.post("/api/v1/ecomining/mine", { action_type: actionType, amount, location }),
   getBalance: () => api.get("/api/v1/ecomining/balance"),
 };
-''')
-    
+""",
+    )
+
     # Zustand store
-    write_file(WEB / "src" / "store" / "useAppStore.ts", '''import { create } from "zustand";
+    write_file(
+        WEB / "src" / "store" / "useAppStore.ts",
+        """import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface AnalysisEvent {
@@ -726,10 +776,13 @@ export const useAppStore = create<AppState>()(
     { name: "econojin-store", partialize: (state) => ({ theme, token, user }) }
   )
 );
-''')
-    
+""",
+    )
+
     # WebSocket hook
-    write_file(WEB / "src" / "hooks" / "useAnalysisWebSocket.ts", '''import { useEffect, useRef, useCallback } from "react";
+    write_file(
+        WEB / "src" / "hooks" / "useAnalysisWebSocket.ts",
+        """import { useEffect, useRef, useCallback } from "react";
 import { useAppStore } from "@/store/useAppStore";
 
 export function useAnalysisWebSocket(sessionId: string | null) {
@@ -790,21 +843,26 @@ export function useAnalysisWebSocket(sessionId: string | null) {
 
   return { connect, disconnect, isConnected: wsRef.current?.readyState === WebSocket.OPEN };
 }
-''')
-    
+""",
+    )
+
     print("✅ سرویس‌های API و Zustand store ایجاد شدند.")
+
 
 # ============================================================================
 # ۵. کامپوننت‌های Layout اصلی (Sidebar, Header, Navigation)
 # ============================================================================
 
+
 def generate_layout_components():
     """تولید کامپوننت‌های چیدمان اصلی"""
-    
+
     layout_dir = WEB / "src" / "components" / "layout"
-    
+
     # Sidebar
-    write_file(layout_dir / "sidebar.tsx", '''"use client";
+    write_file(
+        layout_dir / "sidebar.tsx",
+        """"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -907,10 +965,13 @@ export function Sidebar() {
     </>
   );
 }
-''')
-    
+""",
+    )
+
     # Header
-    write_file(layout_dir / "header.tsx", '''"use client";
+    write_file(
+        layout_dir / "header.tsx",
+        """"use client";
 
 import { Menu, Bell, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -953,10 +1014,13 @@ export function Header() {
     </header>
   );
 }
-''')
-    
+""",
+    )
+
     # Main layout wrapper
-    write_file(WEB / "src" / "components" / "layout" / "main-layout.tsx", '''"use client";
+    write_file(
+        WEB / "src" / "components" / "layout" / "main-layout.tsx",
+        """"use client";
 
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
@@ -981,18 +1045,23 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-''')
-    
+""",
+    )
+
     print("✅ کامپوننت‌های Layout ایجاد شدند.")
+
 
 # ============================================================================
 # ۶. صفحه اصلی Dashboard با کارت‌های ماژول‌ها
 # ============================================================================
 
+
 def generate_dashboard_page():
     """تولید صفحه داشبورد اصلی"""
-    
-    write_file(WEB / "src" / "app" / "page.tsx", '''"use client";
+
+    write_file(
+        WEB / "src" / "app" / "page.tsx",
+        """"use client";
 
 import { MainLayout } from "@/components/layout/main-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1137,21 +1206,26 @@ export default function DashboardPage() {
     </MainLayout>
   );
 }
-''')
-    
+""",
+    )
+
     print("✅ صفحه Dashboard ایجاد شد.")
+
 
 # ============================================================================
 # ۷. صفحات نمونه ماژول‌ها (الگو برای سایر صفحات)
 # ============================================================================
 
+
 def generate_module_pages():
     """تولید صفحات نمونه برای ماژول‌های کلیدی"""
-    
+
     app_dir = WEB / "src" / "app"
-    
+
     # Weather module page
-    write_file(app_dir / "weather" / "page.tsx", '''"use client";
+    write_file(
+        app_dir / "weather" / "page.tsx",
+        """"use client";
 
 import { MainLayout } from "@/components/layout/main-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1284,10 +1358,13 @@ export default function WeatherPage() {
     </MainLayout>
   );
 }
-''')
-    
+""",
+    )
+
     # Accounting module page
-    write_file(app_dir / "accounting" / "page.tsx", '''"use client";
+    write_file(
+        app_dir / "accounting" / "page.tsx",
+        """"use client";
 
 import { MainLayout } from "@/components/layout/main-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1435,10 +1512,13 @@ export default function AccountingPage() {
     </MainLayout>
   );
 }
-''')
-    
+""",
+    )
+
     # GIS module page
-    write_file(app_dir / "gis" / "page.tsx", '''"use client";
+    write_file(
+        app_dir / "gis" / "page.tsx",
+        """"use client";
 
 import { MainLayout } from "@/components/layout/main-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1567,14 +1647,28 @@ export default function GisPage() {
     </MainLayout>
   );
 }
-''')
-    
+""",
+    )
+
     # Create directory structure for other modules (empty pages as templates)
-    otherModules = ["calendar", "store", "library", "desktop", "education", "psychology", "ecomining", "community", "games", "settings"];
+    otherModules = [
+        "calendar",
+        "store",
+        "library",
+        "desktop",
+        "education",
+        "psychology",
+        "ecomining",
+        "community",
+        "games",
+        "settings",
+    ]
     for mod in otherModules:
         mod_dir = app_dir / mod
         mod_dir.mkdir(parents=True, exist_ok=True)
-        write_file(mod_dir / "page.tsx", f'''"""use client";
+        write_file(
+            mod_dir / "page.tsx",
+            f'''"""use client";
 
 import {{ MainLayout }} from "@/components/layout/main-layout";
 
@@ -1594,37 +1688,59 @@ export default function {mod.capitalize()}Page() {{
     </MainLayout>
   );
 }}
-''')
-    
+''',
+        )
+
     print("✅ صفحات ماژول‌ها ایجاد شدند.")
+
 
 # ============================================================================
 # ۸. فایل‌های تکمیلی (manifest, providers, etc.)
 # ============================================================================
 
+
 def generate_support_files():
     """تولید فایل‌های پشتیبان و پیکربندی"""
-    
+
     # manifest.json for PWA
-    write_file(WEB / "public" / "manifest.json", json.dumps({
-        "name": "Econojin - ابرپروژه خدمات جامع",
-        "short_name": "Eco",
-        "description": "پلتفرم رایگان کشاورزی، آموزش، محیط زیست و جامعه",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#0f172a",
-        "theme_color": "#0ea5e9",
-        "orientation": "any",
-        "icons": [
-            {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-            {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
-        ],
-        "categories": ["agriculture", "education", "finance", "environment"],
-        "lang": "fa"
-    }, indent=2, ensure_ascii=False))
-    
+    write_file(
+        WEB / "public" / "manifest.json",
+        json.dumps(
+            {
+                "name": "Econojin - ابرپروژه خدمات جامع",
+                "short_name": "Eco",
+                "description": "پلتفرم رایگان کشاورزی، آموزش، محیط زیست و جامعه",
+                "start_url": "/",
+                "display": "standalone",
+                "background_color": "#0f172a",
+                "theme_color": "#0ea5e9",
+                "orientation": "any",
+                "icons": [
+                    {
+                        "src": "/icons/icon-192.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "any maskable",
+                    },
+                    {
+                        "src": "/icons/icon-512.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                        "purpose": "any maskable",
+                    },
+                ],
+                "categories": ["agriculture", "education", "finance", "environment"],
+                "lang": "fa",
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
+    )
+
     # Theme provider
-    write_file(WEB / "src" / "components" / "providers" / "theme-provider.tsx", '''"use client";
+    write_file(
+        WEB / "src" / "components" / "providers" / "theme-provider.tsx",
+        """"use client";
 
 import * as React from "react";
 import { useAppStore } from "@/store/useAppStore";
@@ -1649,10 +1765,13 @@ export function ThemeProvider({ children, attribute = "class", defaultTheme = "d
   
   return <>{children}</>;
 }
-''')
-    
+""",
+    )
+
     # Toaster component
-    write_file(WEB / "src" / "components" / "ui" / "toaster.tsx", '''"use client";
+    write_file(
+        WEB / "src" / "components" / "ui" / "toaster.tsx",
+        """"use client";
 
 import { useAppStore } from "@/store/useAppStore";
 import { X } from "lucide-react";
@@ -1668,10 +1787,13 @@ export function Toaster() {
   // Placeholder - in real app, use sonner or react-hot-toast
   return null;
 }
-''')
-    
+""",
+    )
+
     # .gitignore for web
-    write_file(WEB / ".gitignore", '''# Dependencies
+    write_file(
+        WEB / ".gitignore",
+        """# Dependencies
 node_modules/
 .pnpm-store/
 
@@ -1695,18 +1817,21 @@ Thumbs.db
 
 # Env
 .env*.local
-''')
-    
+""",
+    )
+
     print("✅ فایل‌های پشتیبان ایجاد شدند.")
+
 
 # ============================================================================
 # تابع اصلی
 # ============================================================================
 
+
 def main():
     print("🎨 شروع تولید فرانت‌اند حرفه‌ای Econojin...")
     print(f"📁 مسیر: {WEB}")
-    
+
     try:
         generate_config_files()
         generate_styles()
@@ -1716,10 +1841,10 @@ def main():
         generate_dashboard_page()
         generate_module_pages()
         generate_support_files()
-        
-        print("\n" + "="*60)
+
+        print("\n" + "=" * 60)
         print("✅ تولید فرانت‌اند با موفقیت تکمیل شد!")
-        print("="*60)
+        print("=" * 60)
         print("\n📋 ساختار ایجاد‌شده:")
         print("   📁 web/src/app/          ← صفحات Next.js App Router")
         print("   📁 web/src/components/   ← کامپوننت‌های UI و Layout")
@@ -1733,16 +1858,19 @@ def main():
         print("   pnpm install  # یا npm install")
         print("   pnpm run dev")
         print("\n🔗 دسترسی: http://localhost:3000")
-        print("="*60)
-        
+        print("=" * 60)
+
         return 0
-        
+
     except Exception as e:
         print(f"\n❌ خطا: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
+
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

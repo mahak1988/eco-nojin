@@ -9,12 +9,12 @@ Econojin Full Spec Implementation Script
 - معماری لایه‌ای و ماژولار
 r"""
 
-import os
-import sys
 import json
+import os
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # ============================================================================
 # CONFIGURATION
@@ -26,37 +26,45 @@ FRONTEND_DIR = PROJECT_ROOT / "frontend"
 INFRA_DIR = PROJECT_ROOT / "infra"
 DOCS_DIR = PROJECT_ROOT / "docs"
 
+
 def print_header(title):
     logger.info(f"\n{'='*70}")
     logger.info(f"  {title}")
     logger.info(f"{'='*70}\n")
 
+
 def print_success(msg):
     logger.info(f"✓ {msg}")
+
 
 def print_warning(msg):
     logger.info(f"⚠ {msg}")
 
+
 def print_error(msg):
     logger.info(f"✗ {msg}")
+
 
 def print_info(msg):
     logger.info(f"ℹ {msg}")
 
+
 def write_file(path, content):
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     print_success(f"Created: {path.relative_to(PROJECT_ROOT)}")
+
 
 # ============================================================================
 # MODULE 1: HYDROLOGY SIMULATOR (wflow/GR4J)
 # ============================================================================
 
+
 def create_hydrology_module():
     """پیاده‌سازی شبیه‌ساز هیدرولوژی حوضه با مدل‌های متن‌باز"""
     print_header("💧 Module 1: Hydrology Simulator (wflow/GR4J)")
-    
+
     # Basin Model Interface
     basin_model = '''"""
 Basin Hydrology Model Interface
@@ -286,9 +294,9 @@ class WflowModel(BasinModel):
             return self.model.results.get(variable)
         return None
 '''
-    
+
     write_file(BACKEND_DIR / "models" / "hydrology" / "basin_model.py", basin_model)
-    
+
     # GR4J Model (fallback)
     gr4j_model = '''"""
 GR4J Conceptual Rainfall-Runoff Model
@@ -454,24 +462,28 @@ class GR4JModel:
             if hasattr(self.params, key):
                 setattr(self.params, key, value)
 r'''
-    
+
     write_file(BACKEND_DIR / "models" / "hydrology" / "gr4j_model.py", gr4j_model)
-    
+
     # __init__.py
-    write_file(BACKEND_DIR / "models" / "hydrology" / "__init__.py", 
-               "from .basin_model import BasinModel, WflowModel\nfrom .gr4j_model import GR4JModel\n")
-    
+    write_file(
+        BACKEND_DIR / "models" / "hydrology" / "__init__.py",
+        "from .basin_model import BasinModel, WflowModel\nfrom .gr4j_model import GR4JModel\n",
+    )
+
     print_success("Hydrology module created (wflow/GR4J)")
     return True
+
 
 # ============================================================================
 # MODULE 2: SOIL WATER (Richards Equation)
 # ============================================================================
 
+
 def create_soil_water_module():
     """پیاده‌سازی حل‌گر معادله ریچاردز برای شبیه‌سازی آب در خاک"""
     print_header("💧 Module 2: Soil Water Simulator (Richards Equation)")
-    
+
     richards_solver = '''"""
 Richards Equation Solver for Soil Water Dynamics
 =================================================
@@ -817,24 +829,28 @@ class SoilWaterCalibrator:
         
         return VanGenuchtenParams(*result.x)
 r'''
-    
+
     write_file(BACKEND_DIR / "models" / "soil_water" / "richards_solver.py", richards_solver)
-    
+
     # __init__.py
-    write_file(BACKEND_DIR / "models" / "soil_water" / "__init__.py",
-               "from .richards_solver import VanGenuchtenModel, RichardsEquation1D, SoilWaterCalibrator\n")
-    
+    write_file(
+        BACKEND_DIR / "models" / "soil_water" / "__init__.py",
+        "from .richards_solver import VanGenuchtenModel, RichardsEquation1D, SoilWaterCalibrator\n",
+    )
+
     print_success("Soil water module created (Richards equation)")
     return True
+
 
 # ============================================================================
 # MODULE 3: CROP GROWTH (AquaCrop-OSPy Integration)
 # ============================================================================
 
+
 def create_crop_module():
     """پیاده‌سازی مدل رشد محصول با AquaCrop-OSPy"""
     print_header("🌱 Module 3: Crop Growth Simulator (AquaCrop-OSPy)")
-    
+
     aquacrop_integration = '''"""
 AquaCrop-OSPy Integration for Econojin
 ======================================
@@ -1249,24 +1265,28 @@ class AgroforestryDesigner:
             'methodology': 'IPCC Tier 1 defaults with logistic growth curve'
         }
 r'''
-    
+
     write_file(BACKEND_DIR / "models" / "crop" / "aquacrop_integration.py", aquacrop_integration)
-    
+
     # __init__.py
-    write_file(BACKEND_DIR / "models" / "crop" / "__init__.py",
-               "from .aquacrop_integration import AquaCropWrapper, AgroforestryDesigner\n")
-    
+    write_file(
+        BACKEND_DIR / "models" / "crop" / "__init__.py",
+        "from .aquacrop_integration import AquaCropWrapper, AgroforestryDesigner\n",
+    )
+
     print_success("Crop growth module created (AquaCrop-OSPy)")
     return True
+
 
 # ============================================================================
 # MODULE 4: SOIL CARBON (RothC Implementation)
 # ============================================================================
 
+
 def create_carbon_module():
     """پیاده‌سازی مدل کربن خاک RothC به صورت متن‌باز"""
     print_header("🌱 Module 4: Soil Carbon Simulator (RothC)")
-    
+
     rothc_model = '''"""
 RothC Soil Carbon Model Implementation
 ======================================
@@ -1687,24 +1707,28 @@ class MRVCalculator:
             'alpha': alpha
         }
 r'''
-    
+
     write_file(BACKEND_DIR / "models" / "carbon" / "rothc_model.py", rothc_model)
-    
+
     # __init__.py
-    write_file(BACKEND_DIR / "models" / "carbon" / "__init__.py",
-               "from .rothc_model import RothCModel, SOCCalculator, MRVCalculator\n")
-    
+    write_file(
+        BACKEND_DIR / "models" / "carbon" / "__init__.py",
+        "from .rothc_model import RothCModel, SOCCalculator, MRVCalculator\n",
+    )
+
     print_success("Soil carbon module created (RothC)")
     return True
+
 
 # ============================================================================
 # MODULE 5: EROSION MODEL (RUSLE + GIS)
 # ============================================================================
 
+
 def create_erosion_module():
     """پیاده‌سازی مدل فرسایش RUSLE با GIS متن‌باز"""
     print_header("🏔️ Module 5: Erosion Simulator (RUSLE + GIS)")
-    
+
     rusle_model = '''"""
 RUSLE Erosion Model with GIS Integration
 ========================================
@@ -2125,24 +2149,28 @@ def _calculate_flow_accumulation(flow_dir: np.ndarray) -> np.ndarray:
     # Placeholder - in production, use proper hydrological routing
     return np.ones_like(flow_dir)
 r'''
-    
+
     write_file(BACKEND_DIR / "models" / "erosion" / "rusle_model.py", rusle_model)
-    
+
     # __init__.py
-    write_file(BACKEND_DIR / "models" / "erosion" / "__init__.py",
-               "from .rusle_model import RUSLEModel, RUSLEFactors\n")
-    
+    write_file(
+        BACKEND_DIR / "models" / "erosion" / "__init__.py",
+        "from .rusle_model import RUSLEModel, RUSLEFactors\n",
+    )
+
     print_success("Erosion module created (RUSLE + GIS)")
     return True
+
 
 # ============================================================================
 # MODULE 6: OPEN DATA INTEGRATIONS
 # ============================================================================
 
+
 def create_data_integrations():
     """پیاده‌سازی کلاینت‌های داده‌های آزاد (ERA5، CHIRPS، Sentinel، SoilGrids)"""
     print_header("🌐 Module 6: Open Data Integrations")
-    
+
     # ERA5 Client
     era5_client = '''"""
 ERA5 Climate Data Client for Econojin
@@ -2335,9 +2363,9 @@ class ERA5Client:
     def _all_hours() -> List[str]:
         return [f'{h:02d}:00' for h in range(0, 24)]
 '''
-    
+
     write_file(BACKEND_DIR / "integrations" / "era5_client.py", era5_client)
-    
+
     # CHIRPS Client
     chirps_client = '''"""
 CHIRPS Precipitation Data Client for Econojin
@@ -2478,9 +2506,9 @@ class CHIRPSClient:
         end_year = pd.to_datetime(end).year
         return [str(y) for y in range(start_year, end_year + 1)]
 '''
-    
+
     write_file(BACKEND_DIR / "integrations" / "chirps_client.py", chirps_client)
-    
+
     # Sentinel Client (simplified)
     sentinel_client = '''"""
 Sentinel Satellite Data Client for Econojin
@@ -2671,26 +2699,30 @@ class SentinelClient:
             attrs={'long_name': 'NDVI time series', 'location': f"{point_lat}, {point_lon}"}
         )
 r'''
-    
+
     write_file(BACKEND_DIR / "integrations" / "sentinel_client.py", sentinel_client)
-    
+
     # __init__.py for integrations
-    write_file(BACKEND_DIR / "integrations" / "__init__.py",
-               "from .era5_client import ERA5Client\nfrom .chirps_client import CHIRPSClient\nfrom .sentinel_client import SentinelClient\n")
-    
+    write_file(
+        BACKEND_DIR / "integrations" / "__init__.py",
+        "from .era5_client import ERA5Client\nfrom .chirps_client import CHIRPSClient\nfrom .sentinel_client import SentinelClient\n",
+    )
+
     print_success("Open data integrations created")
     return True
+
 
 # ============================================================================
 # MODULE 7: INFRASTRUCTURE (Docker, K8s, Monitoring)
 # ============================================================================
 
+
 def create_infrastructure():
     """پیاده‌سازی زیرساخت Docker، Kubernetes، و Monitoring"""
     print_header("🐳 Module 7: Infrastructure (Docker, K8s, Monitoring)")
-    
+
     # Docker Compose
-    docker_compose = '''version: '3.8'
+    docker_compose = """version: '3.8'
 
 services:
   # Backend API
@@ -2851,12 +2883,12 @@ volumes:
   minio_data:
   prometheus_data:
   grafana_data:
-'''
-    
+"""
+
     write_file(PROJECT_ROOT / "docker-compose.yml", docker_compose)
-    
+
     # Backend Dockerfile
-    backend_dockerfile = r'''FROM python:3.10-slim
+    backend_dockerfile = r"""FROM python:3.10-slim
 
 WORKDIR /app
 
@@ -2887,12 +2919,12 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \\
 EXPOSE 8000
 
 CMD ["python", "-m", "uvicorn", "backend.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
-'''
-    
+"""
+
     write_file(PROJECT_ROOT / "backend" / "Dockerfile", backend_dockerfile)
-    
+
     # Frontend Dockerfile
-    frontend_dockerfile = r'''FROM node:18-alpine
+    frontend_dockerfile = r"""FROM node:18-alpine
 
 WORKDIR /app
 
@@ -2914,12 +2946,12 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \\
     CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
 CMD ["npm", "start"]
-'''
-    
+"""
+
     write_file(PROJECT_ROOT / "frontend" / "Dockerfile", frontend_dockerfile)
-    
+
     # Prometheus config
-    prometheus_config = '''global:
+    prometheus_config = """global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
@@ -2937,14 +2969,14 @@ scrape_configs:
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['node-exporter:9100']
-'''
-    
+"""
+
     prometheus_dir = INFRA_DIR / "prometheus"
     prometheus_dir.mkdir(parents=True, exist_ok=True)
     write_file(prometheus_dir / "prometheus.yml", prometheus_config)
-    
+
     # Kubernetes deployment (simplified)
-    k8s_backend = '''apiVersion: apps/v1
+    k8s_backend = """apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: econojin-backend
@@ -3002,24 +3034,26 @@ spec:
   - port: 80
     targetPort: 8000
   type: ClusterIP
-r'''
-    
+r"""
+
     k8s_dir = INFRA_DIR / "k8s"
     k8s_dir.mkdir(parents=True, exist_ok=True)
     write_file(k8s_dir / "backend-deployment.yaml", k8s_backend)
-    
+
     print_success("Infrastructure configs created (Docker, K8s, Prometheus)")
     return True
+
 
 # ============================================================================
 # MAIN EXECUTION
 # ============================================================================
 
+
 def main():
     print_header("🚀 ECONOJIN FULL SPEC IMPLEMENTATION")
     print_info(f"Project: {PROJECT_ROOT}")
     print_info(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     # Create directory structure
     logger.info("\n📁 Creating directory structure...")
     modules = [
@@ -3034,11 +3068,11 @@ def main():
         INFRA_DIR / "grafana" / "dashboards",
         INFRA_DIR / "grafana" / "datasources",
     ]
-    
+
     for module_dir in modules:
         module_dir.mkdir(parents=True, exist_ok=True)
         print_success(f"Created: {module_dir.relative_to(PROJECT_ROOT)}")
-    
+
     # Implement modules
     implementations = [
         ("Hydrology Simulator (wflow/GR4J)", create_hydrology_module),
@@ -3049,7 +3083,7 @@ def main():
         ("Open Data Integrations", create_data_integrations),
         ("Infrastructure (Docker/K8s)", create_infrastructure),
     ]
-    
+
     results = []
     for name, func in implementations:
         try:
@@ -3060,21 +3094,22 @@ def main():
             print_error(f"Failed: {name}")
             print_error(f"Error: {e}")
             import traceback
+
             traceback.print_exc()
             results.append((name, False))
-    
+
     # Summary
     print_header("📊 IMPLEMENTATION SUMMARY")
-    
+
     success_count = sum(1 for _, s in results if s)
     total = len(results)
-    
+
     for name, success in results:
         status = "✓" if success else "✗"
         logger.info(f"{status} {name}")
-    
+
     logger.info(f"\nنتیجه: {success_count}/{total} ماژول پیاده‌سازی شد")
-    
+
     if success_count == total:
         print_success("✅ تمام ماژول‌های اکونوژین پیاده‌سازی شدند!")
         print_info("\n📋 مراحل بعدی:")
@@ -3094,8 +3129,9 @@ def main():
         logger.info("  ✓ معماری ماژولار و قابل استقرار در cloud/on-premise")
     else:
         print_warning(f"{total - success_count} ماژول نیاز به بررسی دارد")
-    
+
     return 0 if success_count == total else 1
+
 
 if __name__ == "__main__":
     try:
@@ -3106,5 +3142,6 @@ if __name__ == "__main__":
     except Exception as e:
         print_error(f"خطا: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

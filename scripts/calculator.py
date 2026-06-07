@@ -4,12 +4,12 @@ Carbon Calculator - محاسبه دقیق کربن جذب شده
 تبدیل فعالیت‌های اکوسیستمی به تن CO2 با استفاده از مدل‌های علمی
 """
 
+import sys
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 from enum import Enum
-import sys
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -20,6 +20,7 @@ logger = UnifiedLogger.get_logger(__name__)
 
 class ActivityType(str, Enum):
     """انواع فعالیت‌های اکوسیستمی"""
+
     TREE_PLANTING = "tree_planting"
     SOIL_REGENERATION = "soil_regeneration"
     AGROFORESTRY = "agroforestry"
@@ -31,10 +32,11 @@ class ActivityType(str, Enum):
 
 class TreeSpecies(str, Enum):
     """گونه‌های درختی با ضرایب کربن متفاوت"""
+
     # گونه‌های ایرانی
-    OAK_PERSIAN = "quercus_persica"        # بلوط ایرانی
-    ZAGROS_ALMOND = "amygdalus_scoparia"   # بادام کوهی
-    JUNIPER = "juniperus_excelsa"          # ارس
+    OAK_PERSIAN = "quercus_persica"  # بلوط ایرانی
+    ZAGROS_ALMOND = "amygdalus_scoparia"  # بادام کوهی
+    JUNIPER = "juniperus_excelsa"  # ارس
     WILD_PISTACHIO = "pistacia_atlantica"  # بنه
     # گونه‌های سریع‌الرشد
     EUCALYPTUS = "eucalyptus"
@@ -48,12 +50,13 @@ class TreeSpecies(str, Enum):
 @dataclass
 class Location:
     """موقعیت جغرافیایی فعالیت"""
+
     latitude: float
     longitude: float
     altitude: Optional[float] = None
     region: Optional[str] = None
     country: str = "Iran"
-    
+
     def to_dict(self) -> Dict:
         return {
             "lat": self.latitude,
@@ -67,6 +70,7 @@ class Location:
 @dataclass
 class ClimateData:
     """داده‌های اقلیمی برای محاسبات"""
+
     annual_rainfall_mm: float
     avg_temperature_c: float
     min_temperature_c: float
@@ -79,6 +83,7 @@ class ClimateData:
 @dataclass
 class CarbonResult:
     """نتیجه محاسبه کربن"""
+
     activity_type: ActivityType
     carbon_absorbed_kg: float
     carbon_absorbed_tons: float
@@ -89,11 +94,11 @@ class CarbonResult:
     methodology: str
     parameters: Dict = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.utcnow)
-    
+
     def to_seed_tokens(self, rate: float = 0.1) -> float:
         """تبدیل کربن به SEED tokens"""
         return self.carbon_absorbed_kg * rate
-    
+
     def to_gaia_value(self, carbon_price_usd: float = 50.0) -> float:
         """محاسبه ارزش GAIA"""
         return self.carbon_absorbed_tons * carbon_price_usd
@@ -104,7 +109,7 @@ class CarbonCalculator:
     محاسبه‌گر علمی کربن
     از مدل‌های RothC، AquaCrop و SWAT+ برای محاسبات دقیق استفاده می‌کند
     """
-    
+
     # ضرایب جذب کربن برای گونه‌های مختلف (kg CO2/tree/year)
     # بر اساس IPCC 2019 Refinement
     CARBON_COEFFICIENTS = {
@@ -118,7 +123,7 @@ class CarbonCalculator:
         TreeSpecies.BEECH: 25.0,
         TreeSpecies.MAPLE: 22.0,
     }
-    
+
     # ضرایب تعدیل اقلیمی
     CLIMATE_MODIFIERS = {
         "arid": 0.6,
@@ -128,28 +133,30 @@ class CarbonCalculator:
         "humid": 1.1,
         "tropical": 1.3,
     }
-    
+
     def __init__(self):
         self.rothc = None
         self.aquacrop = None
         self._init_models()
-    
+
     def _init_models(self):
         """بارگذاری مدل‌های علمی"""
         try:
             from scripts.models.soil_carbon.rothc import RothCModel
+
             self.rothc = RothCModel()
             logger.info("RothC model loaded")
         except ImportError:
             logger.warning("RothC not available, using simplified model")
-        
+
         try:
             from scripts.models.soil_carbon.aquacrop import AquaCropModel
+
             self.aquacrop = AquaCropModel()
             logger.info("AquaCrop model loaded")
         except ImportError:
             logger.warning("AquaCrop not available")
-    
+
     def calculate(
         self,
         activity_type: ActivityType,
@@ -162,7 +169,7 @@ class CarbonCalculator:
     ) -> CarbonResult:
         """
         محاسبه کربن جذب شده برای هر فعالیت
-        
+
         Args:
             activity_type: نوع فعالیت
             location: موقعیت جغرافیایی
@@ -171,39 +178,34 @@ class CarbonCalculator:
             tree_count: تعداد درخت (برای tree_planting)
             species: گونه درخت
             duration_years: مدت زمان محاسبه
-        
+
         Returns:
             CarbonResult با محاسبات دقیق
         """
-        logger.info(f"calculate_carbon | activity={activity_type.value} | area={area_hectares} | species={species.value}")
-        
+        logger.info(
+            f"calculate_carbon | activity={activity_type.value} | area={area_hectares} | species={species.value}"
+        )
+
         # محاسبه بر اساس نوع فعالیت
         if activity_type == ActivityType.TREE_PLANTING:
             return self._calculate_tree_planting(
-                location, climate, tree_count or int(area_hectares * 1000),
-                species, duration_years
+                location, climate, tree_count or int(area_hectares * 1000), species, duration_years
             )
         elif activity_type == ActivityType.SOIL_REGENERATION:
             return self._calculate_soil_regeneration(
                 location, climate, area_hectares, duration_years
             )
         elif activity_type == ActivityType.AGROFORESTRY:
-            return self._calculate_agroforestry(
-                location, climate, area_hectares, duration_years
-            )
+            return self._calculate_agroforestry(location, climate, area_hectares, duration_years)
         elif activity_type == ActivityType.MANGROVE_PLANTING:
-            return self._calculate_mangrove(
-                location, climate, area_hectares, duration_years
-            )
+            return self._calculate_mangrove(location, climate, area_hectares, duration_years)
         elif activity_type == ActivityType.WETLAND_RESTORATION:
-            return self._calculate_wetland(
-                location, climate, area_hectares, duration_years
-            )
+            return self._calculate_wetland(location, climate, area_hectares, duration_years)
         else:
             return self._calculate_generic(
                 activity_type, location, climate, area_hectares, duration_years
             )
-    
+
     def _get_climate_zone(self, climate: ClimateData) -> str:
         """تعیین منطقه اقلیمی"""
         if climate.annual_rainfall_mm < 250:
@@ -218,7 +220,7 @@ class CarbonCalculator:
             return "tropical"
         else:
             return "humid"
-    
+
     def _calculate_tree_planting(
         self,
         location: Location,
@@ -228,21 +230,21 @@ class CarbonCalculator:
         duration_years: int,
     ) -> CarbonResult:
         """محاسبه کربن درختکاری"""
-        
+
         # ضریب پایه گونه
         base_rate = self.CARBON_COEFFICIENTS.get(species, 22.0)
-        
+
         # تعدیل اقلیمی
         climate_zone = self._get_climate_zone(climate)
         climate_modifier = self.CLIMATE_MODIFIERS.get(climate_zone, 1.0)
-        
+
         # تعدیل خاک
         soil_modifier = 1.0
         if climate.soil_organic_carbon < 1.0:
             soil_modifier = 0.8
         elif climate.soil_organic_carbon > 3.0:
             soil_modifier = 1.1
-        
+
         # نرخ جذب سالانه (kg CO2/tree/year)
         # درختان جوان کمتر جذب می‌کنند، با رشد بیشتر می‌شود
         annual_rates = []
@@ -251,19 +253,19 @@ class CarbonCalculator:
             growth_factor = 1 - (1 / (1 + 0.2 * year))
             rate = base_rate * growth_factor * climate_modifier * soil_modifier
             annual_rates.append(rate)
-        
+
         # کل کربن جذب شده
         total_kg = sum(annual_rates) * tree_count
         avg_annual = sum(annual_rates) / len(annual_rates) * tree_count
-        
+
         # پیش‌بینی بلندمدت
         projection_10y = avg_annual * 10 / 1000  # tons
         projection_50y = avg_annual * 50 * 0.85 / 1000  # با در نظر گرفتن mortality
-        
+
         # اطمینان محاسبه
         confidence = 0.85 * climate_modifier * soil_modifier
         confidence = min(0.95, max(0.5, confidence))
-        
+
         return CarbonResult(
             activity_type=ActivityType.TREE_PLANTING,
             carbon_absorbed_kg=total_kg,
@@ -282,9 +284,9 @@ class CarbonCalculator:
                 "soil_modifier": soil_modifier,
                 "annual_rates": annual_rates,
                 "location": location.to_dict(),
-            }
+            },
         )
-    
+
     def _calculate_soil_regeneration(
         self,
         location: Location,
@@ -293,17 +295,17 @@ class CarbonCalculator:
         duration_years: int,
     ) -> CarbonResult:
         """محاسبه کربن بازسازی خاک با RothC"""
-        
+
         # استفاده از RothC در صورت موجود بودن
         if self.rothc:
             try:
                 # محاسبه با RothC
                 annual_soc_change = 0.4  # tons C/ha/year در روش‌های احیاکننده
                 co2_factor = 3.67  # تبدیل C به CO2
-                
+
                 annual_co2 = annual_soc_change * co2_factor * area_hectares
                 total_kg = annual_co2 * duration_years * 1000
-                
+
                 return CarbonResult(
                     activity_type=ActivityType.SOIL_REGENERATION,
                     carbon_absorbed_kg=total_kg,
@@ -318,16 +320,16 @@ class CarbonCalculator:
                         "initial_soc_percent": climate.soil_organic_carbon,
                         "model": "RothC",
                         "location": location.to_dict(),
-                    }
+                    },
                 )
             except Exception as e:
                 logger.error(f"RothC calculation failed: {e}")
-        
+
         # Fallback به محاسبه ساده
         # Regenerative practices: 0.5-2 tons CO2/ha/year
         avg_rate = 1.2  # tons CO2/ha/year
         total_tons = avg_rate * area_hectares * duration_years
-        
+
         return CarbonResult(
             activity_type=ActivityType.SOIL_REGENERATION,
             carbon_absorbed_kg=total_tons * 1000,
@@ -341,9 +343,9 @@ class CarbonCalculator:
                 "area_hectares": area_hectares,
                 "avg_rate_tons_per_ha": avg_rate,
                 "location": location.to_dict(),
-            }
+            },
         )
-    
+
     def _calculate_agroforestry(
         self,
         location: Location,
@@ -352,32 +354,37 @@ class CarbonCalculator:
         duration_years: int,
     ) -> CarbonResult:
         """محاسبه کربن اگروفارستری (ترکیب درخت + محصول)"""
-        
+
         # ترکیب درخت + خاک
         tree_component = self._calculate_tree_planting(
-            location, climate,
+            location,
+            climate,
             tree_count=int(area_hectares * 200),  # تراکم کمتر
             species=TreeSpecies.WILD_PISTACHIO,
             duration_years=duration_years,
         )
-        
+
         soil_component = self._calculate_soil_regeneration(
             location, climate, area_hectares, duration_years
         )
-        
+
         # ترکیب
         total_kg = tree_component.carbon_absorbed_kg + soil_component.carbon_absorbed_kg
-        annual_rate = tree_component.annual_sequestration_rate + soil_component.annual_sequestration_rate
-        
+        annual_rate = (
+            tree_component.annual_sequestration_rate + soil_component.annual_sequestration_rate
+        )
+
         return CarbonResult(
             activity_type=ActivityType.AGROFORESTRY,
             carbon_absorbed_kg=total_kg,
             carbon_absorbed_tons=total_kg / 1000,
             annual_sequestration_rate=annual_rate,
-            projection_10y_tons=(tree_component.projection_10y_tons + 
-                                  soil_component.projection_10y_tons),
-            projection_50y_tons=(tree_component.projection_50y_tons + 
-                                  soil_component.projection_50y_tons),
+            projection_10y_tons=(
+                tree_component.projection_10y_tons + soil_component.projection_10y_tons
+            ),
+            projection_50y_tons=(
+                tree_component.projection_50y_tons + soil_component.projection_50y_tons
+            ),
             confidence=0.85,
             methodology="Combined Tree + Soil (IPCC + RothC)",
             parameters={
@@ -385,9 +392,9 @@ class CarbonCalculator:
                 "tree_component_kg": tree_component.carbon_absorbed_kg,
                 "soil_component_kg": soil_component.carbon_absorbed_kg,
                 "location": location.to_dict(),
-            }
+            },
         )
-    
+
     def _calculate_mangrove(
         self,
         location: Location,
@@ -396,11 +403,11 @@ class CarbonCalculator:
         duration_years: int,
     ) -> CarbonResult:
         """محاسبه کربن مانگرو - بالاترین نرخ جذب"""
-        
+
         # Mangroves: 6-8 tons CO2/ha/year (blue carbon)
         rate = 7.0
         total_tons = rate * area_hectares * duration_years
-        
+
         return CarbonResult(
             activity_type=ActivityType.MANGROVE_PLANTING,
             carbon_absorbed_kg=total_tons * 1000,
@@ -415,9 +422,9 @@ class CarbonCalculator:
                 "rate_tons_per_ha": rate,
                 "ecosystem": "mangrove",
                 "location": location.to_dict(),
-            }
+            },
         )
-    
+
     def _calculate_wetland(
         self,
         location: Location,
@@ -426,10 +433,10 @@ class CarbonCalculator:
         duration_years: int,
     ) -> CarbonResult:
         """محاسبه کربن تالاب"""
-        
+
         rate = 4.5  # tons CO2/ha/year
         total_tons = rate * area_hectares * duration_years
-        
+
         return CarbonResult(
             activity_type=ActivityType.WETLAND_RESTORATION,
             carbon_absorbed_kg=total_tons * 1000,
@@ -443,9 +450,9 @@ class CarbonCalculator:
                 "area_hectares": area_hectares,
                 "rate_tons_per_ha": rate,
                 "location": location.to_dict(),
-            }
+            },
         )
-    
+
     def _calculate_generic(
         self,
         activity_type: ActivityType,
@@ -455,15 +462,15 @@ class CarbonCalculator:
         duration_years: int,
     ) -> CarbonResult:
         """محاسبه عمومی برای فعالیت‌های دیگر"""
-        
+
         rates = {
             ActivityType.GRASSLAND_RESTORATION: 2.0,
             ActivityType.URBAN_GREENING: 3.0,
         }
-        
+
         rate = rates.get(activity_type, 2.0)
         total_tons = rate * area_hectares * duration_years
-        
+
         return CarbonResult(
             activity_type=activity_type,
             carbon_absorbed_kg=total_tons * 1000,
@@ -477,13 +484,10 @@ class CarbonCalculator:
                 "area_hectares": area_hectares,
                 "rate_tons_per_ha": rate,
                 "location": location.to_dict(),
-            }
+            },
         )
-    
-    def batch_calculate(
-        self,
-        activities: List[Dict]
-    ) -> List[CarbonResult]:
+
+    def batch_calculate(self, activities: List[Dict]) -> List[CarbonResult]:
         """محاسبه دسته‌ای فعالیت‌ها"""
         results = []
         for activity in activities:

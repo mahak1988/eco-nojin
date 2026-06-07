@@ -14,9 +14,7 @@ def simulate_rothc(
     try:
         from api.services.rothc_full import run_rothc_from_params
 
-        return run_rothc_from_params(
-            initial_soc, clay_percent, mean_temp_c, annual_rain_mm, years
-        )
+        return run_rothc_from_params(initial_soc, clay_percent, mean_temp_c, annual_rain_mm, years)
     except Exception:
         k = 0.02 + (clay_percent / 100) * 0.01
         soc = initial_soc
@@ -55,7 +53,13 @@ def simulate_coupling(modules: list[dict]) -> dict[str, Any]:
     for m in modules:
         name = m.get("name", "unknown")
         if name == "rothc":
-            r = simulate_rothc(**{k: m[k] for k in ("initial_soc", "clay_percent", "mean_temp_c", "annual_rain_mm") if k in m})
+            r = simulate_rothc(
+                **{
+                    k: m[k]
+                    for k in ("initial_soc", "clay_percent", "mean_temp_c", "annual_rain_mm")
+                    if k in m
+                }
+            )
         elif name == "aquacrop":
             r = simulate_aquacrop(
                 m.get("crop", "wheat"),

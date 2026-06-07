@@ -10,11 +10,11 @@ import abc
 import json
 import logging
 import sys
-from dataclasses import dataclass, field, asdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
 
 # پیکربندی لاگر: خروجی ساختاریافته و بدون نویز اضافی
 logging.basicConfig(
@@ -27,9 +27,10 @@ logger = logging.getLogger(__name__)
 @dataclass
 class EvaluationResult:
     """ساختار داده برای خروجی هر ماژول ارزیابی."""
+
     module_name: str
     score: float  # 0.0 تا 1.0
-    status: str   # "PASS", "WARNING", "CRITICAL", "N/A"
+    status: str  # "PASS", "WARNING", "CRITICAL", "N/A"
     findings: List[str] = field(default_factory=list)
     recommendations: List[str] = field(default_factory=list)
     references: List[str] = field(default_factory=list)
@@ -37,6 +38,7 @@ class EvaluationResult:
 
 class BaseEvaluator(abc.ABC):
     """پایه انتزاعی برای ماژول‌ها. رعایت اصل OCP برای توسعه آتی."""
+
     def __init__(self, config: Dict[str, Any]):
         self.config = config
 
@@ -63,12 +65,21 @@ class ScalabilityEvaluator(BaseEvaluator):
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.75 else ("WARNING" if score >= 0.5 else "CRITICAL")
         findings = []
-        if not criteria["horizontal_scaling"]: findings.append("پشتیبانی از مقیاس‌پذیری افقی تعریف نشده است.")
-        if not criteria["stateless_design"]: findings.append("مدیریت وضعیت (State) ممکن است در مقیاس بالا گلوگاه ایجاد کند.")
+        if not criteria["horizontal_scaling"]:
+            findings.append("پشتیبانی از مقیاس‌پذیری افقی تعریف نشده است.")
+        if not criteria["stateless_design"]:
+            findings.append("مدیریت وضعیت (State) ممکن است در مقیاس بالا گلوگاه ایجاد کند.")
         return EvaluationResult(
-            module_name="Scalability", score=score, status=status, findings=findings,
-            recommendations=["معماری Stateless برای سرویس‌ها", "پیاده‌سازی Redis/Memcached لایه‌ای", "اتوماسیون با Kubernetes HPA"],
-            references=["K8s Gateway API", "Edge Computing Patterns 2026"]
+            module_name="Scalability",
+            score=score,
+            status=status,
+            findings=findings,
+            recommendations=[
+                "معماری Stateless برای سرویس‌ها",
+                "پیاده‌سازی Redis/Memcached لایه‌ای",
+                "اتوماسیون با Kubernetes HPA",
+            ],
+            references=["K8s Gateway API", "Edge Computing Patterns 2026"],
         )
 
 
@@ -84,12 +95,21 @@ class SecurityEvaluator(BaseEvaluator):
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.8 else ("WARNING" if score >= 0.5 else "CRITICAL")
         findings = []
-        if not criteria["zero_trust"]: findings.append("معماری Zero Trust پیاده‌سازی نشده است.")
-        if not criteria["dependency_scanning"]: findings.append("فاقد SBOM و اسکن آسیب‌پذیری وابستگی‌ها.")
+        if not criteria["zero_trust"]:
+            findings.append("معماری Zero Trust پیاده‌سازی نشده است.")
+        if not criteria["dependency_scanning"]:
+            findings.append("فاقد SBOM و اسکن آسیب‌پذیری وابستگی‌ها.")
         return EvaluationResult(
-            module_name="Security", score=score, status=status, findings=findings,
-            recommendations=["پیاده‌سازی mTLS و سیاست‌های Least Privilege", "ادغام OWASP ZAP/Snyk در CI/CD", "آمادگی برای PQC (مقاوم در برابر کوانتوم)"],
-            references=["NIST SP 800-207", "TRiSM Framework", "Post-Quantum Crypto Readiness"]
+            module_name="Security",
+            score=score,
+            status=status,
+            findings=findings,
+            recommendations=[
+                "پیاده‌سازی mTLS و سیاست‌های Least Privilege",
+                "ادغام OWASP ZAP/Snyk در CI/CD",
+                "آمادگی برای PQC (مقاوم در برابر کوانتوم)",
+            ],
+            references=["NIST SP 800-207", "TRiSM Framework", "Post-Quantum Crypto Readiness"],
         )
 
 
@@ -99,14 +119,26 @@ class ArchitectureEvaluator(BaseEvaluator):
         is_microservices = arch.get("style", "").lower() in ["microservices", "service-mesh"]
         has_api_gateway = arch.get("api_gateway", False)
         is_event_driven = arch.get("event_driven", False)
-        criteria = {"microservices": is_microservices, "api_gateway": has_api_gateway, "event_driven": is_event_driven}
+        criteria = {
+            "microservices": is_microservices,
+            "api_gateway": has_api_gateway,
+            "event_driven": is_event_driven,
+        }
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.66 else "WARNING"
         return EvaluationResult(
-            module_name="Architecture", score=score, status=status,
-            findings=[] if score > 0.5 else ["ساختار یکپارچه (Monolith) ممکن است توسعه و استقرار آتی را کند کند."],
-            recommendations=["جداسازی دامنه‌ها (Domain-Driven Design)", "استفاده از Service Mesh برای مدیریت ترافیک", "پیاده‌سازی Composable Architecture"],
-            references=["Microservices Patterns 2026", "Composable Architecture"]
+            module_name="Architecture",
+            score=score,
+            status=status,
+            findings=[]
+            if score > 0.5
+            else ["ساختار یکپارچه (Monolith) ممکن است توسعه و استقرار آتی را کند کند."],
+            recommendations=[
+                "جداسازی دامنه‌ها (Domain-Driven Design)",
+                "استفاده از Service Mesh برای مدیریت ترافیک",
+                "پیاده‌سازی Composable Architecture",
+            ],
+            references=["Microservices Patterns 2026", "Composable Architecture"],
         )
 
 
@@ -122,10 +154,18 @@ class PerformanceEvaluator(BaseEvaluator):
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.7 else "WARNING"
         return EvaluationResult(
-            module_name="Performance", score=score, status=status,
-            findings=["برای سنجش دقیق‌تر، استفاده از Locust/k6 و پروفایلینگ Async توصیه می‌شود."] if score < 0.8 else [],
-            recommendations=["پیاده‌سازی Connection Pooling", "استفاده از Async I/O برای عملیات شبکه", "بهینه‌سازی ایندکس‌های دیتابیس و KVComp"],
-            references=["KVComp Inference Optimization", "Non-blocking I/O Patterns"]
+            module_name="Performance",
+            score=score,
+            status=status,
+            findings=["برای سنجش دقیق‌تر، استفاده از Locust/k6 و پروفایلینگ Async توصیه می‌شود."]
+            if score < 0.8
+            else [],
+            recommendations=[
+                "پیاده‌سازی Connection Pooling",
+                "استفاده از Async I/O برای عملیات شبکه",
+                "بهینه‌سازی ایندکس‌های دیتابیس و KVComp",
+            ],
+            references=["KVComp Inference Optimization", "Non-blocking I/O Patterns"],
         )
 
 
@@ -137,16 +177,29 @@ class BlockchainCryptoEvaluator(BaseEvaluator):
         token_economy = bc.get("token_economy", False)
         # اگر بخش بلاکچین اصلاً تعریف نشده، وضعیت N/A برمی‌گردانیم
         if not bc:
-            return EvaluationResult(module_name="Blockchain & Crypto", score=0.0, status="N/A", findings=["ماژول بلاکچین در پیکربندی تعریف نشده است."])
-        
+            return EvaluationResult(
+                module_name="Blockchain & Crypto",
+                score=0.0,
+                status="N/A",
+                findings=["ماژول بلاکچین در پیکربندی تعریف نشده است."],
+            )
+
         criteria = {"l2_scaling": uses_l2, "consensus": has_consensus_opt, "economy": token_economy}
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.6 else "WARNING"
         return EvaluationResult(
-            module_name="Blockchain & Crypto", score=score, status=status,
-            findings=["مقیاس‌پذیری لایه دوم یا بهینه‌سازی اجماع تعریف نشده است."] if status == "WARNING" else [],
-            recommendations=["بررسی Rollups/Sharding برای TPS بالا", "پیاده‌سازی اقتصاد توکن برای Agentic Coordination", "استفاده از PQC برای امضای تراکنش‌ها"],
-            references=["AGNT2 Protocol", "DeCoAgent Framework", "Post-Quantum Cryptography"]
+            module_name="Blockchain & Crypto",
+            score=score,
+            status=status,
+            findings=["مقیاس‌پذیری لایه دوم یا بهینه‌سازی اجماع تعریف نشده است."]
+            if status == "WARNING"
+            else [],
+            recommendations=[
+                "بررسی Rollups/Sharding برای TPS بالا",
+                "پیاده‌سازی اقتصاد توکن برای Agentic Coordination",
+                "استفاده از PQC برای امضای تراکنش‌ها",
+            ],
+            references=["AGNT2 Protocol", "DeCoAgent Framework", "Post-Quantum Cryptography"],
         )
 
 
@@ -160,10 +213,18 @@ class AIAgentEvaluator(BaseEvaluator):
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.66 else "WARNING"
         return EvaluationResult(
-            module_name="AI & Agents", score=score, status=status,
-            findings=["سیستم فدراسیونی یا Edge Execution برای کاهش تأخیر توصیه می‌شود."] if not has_orchestration else [],
-            recommendations=["پیاده‌سازی Multi-Agent Orchestration", "استفاده از TRiSM برای مدیریت ریسک ایجنت‌ها", "جداسازی Execution Rings برای امنیت"],
-            references=["Agent Governance Toolkit", "TRiSM Framework", "Edge AI 2026"]
+            module_name="AI & Agents",
+            score=score,
+            status=status,
+            findings=["سیستم فدراسیونی یا Edge Execution برای کاهش تأخیر توصیه می‌شود."]
+            if not has_orchestration
+            else [],
+            recommendations=[
+                "پیاده‌سازی Multi-Agent Orchestration",
+                "استفاده از TRiSM برای مدیریت ریسک ایجنت‌ها",
+                "جداسازی Execution Rings برای امنیت",
+            ],
+            references=["Agent Governance Toolkit", "TRiSM Framework", "Edge AI 2026"],
         )
 
 
@@ -173,19 +234,32 @@ class QoSEvaluator(BaseEvaluator):
         has_observability = qos.get("observability", False)
         has_sla_monitoring = qos.get("sla_monitoring", False)
         has_feedback_loop = qos.get("user_feedback_loop", False)
-        criteria = {"observability": has_observability, "sla": has_sla_monitoring, "feedback": has_feedback_loop}
+        criteria = {
+            "observability": has_observability,
+            "sla": has_sla_monitoring,
+            "feedback": has_feedback_loop,
+        }
         score = self._calculate_weighted_score(criteria)
         status = "PASS" if score >= 0.7 else "WARNING"
         return EvaluationResult(
-            module_name="Quality of Service (QoS)", score=score, status=status,
-            findings=["پیاده‌سازی OpenTelemetry برای Tracing و Metrics ضروری است."] if not has_observability else [],
-            recommendations=["تعریف SLI/SLO/SLA شفاف", "ادغام APM و Log Aggregation", "پیاده‌سازی Circuit Breaker و Retry Policy"],
-            references=["SRE Google Handbook", "Agentic Observability Standards"]
+            module_name="Quality of Service (QoS)",
+            score=score,
+            status=status,
+            findings=["پیاده‌سازی OpenTelemetry برای Tracing و Metrics ضروری است."]
+            if not has_observability
+            else [],
+            recommendations=[
+                "تعریف SLI/SLO/SLA شفاف",
+                "ادغام APM و Log Aggregation",
+                "پیاده‌سازی Circuit Breaker و Retry Policy",
+            ],
+            references=["SRE Google Handbook", "Agentic Observability Standards"],
         )
 
 
 class ProjectAnalyzer:
     """هماهنگ‌کننده اصلی (Orchestrator). اجرای موازی، مدیریت خطا و تولید گزارش."""
+
     def __init__(self, config_path: Path):
         self.config_path = config_path
         self.config: Dict[str, Any] = {}
@@ -236,10 +310,15 @@ class ProjectAnalyzer:
                 except Exception as e:
                     # جلوگیری از Silent Failure: خطا لاگ شده و نتیجه CRITICAL ثبت می‌شود
                     logger.error(f"خطا در ماژول {module_name}: {e}")
-                    results.append(EvaluationResult(
-                        module_name=module_name, score=0.0, status="CRITICAL",
-                        findings=[f"خطای اجرا: {e}"], recommendations=["بررسی لاگ‌ها و رفع خطای ماژول"]
-                    ))
+                    results.append(
+                        EvaluationResult(
+                            module_name=module_name,
+                            score=0.0,
+                            status="CRITICAL",
+                            findings=[f"خطای اجرا: {e}"],
+                            recommendations=["بررسی لاگ‌ها و رفع خطای ماژول"],
+                        )
+                    )
 
         return self._generate_report(results)
 
@@ -250,14 +329,16 @@ class ProjectAnalyzer:
             "assessment_metadata": {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "framework_version": "1.0.0",
-                "target_audience": "Internal Technical Team"
+                "target_audience": "Internal Technical Team",
             },
             "overall_health": {
                 "score": round(overall_score, 2),
-                "status": "HEALTHY" if overall_score >= 0.7 else ("AT_RISK" if overall_score >= 0.5 else "CRITICAL")
+                "status": "HEALTHY"
+                if overall_score >= 0.7
+                else ("AT_RISK" if overall_score >= 0.5 else "CRITICAL"),
             },
             "module_results": [asdict(r) for r in results],
-            "next_steps": self._generate_next_steps(results)
+            "next_steps": self._generate_next_steps(results),
         }
         return report
 
@@ -270,7 +351,9 @@ class ProjectAnalyzer:
         if warning_modules:
             steps.append(f"🟡 بهبود وضعیت هشدار در ماژول‌های {warning_modules}")
         if not steps:
-            steps.append("✅ معماری فعلی با استانداردهای ۲۰۲۶ همخوانی دارد. بر روی بهینه‌سازی پیوسته و Shift-Left Security تمرکز کنید.")
+            steps.append(
+                "✅ معماری فعلی با استانداردهای ۲۰۲۶ همخوانی دارد. بر روی بهینه‌سازی پیوسته و Shift-Left Security تمرکز کنید."
+            )
         return steps
 
 
@@ -283,7 +366,9 @@ def main():
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report, f, indent=2, ensure_ascii=False)
         logger.info(f"گزارش نهایی ذخیره شد: {report_path}")
-        logger.info(f"امتیاز کلی: {report['overall_health']['score']} | وضعیت: {report['overall_health']['status']}")
+        logger.info(
+            f"امتیاز کلی: {report['overall_health']['score']} | وضعیت: {report['overall_health']['status']}"
+        )
     except Exception as e:
         logger.error(f"شروع تحلیل ناموفق بود: {e}")
         sys.exit(1)

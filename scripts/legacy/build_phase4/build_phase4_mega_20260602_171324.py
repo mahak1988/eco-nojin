@@ -22,12 +22,12 @@ Econojin Mega Builder - فاز ۴ کامل
 ✅ Dark/Light Theme
 r"""
 
-import sys
-import os
 import json
+import os
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 PROJECT_ROOT = Path(r"D:\econojin.com")
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
@@ -36,593 +36,624 @@ CONTRACTS_DIR = PROJECT_ROOT / "contracts"
 
 class EconojinMegaBuilder:
     """سازنده جامع فاز ۴ Econojin"""
-    
-    SUPPORTED_LOCALES = ['fa', 'en', 'ar', 'tr', 'zh']
-    DEFAULT_LOCALE = 'fa'
-    RTL_LOCALES = ['fa', 'ar']
-    
+
+    SUPPORTED_LOCALES = ["fa", "en", "ar", "tr", "zh"]
+    DEFAULT_LOCALE = "fa"
+    RTL_LOCALES = ["fa", "ar"]
+
     def __init__(self):
-        self.backup_dir = PROJECT_ROOT / '.mega_build_backup'
+        self.backup_dir = PROJECT_ROOT / ".mega_build_backup"
         self.backup_dir.mkdir(exist_ok=True)
         self.files_created = []
-    
+
     def backup(self, path: Path):
         if not path.exists():
             return
         rel = path.relative_to(PROJECT_ROOT)
         dest = self.backup_dir / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup = dest.parent / f"{dest.stem}_{ts}{dest.suffix}"
         shutil.copy2(path, backup)
-    
+
     def write(self, path: Path, content: str):
         path.parent.mkdir(parents=True, exist_ok=True)
         if path.exists():
             self.backup(path)
-        path.write_text(content, encoding='utf-8')
+        path.write_text(content, encoding="utf-8")
         self.files_created.append(path.relative_to(PROJECT_ROOT))
         logger.info(f"  ✓ {path.relative_to(PROJECT_ROOT)}")
-    
+
     # =========================================================================
     # i18n System - ترجمه‌های کامل
     # =========================================================================
     def create_i18n_files(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🌐 Building i18n System (5 Languages)")
-        logger.info("="*70)
-        
+        logger.info("=" * 70)
+
         # Persian (fa) - Default
-        self.write(FRONTEND_DIR / "lib" / "i18n" / "fa.json", json.dumps({
-            "common": {
-                "appName": "اکونوژین",
-                "tagline": "پلتفرم علمی کربن",
-                "home": "خانه",
-                "dashboard": "داشبورد",
-                "calculator": "محاسبه‌گر",
-                "map": "نقشه",
-                "shop": "فروشگاه",
-                "library": "کتابخانه",
-                "about": "درباره ما",
-                "contact": "تماس با ما",
-                "login": "ورود",
-                "logout": "خروج",
-                "register": "ثبت‌نام",
-                "profile": "پروفایل",
-                "settings": "تنظیمات",
-                "privacy": "حریم خصوصی",
-                "terms": "قوانین",
-                "policy": "خط مشی",
-                "save": "ذخیره",
-                "cancel": "لغو",
-                "delete": "حذف",
-                "edit": "ویرایش",
-                "create": "ایجاد",
-                "search": "جستجو",
-                "loading": "در حال بارگذاری...",
-                "error": "خطا",
-                "success": "موفقیت",
-                "language": "زبان",
-                "theme": "تم",
-                "dark": "تاریک",
-                "light": "روشن"
-            },
-            "auth": {
-                "welcomeBack": "خوش آمدید",
-                "loginSubtitle": "برای ادامه وارد حساب کاربری خود شوید",
-                "registerSubtitle": "حساب کاربری جدید ایجاد کنید",
-                "email": "ایمیل",
-                "password": "رمز عبور",
-                "confirmPassword": "تأیید رمز عبور",
-                "fullName": "نام و نام خانوادگی",
-                "forgotPassword": "فراموشی رمز عبور؟",
-                "noAccount": "حساب کاربری ندارید؟",
-                "hasAccount": "قبلاً ثبت‌نام کرده‌اید؟",
-                "loginButton": "ورود به حساب",
-                "registerButton": "ایجاد حساب",
-                "orContinueWith": "یا ادامه با",
-                "wallet": "کیف پول"
-            },
-            "dashboard": {
-                "title": "داشبورد مدیریتی",
-                "welcome": "خوش آمدید",
-                "overview": "نمای کلی",
-                "stats": "آمار",
-                "recentActivity": "فعالیت‌های اخیر",
-                "quickActions": "دسترسی سریع"
-            },
-            "maahak": {
-                "title": "کارتابل هوشمند ماهک",
-                "subtitle": "دستیار هوش مصنوعی اکونوژین",
-                "greeting": "سلام! من ماهک هستم",
-                "helpText": "چطور می‌توانم به شما کمک کنم؟",
-                "askQuestion": "سوال خود را بپرسید...",
-                "systemStatus": "وضعیت سیستم",
-                "allSystemsNormal": "همه سیستم‌ها عادی هستند",
-                "alerts": "هشدارها",
-                "tasks": "وظایف",
-                "insights": "بینش‌ها"
-            },
-            "carbon": {
-                "title": "محاسبه‌گر کربن",
-                "activityType": "نوع فعالیت",
-                "treePlanting": "درختکاری",
-                "soilRegeneration": "بازسازی خاک",
-                "agroforestry": "جنگل‌داری کشاورزی",
-                "latitude": "عرض جغرافیایی",
-                "longitude": "طول جغرافیایی",
-                "area": "مساحت (هکتار)",
-                "treeCount": "تعداد درخت",
-                "species": "گونه",
-                "duration": "مدت (سال)",
-                "calculate": "محاسبه کربن",
-                "result": "نتیجه",
-                "carbonAbsorbed": "کربن جذب شده",
-                "seedTokens": "توکن SEED",
-                "gaiaValue": "ارزش GAIA"
-            },
-            "shop": {
-                "title": "فروشگاه اکونوژین",
-                "subtitle": "محصولات پایدار و سازگار با محیط زیست",
-                "categories": "دسته‌بندی‌ها",
-                "addToCart": "افزودن به سبد",
-                "cart": "سبد خرید",
-                "checkout": "تسویه حساب",
-                "price": "قیمت",
-                "quantity": "تعداد",
-                "total": "جمع کل"
-            },
-            "library": {
-                "title": "کتابخانه دیجیتال",
-                "subtitle": "منابع علمی و آموزشی",
-                "books": "کتاب‌ها",
-                "articles": "مقالات",
-                "research": "پژوهش‌ها",
-                "download": "دانلود",
-                "read": "مطالعه",
-                "author": "نویسنده"
-            },
-            "inventory": {
-                "title": "مدیریت انبار",
-                "items": "اقلام",
-                "stock": "موجودی",
-                "inbound": "ورودی",
-                "outbound": "خروجی",
-                "lowStock": "موجودی کم",
-                "reorder": "سفارش مجدد"
-            },
-            "accounting": {
-                "title": "سیستم حسابداری",
-                "income": "درآمد",
-                "expenses": "هزینه‌ها",
-                "profit": "سود",
-                "balance": "موجودی",
-                "transactions": "تراکنش‌ها",
-                "reports": "گزارش‌ها"
-            },
-            "security": {
-                "title": "داشبورد امنیتی",
-                "threats": "تهدیدها",
-                "active": "فعال",
-                "blocked": "مسدود شده",
-                "firewallStatus": "وضعیت فایروال",
-                "lastScan": "آخرین اسکن",
-                "vulnerabilities": "آسیب‌پذیری‌ها"
-            },
-            "pages": {
-                "about": {
-                    "title": "درباره اکونوژین",
-                    "mission": "ماموریت ما",
-                    "vision": "چشم‌انداز",
-                    "team": "تیم ما",
-                    "story": "داستان ما"
+        self.write(
+            FRONTEND_DIR / "lib" / "i18n" / "fa.json",
+            json.dumps(
+                {
+                    "common": {
+                        "appName": "اکونوژین",
+                        "tagline": "پلتفرم علمی کربن",
+                        "home": "خانه",
+                        "dashboard": "داشبورد",
+                        "calculator": "محاسبه‌گر",
+                        "map": "نقشه",
+                        "shop": "فروشگاه",
+                        "library": "کتابخانه",
+                        "about": "درباره ما",
+                        "contact": "تماس با ما",
+                        "login": "ورود",
+                        "logout": "خروج",
+                        "register": "ثبت‌نام",
+                        "profile": "پروفایل",
+                        "settings": "تنظیمات",
+                        "privacy": "حریم خصوصی",
+                        "terms": "قوانین",
+                        "policy": "خط مشی",
+                        "save": "ذخیره",
+                        "cancel": "لغو",
+                        "delete": "حذف",
+                        "edit": "ویرایش",
+                        "create": "ایجاد",
+                        "search": "جستجو",
+                        "loading": "در حال بارگذاری...",
+                        "error": "خطا",
+                        "success": "موفقیت",
+                        "language": "زبان",
+                        "theme": "تم",
+                        "dark": "تاریک",
+                        "light": "روشن",
+                    },
+                    "auth": {
+                        "welcomeBack": "خوش آمدید",
+                        "loginSubtitle": "برای ادامه وارد حساب کاربری خود شوید",
+                        "registerSubtitle": "حساب کاربری جدید ایجاد کنید",
+                        "email": "ایمیل",
+                        "password": "رمز عبور",
+                        "confirmPassword": "تأیید رمز عبور",
+                        "fullName": "نام و نام خانوادگی",
+                        "forgotPassword": "فراموشی رمز عبور؟",
+                        "noAccount": "حساب کاربری ندارید؟",
+                        "hasAccount": "قبلاً ثبت‌نام کرده‌اید؟",
+                        "loginButton": "ورود به حساب",
+                        "registerButton": "ایجاد حساب",
+                        "orContinueWith": "یا ادامه با",
+                        "wallet": "کیف پول",
+                    },
+                    "dashboard": {
+                        "title": "داشبورد مدیریتی",
+                        "welcome": "خوش آمدید",
+                        "overview": "نمای کلی",
+                        "stats": "آمار",
+                        "recentActivity": "فعالیت‌های اخیر",
+                        "quickActions": "دسترسی سریع",
+                    },
+                    "maahak": {
+                        "title": "کارتابل هوشمند ماهک",
+                        "subtitle": "دستیار هوش مصنوعی اکونوژین",
+                        "greeting": "سلام! من ماهک هستم",
+                        "helpText": "چطور می‌توانم به شما کمک کنم؟",
+                        "askQuestion": "سوال خود را بپرسید...",
+                        "systemStatus": "وضعیت سیستم",
+                        "allSystemsNormal": "همه سیستم‌ها عادی هستند",
+                        "alerts": "هشدارها",
+                        "tasks": "وظایف",
+                        "insights": "بینش‌ها",
+                    },
+                    "carbon": {
+                        "title": "محاسبه‌گر کربن",
+                        "activityType": "نوع فعالیت",
+                        "treePlanting": "درختکاری",
+                        "soilRegeneration": "بازسازی خاک",
+                        "agroforestry": "جنگل‌داری کشاورزی",
+                        "latitude": "عرض جغرافیایی",
+                        "longitude": "طول جغرافیایی",
+                        "area": "مساحت (هکتار)",
+                        "treeCount": "تعداد درخت",
+                        "species": "گونه",
+                        "duration": "مدت (سال)",
+                        "calculate": "محاسبه کربن",
+                        "result": "نتیجه",
+                        "carbonAbsorbed": "کربن جذب شده",
+                        "seedTokens": "توکن SEED",
+                        "gaiaValue": "ارزش GAIA",
+                    },
+                    "shop": {
+                        "title": "فروشگاه اکونوژین",
+                        "subtitle": "محصولات پایدار و سازگار با محیط زیست",
+                        "categories": "دسته‌بندی‌ها",
+                        "addToCart": "افزودن به سبد",
+                        "cart": "سبد خرید",
+                        "checkout": "تسویه حساب",
+                        "price": "قیمت",
+                        "quantity": "تعداد",
+                        "total": "جمع کل",
+                    },
+                    "library": {
+                        "title": "کتابخانه دیجیتال",
+                        "subtitle": "منابع علمی و آموزشی",
+                        "books": "کتاب‌ها",
+                        "articles": "مقالات",
+                        "research": "پژوهش‌ها",
+                        "download": "دانلود",
+                        "read": "مطالعه",
+                        "author": "نویسنده",
+                    },
+                    "inventory": {
+                        "title": "مدیریت انبار",
+                        "items": "اقلام",
+                        "stock": "موجودی",
+                        "inbound": "ورودی",
+                        "outbound": "خروجی",
+                        "lowStock": "موجودی کم",
+                        "reorder": "سفارش مجدد",
+                    },
+                    "accounting": {
+                        "title": "سیستم حسابداری",
+                        "income": "درآمد",
+                        "expenses": "هزینه‌ها",
+                        "profit": "سود",
+                        "balance": "موجودی",
+                        "transactions": "تراکنش‌ها",
+                        "reports": "گزارش‌ها",
+                    },
+                    "security": {
+                        "title": "داشبورد امنیتی",
+                        "threats": "تهدیدها",
+                        "active": "فعال",
+                        "blocked": "مسدود شده",
+                        "firewallStatus": "وضعیت فایروال",
+                        "lastScan": "آخرین اسکن",
+                        "vulnerabilities": "آسیب‌پذیری‌ها",
+                    },
+                    "pages": {
+                        "about": {
+                            "title": "درباره اکونوژین",
+                            "mission": "ماموریت ما",
+                            "vision": "چشم‌انداز",
+                            "team": "تیم ما",
+                            "story": "داستان ما",
+                        },
+                        "contact": {
+                            "title": "تماس با ما",
+                            "subtitle": "ما مشتاق شنیدن نظرات شما هستیم",
+                            "formTitle": "ارسال پیام",
+                            "name": "نام شما",
+                            "email": "ایمیل",
+                            "subject": "موضوع",
+                            "message": "پیام",
+                            "send": "ارسال پیام",
+                        },
+                        "privacy": {
+                            "title": "سیاست حریم خصوصی",
+                            "lastUpdated": "آخرین به‌روزرسانی",
+                        },
+                        "terms": {"title": "قوانین و مقررات", "acceptance": "پذیرش قوانین"},
+                        "policy": {
+                            "title": "خط مشی ما",
+                            "sustainability": "پایداری",
+                            "transparency": "شفافیت",
+                        },
+                    },
+                    "portfolio": {
+                        "title": "نمونه کارها",
+                        "totalCarbon": "کل کربن",
+                        "totalTokens": "کل توکن‌ها",
+                        "nftCertificates": "گواهی‌های NFT",
+                        "viewDetails": "مشاهده جزئیات",
+                    },
+                    "sentinel": {
+                        "title": "تأیید ماهواره‌ای",
+                        "ndviIndex": "شاخص NDVI",
+                        "beforeAfter": "قبل / بعد",
+                        "verification": "تأیید",
+                        "satelliteData": "داده‌های ماهواره‌ای",
+                    },
                 },
-                "contact": {
-                    "title": "تماس با ما",
-                    "subtitle": "ما مشتاق شنیدن نظرات شما هستیم",
-                    "formTitle": "ارسال پیام",
-                    "name": "نام شما",
-                    "email": "ایمیل",
-                    "subject": "موضوع",
-                    "message": "پیام",
-                    "send": "ارسال پیام"
-                },
-                "privacy": {
-                    "title": "سیاست حریم خصوصی",
-                    "lastUpdated": "آخرین به‌روزرسانی"
-                },
-                "terms": {
-                    "title": "قوانین و مقررات",
-                    "acceptance": "پذیرش قوانین"
-                },
-                "policy": {
-                    "title": "خط مشی ما",
-                    "sustainability": "پایداری",
-                    "transparency": "شفافیت"
-                }
-            },
-            "portfolio": {
-                "title": "نمونه کارها",
-                "totalCarbon": "کل کربن",
-                "totalTokens": "کل توکن‌ها",
-                "nftCertificates": "گواهی‌های NFT",
-                "viewDetails": "مشاهده جزئیات"
-            },
-            "sentinel": {
-                "title": "تأیید ماهواره‌ای",
-                "ndviIndex": "شاخص NDVI",
-                "beforeAfter": "قبل / بعد",
-                "verification": "تأیید",
-                "satelliteData": "داده‌های ماهواره‌ای"
-            }
-        }, ensure_ascii=False, indent=2))
-        
+                ensure_ascii=False,
+                indent=2,
+            ),
+        )
+
         # English
-        self.write(FRONTEND_DIR / "lib" / "i18n" / "en.json", json.dumps({
-            "common": {
-                "appName": "Econojin",
-                "tagline": "Scientific Carbon Platform",
-                "home": "Home",
-                "dashboard": "Dashboard",
-                "calculator": "Calculator",
-                "map": "Map",
-                "shop": "Shop",
-                "library": "Library",
-                "about": "About",
-                "contact": "Contact",
-                "login": "Login",
-                "logout": "Logout",
-                "register": "Register",
-                "profile": "Profile",
-                "settings": "Settings",
-                "privacy": "Privacy",
-                "terms": "Terms",
-                "policy": "Policy",
-                "save": "Save",
-                "cancel": "Cancel",
-                "delete": "Delete",
-                "edit": "Edit",
-                "create": "Create",
-                "search": "Search",
-                "loading": "Loading...",
-                "error": "Error",
-                "success": "Success",
-                "language": "Language",
-                "theme": "Theme",
-                "dark": "Dark",
-                "light": "Light"
-            },
-            "auth": {
-                "welcomeBack": "Welcome Back",
-                "loginSubtitle": "Sign in to continue to your account",
-                "registerSubtitle": "Create a new account",
-                "email": "Email",
-                "password": "Password",
-                "confirmPassword": "Confirm Password",
-                "fullName": "Full Name",
-                "forgotPassword": "Forgot password?",
-                "noAccount": "Don't have an account?",
-                "hasAccount": "Already have an account?",
-                "loginButton": "Sign In",
-                "registerButton": "Create Account",
-                "orContinueWith": "Or continue with",
-                "wallet": "Wallet"
-            },
-            "dashboard": {
-                "title": "Dashboard",
-                "welcome": "Welcome",
-                "overview": "Overview",
-                "stats": "Statistics",
-                "recentActivity": "Recent Activity",
-                "quickActions": "Quick Actions"
-            },
-            "maahak": {
-                "title": "Maahak Smart Console",
-                "subtitle": "Econojin AI Assistant",
-                "greeting": "Hello! I'm Maahak",
-                "helpText": "How can I help you today?",
-                "askQuestion": "Ask me anything...",
-                "systemStatus": "System Status",
-                "allSystemsNormal": "All systems are normal",
-                "alerts": "Alerts",
-                "tasks": "Tasks",
-                "insights": "Insights"
-            },
-            "carbon": {
-                "title": "Carbon Calculator",
-                "activityType": "Activity Type",
-                "treePlanting": "Tree Planting",
-                "soilRegeneration": "Soil Regeneration",
-                "agroforestry": "Agroforestry",
-                "latitude": "Latitude",
-                "longitude": "Longitude",
-                "area": "Area (hectares)",
-                "treeCount": "Tree Count",
-                "species": "Species",
-                "duration": "Duration (years)",
-                "calculate": "Calculate Carbon",
-                "result": "Result",
-                "carbonAbsorbed": "Carbon Absorbed",
-                "seedTokens": "SEED Tokens",
-                "gaiaValue": "GAIA Value"
-            },
-            "shop": {
-                "title": "Econojin Shop",
-                "subtitle": "Sustainable & Eco-friendly Products",
-                "categories": "Categories",
-                "addToCart": "Add to Cart",
-                "cart": "Cart",
-                "checkout": "Checkout",
-                "price": "Price",
-                "quantity": "Quantity",
-                "total": "Total"
-            },
-            "library": {
-                "title": "Digital Library",
-                "subtitle": "Scientific & Educational Resources",
-                "books": "Books",
-                "articles": "Articles",
-                "research": "Research",
-                "download": "Download",
-                "read": "Read",
-                "author": "Author"
-            },
-            "inventory": {
-                "title": "Inventory Management",
-                "items": "Items",
-                "stock": "Stock",
-                "inbound": "Inbound",
-                "outbound": "Outbound",
-                "lowStock": "Low Stock",
-                "reorder": "Reorder"
-            },
-            "accounting": {
-                "title": "Accounting System",
-                "income": "Income",
-                "expenses": "Expenses",
-                "profit": "Profit",
-                "balance": "Balance",
-                "transactions": "Transactions",
-                "reports": "Reports"
-            },
-            "security": {
-                "title": "Security Dashboard",
-                "threats": "Threats",
-                "active": "Active",
-                "blocked": "Blocked",
-                "firewallStatus": "Firewall Status",
-                "lastScan": "Last Scan",
-                "vulnerabilities": "Vulnerabilities"
-            },
-            "pages": {
-                "about": {
-                    "title": "About Econojin",
-                    "mission": "Our Mission",
-                    "vision": "Our Vision",
-                    "team": "Our Team",
-                    "story": "Our Story"
+        self.write(
+            FRONTEND_DIR / "lib" / "i18n" / "en.json",
+            json.dumps(
+                {
+                    "common": {
+                        "appName": "Econojin",
+                        "tagline": "Scientific Carbon Platform",
+                        "home": "Home",
+                        "dashboard": "Dashboard",
+                        "calculator": "Calculator",
+                        "map": "Map",
+                        "shop": "Shop",
+                        "library": "Library",
+                        "about": "About",
+                        "contact": "Contact",
+                        "login": "Login",
+                        "logout": "Logout",
+                        "register": "Register",
+                        "profile": "Profile",
+                        "settings": "Settings",
+                        "privacy": "Privacy",
+                        "terms": "Terms",
+                        "policy": "Policy",
+                        "save": "Save",
+                        "cancel": "Cancel",
+                        "delete": "Delete",
+                        "edit": "Edit",
+                        "create": "Create",
+                        "search": "Search",
+                        "loading": "Loading...",
+                        "error": "Error",
+                        "success": "Success",
+                        "language": "Language",
+                        "theme": "Theme",
+                        "dark": "Dark",
+                        "light": "Light",
+                    },
+                    "auth": {
+                        "welcomeBack": "Welcome Back",
+                        "loginSubtitle": "Sign in to continue to your account",
+                        "registerSubtitle": "Create a new account",
+                        "email": "Email",
+                        "password": "Password",
+                        "confirmPassword": "Confirm Password",
+                        "fullName": "Full Name",
+                        "forgotPassword": "Forgot password?",
+                        "noAccount": "Don't have an account?",
+                        "hasAccount": "Already have an account?",
+                        "loginButton": "Sign In",
+                        "registerButton": "Create Account",
+                        "orContinueWith": "Or continue with",
+                        "wallet": "Wallet",
+                    },
+                    "dashboard": {
+                        "title": "Dashboard",
+                        "welcome": "Welcome",
+                        "overview": "Overview",
+                        "stats": "Statistics",
+                        "recentActivity": "Recent Activity",
+                        "quickActions": "Quick Actions",
+                    },
+                    "maahak": {
+                        "title": "Maahak Smart Console",
+                        "subtitle": "Econojin AI Assistant",
+                        "greeting": "Hello! I'm Maahak",
+                        "helpText": "How can I help you today?",
+                        "askQuestion": "Ask me anything...",
+                        "systemStatus": "System Status",
+                        "allSystemsNormal": "All systems are normal",
+                        "alerts": "Alerts",
+                        "tasks": "Tasks",
+                        "insights": "Insights",
+                    },
+                    "carbon": {
+                        "title": "Carbon Calculator",
+                        "activityType": "Activity Type",
+                        "treePlanting": "Tree Planting",
+                        "soilRegeneration": "Soil Regeneration",
+                        "agroforestry": "Agroforestry",
+                        "latitude": "Latitude",
+                        "longitude": "Longitude",
+                        "area": "Area (hectares)",
+                        "treeCount": "Tree Count",
+                        "species": "Species",
+                        "duration": "Duration (years)",
+                        "calculate": "Calculate Carbon",
+                        "result": "Result",
+                        "carbonAbsorbed": "Carbon Absorbed",
+                        "seedTokens": "SEED Tokens",
+                        "gaiaValue": "GAIA Value",
+                    },
+                    "shop": {
+                        "title": "Econojin Shop",
+                        "subtitle": "Sustainable & Eco-friendly Products",
+                        "categories": "Categories",
+                        "addToCart": "Add to Cart",
+                        "cart": "Cart",
+                        "checkout": "Checkout",
+                        "price": "Price",
+                        "quantity": "Quantity",
+                        "total": "Total",
+                    },
+                    "library": {
+                        "title": "Digital Library",
+                        "subtitle": "Scientific & Educational Resources",
+                        "books": "Books",
+                        "articles": "Articles",
+                        "research": "Research",
+                        "download": "Download",
+                        "read": "Read",
+                        "author": "Author",
+                    },
+                    "inventory": {
+                        "title": "Inventory Management",
+                        "items": "Items",
+                        "stock": "Stock",
+                        "inbound": "Inbound",
+                        "outbound": "Outbound",
+                        "lowStock": "Low Stock",
+                        "reorder": "Reorder",
+                    },
+                    "accounting": {
+                        "title": "Accounting System",
+                        "income": "Income",
+                        "expenses": "Expenses",
+                        "profit": "Profit",
+                        "balance": "Balance",
+                        "transactions": "Transactions",
+                        "reports": "Reports",
+                    },
+                    "security": {
+                        "title": "Security Dashboard",
+                        "threats": "Threats",
+                        "active": "Active",
+                        "blocked": "Blocked",
+                        "firewallStatus": "Firewall Status",
+                        "lastScan": "Last Scan",
+                        "vulnerabilities": "Vulnerabilities",
+                    },
+                    "pages": {
+                        "about": {
+                            "title": "About Econojin",
+                            "mission": "Our Mission",
+                            "vision": "Our Vision",
+                            "team": "Our Team",
+                            "story": "Our Story",
+                        },
+                        "contact": {
+                            "title": "Contact Us",
+                            "subtitle": "We'd love to hear from you",
+                            "formTitle": "Send a Message",
+                            "name": "Your Name",
+                            "email": "Email",
+                            "subject": "Subject",
+                            "message": "Message",
+                            "send": "Send Message",
+                        },
+                        "privacy": {"title": "Privacy Policy", "lastUpdated": "Last Updated"},
+                        "terms": {
+                            "title": "Terms & Conditions",
+                            "acceptance": "Acceptance of Terms",
+                        },
+                        "policy": {
+                            "title": "Our Policy",
+                            "sustainability": "Sustainability",
+                            "transparency": "Transparency",
+                        },
+                    },
+                    "portfolio": {
+                        "title": "Portfolio",
+                        "totalCarbon": "Total Carbon",
+                        "totalTokens": "Total Tokens",
+                        "nftCertificates": "NFT Certificates",
+                        "viewDetails": "View Details",
+                    },
+                    "sentinel": {
+                        "title": "Satellite Verification",
+                        "ndviIndex": "NDVI Index",
+                        "beforeAfter": "Before / After",
+                        "verification": "Verification",
+                        "satelliteData": "Satellite Data",
+                    },
                 },
-                "contact": {
-                    "title": "Contact Us",
-                    "subtitle": "We'd love to hear from you",
-                    "formTitle": "Send a Message",
-                    "name": "Your Name",
-                    "email": "Email",
-                    "subject": "Subject",
-                    "message": "Message",
-                    "send": "Send Message"
-                },
-                "privacy": {
-                    "title": "Privacy Policy",
-                    "lastUpdated": "Last Updated"
-                },
-                "terms": {
-                    "title": "Terms & Conditions",
-                    "acceptance": "Acceptance of Terms"
-                },
-                "policy": {
-                    "title": "Our Policy",
-                    "sustainability": "Sustainability",
-                    "transparency": "Transparency"
-                }
-            },
-            "portfolio": {
-                "title": "Portfolio",
-                "totalCarbon": "Total Carbon",
-                "totalTokens": "Total Tokens",
-                "nftCertificates": "NFT Certificates",
-                "viewDetails": "View Details"
-            },
-            "sentinel": {
-                "title": "Satellite Verification",
-                "ndviIndex": "NDVI Index",
-                "beforeAfter": "Before / After",
-                "verification": "Verification",
-                "satelliteData": "Satellite Data"
-            }
-        }, ensure_ascii=False, indent=2))
-        
+                ensure_ascii=False,
+                indent=2,
+            ),
+        )
+
         # Arabic
-        self.write(FRONTEND_DIR / "lib" / "i18n" / "ar.json", json.dumps({
-            "common": {
-                "appName": "إكونوجين",
-                "tagline": "منصة الكربون العلمية",
-                "home": "الرئيسية",
-                "dashboard": "لوحة التحكم",
-                "calculator": "الحاسبة",
-                "map": "الخريطة",
-                "shop": "المتجر",
-                "library": "المكتبة",
-                "about": "من نحن",
-                "contact": "اتصل بنا",
-                "login": "تسجيل الدخول",
-                "logout": "تسجيل الخروج",
-                "register": "إنشاء حساب",
-                "profile": "الملف الشخصي",
-                "settings": "الإعدادات",
-                "privacy": "الخصوصية",
-                "terms": "الشروط",
-                "policy": "السياسة",
-                "save": "حفظ",
-                "cancel": "إلغاء",
-                "delete": "حذف",
-                "edit": "تعديل",
-                "create": "إنشاء",
-                "search": "بحث",
-                "loading": "جاري التحميل...",
-                "error": "خطأ",
-                "success": "نجاح",
-                "language": "اللغة",
-                "theme": "السمة",
-                "dark": "داكن",
-                "light": "فاتح"
-            },
-            "auth": {
-                "welcomeBack": "مرحباً بعودتك",
-                "loginSubtitle": "سجل الدخول للمتابعة",
-                "registerSubtitle": "أنشئ حساباً جديداً",
-                "email": "البريد الإلكتروني",
-                "password": "كلمة المرور",
-                "confirmPassword": "تأكيد كلمة المرور",
-                "fullName": "الاسم الكامل",
-                "forgotPassword": "نسيت كلمة المرور؟",
-                "noAccount": "ليس لديك حساب؟",
-                "hasAccount": "لديك حساب بالفعل؟",
-                "loginButton": "تسجيل الدخول",
-                "registerButton": "إنشاء حساب",
-                "orContinueWith": "أو تابع مع",
-                "wallet": "المحفظة"
-            },
-            "dashboard": {
-                "title": "لوحة التحكم",
-                "welcome": "مرحباً",
-                "overview": "نظرة عامة",
-                "stats": "الإحصائيات",
-                "recentActivity": "النشاط الأخير",
-                "quickActions": "إجراءات سريعة"
-            },
-            "maahak": {
-                "title": "وحدة ماهك الذكية",
-                "subtitle": "مساعد الذكاء الاصطناعي",
-                "greeting": "مرحباً! أنا ماهك",
-                "helpText": "كيف يمكنني مساعدتك اليوم؟",
-                "askQuestion": "اسألني أي شيء...",
-                "systemStatus": "حالة النظام",
-                "allSystemsNormal": "جميع الأنظمة طبيعية",
-                "alerts": "التنبيهات",
-                "tasks": "المهام",
-                "insights": "الرؤى"
-            },
-            "carbon": {
-                "title": "حاسبة الكربون",
-                "activityType": "نوع النشاط",
-                "treePlanting": "زراعة الأشجار",
-                "soilRegeneration": "تجديد التربة",
-                "agroforestry": "الحراجة الزراعية",
-                "latitude": "خط العرض",
-                "longitude": "خط الطول",
-                "area": "المساحة (هكتار)",
-                "treeCount": "عدد الأشجار",
-                "species": "النوع",
-                "duration": "المدة (سنوات)",
-                "calculate": "احسب الكربون",
-                "result": "النتيجة",
-                "carbonAbsorbed": "الكربون الممتص",
-                "seedTokens": "رموز SEED",
-                "gaiaValue": "قيمة GAIA"
-            },
-            "pages": {
-                "about": {"title": "عن إكونوجين"},
-                "contact": {"title": "اتصل بنا", "subtitle": "يسعدنا سماع رأيك"},
-                "privacy": {"title": "سياسة الخصوصية"},
-                "terms": {"title": "الشروط والأحكام"},
-                "policy": {"title": "سياستنا"}
-            }
-        }, ensure_ascii=False, indent=2))
-        
+        self.write(
+            FRONTEND_DIR / "lib" / "i18n" / "ar.json",
+            json.dumps(
+                {
+                    "common": {
+                        "appName": "إكونوجين",
+                        "tagline": "منصة الكربون العلمية",
+                        "home": "الرئيسية",
+                        "dashboard": "لوحة التحكم",
+                        "calculator": "الحاسبة",
+                        "map": "الخريطة",
+                        "shop": "المتجر",
+                        "library": "المكتبة",
+                        "about": "من نحن",
+                        "contact": "اتصل بنا",
+                        "login": "تسجيل الدخول",
+                        "logout": "تسجيل الخروج",
+                        "register": "إنشاء حساب",
+                        "profile": "الملف الشخصي",
+                        "settings": "الإعدادات",
+                        "privacy": "الخصوصية",
+                        "terms": "الشروط",
+                        "policy": "السياسة",
+                        "save": "حفظ",
+                        "cancel": "إلغاء",
+                        "delete": "حذف",
+                        "edit": "تعديل",
+                        "create": "إنشاء",
+                        "search": "بحث",
+                        "loading": "جاري التحميل...",
+                        "error": "خطأ",
+                        "success": "نجاح",
+                        "language": "اللغة",
+                        "theme": "السمة",
+                        "dark": "داكن",
+                        "light": "فاتح",
+                    },
+                    "auth": {
+                        "welcomeBack": "مرحباً بعودتك",
+                        "loginSubtitle": "سجل الدخول للمتابعة",
+                        "registerSubtitle": "أنشئ حساباً جديداً",
+                        "email": "البريد الإلكتروني",
+                        "password": "كلمة المرور",
+                        "confirmPassword": "تأكيد كلمة المرور",
+                        "fullName": "الاسم الكامل",
+                        "forgotPassword": "نسيت كلمة المرور؟",
+                        "noAccount": "ليس لديك حساب؟",
+                        "hasAccount": "لديك حساب بالفعل؟",
+                        "loginButton": "تسجيل الدخول",
+                        "registerButton": "إنشاء حساب",
+                        "orContinueWith": "أو تابع مع",
+                        "wallet": "المحفظة",
+                    },
+                    "dashboard": {
+                        "title": "لوحة التحكم",
+                        "welcome": "مرحباً",
+                        "overview": "نظرة عامة",
+                        "stats": "الإحصائيات",
+                        "recentActivity": "النشاط الأخير",
+                        "quickActions": "إجراءات سريعة",
+                    },
+                    "maahak": {
+                        "title": "وحدة ماهك الذكية",
+                        "subtitle": "مساعد الذكاء الاصطناعي",
+                        "greeting": "مرحباً! أنا ماهك",
+                        "helpText": "كيف يمكنني مساعدتك اليوم؟",
+                        "askQuestion": "اسألني أي شيء...",
+                        "systemStatus": "حالة النظام",
+                        "allSystemsNormal": "جميع الأنظمة طبيعية",
+                        "alerts": "التنبيهات",
+                        "tasks": "المهام",
+                        "insights": "الرؤى",
+                    },
+                    "carbon": {
+                        "title": "حاسبة الكربون",
+                        "activityType": "نوع النشاط",
+                        "treePlanting": "زراعة الأشجار",
+                        "soilRegeneration": "تجديد التربة",
+                        "agroforestry": "الحراجة الزراعية",
+                        "latitude": "خط العرض",
+                        "longitude": "خط الطول",
+                        "area": "المساحة (هكتار)",
+                        "treeCount": "عدد الأشجار",
+                        "species": "النوع",
+                        "duration": "المدة (سنوات)",
+                        "calculate": "احسب الكربون",
+                        "result": "النتيجة",
+                        "carbonAbsorbed": "الكربون الممتص",
+                        "seedTokens": "رموز SEED",
+                        "gaiaValue": "قيمة GAIA",
+                    },
+                    "pages": {
+                        "about": {"title": "عن إكونوجين"},
+                        "contact": {"title": "اتصل بنا", "subtitle": "يسعدنا سماع رأيك"},
+                        "privacy": {"title": "سياسة الخصوصية"},
+                        "terms": {"title": "الشروط والأحكام"},
+                        "policy": {"title": "سياستنا"},
+                    },
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+        )
+
         # Turkish
-        self.write(FRONTEND_DIR / "lib" / "i18n" / "tr.json", json.dumps({
-            "common": {
-                "appName": "Econojin",
-                "tagline": "Bilimsel Karbon Platformu",
-                "home": "Ana Sayfa",
-                "dashboard": "Panel",
-                "calculator": "Hesaplayıcı",
-                "map": "Harita",
-                "shop": "Mağaza",
-                "library": "Kütüphane",
-                "about": "Hakkında",
-                "contact": "İletişim",
-                "login": "Giriş",
-                "logout": "Çıkış",
-                "register": "Kayıt",
-                "save": "Kaydet",
-                "cancel": "İptal",
-                "language": "Dil",
-                "theme": "Tema"
-            },
-            "auth": {
-                "welcomeBack": "Tekrar Hoş Geldiniz",
-                "loginSubtitle": "Devam etmek için giriş yapın",
-                "email": "E-posta",
-                "password": "Şifre",
-                "loginButton": "Giriş Yap"
-            },
-            "maahak": {
-                "title": "Maahak Akıllı Konsol",
-                "subtitle": "Econojin AI Asistanı",
-                "greeting": "Merhaba! Ben Maahak"
-            },
-            "pages": {
-                "about": {"title": "Econojin Hakkında"},
-                "contact": {"title": "İletişim"},
-                "privacy": {"title": "Gizlilik Politikası"},
-                "terms": {"title": "Şartlar ve Koşullar"}
-            }
-        }, ensure_ascii=False, indent=2))
-        
+        self.write(
+            FRONTEND_DIR / "lib" / "i18n" / "tr.json",
+            json.dumps(
+                {
+                    "common": {
+                        "appName": "Econojin",
+                        "tagline": "Bilimsel Karbon Platformu",
+                        "home": "Ana Sayfa",
+                        "dashboard": "Panel",
+                        "calculator": "Hesaplayıcı",
+                        "map": "Harita",
+                        "shop": "Mağaza",
+                        "library": "Kütüphane",
+                        "about": "Hakkında",
+                        "contact": "İletişim",
+                        "login": "Giriş",
+                        "logout": "Çıkış",
+                        "register": "Kayıt",
+                        "save": "Kaydet",
+                        "cancel": "İptal",
+                        "language": "Dil",
+                        "theme": "Tema",
+                    },
+                    "auth": {
+                        "welcomeBack": "Tekrar Hoş Geldiniz",
+                        "loginSubtitle": "Devam etmek için giriş yapın",
+                        "email": "E-posta",
+                        "password": "Şifre",
+                        "loginButton": "Giriş Yap",
+                    },
+                    "maahak": {
+                        "title": "Maahak Akıllı Konsol",
+                        "subtitle": "Econojin AI Asistanı",
+                        "greeting": "Merhaba! Ben Maahak",
+                    },
+                    "pages": {
+                        "about": {"title": "Econojin Hakkında"},
+                        "contact": {"title": "İletişim"},
+                        "privacy": {"title": "Gizlilik Politikası"},
+                        "terms": {"title": "Şartlar ve Koşullar"},
+                    },
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+        )
+
         # Chinese
-        self.write(FRONTEND_DIR / "lib" / "i18n" / "zh.json", json.dumps({
-            "common": {
-                "appName": "Econojin",
-                "tagline": "科学碳平台",
-                "home": "首页",
-                "dashboard": "仪表板",
-                "calculator": "计算器",
-                "map": "地图",
-                "shop": "商店",
-                "library": "图书馆",
-                "about": "关于",
-                "contact": "联系",
-                "login": "登录",
-                "logout": "登出",
-                "register": "注册",
-                "save": "保存",
-                "cancel": "取消",
-                "language": "语言",
-                "theme": "主题"
-            },
-            "auth": {
-                "welcomeBack": "欢迎回来",
-                "loginSubtitle": "登录以继续",
-                "email": "电子邮件",
-                "password": "密码",
-                "loginButton": "登录"
-            },
-            "maahak": {
-                "title": "Maahak 智能控制台",
-                "subtitle": "Econojin AI 助手",
-                "greeting": "你好！我是 Maahak"
-            },
-            "pages": {
-                "about": {"title": "关于 Econojin"},
-                "contact": {"title": "联系我们"},
-                "privacy": {"title": "隐私政策"}
-            }
-        }, ensure_ascii=False, indent=2))
-        
+        self.write(
+            FRONTEND_DIR / "lib" / "i18n" / "zh.json",
+            json.dumps(
+                {
+                    "common": {
+                        "appName": "Econojin",
+                        "tagline": "科学碳平台",
+                        "home": "首页",
+                        "dashboard": "仪表板",
+                        "calculator": "计算器",
+                        "map": "地图",
+                        "shop": "商店",
+                        "library": "图书馆",
+                        "about": "关于",
+                        "contact": "联系",
+                        "login": "登录",
+                        "logout": "登出",
+                        "register": "注册",
+                        "save": "保存",
+                        "cancel": "取消",
+                        "language": "语言",
+                        "theme": "主题",
+                    },
+                    "auth": {
+                        "welcomeBack": "欢迎回来",
+                        "loginSubtitle": "登录以继续",
+                        "email": "电子邮件",
+                        "password": "密码",
+                        "loginButton": "登录",
+                    },
+                    "maahak": {
+                        "title": "Maahak 智能控制台",
+                        "subtitle": "Econojin AI 助手",
+                        "greeting": "你好！我是 Maahak",
+                    },
+                    "pages": {
+                        "about": {"title": "关于 Econojin"},
+                        "contact": {"title": "联系我们"},
+                        "privacy": {"title": "隐私政策"},
+                    },
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+        )
+
         # i18n utility
-        self.write(FRONTEND_DIR / "lib" / "i18n" / "index.ts", """// i18n System - Internationalization
+        self.write(
+            FRONTEND_DIR / "lib" / "i18n" / "index.ts",
+            """// i18n System - Internationalization
 import fa from './fa.json';
 import en from './en.json';
 import ar from './ar.json';
@@ -679,17 +710,20 @@ export function t(dict: any, path: string): string {
   }
   return typeof value === 'string' ? value : path;
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Middleware برای i18n Routing
     # =========================================================================
     def create_middleware(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🔀 Creating i18n Middleware")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "middleware.ts", """import { NextRequest, NextResponse } from 'next/server';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "middleware.ts",
+            """import { NextRequest, NextResponse } from 'next/server';
 
 export const locales = ['fa', 'en', 'ar', 'tr', 'zh'];
 export const defaultLocale = 'fa';
@@ -747,17 +781,20 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ['/((?!_next|api|favicon|.*\\\\..*).*)'],
 };
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Root Layout با i18n Support
     # =========================================================================
     def create_root_layout(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🎨 Creating Root Layout with i18n")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "layout.tsx", """import '../globals.css';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "layout.tsx",
+            """import '../globals.css';
 import type { Metadata } from 'next';
 import { locales, type Locale, getDirection } from '@/lib/i18n';
 import { AuthProvider } from '@/components/providers/AuthProvider';
@@ -816,17 +853,20 @@ export default function LocaleLayout({
     </html>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Logo تایپوگرافی
     # =========================================================================
     def create_logo(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("✨ Creating Typography Logo")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "components" / "Logo.tsx", """import Link from 'next/link';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "components" / "Logo.tsx",
+            """import Link from 'next/link';
 
 interface LogoProps {
   locale?: string;
@@ -891,17 +931,20 @@ export default function Logo({ locale = 'fa', size = 'md', showTagline = false }
     </Link>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Language Switcher
     # =========================================================================
     def create_language_switcher(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🌐 Creating Language Switcher")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "components" / "LanguageSwitcher.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "components" / "LanguageSwitcher.tsx",
+            """'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -972,17 +1015,20 @@ export default function LanguageSwitcher({ currentLocale }: { currentLocale: Loc
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Theme Switcher
     # =========================================================================
     def create_theme_switcher(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🌓 Creating Theme Switcher")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "components" / "ThemeSwitcher.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "components" / "ThemeSwitcher.tsx",
+            """'use client';
 
 import { useState, useEffect } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
@@ -1048,17 +1094,20 @@ export default function ThemeSwitcher() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Providers (Auth, Theme)
     # =========================================================================
     def create_providers(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🔌 Creating Providers")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "components" / "providers" / "AuthProvider.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "components" / "providers" / "AuthProvider.tsx",
+            """'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
@@ -1152,9 +1201,12 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
-""")
-        
-        self.write(FRONTEND_DIR / "components" / "providers" / "ThemeProvider.tsx", """'use client';
+""",
+        )
+
+        self.write(
+            FRONTEND_DIR / "components" / "providers" / "ThemeProvider.tsx",
+            """'use client';
 
 import { createContext, useContext, ReactNode } from 'react';
 
@@ -1169,17 +1221,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Navigation Bar با i18n
     # =========================================================================
     def create_navbar(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🧭 Creating Navigation Bar")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "components" / "Navbar.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "components" / "Navbar.tsx",
+            """'use client';
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -1315,9 +1370,12 @@ export default function Navbar({ locale }: { locale: Locale }) {
     </nav>
   );
 }
-""")
-        
-        self.write(FRONTEND_DIR / "components" / "Footer.tsx", """import Link from 'next/link';
+""",
+        )
+
+        self.write(
+            FRONTEND_DIR / "components" / "Footer.tsx",
+            """import Link from 'next/link';
 import Logo from './Logo';
 import { getDictionary, type Locale } from '@/lib/i18n';
 
@@ -1371,17 +1429,20 @@ export default function Footer({ locale }: { locale: Locale }) {
     </footer>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Auth Pages (Login, Register)
     # =========================================================================
     def create_auth_pages(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🔐 Creating Auth Pages (Login & Register)")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "login" / "page.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "login" / "page.tsx",
+            """'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -1520,9 +1581,12 @@ export default function LoginPage() {
     </div>
   );
 }
-""")
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "register" / "page.tsx", """'use client';
+""",
+        )
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "register" / "page.tsx",
+            """'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -1659,17 +1723,20 @@ export default function RegisterPage() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Maahak (ماهک) AI Admin Dashboard
     # =========================================================================
     def create_maahak_dashboard(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🤖 Creating Maahak AI Admin Dashboard")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "admin" / "page.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "admin" / "page.tsx",
+            """'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
@@ -1993,18 +2060,21 @@ function generateMaahakResponse(input: string, locale: string): string {
       security,
       satellite,
       and blockchain topics. What shall we explore?";}
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Business Modules (Shop, Library, Inventory, Accounting)
     # =========================================================================
     def create_business_modules(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("💼 Creating Business Modules")
-        logger.info("="*70)
-        
+        logger.info("=" * 70)
+
         # Shop
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "shop" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "shop" / "page.tsx",
+            """'use client';
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -2157,10 +2227,13 @@ export default function ShopPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Library
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "library" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "library" / "page.tsx",
+            """'use client';
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -2313,10 +2386,13 @@ export default function LibraryPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Inventory
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "inventory" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "inventory" / "page.tsx",
+            """'use client';
 
 import { useParams } from 'next/navigation';
 import { Package, TrendingUp, TrendingDown, AlertTriangle, Plus } from 'lucide-react';
@@ -2436,10 +2512,13 @@ export default function InventoryPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Accounting
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "accounting" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "accounting" / "page.tsx",
+            """'use client';
 
 import { useParams } from 'next/navigation';
 import { DollarSign, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
@@ -2562,18 +2641,21 @@ export default function AccountingPage() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Static Pages (About, Contact, Privacy, Terms, Policy)
     # =========================================================================
     def create_static_pages(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("📄 Creating Static Pages")
-        logger.info("="*70)
-        
+        logger.info("=" * 70)
+
         # About
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "about" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "about" / "page.tsx",
+            """'use client';
 
 import { useParams } from 'next/navigation';
 import { Leaf, Target, Eye, Users, Heart, Award } from 'lucide-react';
@@ -2673,10 +2755,13 @@ export default function AboutPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Contact
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "contact" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "contact" / "page.tsx",
+            """'use client';
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -2789,10 +2874,13 @@ export default function ContactPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Privacy
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "privacy" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "privacy" / "page.tsx",
+            """'use client';
 
 import { useParams } from 'next/navigation';
 import { Shield } from 'lucide-react';
@@ -2879,10 +2967,13 @@ export default function PrivacyPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Terms
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "terms" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "terms" / "page.tsx",
+            """'use client';
 
 import { useParams } from 'next/navigation';
 import { FileText } from 'lucide-react';
@@ -2947,10 +3038,13 @@ export default function TermsPage() {
     </div>
   );
 }
-""")
+""",
+        )
 
         # Policy
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "policy" / "page.tsx", """'use client';
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "policy" / "page.tsx",
+            """'use client';
 
 import { useParams } from 'next/navigation';
 import { BookOpen, Leaf, Eye, Scale } from 'lucide-react';
@@ -3047,17 +3141,20 @@ export default function PolicyPage() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Security Dashboard
     # =========================================================================
     def create_security_dashboard(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🛡️ Creating Security Dashboard")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "security" / "page.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "security" / "page.tsx",
+            """'use client';
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -3255,17 +3352,20 @@ export default function SecurityPage() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Sentinel-2 Integration Page
     # =========================================================================
     def create_sentinel_page(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🛰️ Creating Sentinel-2 Integration Page")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "sentinel" / "page.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "sentinel" / "page.tsx",
+            """'use client';
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -3439,17 +3539,20 @@ export default function SentinelPage() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Portfolio Page با MetaMask
     # =========================================================================
     def create_portfolio_page(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("💼 Creating Portfolio Page with MetaMask")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "[locale]" / "portfolio" / "[address]" / "page.tsx", """'use client';
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "[locale]" / "portfolio" / "[address]" / "page.tsx",
+            """'use client';
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
@@ -3583,17 +3686,20 @@ export default function PortfolioPage() {
     </div>
   );
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Hardhat Local Deployment
     # =========================================================================
     def create_hardhat_scripts(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("⛓️ Creating Hardhat Local Deployment Scripts")
-        logger.info("="*70)
-        
-        self.write(CONTRACTS_DIR / "scripts" / "deploy_local.js", r"""const hre = require("hardhat");
+        logger.info("=" * 70)
+
+        self.write(
+            CONTRACTS_DIR / "scripts" / "deploy_local.js",
+            r"""const hre = require("hardhat");
 
 async function main() {
   console.log("🚀 Deploying Gaia Protocol to Local Hardhat Network...\\n");
@@ -3673,10 +3779,13 @@ main()
     console.error(error);
     process.exit(1);
   });
-""")
-        
+""",
+        )
+
         # Run script
-        self.write(PROJECT_ROOT / "scripts" / "run_hardhat_local.py", r"""#!/usr/bin/env python3
+        self.write(
+            PROJECT_ROOT / "scripts" / "run_hardhat_local.py",
+            r"""#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 \"\"\"
 راه‌اندازی Hardhat Local Network و Deploy قراردادها
@@ -3736,17 +3845,20 @@ def main():
 
 if __name__ == "__main__":
     main()
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Update Globals CSS
     # =========================================================================
     def update_globals_css(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("🎨 Updating globals.css with fonts & themes")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "app" / "globals.css", """@tailwind base;
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "app" / "globals.css",
+            """@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -3825,17 +3937,20 @@ r""")
 .animate-slide-up { animation: slideUp 0.5s ease-out; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-pulse-ring { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Update Tailwind Config
     # =========================================================================
     def update_tailwind_config(self):
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("⚙️ Updating Tailwind Config")
-        logger.info("="*70)
-        
-        self.write(FRONTEND_DIR / "tailwind.config.js", """/** @type {import('tailwindcss').Config} */
+        logger.info("=" * 70)
+
+        self.write(
+            FRONTEND_DIR / "tailwind.config.js",
+            """/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
   content: [
@@ -3853,18 +3968,19 @@ module.exports = {
   },
   plugins: [],
 }
-r""")
-    
+r""",
+        )
+
     # =========================================================================
     # Main
     # =========================================================================
     def build_all(self):
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info("🌟 ECONOJIN MEGA BUILD - Phase 4 Complete")
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info(f"📁 Frontend: {FRONTEND_DIR}")
         logger.info(f"📁 Contracts: {CONTRACTS_DIR}")
-        
+
         self.create_i18n_files()
         self.create_middleware()
         self.create_root_layout()
@@ -3883,16 +3999,17 @@ r""")
         self.create_hardhat_scripts()
         self.update_globals_css()
         self.update_tailwind_config()
-        
-        logger.info("\n" + "="*70)
+
+        logger.info("\n" + "=" * 70)
         logger.info("✅ MEGA BUILD COMPLETE")
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info(f"\n📁 Files created: {len(self.files_created)}")
-        
-        logger.info("\n" + "="*70)
+
+        logger.info("\n" + "=" * 70)
         logger.info("🚀 HOW TO RUN")
-        logger.info("="*70)
-        print(r"""
+        logger.info("=" * 70)
+        print(
+            r"""
 ═══════════════════════════════════════════════════════════════
 🎯 STEP 1: Start Backend
 ═══════════════════════════════════════════════════════════════
@@ -3973,9 +4090,10 @@ r""")
    Password: (any)
    
    Or use MetaMask wallet login!
-r""")
-        logger.info("="*70)
-        
+r"""
+        )
+        logger.info("=" * 70)
+
         return True
 
 
@@ -3990,9 +4108,10 @@ def main():
     except Exception as e:
         logger.info(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

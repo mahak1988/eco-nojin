@@ -43,7 +43,9 @@ class RothCModel:
             loss = soc * annual_loss
             gain = residue / 100
             soc += gain - loss
-            series.append({"year": year, "soc_percent": round(soc, 4), "soc_t_ha": round(soc * 25, 3)})
+            series.append(
+                {"year": year, "soc_percent": round(soc, 4), "soc_t_ha": round(soc * 25, 3)}
+            )
 
         self.results = {
             "model": "RothC-full",

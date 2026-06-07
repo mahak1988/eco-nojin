@@ -5,12 +5,13 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional
 from enum import Enum
+from typing import Dict, List, Optional
 
 
 class SensorType(str, Enum):
     """انواع سنسور"""
+
     SOIL_MOISTURE = "soil_moisture"
     SOIL_TEMPERATURE = "soil_temperature"
     AIR_TEMPERATURE = "air_temperature"
@@ -24,6 +25,7 @@ class SensorType(str, Enum):
 @dataclass
 class SensorReading:
     """یک خوانش سنسور"""
+
     sensor_id: str
     sensor_type: SensorType
     value: float
@@ -33,7 +35,7 @@ class SensorReading:
     location_lng: Optional[float] = None
     battery_percent: Optional[float] = None
     quality_score: float = 1.0  # 0-1
-    
+
     def is_valid(self) -> bool:
         """اعتبارسنجی داده"""
         # محدوده‌های معقول
@@ -45,43 +47,38 @@ class SensorReading:
             SensorType.CO2_CONCENTRATION: (300, 5000),
             SensorType.RAINFALL: (0, 500),
         }
-        
+
         if self.sensor_type in ranges:
             min_val, max_val = ranges[self.sensor_type]
             return min_val <= self.value <= max_val
-        
+
         return True
 
 
 @dataclass
 class SensorNetwork:
     """شبکه سنسورها"""
+
     network_id: str
     name: str
     location_region: str
     sensors: List[SensorReading] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.utcnow)
-    
+
     def get_latest(self, sensor_type: SensorType) -> Optional[SensorReading]:
         """دریافت آخرین خوانش یک نوع سنسور"""
-        readings = [
-            s for s in self.sensors
-            if s.sensor_type == sensor_type
-        ]
+        readings = [s for s in self.sensors if s.sensor_type == sensor_type]
         if not readings:
             return None
         return max(readings, key=lambda s: s.timestamp)
-    
+
     def get_statistics(self, sensor_type: SensorType) -> Dict:
         """آمار یک نوع سنسور"""
-        readings = [
-            s for s in self.sensors
-            if s.sensor_type == sensor_type
-        ]
-        
+        readings = [s for s in self.sensors if s.sensor_type == sensor_type]
+
         if not readings:
             return {"count": 0}
-        
+
         values = [s.value for s in readings]
         return {
             "count": len(readings),

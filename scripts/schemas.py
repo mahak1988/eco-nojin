@@ -3,12 +3,14 @@ Pydantic schemas برای Econojin API
 """
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any, List, Optional
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class RegionEnum(str, Enum):
@@ -22,11 +24,12 @@ class RegionEnum(str, Enum):
 
 class AnalysisRequest(BaseModel):
     """درخواست تحلیل"""
+
     query: str = Field(..., min_length=5, max_length=500, description="درخواست کاربر به زبان طبیعی")
     region: RegionEnum = Field(default=RegionEnum.khorasan, description="منطقه جغرافیایی")
     include_tools: List[str] = Field(
         default=["gee_ndvi", "open_meteo", "soil_grids", "rusle", "aquacrop"],
-        description="ابزارهای مورد استفاده"
+        description="ابزارهای مورد استفاده",
     )
 
     class Config:
@@ -34,7 +37,7 @@ class AnalysisRequest(BaseModel):
             "example": {
                 "query": "تحلیل داده‌های ماهواره‌ای NDVI برای منطقه خراسان در ۶ ماه گذشته",
                 "region": "خراسان",
-                "include_tools": ["gee_ndvi", "open_meteo", "soil_grids"]
+                "include_tools": ["gee_ndvi", "open_meteo", "soil_grids"],
             }
         }
 
@@ -48,6 +51,7 @@ class NodeStatus(str, Enum):
 
 class StreamEvent(BaseModel):
     """رویداد streaming برای WebSocket"""
+
     event_type: str  # node_start, node_complete, tool_executed, final
     node_name: Optional[str] = None
     status: NodeStatus = NodeStatus.completed
@@ -58,6 +62,7 @@ class StreamEvent(BaseModel):
 
 class TaskResult(BaseModel):
     """نتیجه یک task"""
+
     task_id: str
     description: str
     status: str
@@ -69,6 +74,7 @@ class TaskResult(BaseModel):
 
 class AnalysisResponse(BaseModel):
     """پاسخ نهایی تحلیل"""
+
     session_id: str
     request: AnalysisRequest
     summary: Dict[str, Any]
@@ -81,6 +87,7 @@ class AnalysisResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     """پاسخ خطا"""
+
     error: str
     detail: str
     session_id: Optional[str] = None

@@ -11,17 +11,14 @@ from core.safety import SafeModuleLoader
 
 class SWATPlusModel:
     """مدل هیدرولوژیکی SWAT+"""
-    
+
     def __init__(self, config: dict = None):
         self.config = config or {}
-    
+
     def run_simulation(self, input_data: dict) -> dict:
         """اجرای شبیه‌سازی"""
         # پیاده‌سازی واقعی اینجا
-        return {
-            'status': 'success',
-            'output': {}
-        }
+        return {"status": "success", "output": {}}
 
 
 def load_model():

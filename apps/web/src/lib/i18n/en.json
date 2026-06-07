@@ -1,0 +1,112 @@
+{
+  "common": {
+    "appName": "Econojin",
+    "tagline": "Land Restoration Platform",
+    "home": "Home",
+    "modules": "Modules",
+    "scientific": "Scientific",
+    "community": "Community",
+    "services": "Services",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "hero": {
+    "title": "Econojin",
+    "subtitle": "Integrated Smart Management",
+    "description": "Restoration of arid and semi-arid landscapes through hydrology science, carbon modeling, remote sensing and artificial intelligence",
+    "startSimulation": "Start Simulation",
+    "freeEducation": "Free Education",
+    "userRating": "User Rating",
+    "activeUsers": "Active Users",
+    "secure": "Secure & Trusted"
+  },
+  "stats": {
+    "hectares": "Hectares Monitored",
+    "carbon": "Tons CO₂ Absorbed",
+    "farmers": "Active Farmers",
+    "basins": "Watershed Basins"
+  },
+  "modules": {
+    "scientific": "Scientific Modules",
+    "scientificDesc": "Specialized tools for arid and semi-arid land restoration",
+    "community": "Community & Services",
+    "communityDesc": "Everything a sustainable farmer needs",
+    "details": "View Details"
+  },
+  "hydrology": {
+    "title": "Hydrology",
+    "subtitle": "Runoff Simulation & Watershed Management",
+    "description": "Analysis of water flow, precipitation and evaporation in arid and semi-arid watersheds"
+  },
+  "soilWater": {
+    "title": "Soil Water",
+    "subtitle": "Soil Moisture & Water Movement Analysis",
+    "description": "Modeling infiltration, moisture distribution and water balance in soil profile"
+  },
+  "carbon": {
+    "title": "Soil Carbon",
+    "subtitle": "RothC Model & Carbon Sequestration",
+    "description": "Predicting soil organic carbon dynamics and assessing carbon sequestration potential"
+  },
+  "erosion": {
+    "title": "Soil Erosion",
+    "subtitle": "RUSLE Model & Risk Assessment",
+    "description": "Estimating soil erosion rate and identifying critical areas"
+  },
+  "crop": {
+    "title": "Crop Management",
+    "subtitle": "AquaCrop Simulation",
+    "description": "Crop yield prediction and irrigation optimization"
+  },
+  "weather": {
+    "title": "Weather",
+    "subtitle": "Agricultural Forecasting & Alerts",
+    "description": "Weather forecasting, frost warnings and irrigation recommendations"
+  },
+  "gis": {
+    "title": "GIS & Mapping",
+    "subtitle": "Spatial Analysis & NDVI",
+    "description": "Vegetation analysis, thematic maps and spatial analysis"
+  },
+  "sentinel": {
+    "title": "Remote Sensing",
+    "subtitle": "Sentinel-2 Imagery",
+    "description": "Receiving and processing satellite imagery for land monitoring"
+  },
+  "features": {
+    "free": "Free & Open",
+    "freeDesc": "All scientific services at no cost",
+    "ai": "Artificial Intelligence",
+    "aiDesc": "Smart analysis with advanced models",
+    "secure": "Secure & Trusted",
+    "secureDesc": "Protection of your research data",
+    "global": "Global Access",
+    "globalDesc": "Accessible from anywhere in the world"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "policy": "Policy",
+    "contactUs": "Contact Us",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address"
+  }
+}

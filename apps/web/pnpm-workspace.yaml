@@ -2,8 +2,9 @@ packages:
   - '.'
 
 allowBuilds:
+  core-js: false
   sharp: set this to true or false
+  unrs-resolver: false
 
 # اجازه به sharp برای اجرای build scripts
-onlyBuiltDependencies:
-  - sharp
+onlyBuiltDependencies: unrs-resolver
