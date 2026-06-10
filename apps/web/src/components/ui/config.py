@@ -1,15 +1,15 @@
 from pydantic_settings import BaseSettings
 
 
-class Settings(BaseSettings):
-    APP_NAME: str = "Econojin"
-    APP_VERSION: str = "2.0.0"
-    DEBUG: bool = True
-    HOST: str = "127.0.0.1"
-    PORT: int = 8000
+class Settings(BaseSettings): REDACTED_BY_TRIAGE_TOOL
+    APP_NAME: str =REDACTED_BY_TRIAGE_TOOL
+    APP_VERSION: str =REDACTED_BY_TRIAGE_TOOL
+    DEBUG: bool =REDACTED_BY_TRIAGE_TOOL
+    HOST: str =REDACTED_BY_TRIAGE_TOOL
+    PORT: int =REDACTED_BY_TRIAGE_TOOL
 
-    class Config:
-        env_file = ".env"
+    class Config: REDACTED_BY_TRIAGE_TOOL
+        env_file =REDACTED_BY_TRIAGE_TOOL
 
 
-settings = Settings()
+settings =REDACTED_BY_TRIAGE_TOOL
