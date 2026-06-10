@@ -7,51 +7,51 @@ import os
 from pathlib import Path
 
 # Server Configuration
-HOST = os.getenv("HOST", "0.0.0.0")
-PORT = int(os.getenv("PORT", "8000"))
-DEBUG = os.getenv("DEBUG", "true").lower() == "true"
-RELOAD = os.getenv("RELOAD", "true").lower() == "true"
+HOST =REDACTED_BY_TRIAGE_TOOL
+PORT =REDACTED_BY_TRIAGE_TOOL
+DEBUG =REDACTED_BY_TRIAGE_TOOL
+RELOAD =REDACTED_BY_TRIAGE_TOOL
 
 # Database Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/econojin")
+DATABASE_URL =REDACTED_BY_TRIAGE_TOOL
 
 # Redis Configuration
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+REDIS_URL =REDACTED_BY_TRIAGE_TOOL
 
 # API Configuration
-API_V1_PREFIX = "/api/v1"
-PROJECT_NAME = "Econojin API"
-VERSION = "2.0.0"
-DESCRIPTION = "Scientific Carbon Platform powered by Gaia Protocol"
+API_V1_PREFIX =REDACTED_BY_TRIAGE_TOOL
+PROJECT_NAME =REDACTED_BY_TRIAGE_TOOL
+VERSION =REDACTED_BY_TRIAGE_TOOL
+DESCRIPTION =REDACTED_BY_TRIAGE_TOOL
 
 # CORS Configuration
-CORS_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:8080",
-    "https://econojin.com",
-    "https://staging.econojin.com",
+CORS_ORIGINS =REDACTED_BY_TRIAGE_TOOL
+    "http: REDACTED_BY_TRIAGE_TOOL
+    "http: REDACTED_BY_TRIAGE_TOOL
+    "http: REDACTED_BY_TRIAGE_TOOL
+    "https: REDACTED_BY_TRIAGE_TOOL
+    "https: REDACTED_BY_TRIAGE_TOOL
 ]
 
 # JWT Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+SECRET_KEY =REDACTED_BY_TRIAGE_TOOL
+ALGORITHM =REDACTED_BY_TRIAGE_TOOL
+ACCESS_TOKEN_EXPIRE_MINUTES =REDACTED_BY_TRIAGE_TOOL
 
 # Gaia Protocol Configuration
-GAIA_CONTRACT_ADDRESS = os.getenv("GAIA_CONTRACT_ADDRESS", "")
-GAIA_ORACLE_PRIVATE_KEY = os.getenv("GAIA_ORACLE_PRIVATE_KEY", "")
-POLYGON_RPC_URL = os.getenv("POLYGON_RPC_URL", "https://polygon-rpc.com")
+GAIA_CONTRACT_ADDRESS =REDACTED_BY_TRIAGE_TOOL
+GAIA_ORACLE_PRIVATE_KEY =REDACTED_BY_TRIAGE_TOOL
+POLYGON_RPC_URL =REDACTED_BY_TRIAGE_TOOL
 
 # Copernicus/Sentinel-2 Configuration
-COPERNICUS_CLIENT_ID = os.getenv("COPERNICUS_CLIENT_ID", "")
-COPERNICUS_CLIENT_SECRET = os.getenv("COPERNICUS_CLIENT_SECRET", "")
+COPERNICUS_CLIENT_ID =REDACTED_BY_TRIAGE_TOOL
+COPERNICUS_CLIENT_SECRET =REDACTED_BY_TRIAGE_TOOL
 
 # Paths
-BASE_DIR = Path(__file__).parent.parent.parent
-DATA_DIR = BASE_DIR / "data"
-UPLOAD_DIR = BASE_DIR / "uploads"
+BASE_DIR =REDACTED_BY_TRIAGE_TOOL
+DATA_DIR =REDACTED_BY_TRIAGE_TOOL
+UPLOAD_DIR =REDACTED_BY_TRIAGE_TOOL
 
 # Ensure directories exist
-DATA_DIR.mkdir(exist_ok=True)
-UPLOAD_DIR.mkdir(exist_ok=True)
+DATA_DIR.mkdir(exist_ok=REDACTED_BY_TRIAGE_TOOL
+UPLOAD_DIR.mkdir(exist_ok=REDACTED_BY_TRIAGE_TOOL

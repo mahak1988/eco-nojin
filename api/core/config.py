@@ -1,42 +1,42 @@
 ﻿from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+class Settings(BaseSettings): REDACTED_BY_TRIAGE_TOOL
+    model_config =REDACTED_BY_TRIAGE_TOOL
 
-    APP_NAME: str = "Econojin"
-    APP_VERSION: str = "2.0.0"
-    DEBUG: bool = True
-    HOST: str = "127.0.0.1"
-    PORT: int = 8000
-    DATABASE_URL: str = "sqlite+aiosqlite:///./econojin.db"
-    JWT_SECRET: str = "change-me-in-production"
-    JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRE_DAYS: int = 7
-    ALLOWED_ORIGINS: list[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
+    APP_NAME: str =REDACTED_BY_TRIAGE_TOOL
+    APP_VERSION: str =REDACTED_BY_TRIAGE_TOOL
+    DEBUG: bool =REDACTED_BY_TRIAGE_TOOL
+    HOST: str =REDACTED_BY_TRIAGE_TOOL
+    PORT: int =REDACTED_BY_TRIAGE_TOOL
+    DATABASE_URL: str =REDACTED_BY_TRIAGE_TOOL
+    JWT_SECRET: str =REDACTED_BY_TRIAGE_TOOL
+    JWT_ALGORITHM: str =REDACTED_BY_TRIAGE_TOOL
+    JWT_EXPIRE_DAYS: int =REDACTED_BY_TRIAGE_TOOL
+    ALLOWED_ORIGINS: list[str] =REDACTED_BY_TRIAGE_TOOL
+        "http: REDACTED_BY_TRIAGE_TOOL
+        "http: REDACTED_BY_TRIAGE_TOOL
+        "http: REDACTED_BY_TRIAGE_TOOL
     ]
-    RATE_LIMIT_ENABLED: bool = True
-    RATE_LIMIT_MAX_REQUESTS: int = 120
-    RATE_LIMIT_WINDOW_SEC: int = 60
-    REQUIRE_AUTH_FOR_WRITES: bool = True
-    OTP_DEV_MODE: bool = True
-    SMS_PROVIDER: str = "none"  # none | kavenegar | twilio
-    KAVENEGAR_API_KEY: str = ""
-    KAVENEGAR_TEMPLATE: str = "verify"
-    TWILIO_ACCOUNT_SID: str = ""
-    TWILIO_AUTH_TOKEN: str = ""
-    TWILIO_FROM_NUMBER: str = ""
-    LLM_ENABLED: bool = False
-    OPENAI_API_KEY: str = ""
-    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    LLM_MODEL: str = "gpt-4o-mini"
-    AZURE_OPENAI_ENDPOINT: str = ""
-    AZURE_OPENAI_KEY: str = ""
-    AZURE_OPENAI_DEPLOYMENT: str = "gpt-4o-mini"
-    AZURE_OPENAI_API_VERSION: str = "2024-02-15-preview"
+    RATE_LIMIT_ENABLED: bool =REDACTED_BY_TRIAGE_TOOL
+    RATE_LIMIT_MAX_REQUESTS: int =REDACTED_BY_TRIAGE_TOOL
+    RATE_LIMIT_WINDOW_SEC: int =REDACTED_BY_TRIAGE_TOOL
+    REQUIRE_AUTH_FOR_WRITES: bool =REDACTED_BY_TRIAGE_TOOL
+    OTP_DEV_MODE: bool =REDACTED_BY_TRIAGE_TOOL
+    SMS_PROVIDER: str =REDACTED_BY_TRIAGE_TOOL
+    KAVENEGAR_API_KEY: str =REDACTED_BY_TRIAGE_TOOL
+    KAVENEGAR_TEMPLATE: str =REDACTED_BY_TRIAGE_TOOL
+    TWILIO_ACCOUNT_SID: str =REDACTED_BY_TRIAGE_TOOL
+    TWILIO_AUTH_TOKEN: str =REDACTED_BY_TRIAGE_TOOL
+    TWILIO_FROM_NUMBER: str =REDACTED_BY_TRIAGE_TOOL
+    LLM_ENABLED: bool =REDACTED_BY_TRIAGE_TOOL
+    OPENAI_API_KEY: str =REDACTED_BY_TRIAGE_TOOL
+    OPENAI_BASE_URL: str =REDACTED_BY_TRIAGE_TOOL
+    LLM_MODEL: str =REDACTED_BY_TRIAGE_TOOL
+    AZURE_OPENAI_ENDPOINT: str =REDACTED_BY_TRIAGE_TOOL
+    AZURE_OPENAI_KEY: str =REDACTED_BY_TRIAGE_TOOL
+    AZURE_OPENAI_DEPLOYMENT: str =REDACTED_BY_TRIAGE_TOOL
+    AZURE_OPENAI_API_VERSION: str =REDACTED_BY_TRIAGE_TOOL
 
 
-settings = Settings()
+settings =REDACTED_BY_TRIAGE_TOOL
