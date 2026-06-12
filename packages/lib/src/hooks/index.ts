@@ -1,3 +1,14 @@
 ﻿// Custom hooks exports
 // TODO: Move hooks from apps/web/src/hooks/
 export {};
+
+// Additional exports from nested index
+// Main hooks index
+export * from './weather/useWeather';
+export * from './soil/useSoil';
+export * from './satellite/useSatellite';
+export * from './drought/useDrought';
+export * from './forest/useForest';
+export * from './iot/useIoT';
+export * from './blockchain/useBlockchain';
+export * from './ai/useAI';
