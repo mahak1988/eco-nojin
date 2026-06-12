@@ -1,1 +1,2 @@
-export { useAnalysisWebSocket } from './useAnalysisWebSocket';
+// Auto-generated index file
+export * from './useAnalysisWebSocket';
