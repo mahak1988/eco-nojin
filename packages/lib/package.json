@@ -12,7 +12,7 @@
     "./validation": "./src/validation/index.ts"
   },
   "scripts": {
-    "lint": "eslint \"src/**/*.ts\","
+    "lint": "eslint src/**/*.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
