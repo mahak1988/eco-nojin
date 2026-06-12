@@ -1,37 +1,19 @@
-﻿{
+{
     "name":  "econojin-monorepo",
+    "version":  "1.0.0",
     "private":  true,
-    "packageManager":  "pnpm@8.8.0",
-    "workspaces":  [
-                       "apps/*",
-                       "packages/*"
-                   ],
     "scripts":  {
-                    "bootstrap":  "pnpm install",
-                    "dev:web":  "pnpm --filter @econojin/web dev",
-                    "dev:cms":  "pnpm --filter @econojin/cms develop",
-                    "dev:admin":  "pnpm --filter @econojin/admin dev",
-                    "build":  "pnpm --filter @econojin/web build",
-                    "lint":  "pnpm --filter @econojin/web lint",
-                    "type-check":  "pnpm --filter @econojin/web type-check",
-                    "test":  "pnpm --filter @econojin/web test",
-                    "test:e2e":  "pnpm --filter @econojin/web test:e2e",
-                    "format":  "pnpm --filter @econojin/web format",
+                    "dev":  "turbo run dev",
+                    "build":  "turbo run build",
+                    "lint":  "turbo run lint",
+                    "type-check":  "turbo run type-check",
                     "clean":  "turbo run clean",
-                    "dev":  "turbo run dev"
+                    "dev:web":  "pnpm --filter @econojin/web dev",
+                    "build:web":  "pnpm --filter @econojin/web build",
+                    "dev:admin":  "pnpm --filter @econojin/admin dev",
+                    "dev:cms":  "pnpm --filter @econojin/cms develop"
                 },
     "devDependencies":  {
-                            "openapi-typescript-codegen":  "^0.30.0",
-                            "pnpm":  "^8.8.0",
-                            "turbo":  "^1.9.0"
-                        },
-    "dependencies":  {
-                         "@hookform/resolvers":  "^5.4.0",
-                         "@tanstack/react-query":  "^5.101.0",
-                         "axios":  "^1.17.0",
-                         "react-hook-form":  "^7.78.0",
-                         "react-hot-toast":  "^2.6.0",
-                         "zod":  "^4.4.3",
-                         "zustand":  "^5.0.14"
-                     }
+                            "turbo":  "^2.0.0"
+                        }
 }

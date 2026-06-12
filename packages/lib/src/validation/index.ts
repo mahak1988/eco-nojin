@@ -1,3 +1,2 @@
-﻿// Validation schemas exports
-// TODO: Move validation from apps/web/src/lib/validation/
-export {};
+// Auto-generated index file
+export * from './auth.schema';

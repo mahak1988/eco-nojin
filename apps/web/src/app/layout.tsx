@@ -1,9 +1,9 @@
-﻿import type { Metadata } from 'next';
 import './globals.css';
+import { Providers } from '@/components/providers/Providers';
 
-export const metadata: Metadata = {
-  title: 'Econojin - پلتفرم تصمیم‌یار کشاورزی',
-  description: 'پلتفرم پیشرفته تصمیم‌یار کشاورزی و پایش محیط‌زیست',
+export const metadata = {
+  title: 'Econojin',
+  description: 'Econojin Platform',
 };
 
 export default function RootLayout({
@@ -13,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fa" dir="rtl">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

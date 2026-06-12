@@ -73,7 +73,7 @@ export const gisStorage = {
 
   deleteLocation(id: string): boolean {
     const locations = this.getLocations();
-    const filtered = locations.filter(l => l.id !== id);
+    const filtered = locations.filter((l: any) => l.id !== id);
     if (filtered.length === locations.length) return false;
     localStorage.setItem(STORAGE_KEYS.LOCATIONS, JSON.stringify(filtered));
     return true;
@@ -137,7 +137,7 @@ export const gisStorage = {
     const locations = this.getLocations();
     const geojson = {
       type: "FeatureCollection",
-      features: locations.map(loc => ({
+      features: locations.map((loc: any) => ({
         type: "Feature",
         properties: {
           name: loc.name,
@@ -158,7 +158,7 @@ export const gisStorage = {
 
   exportAsKML(): string {
     const locations = this.getLocations();
-    const placemarks = locations.map(loc => `
+    const placemarks = locations.map((loc: any) => `
     <Placemark>
       <name>${this.escapeXml(loc.name)}</name>
       <description>${this.escapeXml(loc.description || "")}</description>
