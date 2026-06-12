@@ -1,0 +1,15 @@
+﻿Legacy Cleanup Log - Phase 1
+Date: 2026-06-12 04:27:02
+Project: D:\econojin.com
+==================================================
+
+[OK] .\index.html - Duplicate - exists in apps/web/app/
+[OK] .\ProductionGIS.tsx - Duplicate - exists in apps/web/src/components/gis/
+[OK] .\Untitled-1.js - Temporary/test file - unused
+[OK] .\api\test_client.html - Old test file
+[OK] .\src - Duplicate of apps/web/src/ - contains App.tsx, components/, hooks/, store/
+[OK] .\lib - Duplicate of apps/web/src/lib/ - contains api/client.ts, validation/
+
+==================================================
+Summary: Success=6, Failed=0
+
