@@ -109,15 +109,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@econojin/features':
-        specifier: workspace:*
-        version: link:../../packages/features
-      '@econojin/lib':
-        specifier: workspace:*
-        version: link:../../packages/lib
-      '@econojin/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@fontsource/inter':
         specifier: ^5.2.8
         version: 5.2.8
