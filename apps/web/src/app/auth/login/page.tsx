@@ -1,84 +1,116 @@
 "use client";
 
 import { useState } from "react";
-
-const API_BASE = "http://localhost:8000";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
+import { loginSchema, type LoginInput } from "@/lib/validation/auth.schema";
+import { useAuth } from "@/lib/api/hooks/useAuth";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
-  const [fid, setFid] = useState("F001");
-  const [phone, setPhone] = useState("+989123456789");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fid, phone }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.detail || `Login failed (${res.status})`);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
 
-      localStorage.setItem("access_token", data.access_token);
-      localStorage.setItem("farmer_id", data.farmer_id);
+  const loginMutation = useMutation({
+    mutationFn: login,
+    onSuccess: () => {
+      toast.success("ورود موفقیت‌آمیز!");
+      window.location.href = "/dashboard";
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
 
-      window.location.href = "/auth/profile";
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Login failed";
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (data: LoginInput) => {
+    loginMutation.mutate(data);
   };
 
   return (
-    <main className="p-6 max-w-xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold">Auth Login</h1>
-
-      <div className="space-y-2">
-        <label htmlFor="fid" className="block text-sm text-gray-600">
-          Farmer ID
-        </label>
-        <input
-          id="fid"
-          title="Farmer ID"
-          placeholder="F001"
-          className="w-full border rounded px-3 py-2"
-          value={fid}
-          onChange={(e: any) => setFid(e.target.value)}
-        />
+    <div className="min-h-screen relative flex items-center justify-center p-6">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[#0a0a0c]" />
+        <div className="absolute inset-0 opacity-40" style={{
+          backgroundImage: `
+            radial-gradient(at 20% 20%, rgba(16, 185, 129, 0.2) 0px, transparent 50%),
+            radial-gradient(at 80% 80%, rgba(59, 130, 246, 0.15) 0px, transparent 50%)
+          `
+        }} />
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="phone" className="block text-sm text-gray-600">
-          Phone
-        </label>
-        <input
-          id="phone"
-          title="Phone"
-          placeholder="+989123456789"
-          className="w-full border rounded px-3 py-2"
-          value={phone}
-          onChange={(e: any) => setPhone(e.target.value)}
-        />
-      </div>
-
-      {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-          ❌ {error}
-        </div>
-      )}
-
-      <button
-        onClick={handleLogin}
-        disabled={loading}
-        className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+      {/* Login Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md bg-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl"
       >
-        {loading ? "Logging in..." : "Login"}
-      </button>
-    </main>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-black text-white mb-2">ورود به اکو نوژین</h1>
+          <p className="text-zinc-400">به خانواده احیای زمین بپیوندید</p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Farmer ID */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              شناسه کشاورز
+            </label>
+            <input
+              {...register("fid")}
+              placeholder="F001"
+              className="w-full px-4 py-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+            />
+            {errors.fid && (
+              <p className="mt-2 text-sm text-rose-400">{errors.fid.message}</p>
+            )}
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              شماره تلفن
+            </label>
+            <input
+              {...register("phone")}
+              placeholder="+989123456789"
+              className="w-full px-4 py-3 bg-black/30 backdrop-blur-xl border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+            />
+            {errors.phone && (
+              <p className="mt-2 text-sm text-rose-400">{errors.phone.message}</p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-xl font-bold text-white transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                در حال ورود...
+              </span>
+            ) : (
+              "ورود"
+            )}
+          </button>
+        </form>
+      </motion.div>
+    </div>
   );
 }

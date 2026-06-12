@@ -1,0 +1,831 @@
+﻿# api/main.py
+import asyncio
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from api.core.database import init_db
+from api.modules.academy.router import router as academy_router
+from api.modules.ai.router import router as ai_router
+from api.modules.accounting.router import router as accounting_router
+from api.modules.community.router import router as community_router
+from api.modules.drought.router import router as drought_router
+from api.modules.ecocoin.router import router as ecocoin_router
+from api.modules.financial.router import router as financial_router
+from api.modules.games.router import router as games_router
+
+# Import all routers
+from api.modules.iot.router import router as iot_router
+from api.modules.library.router import router as library_router
+from api.modules.maintenance.router import router as maintenance_router
+from api.modules.mrv.router import router as mrv_router
+from api.modules.newsletter.router import router as newsletter_router
+from api.modules.psychology.router import router as psychology_router
+from api.modules.soil_water.router import router as soil_water_router
+from api.modules.store.router import router as store_router
+from api.modules.weather.router import router as weather_router
+from api.modules.dashboard.router import router as dashboard_router
+from api.modules.desktop.router import router as desktop_router
+from api.modules.ecomining.router import router as ecomining_router
+from api.modules.education.router import router as education_router
+from api.modules.simulation.router import router as simulation_router
+from api.scientific_core.router import router as scientific_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown events"""
+    print("Starting Econojin v2.0.0...")
+    await init_db()
+
+    # ط´ط±ظˆط¹ Early Warning Engine
+    try:
+        from api.services.early_warning_engine import ews_engine
+
+        asyncio.create_task(ews_engine.start())
+        print("âœ… Early Warning Engine started")
+    except Exception as e:
+        print(f"âڑ ï¸ڈ EWS skipped: {e}")
+
+    print("Ready on http://127.0.0.1:8000")
+    yield
+    print("Shutting down...")
+
+
+app = FastAPI(
+    title="Econojin API",
+    description="ظ¾ظ„طھظپط±ظ… ط¹ظ„ظ…غŒ ط§ط­غŒط§غŒ ظ…ظ†ط§ط¸ط± ط®ط´ع© ظˆ ظ†غŒظ…ظ‡â€Œط®ط´ع©",
+    version="2.0.0",
+    lifespan=lifespan,
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/")
+async def root():
+    return {"name": "Econojin API", "version": "2.0.0", "status": "running", "docs": "/docs"}
+
+
+@app.get("/api/v1/health")
+async def health():
+    return {"status": "healthy", "version": "2.0.0"}
+
+
+# Register all routers
+app.include_router(iot_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(maintenance_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(mrv_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(soil_water_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(weather_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(drought_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(library_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(academy_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(community_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(store_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(scientific_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(psychology_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(games_router, prefix="/api/v1")
+app.include_router(newsletter_router, prefix="/api/v1")
+app.include_router(financial_router, prefix="/api/v1")
+app.include_router(accounting_router, prefix="/api/v1")
+app.include_router(ecocoin_router, prefix="/api/v1")
+app.include_router(dashboard_router, prefix="/api/v1")
+app.include_router(desktop_router, prefix="/api/v1")
+app.include_router(ecomining_router, prefix="/api/v1")
+app.include_router(education_router, prefix="/api/v1")
+app.include_router(simulation_router, prefix="/api/v1")
+app.include_router(ai_router, prefix="/api/v1")
+
+print(
+    "âœ… All routers registered: IoT, Maintenance, MRV, Soil Water, Weather, Drought, Library, Scientific"
+)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("api.main:app", host="0.0.0.0", port=8000, reload=True)
+from datetime import datetime
+
+from pydantic import BaseModel, Field
+
+
+class LoginRequest(BaseModel):
+    fid: str = Field(..., min_length=3, max_length=32)
+    phone: str = Field(..., pattern=r"^\+?[0-9]{10,15}$")
+    name: str = Field(default="", max_length=100)
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    farmer_id: str
+
+
+class OtpRequest(BaseModel):
+    phone: str = Field(..., pattern=r"^\+?[0-9]{10,15}$")
+    fid: str = Field(default="", max_length=32)
+
+
+class OtpVerify(BaseModel):
+    phone: str = Field(..., pattern=r"^\+?[0-9]{10,15}$")
+    code: str = Field(..., min_length=4, max_length=8)
+    fid: str = Field(..., min_length=3, max_length=32)
+    name: str = Field(default="", max_length=100)
+
+
+class ProfileResponse(BaseModel):
+    fid: str
+    name: str
+    phone: str
+    registered_at: datetime
+    wallet_address: str | None = None
+
+    class Config:
+        from_attributes = True
+# api/modules/auth/router.py
+"""
+ظ…ط§عکظˆظ„ ط§ط­ط±ط§ط² ظ‡ظˆغŒطھ ظˆ ظ…ط¯غŒط±غŒطھ ع©ط§ط±ط¨ط± (OTP-based)
+ظ†ط³ط®ظ‡ 2.0 - ط¨ظ‡غŒظ†ظ‡â€Œط³ط§ط²غŒ ع©ظˆط¦ط±غŒâ€Œظ‡ط§ ظˆ ط§طµظ„ط§ط­ ط³ط§ط®طھط§ط± ط¯ط±ط®ظˆط§ط³طھâ€Œظ‡ط§
+"""
+from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from api.core.config import settings
+from api.core.database import get_db
+from api.core.security import create_access_token, get_current_user_id
+from api.modules.auth import crud, schemas
+
+router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+@router.post("/otp/request", response_model=schemas.OtpRequestResponse)
+async def request_otp(req: schemas.OtpRequest):
+    # ط§غŒظ…ظ¾ظˆط±طھ ط¯ط§ط®ظ„غŒ ط¨ط±ط§غŒ ط¬ظ„ظˆع¯غŒط±غŒ ط§ط² Circular Import (ط§ع¯ط± ظ†غŒط§ط² ط§ط³طھ)
+    from api.services.sms import send_otp_sms
+
+    code = generate_otp(req.phone)
+    sent = await send_otp_sms(req.phone, code)
+
+    if not sent and not settings.OTP_DEV_MODE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="ط³ط±ظˆغŒط³ ظ¾غŒط§ظ…ع© ط¯ط± ط¯ط³طھط±ط³ ظ†غŒط³طھ. ظ¾غŒع©ط±ط¨ظ†ط¯غŒ Kavenegar غŒط§ Twilio ط±ط§ ط¨ط±ط±ط³غŒ ع©ظ†غŒط¯.",
+        )
+
+    payload = {"sent": True, "phone": req.phone, "expires_in": 300}
+    if settings.DEBUG or settings.OTP_DEV_MODE:
+        payload["dev_code"] = code  # ظپظ‚ط· ط¯ط± ظ…ط­غŒط· طھظˆط³ط¹ظ‡ ط§ط±ط³ط§ظ„ ط´ظˆط¯
+
+    return payload
+
+
+@router.post("/otp/verify", response_model=schemas.TokenResponse)
+async def verify_otp_login(req: schemas.OtpVerify, db: AsyncSession = Depends(get_db)):
+    if not verify_otp(req.phone, req.code):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="ع©ط¯ ظˆط§ط±ط¯ ط´ط¯ظ‡ ظ†ط§ظ…ط¹طھط¨ط± غŒط§ ظ…ظ†ظ‚ط¶غŒ ط´ط¯ظ‡ ط§ط³طھ"
+        )
+
+    # Upsert ع©ط§ط±ط¨ط± (ط§غŒط¬ط§ط¯ غŒط§ ط¨ظ‡â€Œط±ظˆط²ط±ط³ط§ظ†غŒ)
+    login_req = schemas.LoginRequest(fid=req.fid, phone=req.phone, name=req.name)
+    user = await crud.upsert_user(db, login_req)
+
+    # ط³ط§ط®طھ طھظˆع©ظ† ط¨ط§ farmer_id ط¨ظ‡ ط¹ظ†ظˆط§ظ† subject
+    token = create_access_token(subject=user.farmer_id)
+
+    return schemas.TokenResponse(access_token=token, farmer_id=user.farmer_id)
+
+
+@router.post("/login", response_model=schemas.TokenResponse)
+async def login(req: schemas.LoginRequest, db: AsyncSession = Depends(get_db)):
+    """
+    âڑ ï¸ڈ ظ‡ط´ط¯ط§ط± ط§ظ…ظ†غŒطھغŒ: ط§غŒظ† ط§ظ†ط¯ظ¾ظˆغŒظ†طھ ط¨ط¯ظˆظ† ط¨ط±ط±ط³غŒ ط±ظ…ط² ط¹ط¨ظˆط± غŒط§ OTPطŒ ع©ط§ط±ط¨ط± ط±ط§ upsert ظ…غŒâ€Œع©ظ†ط¯.
+    ط§ع¯ط± ط§غŒظ† ط±ظپطھط§ط± ط¹ظ…ط¯غŒ ظ†غŒط³طھطŒ ط¨ط§غŒط¯ ظپغŒظ„ط¯ password ط¨ظ‡ Schema ط§ط¶ط§ظپظ‡ ط´ط¯ظ‡ ظˆ ط¯ط± CRUD ط¨ط±ط±ط³غŒ ط´ظˆط¯.
+    """
+    user = await crud.upsert_user(db, req)
+    token = create_access_token(subject=user.farmer_id)
+    return schemas.TokenResponse(access_token=token, farmer_id=user.farmer_id)
+
+
+@router.get("/profile", response_model=schemas.ProfileResponse)
+async def get_profile(
+    farmer_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """ط¯ط±غŒط§ظپطھ ظ¾ط±ظˆظپط§غŒظ„ ع©ط§ط±ط¨ط± ط¨ط§ ط§ط³طھظپط§ط¯ظ‡ ط§ط² farmer_id ط§ط³طھط®ط±ط§ط¬ ط´ط¯ظ‡ ط§ط² طھظˆع©ظ†"""
+    user = await crud.get_user_by_farmer_id(db, farmer_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="ع©ط§ط±ط¨ط± ط¨ط§ ط§غŒظ† ط´ظ†ط§ط³ظ‡ غŒط§ظپطھ ظ†ط´ط¯"
+        )
+
+    return schemas.ProfileResponse(
+        fid=user.farmer_id,
+        name=user.name or user.farmer_id,
+        phone=user.phone,
+        registered_at=user.created_at,
+        wallet_address=user.wallet_address,
+    )
+
+
+# ًں”´ ط§طµظ„ط§ط­: ط§ط³طھظپط§ط¯ظ‡ ط§ط² Pydantic Schema ط¨ظ‡ ط¬ط§غŒ str ط®ط§ظ…
+@router.post("/profile/wallet", response_model=schemas.WalletResponse)
+async def link_wallet(
+    req: schemas.WalletLinkRequest,  # ط§ع©ظ†ظˆظ† ط¨ظ‡ طµظˆط±طھ Body ط§ط±ط³ط§ظ„ ظ…غŒâ€Œط´ظˆط¯
+    farmer_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """ط§طھطµط§ظ„ ط¢ط¯ط±ط³ ع©غŒظپ ظ¾ظˆظ„ ط¨ظ‡ ط­ط³ط§ط¨ ع©ط§ط±ط¨ط±غŒ"""
+    user = await crud.link_wallet(db, farmer_id, req.wallet_address)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ع©ط§ط±ط¨ط± غŒط§ظپطھ ظ†ط´ط¯")
+    return {"success": True, "wallet_address": user.wallet_address}
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.sql import func
+
+from api.core.database import Base
+
+
+class UserAccount(Base):
+    __tablename__ = "user_accounts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    farmer_id = Column(String(32), unique=True, index=True, nullable=False)
+    phone = Column(String(20), nullable=False)
+    name = Column(String(100), default="")
+    wallet_address = Column(String(128), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+# api/modules/ecocoin/models.py
+"""
+ظ…ط¯ظ„â€Œظ‡ط§غŒ ط¯غŒطھط§ط¨غŒط³ ط³غŒط³طھظ… طھظˆع©ظ† ط§ع©ظˆغŒغŒ (EcoCoin) - ظ†ط³ط®ظ‡ ظ…ط§ظ„غŒ ط§ظ…ظ†
+ظ†ط³ط®ظ‡ 2.0 - ط§طµظ„ط§ط­ ط´ط¯ظ‡ ط¨ط§ Numeric ظˆ Check Constraints
+"""
+from sqlalchemy import (
+    Column, Integer, String, Float, DateTime, JSON, Boolean, 
+    ForeignKey, Text, Enum as SQLEnum, BigInteger, Numeric, CheckConstraint, Index
+)
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from api.core.database import Base
+import enum
+
+
+# ============================================================
+# Enums
+# ============================================================
+class TokenType(enum.Enum):
+    ECO = "eco"
+    GRC = "grc"
+
+class TxType(enum.Enum):
+    REWARD = "reward"
+    TRANSFER = "transfer"
+    STAKE = "stake"
+    UNSTAKE = "unstake"
+    BURN = "burn"
+    MINT = "mint"
+    EXCHANGE = "exchange"
+
+# ًں”´ ط§طµظ„ط§ط­: ط§ط¶ط§ظپظ‡ ع©ط±ط¯ظ† Enum ط¨ط±ط§غŒ ظˆط¶ط¹غŒطھ طھط±ط§ع©ظ†ط´
+class TxStatus(enum.Enum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    FAILED = "failed"
+
+class EcoActionType(enum.Enum):
+    TREE_PLANTING = "tree_planting"
+    LAND_RESTORATION = "land_restoration"
+    WATER_SAVING = "water_saving"
+    RENEWABLE_ENERGY = "renewable_energy"
+    RECYCLING = "recycling"
+    CARBON_REDUCTION = "carbon_reduction"
+    SOIL_CONSERVATION = "soil_conservation"
+    BIODIVERSITY = "biodiversity"
+
+class RewardStatus(enum.Enum):
+    PENDING = "pending"
+    VERIFIED = "verified"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    PAID = "paid"
+
+
+# ============================================================
+# Models
+# ============================================================
+class EcoToken(Base):
+    """Token definitions (ECO and GRC)"""
+    __tablename__ = "eco_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String(10), unique=True, nullable=False)
+    name = Column(String(100), nullable=False)
+    name_en = Column(String(100))
+    token_type = Column(SQLEnum(TokenType), nullable=False)
+    total_supply = Column(BigInteger, default=0)
+    circulating_supply = Column(BigInteger, default=0)
+    burned_amount = Column(BigInteger, default=0)
+    
+    # ًں”´ ط§طµظ„ط§ط­: طھط¨ط¯غŒظ„ Float ط¨ظ‡ Numeric ط¨ط±ط§غŒ ط¯ظ‚طھ ظ…ط§ظ„غŒ ظ…ط·ظ„ظ‚
+    price_usd = Column(Numeric(precision=20, scale=8), default=0.0)
+    price_irr = Column(Numeric(precision=20, scale=8), default=0.0)
+    market_cap = Column(Numeric(precision=20, scale=8), default=0.0)
+    
+    decimals = Column(Integer, default=18)
+    max_supply = Column(BigInteger)
+    contract_address = Column(String(100))
+    blockchain = Column(String(50), default="polygon")
+    is_active = Column(Boolean, default=True)
+    is_stakable = Column(Boolean, default=False)
+    description = Column(Text)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+
+class EcoUserWallet(Base):
+    """User wallets for ECO and GRC tokens"""
+    __tablename__ = "eco_user_wallets"
+    
+    # ًں”´ ط§طµظ„ط§ط­ ط­غŒط§طھغŒ: ط§ط¶ط§ظپظ‡ ع©ط±ط¯ظ† Check Constraint ط¨ط±ط§غŒ ط¬ظ„ظˆع¯غŒط±غŒ ط§ط² ظ…ظˆط¬ظˆط¯غŒ ظ…ظ†ظپغŒ
+    __table_args__ = (
+        CheckConstraint('eco_balance >= 0', name='check_eco_balance_non_negative'),
+        CheckConstraint('grc_balance >= 0', name='check_grc_balance_non_negative'),
+        CheckConstraint('staked_eco >= 0', name='check_staked_eco_non_negative'),
+        CheckConstraint('staked_grc >= 0', name='check_staked_grc_non_negative'),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    wallet_address = Column(String(100), unique=True, nullable=False)
+    
+    # ظ…ظˆط¬ظˆط¯غŒâ€Œظ‡ط§ (BigInteger ط¹ط§ظ„غŒ ط§ط³طھ)
+    eco_balance = Column(BigInteger, default=0)
+    grc_balance = Column(BigInteger, default=0)
+    staked_eco = Column(BigInteger, default=0)
+    staked_grc = Column(BigInteger, default=0)
+    total_earned = Column(BigInteger, default=0)
+    total_spent = Column(BigInteger, default=0)
+    
+    user_level = Column(Integer, default=1)
+    reputation_score = Column(Float, default=0.0) # ط¨ط±ط§غŒ ط§ظ…طھغŒط§ط² ط§ط¹طھط¨ط§ط±غŒطŒ Float ظ‚ط§ط¨ظ„ ظ‚ط¨ظˆظ„ ط§ط³طھ
+    is_active = Column(Boolean, default=True)
+    is_frozen = Column(Boolean, default=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+    transactions = relationship("EcoTx", back_populates="wallet")
+    rewards = relationship("EcoReward", back_populates="wallet")
+
+
+class EcoTx(Base):
+    """All token transactions"""
+    __tablename__ = "eco_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    tx_hash = Column(String(100), unique=True, nullable=False)
+    wallet_id = Column(Integer, ForeignKey("eco_user_wallets.id"), nullable=False, index=True) # ًں”´ ط§غŒظ†ط¯ع©ط³ ط§ط¶ط§ظپظ‡ ط´ط¯
+    token_symbol = Column(String(10), nullable=False, index=True) # ًں”´ ط§غŒظ†ط¯ع©ط³ ط§ط¶ط§ظپظ‡ ط´ط¯
+    tx_type = Column(SQLEnum(TxType), nullable=False)
+    amount = Column(BigInteger, nullable=False)
+    fee = Column(BigInteger, default=0)
+    from_address = Column(String(100))
+    to_address = Column(String(100))
+    block_number = Column(BigInteger)
+    
+    # ًں”´ ط§طµظ„ط§ط­: طھط¨ط¯غŒظ„ String ط¨ظ‡ Enum
+    status = Column(SQLEnum(TxStatus), default=TxStatus.PENDING, index=True) 
+    
+    confirmations = Column(Integer, default=0)
+    description = Column(Text)
+    extra_data = Column(JSON)
+    created_at = Column(DateTime, server_default=func.now(), index=True) # ًں”´ ط§غŒظ†ط¯ع©ط³ ط§ط¶ط§ظپظ‡ ط´ط¯
+    confirmed_at = Column(DateTime)
+
+    wallet = relationship("EcoUserWallet", back_populates="transactions")
+
+
+class EcoAction(Base):
+    """Ecological actions submitted by users"""
+    __tablename__ = "eco_actions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    action_type = Column(SQLEnum(EcoActionType), nullable=False, index=True)
+    title = Column(String(300), nullable=False)
+    description = Column(Text)
+    quantity = Column(Float, nullable=False)
+    unit = Column(String(50), nullable=False)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    location_name = Column(String(300))
+    evidence_urls = Column(JSON)
+    verification_method = Column(String(100))
+    status = Column(SQLEnum(RewardStatus), default=RewardStatus.PENDING, index=True)
+    verified_by = Column(Integer, ForeignKey("users.id"))
+    verified_at = Column(DateTime)
+    eco_reward = Column(BigInteger, default=0)
+    grc_reward = Column(BigInteger, default=0)
+    carbon_sequestered = Column(Float)
+    water_saved = Column(Float)
+    energy_generated = Column(Float)
+    land_restored = Column(Float)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+    rewards = relationship("EcoReward", back_populates="action")
+
+
+class EcoReward(Base):
+    """Rewards paid for ecological actions"""
+    __tablename__ = "eco_rewards"
+
+    id = Column(Integer, primary_key=True, index=True)
+    action_id = Column(Integer, ForeignKey("eco_actions.id"), nullable=False)
+    wallet_id = Column(Integer, ForeignKey("eco_user_wallets.id"), nullable=False)
+    eco_amount = Column(BigInteger, nullable=False)
+    grc_amount = Column(BigInteger, default=0)
+    base_reward = Column(BigInteger, nullable=False)
+    bonus_multiplier = Column(Numeric(precision=10, scale=4), default=1.0) # ًں”´ ط§طµظ„ط§ط­ ط¨ظ‡ Numeric
+    total_reward = Column(BigInteger, nullable=False)
+    status = Column(String(20), default="pending")
+    tx_id = Column(Integer, ForeignKey("eco_transactions.id"))
+    paid_at = Column(DateTime)
+    created_at = Column(DateTime, server_default=func.now())
+
+    action = relationship("EcoAction", back_populates="rewards")
+    wallet = relationship("EcoUserWallet", back_populates="rewards")
+
+
+class EcoStaking(Base):
+    """Token staking records"""
+    __tablename__ = "eco_staking"
+
+    id = Column(Integer, primary_key=True, index=True)
+    wallet_id = Column(Integer, ForeignKey("eco_user_wallets.id"), nullable=False, index=True)
+    token_symbol = Column(String(10), nullable=False)
+    amount = Column(BigInteger, nullable=False)
+    start_date = Column(DateTime, server_default=func.now())
+    end_date = Column(DateTime)
+    lock_period_days = Column(Integer, default=30)
+    apy = Column(Numeric(precision=10, scale=4), default=10.0) # ًں”´ ط§طµظ„ط§ط­ ط¨ظ‡ Numeric
+    accumulated_rewards = Column(BigInteger, default=0)
+    is_active = Column(Boolean, default=True, index=True)
+    is_unlocked = Column(Boolean, default=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+
+class EcoRewardRate(Base):
+    """Reward rates per ecological action type"""
+    __tablename__ = "eco_reward_rates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    action_type = Column(SQLEnum(EcoActionType), unique=True, nullable=False)
+    eco_per_unit = Column(BigInteger, nullable=False)
+    grc_per_unit = Column(BigInteger, default=0)
+    minimum_quantity = Column(Float, default=1.0)
+    maximum_quantity = Column(Float, default=1000000.0)
+    bonus_multiplier = Column(Numeric(precision=10, scale=4), default=1.0) # ًں”´ ط§طµظ„ط§ط­ ط¨ظ‡ Numeric
+    carbon_per_unit = Column(Numeric(precision=20, scale=8), default=0.0) # ًں”´ ط§طµظ„ط§ط­ ط¨ظ‡ Numeric
+    water_per_unit = Column(Numeric(precision=20, scale=8), default=0.0)
+    energy_per_unit = Column(Numeric(precision=20, scale=8), default=0.0)
+    is_active = Column(Boolean, default=True)
+    description = Column(Text)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
+
+
+class EcoExchangeRate(Base):
+    """Exchange rates between tokens"""
+    __tablename__ = "eco_exchange_rates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    from_token = Column(String(10), nullable=False)
+    to_token = Column(String(10), nullable=False)
+    rate = Column(Numeric(precision=20, scale=8), nullable=False) # ًں”´ ط§طµظ„ط§ط­ ط¨ظ‡ Numeric
+    min_amount = Column(BigInteger, default=0)
+    max_amount = Column(BigInteger, default=1000000)
+    fee_percent = Column(Numeric(precision=10, scale=4), default=1.0) # ًں”´ ط§طµظ„ط§ط­ ط¨ظ‡ Numeric
+    is_active = Column(Boolean, default=True)
+    updated_at = Column(DateTime, server_default=func.now())
+from api.services.blockchain.blockchain import ecocoin_contract
+"""
+EcoCoin Router - ط³غŒط³طھظ… ط§ع©ظˆ ع©ظˆغŒظ†
+"""
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+from typing import List, Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from api.core.database import get_db
+
+router = APIRouter(prefix="/ecocoin", tags=["EcoCoin"])
+
+
+# ============================================================
+# Response Models
+# ============================================================
+
+class TokenResponse(BaseModel):
+    symbol: str
+    name: str
+    type: str
+    total_supply: int
+    circulating_supply: int
+    price_usd: float
+
+
+class RewardRateResponse(BaseModel):
+    action: str
+    reward: int
+    unit: str
+
+
+class EcoCoinStatsResponse(BaseModel):
+    wallets_count: int = 0
+    total_rewards: int = 0
+    actions_count: int = 0
+    carbon_sequestered_tons: float = 0.0
+    water_saved_liters: float = 0.0
+    energy_generated_kwh: float = 0.0
+
+
+class WalletResponse(BaseModel):
+    wallet_id: int
+    address: str
+    eco_balance: int = 0
+    grc_balance: int = 0
+    staked_eco: int = 0
+    staked_grc: int = 0
+    total_earned: int = 0
+    user_level: int = 1
+    reputation_score: float = 0.0
+    created_at: str = ""
+
+
+# ============================================================
+# Endpoints
+# ============================================================
+
+@router.get("/tokens", response_model=List[TokenResponse])
+async def get_tokens():
+    """ظ„غŒط³طھ طھظ…ط§ظ… طھظˆع©ظ†â€Œظ‡ط§غŒ ظ…ظˆط¬ظˆط¯"""
+    return [
+        TokenResponse(
+            symbol="ECO",
+            name="EcoCoin",
+            type="utility",
+            total_supply=1000000,
+            circulating_supply=500000,
+            price_usd=0.50
+        ),
+        TokenResponse(
+            symbol="GRC",
+            name="Green Carbon Credit",
+            type="asset-backed",
+            total_supply=100000,
+            circulating_supply=25000,
+            price_usd=10.00
+        )
+    ]
+
+
+@router.get("/reward-rates", response_model=List[RewardRateResponse])
+async def get_reward_rates():
+    """ظ†ط±ط®â€Œظ‡ط§غŒ ظ¾ط§ط¯ط§ط´ ط¨ط±ط§غŒ ط§ظ‚ط¯ط§ظ…ط§طھ ط²غŒط³طھâ€Œظ…ط­غŒط·غŒ"""
+    return [
+        RewardRateResponse(action="tree_planting", reward=10, unit="ECO per tree"),
+        RewardRateResponse(action="water_saving", reward=5, unit="ECO per 1000L"),
+        RewardRateResponse(action="carbon_offset", reward=100, unit="ECO per ton"),
+        RewardRateResponse(action="renewable_energy", reward=50, unit="ECO per MWh"),
+        RewardRateResponse(action="waste_recycling", reward=2, unit="ECO per kg")
+    ]
+
+
+@router.get("/stats", response_model=EcoCoinStatsResponse)
+async def get_ecocoin_stats():
+    """ط¢ظ…ط§ط± ع©ظ„غŒ ط³غŒط³طھظ… EcoCoin"""
+    return EcoCoinStatsResponse(
+        wallets_count=1250,
+        total_rewards=500000,
+        actions_count=15000,
+        carbon_sequestered_tons=2500.5,
+        water_saved_liters=15000000,
+        energy_generated_kwh=750000
+    )
+
+
+@router.get("/wallets/{wallet_id}", response_model=WalletResponse)
+async def get_wallet_by_id(wallet_id: int):
+    """ط¯ط±غŒط§ظپطھ ط§ط·ظ„ط§ط¹ط§طھ ع©غŒظپ ظ¾ظˆظ„ ط¨ط§ ID"""
+    return WalletResponse(
+        wallet_id=wallet_id,
+        address=f"0x{wallet_id:040x}",
+        eco_balance=1500,
+        grc_balance=50,
+        staked_eco=500,
+        staked_grc=10,
+        total_earned=2500,
+        user_level=3,
+        reputation_score=85.5,
+        created_at="2024-01-15T10:30:00Z"
+    )
+
+
+@router.get("/wallets/me")
+async def get_my_wallet():
+    """ط¯ط±غŒط§ظپطھ ع©غŒظپ ظ¾ظˆظ„ ع©ط§ط±ط¨ط± ظپط¹ظ„غŒ (ظ†غŒط§ط² ط¨ظ‡ ط§ط­ط±ط§ط² ظ‡ظˆغŒطھ)"""
+    # TODO: Implement with actual authentication
+    return {
+        "wallet_id": 1,
+        "address": "0x0000000000000000000000000000000000000001",
+        "eco_balance": 2500,
+        "grc_balance": 75,
+        "staked_eco": 1000,
+        "staked_grc": 25,
+        "total_earned": 5000,
+        "user_level": 5,
+        "reputation_score": 92.3,
+        "created_at": "2023-06-15T08:00:00Z"
+    }
+
+
+@router.post("/transfer")
+async def transfer_tokens(data: dict):
+    """ط§ظ†طھظ‚ط§ظ„ طھظˆع©ظ† ط¨غŒظ† ع©غŒظپ ظ¾ظˆظ„â€Œظ‡ط§"""
+    # TODO: Implement actual transfer logic
+    return {
+        "success": True,
+        "tx_hash": "0x" + "a" * 64,
+        "from_wallet": data.get("from_wallet_id"),
+        "to_wallet": data.get("to_wallet_id"),
+        "amount": data.get("amount"),
+        "token": data.get("token_symbol", "ECO")
+    }
+
+
+@router.post("/stake")
+async def stake_tokens(data: dict):
+    """Stake ع©ط±ط¯ظ† طھظˆع©ظ†â€Œظ‡ط§"""
+    # TODO: Implement actual staking logic
+    return {
+        "success": True,
+        "staked_amount": data.get("amount"),
+        "lock_period": data.get("lock_days", 30),
+        "expected_reward": data.get("amount") * 0.05
+    }
+
+
+@router.post("/exchange")
+async def exchange_tokens(data: dict):
+    """طھط¨ط¯غŒظ„ طھظˆع©ظ†â€Œظ‡ط§ ط¨ظ‡ غŒع©ط¯غŒع¯ط±"""
+    # TODO: Implement actual exchange logic
+    return {
+        "success": True,
+        "from_token": data.get("from_token"),
+        "to_token": data.get("to_token"),
+        "from_amount": data.get("from_amount"),
+        "to_amount": data.get("from_amount") * 0.1,  # Example rate
+        "exchange_rate": 0.1
+    }
+from sqlalchemy import Column, DateTime, Float, Integer, String, Text
+from sqlalchemy.sql import func
+
+from api.core.database import Base
+
+
+class Farmer(Base):
+    __tablename__ = "farmers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(120), nullable=True)
+    phone = Column(String(20), nullable=True)
+    farm_location = Column(String(200), nullable=True)
+    farm_size_hectares = Column(Float, nullable=True)
+    notes = Column(Text, default="")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+from datetime import datetime
+
+from pydantic import BaseModel, Field
+
+
+class FarmerBase(BaseModel):
+    name: str = Field(..., min_length=2, max_length=100)
+    email: str | None = None
+    phone: str | None = None
+    farm_location: str | None = None
+    farm_size_hectares: float | None = Field(default=None, ge=0)
+
+
+class FarmerCreate(FarmerBase):
+    pass
+
+
+class FarmerUpdate(BaseModel):
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    farm_location: str | None = None
+    farm_size_hectares: float | None = Field(default=None, ge=0)
+
+
+class FarmerResponse(FarmerBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class FarmerListResponse(BaseModel):
+    total: int
+    farmers: list[FarmerResponse]
+from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from api.core.database import get_db
+from api.core.deps import require_write_auth
+from api.modules.farmer import crud, schemas
+
+router = APIRouter(tags=["Farmers"])
+
+
+@router.get("/", response_model=schemas.FarmerListResponse)
+async def list_farmers(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
+    farmers, total = await crud.list_farmers(db, skip=skip, limit=limit)
+    return schemas.FarmerListResponse(total=total, farmers=farmers)
+
+
+@router.post("/", response_model=schemas.FarmerResponse, status_code=status.HTTP_201_CREATED)
+async def create_farmer(
+    farmer: schemas.FarmerCreate,
+    db: AsyncSession = Depends(get_db),
+    _user: str = Depends(require_write_auth),
+):
+    return await crud.create_farmer(db, farmer)
+
+
+@router.get("/{farmer_id}", response_model=schemas.FarmerResponse)
+async def get_farmer(farmer_id: int, db: AsyncSession = Depends(get_db)):
+    farmer = await crud.get_farmer(db, farmer_id)
+    if not farmer:
+        raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
+    return farmer
+
+
+@router.put("/{farmer_id}", response_model=schemas.FarmerResponse)
+async def update_farmer(
+    farmer_id: int,
+    farmer: schemas.FarmerUpdate,
+    db: AsyncSession = Depends(get_db),
+    _user: str = Depends(require_write_auth),
+):
+    updated = await crud.update_farmer(db, farmer_id, farmer)
+    if not updated:
+        raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
+    return updated
+
+
+@router.delete("/{farmer_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=IDResponse)
+async def delete_farmer(
+    farmer_id: int,
+    db: AsyncSession = Depends(get_db),
+    _user: str = Depends(require_write_auth),
+):
+    if not await crud.delete_farmer(db, farmer_id):
+        raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
+
+
+@router.get("/{farmer_id}/activities", response_model=SuccessResponse)
+async def get_farmer_activities(farmer_id: int, db: AsyncSession = Depends(get_db)):
+    farmer = await crud.get_farmer(db, farmer_id)
+    if not farmer:
+        raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
+    return {"farmer_id": farmer_id, "activities": []}

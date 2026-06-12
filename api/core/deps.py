@@ -1,18 +1,34 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials
+﻿"""
+Dependencies for FastAPI routes
+"""
+from api.core.security import (
+    security,
+    verify_token,
+    get_current_user_id,
+    require_auth,
+    require_write_auth,
+    require_admin,
+    require_reviewer,
+    require_reviewer_or_admin,
+    require_expert,
+    require_farmer,
+    require_manager,
+    require_operator,
+    require_supervisor,
+)
 
-from api.core.config import settings
-from api.core.security import decode_token, security
-
-
-async def require_write_auth(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security),
-) -> str:
-    if not settings.REQUIRE_AUTH_FOR_WRITES:
-        return "system"
-    if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required for this operation",
-        )
-    return decode_token(credentials.credentials)
+__all__ = [
+    "require_auth",
+    "require_write_auth",
+    "require_admin",
+    "require_reviewer",
+    "require_reviewer_or_admin",
+    "require_expert",
+    "require_farmer",
+    "require_manager",
+    "require_operator",
+    "require_supervisor",
+    "get_current_user_id",
+    "security",
+    "verify_token",
+]
