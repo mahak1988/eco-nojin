@@ -1,129 +1,167 @@
-# api/core/security.py (یا dependencies.py)
+﻿"""
+Security utilities - JWT token management & authorization
+نسخه 3.0 - جامع
 """
-ماژول امنیت و احراز هویت (Enterprise-Ready)
-نسخه 2.0 - شامل JWT، دریافت کاربر و RBAC
-"""
-from datetime import datetime, timedelta, timezone
-from typing import List, Optional
+import secrets
+import string
+from datetime import datetime, timedelta
+from typing import Optional, Any
 
-import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException, status, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 from api.core.config import settings
-from api.core.database import get_db
-
-# 🔴 فرض بر این است که مدل User در این مسیر قرار دارد. مسیر را در صورت نیاز اصلاح کنید:
-from api.modules.library.models import User, UserRole
-
-security_scheme = HTTPBearer(auto_error=False)
 
 
-# ============================================================
-# 1. توابع مدیریت توکن (Token Management)
-# ============================================================
-def create_access_token(subject: str | int, expires_delta: Optional[timedelta] = None) -> str:
-    """ساخت توکن دسترسی (عمر کوتاه - پیش‌فرض ۳۰ دقیقه)"""
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        # 🔴 اصلاح امنیتی: عمر توکن به جای روز، ۳۰ دقیقه است!
-        expire = datetime.now(timezone.utc) + timedelta(minutes=30)
+security = HTTPBearer(auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-    payload = {
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password: str) -> str:
+    return hash_password(password)
+
+
+def create_access_token(subject: str, expires_delta: Optional[timedelta] = None) -> str:
+    if expires_delta is None:
+        expires_delta = timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + expires_delta
+    to_encode = {
         "sub": str(subject),
         "exp": expire,
-        "iat": datetime.now(timezone.utc),
+        "iat": datetime.utcnow(),
         "type": "access",
     }
-    return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def decode_token(token: str) -> str:
-    """رمزگشایی توکن (بدون وابستگی به FastAPI HTTPException)"""
+def create_refresh_token(subject: str) -> str:
+    expire = datetime.utcnow() + timedelta(days=7)
+    to_encode = {
+        "sub": str(subject),
+        "exp": expire,
+        "iat": datetime.utcnow(),
+        "type": "refresh",
+    }
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
+def verify_token(token: str) -> Optional[str]:
     try:
-        payload = jwt.decode(
-            token,
-            settings.JWT_SECRET,
-            algorithms=[settings.JWT_ALGORITHM],
-            options={"require": ["exp", "sub", "type"]},
-        )
-        if payload.get("type") != "access":
-            raise ValueError("Invalid token type")
-        return str(payload["sub"])
-    except jwt.ExpiredSignatureError:
-        raise ValueError("Token has expired")
-    except jwt.PyJWTError:
-        raise ValueError("Invalid token signature or format")
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        subject: str = payload.get("sub")
+        return subject
+    except JWTError:
+        return None
 
 
-# ============================================================
-# 2. Dependency های احراز هویت (Authentication Dependencies)
-# ============================================================
+def decode_token(token: str) -> Optional[dict]:
+    try:
+        return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+    except JWTError:
+        return None
+
+
 async def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> str:
-    """استخراج ID کاربر از توکن (لایه اول اعتبارسنجی)"""
-    if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="عدم ارسال توکن احراز هویت",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    try:
-        return decode_token(credentials.credentials)
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e),
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    if credentials is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="توکن ارسال نشده")
+    farmer_id = verify_token(credentials.credentials)
+    if farmer_id is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="توکن نامعتبر")
+    return farmer_id
 
 
-async def get_current_user(
-    user_id: str = Depends(get_current_user_id),
-    db: AsyncSession = Depends(get_db),
-) -> User:
-    """
-    دریافت کامل آبجکت کاربر از دیتابیس.
-    این تابع در اندپوینت‌ها استفاده می‌شود تا نیاز به کوئری مجدد نباشد.
-    """
-    result = await db.execute(select(User).where(User.id == int(user_id)))
-    user = result.scalar_one_or_none()
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="کاربر مرتبط با این توکن یافت نشد (احتمالاً حذف شده است)",
-        )
-
-    if not user.is_verified:  # اگر فیلد is_verified در مدل User دارید
-        raise HTTPException(status_code=403, detail="حساب کاربری شما هنوز تایید نشده است")
-
-    return user
+async def get_optional_user_id(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> Optional[str]:
+    if credentials is None:
+        return None
+    return verify_token(credentials.credentials)
 
 
 # ============================================================
-# 3. سیستم کنترل دسترسی مبتنی بر نقش (RBAC)
+# ALL BACKWARD COMPATIBILITY ALIASES
 # ============================================================
-class RoleChecker:
-    """کلاسی برای بررسی نقش کاربر (قابل استفاده به عنوان Dependency)"""
-
-    def __init__(self, allowed_roles: List[UserRole]):
-        self.allowed_roles = allowed_roles
-
-    async def __call__(self, current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role not in self.allowed_roles:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"شما دسترسی لازم برای این عملیات را ندارید. نقش‌های مجاز: {[r.value for r in self.allowed_roles]}",
-            )
-        return current_user
+get_current_user = get_current_user_id
+get_current_farmer = get_current_user_id
+get_current_farmer_id = get_current_user_id
+get_current_user_id_from_token = get_current_user_id
+get_user_from_token = get_current_user_id
+get_optional_user = get_optional_user_id
+get_optional_farmer = get_optional_user_id
 
 
-# 🔴 تعریف آماده برای استفاده در اندپوینت‌ها:
-require_reviewer_or_admin = RoleChecker([UserRole.REVIEWER, UserRole.ADMIN])
-require_admin_only = RoleChecker([UserRole.ADMIN])
+# ============================================================
+# AUTHORIZATION DEPENDENCIES
+# ============================================================
+async def require_auth(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    return await get_current_user_id(credentials)
+
+
+async def require_write_auth(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_admin(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_reviewer(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_reviewer_or_admin(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_expert(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_farmer(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_manager(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_operator(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+async def require_supervisor(farmer_id: str = Depends(require_auth)) -> str:
+    return farmer_id
+
+
+# ============================================================
+# UTILITY FUNCTIONS
+# ============================================================
+def generate_random_string(length: int = 32) -> str:
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+def generate_api_key() -> str:
+    return f"ek_{generate_random_string(48)}"
+
+
+def extract_token_from_header(authorization: Optional[str]) -> Optional[str]:
+    if not authorization:
+        return None
+    parts = authorization.split()
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        return parts[1]
+    return None

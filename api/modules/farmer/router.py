@@ -1,4 +1,6 @@
-from api.core.schemas import SuccessResponse, IDResponse, StatsResponse, PaginatedResponse
+"""
+Farmer Router - مدیریت کشاورزان
+"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +13,7 @@ router = APIRouter(tags=["Farmers"])
 
 @router.get("/", response_model=schemas.FarmerListResponse)
 async def list_farmers(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
+    """لیست تمام کشاورزان"""
     farmers, total = await crud.list_farmers(db, skip=skip, limit=limit)
     return schemas.FarmerListResponse(total=total, farmers=farmers)
 
@@ -21,11 +24,13 @@ async def create_farmer(
     db: AsyncSession = Depends(get_db),
     _user: str = Depends(require_write_auth),
 ):
+    """ایجاد کشاورز جدید"""
     return await crud.create_farmer(db, farmer)
 
 
 @router.get("/{farmer_id}", response_model=schemas.FarmerResponse)
 async def get_farmer(farmer_id: int, db: AsyncSession = Depends(get_db)):
+    """دریافت اطلاعات یک کشاورز"""
     farmer = await crud.get_farmer(db, farmer_id)
     if not farmer:
         raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
@@ -39,24 +44,29 @@ async def update_farmer(
     db: AsyncSession = Depends(get_db),
     _user: str = Depends(require_write_auth),
 ):
+    """به‌روزرسانی اطلاعات کشاورز"""
     updated = await crud.update_farmer(db, farmer_id, farmer)
     if not updated:
         raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
     return updated
 
 
-@router.delete("/{farmer_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=IDResponse)
+# 🔴 اصلاح: حذف response_model از DELETE
+@router.delete("/{farmer_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_farmer(
     farmer_id: int,
     db: AsyncSession = Depends(get_db),
     _user: str = Depends(require_write_auth),
 ):
+    """حذف کشاورز"""
     if not await crud.delete_farmer(db, farmer_id):
         raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")
+    return None
 
 
-@router.get("/{farmer_id}/activities", response_model=SuccessResponse)
+@router.get("/{farmer_id}/activities")
 async def get_farmer_activities(farmer_id: int, db: AsyncSession = Depends(get_db)):
+    """دریافت فعالیت‌های کشاورز"""
     farmer = await crud.get_farmer(db, farmer_id)
     if not farmer:
         raise HTTPException(status_code=404, detail=f"Farmer {farmer_id} not found")

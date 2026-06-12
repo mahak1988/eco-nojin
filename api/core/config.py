@@ -1,42 +1,85 @@
-﻿from pydantic_settings import BaseSettings, SettingsConfigDict
+"""
+Econojin Configuration - Pydantic Settings
+"""
+from pathlib import Path
+from typing import Optional
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings): REDACTED_BY_TRIAGE_TOOL
-    model_config =REDACTED_BY_TRIAGE_TOOL
-
-    APP_NAME: str =REDACTED_BY_TRIAGE_TOOL
-    APP_VERSION: str =REDACTED_BY_TRIAGE_TOOL
-    DEBUG: bool =REDACTED_BY_TRIAGE_TOOL
-    HOST: str =REDACTED_BY_TRIAGE_TOOL
-    PORT: int =REDACTED_BY_TRIAGE_TOOL
-    DATABASE_URL: str =REDACTED_BY_TRIAGE_TOOL
-    JWT_SECRET: str =REDACTED_BY_TRIAGE_TOOL
-    JWT_ALGORITHM: str =REDACTED_BY_TRIAGE_TOOL
-    JWT_EXPIRE_DAYS: int =REDACTED_BY_TRIAGE_TOOL
-    ALLOWED_ORIGINS: list[str] =REDACTED_BY_TRIAGE_TOOL
-        "http: REDACTED_BY_TRIAGE_TOOL
-        "http: REDACTED_BY_TRIAGE_TOOL
-        "http: REDACTED_BY_TRIAGE_TOOL
-    ]
-    RATE_LIMIT_ENABLED: bool =REDACTED_BY_TRIAGE_TOOL
-    RATE_LIMIT_MAX_REQUESTS: int =REDACTED_BY_TRIAGE_TOOL
-    RATE_LIMIT_WINDOW_SEC: int =REDACTED_BY_TRIAGE_TOOL
-    REQUIRE_AUTH_FOR_WRITES: bool =REDACTED_BY_TRIAGE_TOOL
-    OTP_DEV_MODE: bool =REDACTED_BY_TRIAGE_TOOL
-    SMS_PROVIDER: str =REDACTED_BY_TRIAGE_TOOL
-    KAVENEGAR_API_KEY: str =REDACTED_BY_TRIAGE_TOOL
-    KAVENEGAR_TEMPLATE: str =REDACTED_BY_TRIAGE_TOOL
-    TWILIO_ACCOUNT_SID: str =REDACTED_BY_TRIAGE_TOOL
-    TWILIO_AUTH_TOKEN: str =REDACTED_BY_TRIAGE_TOOL
-    TWILIO_FROM_NUMBER: str =REDACTED_BY_TRIAGE_TOOL
-    LLM_ENABLED: bool =REDACTED_BY_TRIAGE_TOOL
-    OPENAI_API_KEY: str =REDACTED_BY_TRIAGE_TOOL
-    OPENAI_BASE_URL: str =REDACTED_BY_TRIAGE_TOOL
-    LLM_MODEL: str =REDACTED_BY_TRIAGE_TOOL
-    AZURE_OPENAI_ENDPOINT: str =REDACTED_BY_TRIAGE_TOOL
-    AZURE_OPENAI_KEY: str =REDACTED_BY_TRIAGE_TOOL
-    AZURE_OPENAI_DEPLOYMENT: str =REDACTED_BY_TRIAGE_TOOL
-    AZURE_OPENAI_API_VERSION: str =REDACTED_BY_TRIAGE_TOOL
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
-settings =REDACTED_BY_TRIAGE_TOOL
+class Settings(BaseSettings):
+    """تنظیمات اصلی پروژه"""
+    
+    model_config = SettingsConfigDict(
+        env_file=str(BASE_DIR / "api" / ".env"),
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+    
+    # Application
+    APP_NAME: str = "Econojin API"
+    APP_VERSION: str = "2.0.0"
+    DEBUG: bool = True
+    ENVIRONMENT: str = "development"
+    
+    # API
+    API_V1_PREFIX: str = "/api/v1"
+    
+    # CORS
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
+    CORS_ALLOW_CREDENTIALS: bool = True
+    
+    # Database
+    DATABASE_URL: str = "sqlite+aiosqlite:///./econojin.db"
+    DATABASE_ECHO: bool = False
+    
+    # Security & JWT
+    SECRET_KEY: str = "dev-secret-key-change-in-production-abcdef123456"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    
+    # OTP
+    OTP_DEV_MODE: bool = True
+    OTP_LENGTH: int = 6
+    OTP_EXPIRE_MINUTES: int = 5
+    
+    # SMS
+    SMS_PROVIDER: str = "dev"
+    KAVENEGAR_API_KEY: Optional[str] = None
+    
+    # AI
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    
+    # Upload
+    UPLOAD_DIR: Path = BASE_DIR / "uploads"
+    
+    @property
+    def cors_origins_list(self) -> list[str]:
+        if isinstance(self.CORS_ORIGINS, list):
+            return self.CORS_ORIGINS
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+    
+    @property
+    def is_development(self) -> bool:
+        return self.ENVIRONMENT == "development"
+    
+    @property
+    def database_is_sqlite(self) -> bool:
+        return "sqlite" in self.DATABASE_URL
+
+
+settings = Settings()
+
+
+def validate_settings() -> None:
+    settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"Settings: {settings.ENVIRONMENT} mode")
+    print(f"Database: SQLite" if settings.database_is_sqlite else f"Database: PostgreSQL")
+    print(f"CORS: {settings.cors_origins_list}")

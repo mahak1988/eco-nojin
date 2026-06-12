@@ -1,80 +1,56 @@
-"use client";
-
-import { Link } from "@/i18n/navigation";
+﻿import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type Props = {
-  className?: string;
+interface LogoProps {
   size?: "sm" | "md" | "lg";
-  showTagline?: boolean;
-};
+  className?: string;
+  showText?: boolean;
+}
 
-const sizes = {
-  sm: { mark: 32, title: "text-lg", sub: "text-[10px]" },
-  md: { mark: 40, title: "text-xl", sub: "text-xs" },
-  lg: { mark: 52, title: "text-3xl", sub: "text-sm" },
-};
+export function Logo({ size = "md", className, showText = true }: LogoProps) {
+  const dimensions = {
+    sm: { width: 140, height: 70, text: "text-base" },
+    md: { width: 180, height: 90, text: "text-xl" },
+    lg: { width: 240, height: 120, text: "text-2xl" },
+  };
 
-export function Logo({ className, size = "md", showTagline = true }: Props) {
-  const s = sizes[size];
+  const { width, height, text } = dimensions[size];
+
   return (
-    <Link href="/" className={cn("inline-flex items-center gap-3 group", className)}>
-      <svg
-        width={s.mark}
-        height={s.mark}
-        viewBox="0 0 64 64"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="shrink-0 drop-shadow-lg group-hover:scale-105 transition-transform"
-        aria-hidden
-      >
-        <defs>
-          <linearGradient id="ecoGrad" x1="0" y1="0" x2="64" y2="64">
-            <stop offset="0%" stopColor="#38bdf8" />
-            <stop offset="50%" stopColor="#34d399" />
-            <stop offset="100%" stopColor="#a3e635" />
-          </linearGradient>
-        </defs>
-        <circle cx="32" cy="32" r="30" stroke="url(#ecoGrad)" strokeWidth="2" fill="#0f172a" />
-        <path
-          d="M32 14 C24 22 20 32 22 42 C28 38 36 38 42 42 C44 32 40 22 32 14Z"
-          fill="url(#ecoGrad)"
-          opacity="0.9"
-        />
-        <path
-          d="M18 46 Q32 52 46 46"
-          stroke="#38bdf8"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <text
-          x="32"
-          y="36"
-          textAnchor="middle"
-          fill="#f8fafc"
-          fontSize="14"
-          fontWeight="800"
-          fontFamily="system-ui, sans-serif"
-        >
-          E
-        </text>
-      </svg>
-      <div className="flex flex-col leading-none">
-        <span
-          className={cn(
-            "font-black tracking-tight bg-gradient-to-l from-sky-400 via-emerald-400 to-lime-400 bg-clip-text text-transparent",
-            s.title
-          )}
-        >
-          Econojin
-        </span>
-        {showTagline && (
-          <span className={cn("text-slate-500 font-medium mt-0.5", s.sub)}>
-            اکو · نو · ژین
-          </span>
-        )}
+    <Link href="/" className={cn("flex items-center gap-3 group", className)}>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
+        <svg width={width} height={height} viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10 transition-transform duration-500 group-hover:scale-105">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#047857" />
+              <stop offset="50%" stopColor="#10b981" />
+              <stop offset="100%" stopColor="#2dd4bf" />
+            </linearGradient>
+            <linearGradient id="leafGradient1" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#059669" />
+              <stop offset="100%" stopColor="#34d399" />
+            </linearGradient>
+            <linearGradient id="leafGradient2" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#0d9488" />
+              <stop offset="100%" stopColor="#5eead4" />
+            </linearGradient>
+          </defs>
+          <text x="10" y="75" fontFamily="system-ui, -apple-system, sans-serif" fontSize="52" fontWeight="800" fill="url(#logoGradient)">Eco</text>
+          <path d="M 78 62 Q 88 88, 102 58" stroke="url(#logoGradient)" strokeWidth="5" strokeLinecap="round" fill="none" />
+          <text x="100" y="75" fontFamily="system-ui, -apple-system, sans-serif" fontSize="52" fontWeight="800" fill="url(#logoGradient)">N</text>
+          <path d="M 118 55 Q 120 40, 125 30" stroke="url(#logoGradient)" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <path d="M 125 32 Q 115 25, 110 28 Q 105 31, 108 35 Q 111 39, 125 32" fill="url(#leafGradient1)" />
+          <path d="M 125 30 Q 138 18, 145 22 Q 152 26, 148 32 Q 144 38, 125 30" fill="url(#leafGradient2)" />
+          <text x="148" y="75" fontFamily="system-ui, -apple-system, sans-serif" fontSize="52" fontWeight="700" fill="url(#logoGradient)">ojin</text>
+        </svg>
       </div>
+      {showText && (
+        <div className="flex flex-col leading-none mr-2">
+          <span className={cn("font-black text-white tracking-tight", text)}>اکو نوین</span>
+          <span className="text-[8px] font-bold text-emerald-400 tracking-[0.3em] mt-1.5 uppercase">ECONOJIN</span>
+        </div>
+      )}
     </Link>
   );
 }

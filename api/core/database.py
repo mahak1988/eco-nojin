@@ -1,15 +1,33 @@
-# api/core/database.py
-import os
+"""
+Database configuration and initialization
+"""
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import declarative_base
-
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./econojin.db")
-engine = create_async_engine(DATABASE_URL, echo=False, future=True)
-async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-Base = declarative_base()
+from api.core.config import settings
 
 
+# Engine
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=settings.DATABASE_ECHO,
+    future=True,
+)
+
+# Session
+async_session = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+# Base class for models
+class Base(DeclarativeBase):
+    pass
+
+
+# Dependency for FastAPI
 async def get_db():
     async with async_session() as session:
         try:
@@ -18,9 +36,14 @@ async def get_db():
             await session.close()
 
 
+# Initialize database
 async def init_db():
-    from api.modules.iot import models
-
+    """Create all tables"""
     async with engine.begin() as conn:
+        # Import all models
+        from api.modules import all_models  # noqa: F401
+        
+        # Create tables
         await conn.run_sync(Base.metadata.create_all)
-    print("✅ Database initialized")
+    
+    return True
