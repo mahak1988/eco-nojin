@@ -126,3 +126,4 @@
 2. CRUD DB برای ۲–۳ ماژول پرکاربرد (education، community)  
 3. استقرار Vercel + Render با `DEPLOY_VERCEL_NEON.md`  
 4. غیرفعال کردن `scripts/main.py` در مستندات به‌عنوان deprecated  
+این پایان نیست، بلکه آغاز یک جنبش است. 🌱

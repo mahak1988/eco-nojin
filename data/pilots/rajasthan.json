@@ -1,0 +1,52 @@
+{
+  "pilot_id": "rajasthan",
+  "name": "راجستان",
+  "country": "هند",
+  "continent": "آسیا",
+  "province": "Thar Desert Region",
+  "climate_zone": "نیمه‌خشک گرم (BSh)",
+  "coordinates": {
+    "lat": 26.92,
+    "lon": 70.9
+  },
+  "area_hectares": 15000,
+  "elevation_m": 320,
+  "annual_precipitation_mm": 250,
+  "avg_temperature_c": 27.5,
+  "soil_type": "شنی-قلیایی",
+  "land_use": [
+    "کشاورزی دیم",
+    "دامداری",
+    "جنگل‌کاری بیابانی"
+  ],
+  "main_challenges": [
+    "بیابان‌زایی",
+    "کم‌آبی مزمن",
+    "شوری"
+  ],
+  "interventions": [
+    "Johad (آب‌انبار بومی)",
+    "آگروفارستری بیابانی",
+    "انرژی خورشیدی"
+  ],
+  "baseline_indicators": {
+    "wue_kg_m3": 0.6,
+    "groundwater_level_m": 25.0,
+    "tree_cover_percent": 5.0
+  },
+  "target_indicators": {
+    "wue_kg_m3": 1.5,
+    "groundwater_level_m": 15.0,
+    "tree_cover_percent": 18.0
+  },
+  "beneficiaries": {
+    "households": 1200,
+    "farmers": 950,
+    "women": 480
+  },
+  "global_partnership": [
+    "NABARD",
+    "ICRISAT",
+    "Rajasthan Watershed Program"
+  ]
+}

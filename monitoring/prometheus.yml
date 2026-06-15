@@ -1,0 +1,14 @@
+# Prometheus configuration for Econojin
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'econojin-api'
+    static_configs:
+      - targets: ['localhost:8000']
+    metrics_path: '/metrics'
+    
+  - job_name: 'econojin-blockchain'
+    static_configs:
+      - targets: ['localhost:8545']

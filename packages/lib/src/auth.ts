@@ -9,7 +9,7 @@ export const login = (email: string, name: string) => {
   const user: User = { 
     email, 
     name, 
-    token: "mock-jwt-token-" + Date.now() 
+    token: (process.env.NEXT_PUBLIC_MOCK_JWT_PREFIX || "mock-jwt-token-") + Date.now() 
   };
   localStorage.setItem("econojin_user", JSON.stringify(user));
   window.dispatchEvent(new Event("storage")); // Trigger UI update across components

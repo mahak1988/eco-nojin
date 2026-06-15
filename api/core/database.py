@@ -1,49 +1,101 @@
 """
-Database configuration and initialization
+Database Configuration for Econojin Platform
+Optimized for both PostgreSQL (production) and SQLite (development/testing)
 """
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
+import os
 
-from api.core.config import settings
-
-
-# Engine
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DATABASE_ECHO,
-    future=True,
+# Database URL - supports both PostgreSQL and SQLite
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./econojin.db"
 )
 
-# Session
-async_session = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+# Detect database type
+is_postgresql = "postgresql" in SQLALCHEMY_DATABASE_URL
+
+# Engine configuration - optimized for database type
+if is_postgresql:
+    # PostgreSQL-specific optimizations
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        poolclass=QueuePool,
+        pool_size=20,
+        max_overflow=30,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        pool_timeout=30,
+        echo=False
+    )
+else:
+    # SQLite configuration (for development/testing)
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {},
+        pool_pre_ping=True,
+        echo=False
+    )
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 
-# Base class for models
-class Base(DeclarativeBase):
-    pass
+def get_db():
+    """Dependency for database sessions with proper cleanup"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-# Dependency for FastAPI
-async def get_db():
-    async with async_session() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-
-# Initialize database
-async def init_db():
-    """Create all tables"""
-    async with engine.begin() as conn:
-        # Import all models
-        from api.modules import all_models  # noqa: F401
-        
-        # Create tables
-        await conn.run_sync(Base.metadata.create_all)
+# ========================================================================
+# Database initialization helpers
+# ========================================================================
+def create_tables():
+    """Create all database tables"""
+    # Import all models to ensure they're registered
+    try:
+        from api.domains.dashboard.models import db_models
+        from api.domains.hydrology.models import db_models
+        from api.domains.iot.models import db_models
+        from api.domains.logframe.models import db_models
+        from api.domains.mrv.models import db_models
+        from api.domains.pilots.models import db_models
+        from api.domains.psychology.models import db_models
+        from api.domains.remote_sensing.models import db_models
+        from api.domains.safeguards.models import db_models
+        from api.domains.training.models import db_models
+        from api.domains.lms.models import db_models
+        from api.domains.drought.models import db_models
+        from api.domains.soil_water.models import db_models
+        from api.domains.financial.models import db_models
+    except ImportError as e:
+        print(f"Warning: Could not import some models: {e}")
     
-    return True
+    Base.metadata.create_all(bind=engine)
+    print("✅ Database tables created successfully")
+
+
+def check_connection():
+    """Test database connection"""
+    try:
+        with engine.connect() as conn:
+            result = conn.execute("SELECT 1")
+            print(f"✅ Database connection successful: {SQLALCHEMY_DATABASE_URL}")
+            return True
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        return False
+
+
+if __name__ == "__main__":
+    # Quick test when run directly
+    print("Testing database configuration...")
+    if check_connection():
+        print("Creating tables...")
+        create_tables()
