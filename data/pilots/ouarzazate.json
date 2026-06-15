@@ -1,0 +1,54 @@
+{
+  "pilot_id": "ouarzazate",
+  "name": "وارزازت",
+  "country": "مراکش",
+  "continent": "آفریقا",
+  "province": "Drâa-Tafilalet",
+  "climate_zone": "بیابانی نیمه‌خشک (BWh)",
+  "coordinates": {
+    "lat": 30.92,
+    "lon": -6.9
+  },
+  "area_hectares": 10000,
+  "elevation_m": 1160,
+  "annual_precipitation_mm": 120,
+  "avg_temperature_c": 20.5,
+  "soil_type": "شنی، بسیار کم‌عمق",
+  "land_use": [
+    "واحه",
+    "کشاورزی oasis",
+    "مرتع بیابانی"
+  ],
+  "main_challenges": [
+    "بیابان‌زایی",
+    "کم‌آبی شدید",
+    "فرسایش بادی"
+  ],
+  "interventions": [
+    "مدیریت آب وازه",
+    "آگروفارستری بیابانی",
+    "انرژی خورشیدی"
+  ],
+  "baseline_indicators": {
+    "wue_kg_m3": 0.5,
+    "soc_percent": 0.4,
+    "ndvi": 0.12,
+    "water_stress_index": 0.92
+  },
+  "target_indicators": {
+    "wue_kg_m3": 1.2,
+    "soc_percent": 1.0,
+    "ndvi": 0.3,
+    "water_stress_index": 0.65
+  },
+  "beneficiaries": {
+    "households": 650,
+    "farmers": 480,
+    "women": 220
+  },
+  "global_partnership": [
+    "UNCCD",
+    "GEF",
+    "Green Morocco Plan"
+  ]
+}

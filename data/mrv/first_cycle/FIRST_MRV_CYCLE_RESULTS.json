@@ -1,0 +1,646 @@
+{
+  "cycle_id": "FIRST-MRV-2026",
+  "pilots": {
+    "dishmok": {
+      "mrv": {
+        "pilot_site": "dishmok",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 1.2,
+            "final_soc_percent": 1.319,
+            "total_change_tCO2": 1701.7
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 510.51
+          },
+          "total_sequestration_tCO2": 2212.21,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.8,
+            "final_kg_m3": 0.88
+          },
+          "water_saved_m3": 1230.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.65
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.393441+00:00",
+        "report_hash": "312194156743f62102a76e3b00bbda8e45b2a26d2bbac58c46c812128185323a"
+      },
+      "credit": {
+        "credit_id": "CREDIT-DISHMOK-DAC64943",
+        "pilot_site": "dishmok",
+        "volume_tCO2e": 2212.21,
+        "credit_value_usd": 27652.62,
+        "blockchain_tx_hash": "0xd6a65a5e4791a8c3346ffda3a15cb9890ab260995966a14c37fe3f2e39fe20b7",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-DISHMOK-3C0A3231",
+        "pilot_site": "dishmok",
+        "breakdown": {
+          "carbon_payment_usd": 22122.1,
+          "water_saved_m3": 1230.0,
+          "water_payment_usd": 922.5,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 24893.92,
+        "blockchain_tx_hash": "0xde0259850738d4234d4d8aec22cbfe4a171259c89dcc43c8659b74cee1bbe6ec",
+        "status": "paid"
+      }
+    },
+    "behbahan": {
+      "mrv": {
+        "pilot_site": "behbahan",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.9,
+            "final_soc_percent": 1.013,
+            "total_change_tCO2": 1615.9
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 484.77
+          },
+          "total_sequestration_tCO2": 2100.67,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 1.1,
+            "final_kg_m3": 1.24
+          },
+          "water_saved_m3": 1335.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.33
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.394113+00:00",
+        "report_hash": "60040974a875ed2c51eff323a0b614ebc9f94a89670029090fc771dd76e10555"
+      },
+      "credit": {
+        "credit_id": "CREDIT-BEHBAHAN-B88C9054",
+        "pilot_site": "behbahan",
+        "volume_tCO2e": 2100.67,
+        "credit_value_usd": 26258.38,
+        "blockchain_tx_hash": "0x575fda7c8c89fa4d561ae429b596cead7914fb0f69ad0b2dd87a84e715c18554",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-BEHBAHAN-ED2799D5",
+        "pilot_site": "behbahan",
+        "breakdown": {
+          "carbon_payment_usd": 21006.7,
+          "water_saved_m3": 1335.0,
+          "water_payment_usd": 1001.25,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 23857.27,
+        "blockchain_tx_hash": "0x4d17807551bc477aa6c34d2e22ac85a6f04b49365c21190c6bc153cb783ea3c1",
+        "status": "paid"
+      }
+    },
+    "rodbar_talesh": {
+      "mrv": {
+        "pilot_site": "rodbar_talesh",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 2.1,
+            "final_soc_percent": 2.285,
+            "total_change_tCO2": 2645.5
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 793.65
+          },
+          "total_sequestration_tCO2": 3439.15,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 1.5,
+            "final_kg_m3": 1.63
+          },
+          "water_saved_m3": 911.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.79
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.394494+00:00",
+        "report_hash": "d709ea8ac6241ae168b15e6d58ccd583fede96a3d179b1cf95d15943fb9f93c3"
+      },
+      "credit": {
+        "credit_id": "CREDIT-RODBAR_TALESH-D9375E0A",
+        "pilot_site": "rodbar_talesh",
+        "volume_tCO2e": 3439.15,
+        "credit_value_usd": 42989.38,
+        "blockchain_tx_hash": "0x541dcfaea0d97d8dac90e4432ab5386c2bfb67888b1157d08b3f029b36b2bb7e",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-RODBAR_TALESH-C974D24B",
+        "pilot_site": "rodbar_talesh",
+        "breakdown": {
+          "carbon_payment_usd": 34391.5,
+          "water_saved_m3": 911.0,
+          "water_payment_usd": 683.25,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 36924.07,
+        "blockchain_tx_hash": "0xb2c2b36a949b08a927fc784364a17f5fbd9b8dc4264df911da3bc6b109c75287",
+        "status": "paid"
+      }
+    },
+    "snow_mountain": {
+      "mrv": {
+        "pilot_site": "snow_mountain",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 1.8,
+            "final_soc_percent": 1.904,
+            "total_change_tCO2": 1487.2
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 446.16
+          },
+          "total_sequestration_tCO2": 1933.36,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 1.2,
+            "final_kg_m3": 1.27
+          },
+          "water_saved_m3": 1432.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 14.18
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.394889+00:00",
+        "report_hash": "fbecfd63bfcb3c4efa7ba501ce51e1c02716988380dab6b5c29c906d29540797"
+      },
+      "credit": {
+        "credit_id": "CREDIT-SNOW_MOUNTAIN-026C4FCF",
+        "pilot_site": "snow_mountain",
+        "volume_tCO2e": 1933.36,
+        "credit_value_usd": 24167.0,
+        "blockchain_tx_hash": "0x117009b6aaf895b4d5a83d1102404141b1a0c31f2e14fa0346a8fa0f9dd34dec",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-SNOW_MOUNTAIN-71773B05",
+        "pilot_site": "snow_mountain",
+        "breakdown": {
+          "carbon_payment_usd": 19333.6,
+          "water_saved_m3": 1432.0,
+          "water_payment_usd": 1074.0,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 22256.92,
+        "blockchain_tx_hash": "0xa5f82b76d8ed306f7228da8e78ad31d8a13660fe1a5ee2a95b8b6041470ede4f",
+        "status": "paid"
+      }
+    },
+    "ouarzazate": {
+      "mrv": {
+        "pilot_site": "ouarzazate",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.6,
+            "final_soc_percent": 0.67,
+            "total_change_tCO2": 1001.0
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 300.3
+          },
+          "total_sequestration_tCO2": 1301.3,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.5,
+            "final_kg_m3": 0.56
+          },
+          "water_saved_m3": 1294.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.44
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.395265+00:00",
+        "report_hash": "749763415560006fe9bbd448629cc6dde290a842700caa65bba1682e9d1c7087"
+      },
+      "credit": {
+        "credit_id": "CREDIT-OUARZAZATE-8AA0FB71",
+        "pilot_site": "ouarzazate",
+        "volume_tCO2e": 1301.3,
+        "credit_value_usd": 16266.25,
+        "blockchain_tx_hash": "0x6d4724a1c511d4a0f966f2dada3301ab7bb20b3aa18a809965c3dc4f776b16be",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-OUARZAZATE-99164DFE",
+        "pilot_site": "ouarzazate",
+        "breakdown": {
+          "carbon_payment_usd": 13013.0,
+          "water_saved_m3": 1294.0,
+          "water_payment_usd": 970.5,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 15832.82,
+        "blockchain_tx_hash": "0xaa15548de662ad7e307bddf3f70abc864459f83163fef3e5c2a2463c769187ff",
+        "status": "paid"
+      }
+    },
+    "wadi_rum": {
+      "mrv": {
+        "pilot_site": "wadi_rum",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.4,
+            "final_soc_percent": 0.426,
+            "total_change_tCO2": 371.8
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 111.54
+          },
+          "total_sequestration_tCO2": 483.34,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.3,
+            "final_kg_m3": 0.32
+          },
+          "water_saved_m3": 1336.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 14.07
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.395628+00:00",
+        "report_hash": "f697b67dc15391b9bfa1cdad57eaa912717787ebadb50708d72ce98b14361ce5"
+      },
+      "credit": {
+        "credit_id": "CREDIT-WADI_RUM-16142D29",
+        "pilot_site": "wadi_rum",
+        "volume_tCO2e": 483.34,
+        "credit_value_usd": 6041.75,
+        "blockchain_tx_hash": "0x2985c531ae568c5a0c1925d9c408ee0bb5370b37a8db9d78256280ed6ac63149",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-WADI_RUM-063F27C1",
+        "pilot_site": "wadi_rum",
+        "breakdown": {
+          "carbon_payment_usd": 4833.4,
+          "water_saved_m3": 1336.0,
+          "water_payment_usd": 1002.0,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 7684.72,
+        "blockchain_tx_hash": "0x795f04163e8f5b83dd5169e1e393ecb9cc1a694cf4db1a2bfd015cbe4a555c9f",
+        "status": "paid"
+      }
+    },
+    "sahel_senegal": {
+      "mrv": {
+        "pilot_site": "sahel_senegal",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.8,
+            "final_soc_percent": 0.892,
+            "total_change_tCO2": 1315.6
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 394.68
+          },
+          "total_sequestration_tCO2": 1710.28,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.7,
+            "final_kg_m3": 0.78
+          },
+          "water_saved_m3": 1075.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.45
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.395993+00:00",
+        "report_hash": "c73d4777a887ad40be72d10b5a86446c5c0864d064ed34b2a17b415717db0200"
+      },
+      "credit": {
+        "credit_id": "CREDIT-SAHEL_SENEGAL-872264D0",
+        "pilot_site": "sahel_senegal",
+        "volume_tCO2e": 1710.28,
+        "credit_value_usd": 21378.5,
+        "blockchain_tx_hash": "0x4979b5b563a38d287bf1793512297c5e2ee0648d7ee3c867e64f73e4b3ee71d5",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-SAHEL_SENEGAL-FDF2A868",
+        "pilot_site": "sahel_senegal",
+        "breakdown": {
+          "carbon_payment_usd": 17102.8,
+          "water_saved_m3": 1075.0,
+          "water_payment_usd": 806.25,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 19758.37,
+        "blockchain_tx_hash": "0xcd6549c15e1d5f886f59984c67410b72551211043a130918bf783c3a2b4ac455",
+        "status": "paid"
+      }
+    },
+    "ethiopian_highlands": {
+      "mrv": {
+        "pilot_site": "ethiopian_highlands",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 1.5,
+            "final_soc_percent": 1.686,
+            "total_change_tCO2": 2659.8
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 797.94
+          },
+          "total_sequestration_tCO2": 3457.74,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 1.0,
+            "final_kg_m3": 1.12
+          },
+          "water_saved_m3": 918.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.34
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.396359+00:00",
+        "report_hash": "ae59e279dcee5c0f4de22d5e720527576ce57018a8800013f3a86f44f14acfaa"
+      },
+      "credit": {
+        "credit_id": "CREDIT-ETHIOPIAN_HIGHLANDS-C9E66F25",
+        "pilot_site": "ethiopian_highlands",
+        "volume_tCO2e": 3457.74,
+        "credit_value_usd": 43221.75,
+        "blockchain_tx_hash": "0x38b285d74b8078bed8f6f6431ee524a1aa1f2c1f4274a45f439d692e490b4c0c",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-ETHIOPIAN_HIGHLANDS-A8FA431B",
+        "pilot_site": "ethiopian_highlands",
+        "breakdown": {
+          "carbon_payment_usd": 34577.4,
+          "water_saved_m3": 918.0,
+          "water_payment_usd": 688.5,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 37115.22,
+        "blockchain_tx_hash": "0x71b08584e8d7bc603b54485753350d41b1926c8906df755f5e427dfe0b9d8ecd",
+        "status": "paid"
+      }
+    },
+    "rajasthan": {
+      "mrv": {
+        "pilot_site": "rajasthan",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.7,
+            "final_soc_percent": 0.78,
+            "total_change_tCO2": 1144.0
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 343.2
+          },
+          "total_sequestration_tCO2": 1487.2,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.6,
+            "final_kg_m3": 0.67
+          },
+          "water_saved_m3": 1191.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.47
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.396738+00:00",
+        "report_hash": "eac7ff9337fb3e432fc1dd37fa9cdda72b9209fa60719600d98afda25dd3f262"
+      },
+      "credit": {
+        "credit_id": "CREDIT-RAJASTHAN-798D13BC",
+        "pilot_site": "rajasthan",
+        "volume_tCO2e": 1487.2,
+        "credit_value_usd": 18590.0,
+        "blockchain_tx_hash": "0x71e3f3deec47d4cad89a2d9d2659d5f6966d630c86f825545d2be56809deaf01",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-RAJASTHAN-7FDA7DBD",
+        "pilot_site": "rajasthan",
+        "breakdown": {
+          "carbon_payment_usd": 14872.0,
+          "water_saved_m3": 1191.0,
+          "water_payment_usd": 893.25,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 17614.57,
+        "blockchain_tx_hash": "0x53c94c7aca28c8d3f57b0820d594645c1f463fef9133c8481be64a65a7ed078a",
+        "status": "paid"
+      }
+    },
+    "outback_australia": {
+      "mrv": {
+        "pilot_site": "outback_australia",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.5,
+            "final_soc_percent": 0.541,
+            "total_change_tCO2": 586.3
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 175.89
+          },
+          "total_sequestration_tCO2": 762.19,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.4,
+            "final_kg_m3": 0.43
+          },
+          "water_saved_m3": 953.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.87
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.397087+00:00",
+        "report_hash": "9f5dd3e619573deed9942295b09cb409dcb216af1556159f88a22ea517166e8f"
+      },
+      "credit": {
+        "credit_id": "CREDIT-OUTBACK_AUSTRALIA-5B23CA4F",
+        "pilot_site": "outback_australia",
+        "volume_tCO2e": 762.19,
+        "credit_value_usd": 9527.38,
+        "blockchain_tx_hash": "0x25233822ff6c5ab229ef50e7936faae9bd6120a9979a99f76a62cee0b795b5ef",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-OUTBACK_AUSTRALIA-2780C73C",
+        "pilot_site": "outback_australia",
+        "breakdown": {
+          "carbon_payment_usd": 7621.9,
+          "water_saved_m3": 953.0,
+          "water_payment_usd": 714.75,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 10185.97,
+        "blockchain_tx_hash": "0xbb97466559de0ed579700d59806970f0c47e03b6d9510c01e9160fe194799882",
+        "status": "paid"
+      }
+    },
+    "atacama_chile": {
+      "mrv": {
+        "pilot_site": "atacama_chile",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 0.3,
+            "final_soc_percent": 0.318,
+            "total_change_tCO2": 257.4
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 77.22
+          },
+          "total_sequestration_tCO2": 334.62,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.2,
+            "final_kg_m3": 0.21
+          },
+          "water_saved_m3": 1337.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 14.17
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.397452+00:00",
+        "report_hash": "c4d82353c8ec7169a1a411d6524d4777da4ac878fd6de1a79514640e82c0dd03"
+      },
+      "credit": {
+        "credit_id": "CREDIT-ATACAMA_CHILE-A0EE2434",
+        "pilot_site": "atacama_chile",
+        "volume_tCO2e": 334.62,
+        "credit_value_usd": 4182.75,
+        "blockchain_tx_hash": "0x2178154fcf510b88fdca778e36a6ee60de58942f0a0ad5db17f62aa9429bca7d",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-ATACAMA_CHILE-DBAA938A",
+        "pilot_site": "atacama_chile",
+        "breakdown": {
+          "carbon_payment_usd": 3346.2,
+          "water_saved_m3": 1337.0,
+          "water_payment_usd": 1002.75,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 6198.27,
+        "blockchain_tx_hash": "0x8b8356f632916dcbaf05d214976d5918449d7b40f6ef84523e68c26ed9ef8693",
+        "status": "paid"
+      }
+    },
+    "mongolian_steppe": {
+      "mrv": {
+        "pilot_site": "mongolian_steppe",
+        "carbon": {
+          "soil_carbon": {
+            "baseline_soc_percent": 1.3,
+            "final_soc_percent": 1.457,
+            "total_change_tCO2": 2245.1
+          },
+          "biomass_carbon": {
+            "sequestration_tCO2": 673.53
+          },
+          "total_sequestration_tCO2": 2918.63,
+          "methodology": "IPCC AFOLU Tier 2"
+        },
+        "water": {
+          "wue": {
+            "baseline_kg_m3": 0.9,
+            "final_kg_m3": 1.01
+          },
+          "water_saved_m3": 1250.0
+        },
+        "soil": {
+          "erosion": {
+            "current_t_ha_yr": 13.38
+          },
+          "methodology": "RUSLE"
+        },
+        "generated_at": "2026-06-15T06:22:19.397820+00:00",
+        "report_hash": "c2b57ab494cf438d2b5c94e1d842a72d356c8a5e58bcc7e2aa98ca33bf619b12"
+      },
+      "credit": {
+        "credit_id": "CREDIT-MONGOLIAN_STEPPE-6EEF822A",
+        "pilot_site": "mongolian_steppe",
+        "volume_tCO2e": 2918.63,
+        "credit_value_usd": 36482.88,
+        "blockchain_tx_hash": "0x7ab18ef80793898ba4d3bfcce9e7328fd9dc83b209e56fd58274b20bf10e9dd2",
+        "status": "issued"
+      },
+      "payment": {
+        "payment_id": "PES-MONGOLIAN_STEPPE-82074274",
+        "pilot_site": "mongolian_steppe",
+        "breakdown": {
+          "carbon_payment_usd": 29186.3,
+          "water_saved_m3": 1250.0,
+          "water_payment_usd": 937.5,
+          "soil_payment_usd": 1849.32
+        },
+        "total_payment_usd": 31973.12,
+        "blockchain_tx_hash": "0x8db5e3e0b224ae9cfab559ca2d4ecf696d6f135b0d1b0133fd71f653ee6f4d79",
+        "status": "paid"
+      }
+    }
+  },
+  "summary": {
+    "total_carbon_tCO2e": 22140.69,
+    "total_water_m3": 14262.0,
+    "total_pay_usd": 254295.24
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "pilot_id": "rodbar_talesh",
+  "name": "رودبار و تالش",
+  "country": "ایران",
+  "continent": "آسیا",
+  "province": "گیلان",
+  "climate_zone": "مرطوب جنگلی (Cfb)",
+  "coordinates": {
+    "lat": 37.0,
+    "lon": 49.5
+  },
+  "area_hectares": 6000,
+  "elevation_m": 800,
+  "annual_precipitation_mm": 1200,
+  "avg_temperature_c": 15.2,
+  "soil_type": "عمیق، حساس به فرسایش",
+  "land_use": [
+    "جنگل هیرکانی",
+    "باغ",
+    "چای"
+  ],
+  "main_challenges": [
+    "رانش و لغزش",
+    "آلودگی آب",
+    "تخریب جنگل"
+  ],
+  "interventions": [
+    "تثبیت شیب",
+    "حفاظت جنگل",
+    "مدیریت پسماند"
+  ],
+  "baseline_indicators": {
+    "forest_cover_percent": 45.0,
+    "erosion_t_ha_year": 22.0,
+    "biodiversity_index": 0.65
+  },
+  "target_indicators": {
+    "forest_cover_percent": 65.0,
+    "erosion_t_ha_year": 10.0,
+    "biodiversity_index": 0.85
+  },
+  "beneficiaries": {
+    "households": 420,
+    "farmers": 350,
+    "women": 150
+  }
+}

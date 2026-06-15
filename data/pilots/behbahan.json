@@ -1,0 +1,49 @@
+{
+  "pilot_id": "behbahan",
+  "name": "بهبهان",
+  "country": "ایران",
+  "continent": "آسیا",
+  "province": "خوزستان",
+  "climate_zone": "نیمه‌خشک گرم (BSh)",
+  "coordinates": {
+    "lat": 30.6,
+    "lon": 50.2
+  },
+  "area_hectares": 8000,
+  "elevation_m": 250,
+  "annual_precipitation_mm": 280,
+  "avg_temperature_c": 24.8,
+  "soil_type": "شوری متوسط تا شدید",
+  "land_use": [
+    "کشاورزی آبی",
+    "نیشکر",
+    "صیفی"
+  ],
+  "main_challenges": [
+    "شوری خاک و آب",
+    "افت آب زیرزمینی",
+    "آلودگی نیترات"
+  ],
+  "interventions": [
+    "IWRM",
+    "مدیریت شوری",
+    "اصلاح الگوی کشت"
+  ],
+  "baseline_indicators": {
+    "wue_kg_m3": 1.1,
+    "soc_percent": 0.8,
+    "salinity_ds_m": 6.5,
+    "groundwater_level_m": 8.5
+  },
+  "target_indicators": {
+    "wue_kg_m3": 2.0,
+    "soc_percent": 1.8,
+    "salinity_ds_m": 3.5,
+    "groundwater_level_m": 12.0
+  },
+  "beneficiaries": {
+    "households": 520,
+    "farmers": 450,
+    "women": 180
+  }
+}

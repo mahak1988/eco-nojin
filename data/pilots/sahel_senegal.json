@@ -1,0 +1,52 @@
+{
+  "pilot_id": "sahel_senegal",
+  "name": "ساحل سنگال",
+  "country": "سنگال",
+  "continent": "آفریقا",
+  "province": "Louga",
+  "climate_zone": "نیمه‌خشک ساحلی (BSh)",
+  "coordinates": {
+    "lat": 15.62,
+    "lon": -16.22
+  },
+  "area_hectares": 9000,
+  "elevation_m": 30,
+  "annual_precipitation_mm": 380,
+  "avg_temperature_c": 26.5,
+  "soil_type": "شنی-لومی، فقیر",
+  "land_use": [
+    "کشاورزی دیم",
+    "دامداری",
+    "جنگل‌کاری"
+  ],
+  "main_challenges": [
+    "پیشروی صحرا",
+    "شوری خاک",
+    "ناامنی غذایی"
+  ],
+  "interventions": [
+    "دیوار سبز بزرگ آفریقا",
+    "کشاورزی حفاظتی",
+    "آگروفارستری"
+  ],
+  "baseline_indicators": {
+    "food_security_score": 42,
+    "soc_percent": 0.6,
+    "tree_cover_percent": 8.0
+  },
+  "target_indicators": {
+    "food_security_score": 72,
+    "soc_percent": 1.5,
+    "tree_cover_percent": 25.0
+  },
+  "beneficiaries": {
+    "households": 780,
+    "farmers": 620,
+    "women": 340
+  },
+  "global_partnership": [
+    "Great Green Wall",
+    "AFR100",
+    "FAO"
+  ]
+}

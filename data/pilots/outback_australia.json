@@ -1,0 +1,52 @@
+{
+  "pilot_id": "outback_australia",
+  "name": "اوت‌بک استرالیا",
+  "country": "استرالیا",
+  "continent": "اقیانوسیه",
+  "province": "Northern Territory",
+  "climate_zone": "بیابانی گرم (BWh)",
+  "coordinates": {
+    "lat": -23.7,
+    "lon": 133.88
+  },
+  "area_hectares": 25000,
+  "elevation_m": 450,
+  "annual_precipitation_mm": 180,
+  "avg_temperature_c": 25.0,
+  "soil_type": "شنی-سنگی، فقیر از مواد مغذی",
+  "land_use": [
+    "دامداری گسترده",
+    "مرتع بومی",
+    "اکوتوریسم"
+  ],
+  "main_challenges": [
+    "خشکسالی طولانی",
+    "تخریب مرتع",
+    "آتش‌سوزی"
+  ],
+  "interventions": [
+    "مدیریت بومی آتش",
+    "مرتع‌داری پایدار",
+    "حفاظت آب"
+  ],
+  "baseline_indicators": {
+    "rangeland_condition": 0.45,
+    "biodiversity_index": 0.7,
+    "fire_frequency_years": 3
+  },
+  "target_indicators": {
+    "rangeland_condition": 0.75,
+    "biodiversity_index": 0.85,
+    "fire_frequency_years": 6
+  },
+  "beneficiaries": {
+    "households": 85,
+    "indigenous_communities": 12,
+    "ranchers": 45
+  },
+  "global_partnership": [
+    "Australian Gov",
+    "Landcare",
+    "Indigenous Rangers"
+  ]
+}

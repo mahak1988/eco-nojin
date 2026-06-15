@@ -1,0 +1,49 @@
+{
+  "pilot_id": "dishmok",
+  "name": "دیشموک",
+  "country": "ایران",
+  "continent": "آسیا",
+  "province": "کهگیلویه و بویراحمد",
+  "climate_zone": "نیمه‌خشک کوهستانی (BSk)",
+  "coordinates": {
+    "lat": 30.9,
+    "lon": 51.4
+  },
+  "area_hectares": 5000,
+  "elevation_m": 1800,
+  "annual_precipitation_mm": 450,
+  "avg_temperature_c": 16.5,
+  "soil_type": "کم‌عمق، سنگی",
+  "land_use": [
+    "مرتع",
+    "زراعت دیم",
+    "بادام کوهی"
+  ],
+  "main_challenges": [
+    "فرسایش شدید",
+    "کم‌آبی",
+    "تخریب مرتع"
+  ],
+  "interventions": [
+    "SWC-AgMAR",
+    "احیای مرتع",
+    "آگروفارستری"
+  ],
+  "baseline_indicators": {
+    "wue_kg_m3": 0.8,
+    "soc_percent": 1.2,
+    "erosion_t_ha_year": 18.5,
+    "ndvi": 0.25
+  },
+  "target_indicators": {
+    "wue_kg_m3": 1.5,
+    "soc_percent": 2.5,
+    "erosion_t_ha_year": 8.0,
+    "ndvi": 0.45
+  },
+  "beneficiaries": {
+    "households": 350,
+    "farmers": 280,
+    "women": 120
+  }
+}

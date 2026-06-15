@@ -1,0 +1,46 @@
+{
+  "total_pilots": 12,
+  "total_countries": 9,
+  "continents": [
+    "آسیا",
+    "آفریقا",
+    "اقیانوسیه",
+    "آمریکای جنوبی"
+  ],
+  "climate_zones": [
+    "نیمه‌خشک کوهستانی",
+    "نیمه‌خشک گرم",
+    "مرطوب جنگلی",
+    "کوهستانی برفی",
+    "بیابانی نیمه‌خشک",
+    "بیابانی گرم",
+    "نیمه‌خشک ساحلی",
+    "کوهستانی نیمه‌خشک",
+    "فوق‌خشک",
+    "استپ خشک سرد"
+  ],
+  "total_area_hectares": 146000,
+  "total_beneficiaries": {
+    "households": 6955,
+    "farmers": 5670,
+    "women": 2560,
+    "indigenous_communities": 47
+  },
+  "global_partnerships": [
+    "UNCCD",
+    "GEF",
+    "GCF",
+    "FAO",
+    "World Bank",
+    "UNDP",
+    "IFAD",
+    "UNESCO",
+    "GIZ",
+    "AFR100",
+    "Great Green Wall",
+    "ICRISAT",
+    "CGIAR"
+  ],
+  "created_at": "2026-06-15T04:27:13.580656",
+  "vision": "Econojin as a Global Platform for Dryland Landscape Management"
+}

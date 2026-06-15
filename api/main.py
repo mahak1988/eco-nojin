@@ -1,146 +1,161 @@
 """
-Econojin API - Main Application
+Econojin Platform - Main FastAPI Application
+Integrated Landscape Management across 12 global pilots
 """
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.core.config import settings, validate_settings
-
-# Import routers
-from api.modules.auth.router import router as auth_router
-from api.modules.farmer.router import router as farmer_router
-from api.modules.ecocoin.router import router as ecocoin_router
-from api.modules.ecomining.router import router as ecomining_router
-from api.modules.dashboard.router import router as dashboard_router
-from api.modules.desktop.router import router as desktop_router
-from api.modules.weather.router import router as weather_router
-from api.modules.drought.router import router as drought_router
-from api.modules.soil_water.router import router as soil_water_router
-from api.modules.mrv.router import router as mrv_router
-from api.modules.iot.router import router as iot_router
-from api.modules.store.router import router as store_router
-from api.modules.financial.router import router as financial_router
-from api.modules.accounting.router import router as accounting_router
-from api.modules.academy.router import router as academy_router
-from api.modules.education.router import router as education_router
-from api.modules.library.router import router as library_router
-from api.modules.community.router import router as community_router
-from api.modules.newsletter.router import router as newsletter_router
-from api.modules.psychology.router import router as psychology_router
-from api.modules.games.router import router as games_router
-from api.modules.maintenance.router import router as maintenance_router
-from api.modules.simulation.router import router as simulation_router
-from api.modules.ai.router import router as ai_router
-from api.scientific_core.router import router as scientific_router
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Startup and shutdown events - with error handling"""
-    print("🚀 Starting Econojin v2.0.0...")
-    
-    # Validate settings
-    try:
-        validate_settings()
-    except Exception as e:
-        print(f"⚠️  Settings validation error: {e}")
-    
-    # Initialize database
-    try:
-        from api.core.database import init_db
-        await init_db()
-        print("✅ Database initialized")
-    except Exception as e:
-        print(f"❌ Database initialization error: {e}")
-        import traceback
-        traceback.print_exc()
-    
-    # Start Early Warning Engine (optional)
-    try:
-        from api.services.early_warning_engine import ews_engine
-        import asyncio
-        asyncio.create_task(ews_engine.start())
-        print("✅ Early Warning Engine started")
-    except Exception as e:
-        print(f"⚠️  EWS skipped: {e}")
-    
-    print("✅ Ready on http://127.0.0.1:8000")
-    print("📚 API Docs: http://127.0.0.1:8000/docs")
-    
-    yield
-    
-    print("🛑 Shutting down...")
-
-
+# ========================================================================
+# Create FastAPI app
+# ========================================================================
 app = FastAPI(
-    title="Econojin API",
-    description="Econojin Platform API",
-    version="2.0.0",
-    lifespan=lifespan,
+    title="Econojin Platform",
+    description="Integrated Landscape Management Platform - Hydroma Nojin",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
-# CORS
+# ========================================================================
+# CORS Middleware
+# ========================================================================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ========================================================================
+# Import Domain Routers
+# ========================================================================
+try:
+    # Core domains (always available)
+    from api.domains.drought.routers.drought_router import router as drought_router
+    from api.domains.soil_water.routers.soil_water_router import router as soil_water_router
+    from api.domains.financial.routers.financial_router import router as financial_router
+    
+    # Extended domains (may be added progressively)
+    from api.domains.psychology.routers.psychology_router import router as psychology_router
+    from api.domains.iot.routers.iot_router import router as iot_router
+    from api.domains.hydrology.routers.hydrology_router import router as hydrology_router
+    from api.domains.dashboard.routers.dashboard_router import router as dashboard_router
+    from api.domains.training.routers.training_router import router as training_router
+    from api.domains.remote_sensing.routers.remote_sensing_router import router as remote_sensing_router
+    from api.domains.mrv.routers.mrv_router import router as mrv_router
+    from api.domains.safeguards.routers.safeguards_router import router as safeguards_router
+    from api.domains.pilots.routers.pilot_router import router as pilots_router
+    from api.domains.logframe.routers.logframe_router import router as logframe_router
+    
+    # Register all routers
+    app.include_router(drought_router, prefix="/api/drought", tags=["Drought"])
+    app.include_router(soil_water_router, prefix="/api/soil-water", tags=["Soil & Water"])
+    app.include_router(financial_router, prefix="/api/financial", tags=["Financial"])
+    app.include_router(psychology_router, prefix="/api/psychology", tags=["Psychology"])
+    app.include_router(iot_router, prefix="/api/iot", tags=["IoT"])
+    app.include_router(hydrology_router, prefix="/api/hydrology", tags=["Hydrology"])
+    app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Dashboard"])
+    app.include_router(training_router, prefix="/api/training", tags=["Training"])
+    app.include_router(remote_sensing_router, prefix="/api/remote-sensing", tags=["Remote Sensing"])
+    app.include_router(mrv_router, prefix="/api/mrv", tags=["MRV"])
+    app.include_router(safeguards_router, prefix="/api/safeguards", tags=["Safeguards"])
+    app.include_router(pilots_router, prefix="/api/pilots", tags=["Pilots"])
+    app.include_router(logframe_router, prefix="/api/logframe", tags=["LogFrame"])
+    
+    print("✅ All domain routers registered successfully")
+    
+except ImportError as e:
+    print(f"⚠️  Some routers could not be imported: {e}")
+    print("   Continuing with available routers...")
 
+# ========================================================================
+# Gateway Router (if available)
+# ========================================================================
+try:
+    from api.gateway.api_gateway import router as gateway_router
+    app.include_router(gateway_router, prefix="/gateway", tags=["Gateway"])
+    print("✅ Gateway router registered")
+except ImportError:
+    print("⚠️  Gateway router not available")
+
+# ========================================================================
+# Root Endpoints
+# ========================================================================
 @app.get("/")
-async def root():
+def root():
+    """Root endpoint"""
     return {
-        "name": "Econojin API",
-        "version": "2.0.0",
-        "status": "running",
+        "message": "Econojin Platform - Hydroma Nojin",
+        "version": "1.0.0",
+        "status": "operational",
         "docs": "/docs",
+        "redoc": "/redoc"
     }
 
 
-@app.get("/api/v1/health")
-async def health():
-    return {"status": "healthy", "version": "2.0.0"}
+@app.get("/health")
+def health():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "platform": "Econojin",
+        "version": "1.0.0"
+    }
 
 
-# Register all routers
-ROUTERS = [
-    (auth_router, "/api/v1"),
-    (farmer_router, "/api/v1/farmers"),
-    (ecocoin_router, "/api/v1"),
-    (ecomining_router, "/api/v1"),
-    (dashboard_router, "/api/v1"),
-    (desktop_router, "/api/v1"),
-    (weather_router, "/api/v1"),
-    (drought_router, "/api/v1"),
-    (soil_water_router, "/api/v1"),
-    (mrv_router, "/api/v1"),
-    (iot_router, "/api/v1"),
-    (scientific_router, "/api/v1"),
-    (store_router, "/api/v1"),
-    (financial_router, "/api/v1"),
-    (accounting_router, "/api/v1"),
-    (academy_router, "/api/v1"),
-    (education_router, "/api/v1"),
-    (library_router, "/api/v1"),
-    (community_router, "/api/v1"),
-    (newsletter_router, "/api/v1"),
-    (psychology_router, "/api/v1"),
-    (games_router, "/api/v1"),
-    (maintenance_router, "/api/v1"),
-    (simulation_router, "/api/v1"),
-    (ai_router, "/api/v1"),
-]
-
-for router_instance, prefix in ROUTERS:
-    app.include_router(router_instance, prefix=prefix)
-
-print(f"✅ All {len(ROUTERS)} routers registered")
+@app.get("/api/info")
+def api_info():
+    """API information"""
+    return {
+        "name": "Econojin Platform API",
+        "version": "1.0.0",
+        "description": "Integrated Landscape Management Platform",
+        "domains": [
+            "drought",
+            "soil_water",
+            "financial",
+            "psychology",
+            "iot",
+            "hydrology",
+            "dashboard",
+            "training",
+            "remote_sensing",
+            "mrv",
+            "safeguards",
+            "pilots",
+            "logframe"
+        ],
+        "total_pilots": 12,
+        "frameworks": ["CSA", "IWRM", "SLM", "LDN", "NbS"]
+    }
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("api.main:app", host="0.0.0.0", port=8000, reload=True)
+# ========================================================================
+# Startup Event
+# ========================================================================
+@app.on_event("startup")
+async def startup_event():
+    """Initialize on startup"""
+    print("=" * 80)
+    print("🚀 Econojin Platform Starting...")
+    print("=" * 80)
+    print("📍 Platform: Integrated Landscape Management")
+    print("🌍 Pilots: 12 global sites")
+    print("📊 Frameworks: CSA, IWRM, SLM, LDN, NbS")
+    print("=" * 80)
+    
+    # Optional: Create database tables on startup
+    try:
+        from api.core.database import create_tables
+        # Uncomment the next line to auto-create tables on startup
+        # create_tables()
+        pass
+    except Exception as e:
+        print(f"⚠️  Could not initialize database: {e}")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    print("👋 Econojin Platform shutting down...")

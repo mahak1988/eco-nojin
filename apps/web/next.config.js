@@ -1,22 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    domains: ['images.unsplash.com', 'localhost'],
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000"]
+    }
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*',
-      },
-    ];
+  // i18n handled by next-intl routing, but we also declare locales here
+  i18n: {
+    locales: ["fa", "en"],
+    defaultLocale: "fa"
   },
 };
 

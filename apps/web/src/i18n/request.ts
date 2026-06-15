@@ -1,13 +1,17 @@
-import { getRequestConfig } from "next-intl/server";
-import { routing } from "./routing";
+import {NextRequest} from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
+import {locales, defaultLocale} from "./routing";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
-  if (!locale || !routing.locales.includes(locale as "fa" | "en")) {
-    locale = routing.defaultLocale;
-  }
-  return {
-    locale,
-    messages: (await import(`./messages/${locale}.json`)).default,
-  };
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale
 });
+
+export default function middleware(request: NextRequest) {
+  return intlMiddleware(request);
+}
+
+export const config = {
+  // Match only internationalized pathnames
+  matcher: ["/", "/(.*)"],
+};

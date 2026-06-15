@@ -1,20 +1,22 @@
-import './globals.css';
-import { Providers } from '@/components/providers/Providers';
+import type { Metadata } from "next";
+import React from "react";
+import "./globals.css";
 
-export const metadata = {
-  title: 'Econojin',
-  description: 'Econojin Platform',
+export const metadata: Metadata = {
+  title: "EcoNojin GeoAI–DSS",
+  description:
+    "Integrated dashboard for water, soil, climate, carbon and livelihoods in arid and semi-arid landscapes.",
 };
 
-export default function RootLayout({
-  children,
-}: {
+type RootLayoutProps = {
   children: React.ReactNode;
-}) {
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="fa" dir="rtl">
-      <body>
-        <Providers>{children}</Providers>
+    <html lang="en">
+      <body className="bg-slate-950 text-slate-100">
+        {children}
       </body>
     </html>
   );
