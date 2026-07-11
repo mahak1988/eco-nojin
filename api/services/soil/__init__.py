@@ -1,1 +1,0 @@
-from .soilgrids import soilgrids, SoilGridsService

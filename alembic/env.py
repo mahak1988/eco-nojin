@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 try:
-    from api.core.database import Base
+    from apps.app.core.database import Base
 except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
     Base = declarative_base()
@@ -19,17 +19,17 @@ if config.config_file_name is not None:
 
 # Auto-import all db_models
 try:
-    from api.domains.dashboard.models.db_models import *
-    from api.domains.hydrology.models.db_models import *
-    from api.domains.iot.models.db_models import *
-    from api.domains.logframe.models.db_models import *
-    from api.domains.mrv.models.db_models import *
-    from api.domains.pilots.models.db_models import *
-    from api.domains.psychology.models.db_models import *
-    from api.domains.remote_sensing.models.db_models import *
-    from api.domains.safeguards.models.db_models import *
-    from api.domains.training.models.db_models import *
-    from api.domains.lms.models.db_models import *
+    from apps.app.domains.dashboard.models.db_models import *
+    from apps.app.domains.hydrology.models.db_models import *
+    from apps.app.domains.iot.models.db_models import *
+    from apps.app.domains.logframe.models.db_models import *
+    from apps.app.domains.mrv.models.db_models import *
+    from apps.app.domains.pilots.models.db_models import *
+    from apps.app.domains.psychology.models.db_models import *
+    from apps.app.domains.remote_sensing.models.db_models import *
+    from apps.app.domains.safeguards.models.db_models import *
+    from apps.app.domains.training.models.db_models import *
+    from apps.app.domains.lms.models.db_models import *
 except ImportError as e:
     print(f"Warning: {e}")
 

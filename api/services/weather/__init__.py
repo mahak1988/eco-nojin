@@ -1,1 +1,0 @@
-from .open_meteo import open_meteo, OpenMeteoService

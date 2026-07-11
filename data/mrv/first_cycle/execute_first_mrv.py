@@ -2,10 +2,10 @@ import sys, os, json
 from pathlib import Path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from api.services.iot.iot_data_simulator import IoTDataSimulator
-from api.services.mrv.mrv_calculator import MRVCalculator
-from api.services.carbon.carbon_credit_issuer import CarbonCreditIssuer
-from api.services.pes.pes_payment_system import PESPaymentSystem
+from apps.app.services.iot.iot_data_simulator import IoTDataSimulator
+from apps.app.services.mrv.mrv_calculator import MRVCalculator
+from apps.app.services.carbon.carbon_credit_issuer import CarbonCreditIssuer
+from apps.app.services.pes.pes_payment_system import PESPaymentSystem
 
 def execute_first_mrv_cycle():
     print("=" * 80)
