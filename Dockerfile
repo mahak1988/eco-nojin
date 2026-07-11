@@ -1,55 +1,22 @@
-version: "3.9"
+FROM python:3.13-slim
 
-services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: econojin-backend
-    restart: unless-stopped
-    ports: ["8000:8000"]
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:econojin_pass@db:5432/econojin
-      - ENABLE_DATABASE=true
-      - DEBUG=false
-    depends_on:
-      db: { condition: service_healthy }
-    networks: [econet]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+WORKDIR /app
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: econojin-frontend
-    restart: unless-stopped
-    ports: ["80:80"]
-    depends_on: [backend]
-    networks: [econet]
+# نصب وابستگی‌های سیستمی
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-  db:
-    image: postgis/postgis:17-3.5
-    container_name: econojin-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: econojin
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: econojin_pass
-    volumes: [pgdata:/var/lib/postgresql/data]
-    ports: ["5432:5432"]
-    networks: [econet]
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+# نصب وابستگی‌های پایتون
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-networks:
-  econet: { driver: bridge }
+# کپی کردن کد پروژه
+COPY . .
 
-volumes:
-  pgdata:
+# تنظیم متغیر محیطی
+ENV PYTHONPATH=/app
+
+# اجرای بک‌اند
+CMD ["uvicorn", "apps.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

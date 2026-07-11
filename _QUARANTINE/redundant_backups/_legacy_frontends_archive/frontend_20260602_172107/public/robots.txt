@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://econojin.com/sitemap.xml
-
-# Crawl-delay for better performance
-Crawl-delay: 1

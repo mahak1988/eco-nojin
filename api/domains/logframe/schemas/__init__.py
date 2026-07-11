@@ -1,1 +1,0 @@
-"""LogFrame schemas."""
