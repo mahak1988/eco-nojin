@@ -1,24 +1,43 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "apps/web",
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["src/*"],
+      "@econojin/ui": ["../../packages/ui/src"],
+      "@econojin/ui/*": ["../../packages/ui/src/*"],
+      "@econojin/lib": ["../../packages/lib/src"],
+      "@econojin/lib/*": ["../../packages/lib/src/*"],
+      "@econojin/hooks": ["../../packages/hooks/src"],
+      "@econojin/hooks/*": ["../../packages/hooks/src/*"],
+      "@econojin/types": ["../../packages/types/src"],
+      "@econojin/types/*": ["../../packages/types/src/*"]
+    },
+
+    "types": ["vite/client"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
