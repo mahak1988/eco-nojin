@@ -1,0 +1,234 @@
+{
+  "root": "D:\\econojin.com",
+  "analyzed_at": "2026-07-15T05:13:30",
+  "focus": "apps",
+  "total_files": 334,
+  "total_size_bytes": 2049594,
+  "total_loc": 43357,
+  "files_by_language": {
+    "Python": 128,
+    "TypeScript (TSX)": 104,
+    "TypeScript": 57,
+    "JSON": 17,
+    "Markdown": 3,
+    "JavaScript": 2,
+    "CSS": 2,
+    "Plain Text": 1,
+    "PowerShell": 1,
+    "HTML": 1
+  },
+  "loc_by_language": {
+    "Python": 22401,
+    "TypeScript (TSX)": 9697,
+    "JSON": 6806,
+    "TypeScript": 3707,
+    "CSS": 298,
+    "PowerShell": 158,
+    "Markdown": 139,
+    "JavaScript": 64,
+    "Plain Text": 62,
+    "HTML": 25
+  },
+  "largest_files": [
+    {
+      "path": "apps\\web\\src\\i18n\\locales\\fa.json.backup_20260714_072112",
+      "size_bytes": 112480,
+      "size_human": "109.8 KB"
+    },
+    {
+      "path": "apps\\web\\generate_batch2.py",
+      "size_bytes": 88625,
+      "size_human": "86.5 KB"
+    },
+    {
+      "path": "apps\\econojin.db",
+      "size_bytes": 77824,
+      "size_human": "76.0 KB"
+    },
+    {
+      "path": "apps\\web\\generate_languages.py",
+      "size_bytes": 71531,
+      "size_human": "69.9 KB"
+    },
+    {
+      "path": "apps\\web\\generate_phase5.py",
+      "size_bytes": 69584,
+      "size_human": "68.0 KB"
+    },
+    {
+      "path": "apps\\web\\generate_advanced.py",
+      "size_bytes": 66622,
+      "size_human": "65.1 KB"
+    },
+    {
+      "path": "apps\\shared\\ecocoin\\ecocoin_model.py",
+      "size_bytes": 57055,
+      "size_human": "55.7 KB"
+    },
+    {
+      "path": "apps\\web\\src\\i18n\\locales\\fa.json",
+      "size_bytes": 38585,
+      "size_human": "37.7 KB"
+    },
+    {
+      "path": "apps\\web\\src\\i18n\\locales\\en.json",
+      "size_bytes": 36583,
+      "size_human": "35.7 KB"
+    },
+    {
+      "path": "apps\\web\\fix_build_errors.py",
+      "size_bytes": 34433,
+      "size_human": "33.6 KB"
+    }
+  ],
+  "detected_configs": {
+    "apps\\cms\\package.json": "Node.js / JavaScript package",
+    "apps\\cms\\README.md": "README documentation",
+    "apps\\library\\package.json": "Node.js / JavaScript package",
+    "apps\\web\\.env": "Environment variables (SENSITIVE)",
+    "apps\\web\\.env.example": "Env template (safe to commit)",
+    "apps\\web\\package.json": "Node.js / JavaScript package",
+    "apps\\web\\postcss.config.js": "PostCSS",
+    "apps\\web\\tailwind.config.js": "Tailwind CSS",
+    "apps\\web\\tsconfig.json": "TypeScript configuration",
+    "apps\\web\\vite.config.ts": "Vite bundler"
+  },
+  "dependencies": {
+    "ecosystems": [
+      "Node.js (npm)"
+    ],
+    "packages": {
+      "apps\\cms\\package.json": [
+        "@strapi/strapi@^5.0.0"
+      ],
+      "apps\\library\\package.json": [],
+      "apps\\web\\package.json": [
+        "@fontsource-variable/geist@^5.2.9",
+        "@headlessui/react@^2.2.10",
+        "@heroicons/react@^2.2.0",
+        "@rainbow-me/rainbowkit@^2.2.11",
+        "@supabase/supabase-js@^2.108.2",
+        "@tanstack/react-query@^5.101.2",
+        "@tanstack/react-query-devtools@^5.101.2",
+        "@tsparticles/react@^4.2.1",
+        "@tsparticles/slim@^4.2.1",
+        "aos@^2.3.4",
+        "axios@^1.17.0",
+        "class-variance-authority@^0.7.1",
+        "clsx@^2.1.1",
+        "ethers@^6.8.0",
+        "framer-motion@^12.40.0",
+        "i18next@^26.3.6",
+        "i18next-browser-languagedetector@^8.2.1",
+        "lucide-react@^1.21.0",
+        "radix-ui@^1.6.2",
+        "react@^18.3.1",
+        "react-dom@^18.3.1",
+        "react-i18next@^17.0.9",
+        "react-icons@^5.6.0",
+        "react-markdown@^10.1.0",
+        "react-router-dom@^6.30.4",
+        "recharts@^3.8.1",
+        "shadcn@^4.13.0",
+        "tailwind-merge@^2.6.1",
+        "tw-animate-css@^1.4.0",
+        "viem@^2.55.1",
+        "wagmi@^3.7.1",
+        "zustand@^5.0.14",
+        "@types/aos@^3.0.8",
+        "@types/node@^20.19.43",
+        "@types/react@^18.3.31",
+        "@types/react-dom@^18.3.7",
+        "@vitejs/plugin-react@^4.7.0",
+        "autoprefixer@^10.5.0",
+        "postcss@^8.5.15",
+        "tailwindcss@^3.4.19",
+        "typescript@^5.5.4",
+        "vite@^5.4.21"
+      ]
+    },
+    "workspaces": [
+      {
+        "path": "apps\\cms",
+        "name": "@econojin/cms",
+        "version": "0.1.0",
+        "private": true,
+        "is_workspace_root": false,
+        "dep_count": 1
+      },
+      {
+        "path": "apps\\library",
+        "name": "@econojin/library",
+        "version": "0.1.0",
+        "private": true,
+        "is_workspace_root": false,
+        "dep_count": 0
+      },
+      {
+        "path": "apps\\web",
+        "name": "hydrology-frontend",
+        "version": "0.1.0",
+        "private": true,
+        "is_workspace_root": false,
+        "dep_count": 42
+      }
+    ],
+    "project_name": null,
+    "project_version": null,
+    "package_manager": "pnpm"
+  },
+  "entry_points": [
+    "apps\\main.py",
+    "apps\\cms\\config\\server.ts",
+    "apps\\web\\index.html",
+    "apps\\web\\src\\i18n\\index.ts",
+    "apps\\web\\src\\types\\index.ts"
+  ],
+  "test_files": [
+    "apps\\ai_agents\\tests\\test_admin_agent.py",
+    "apps\\ai_agents\\tests\\test_ai_agents.py",
+    "apps\\ai_agents\\tests\\test_code_assistant_agent.py",
+    "apps\\ai_agents\\tests\\test_data_analyst_agent.py",
+    "apps\\ai_agents\\tests\\test_research_agent.py",
+    "apps\\ai_agents\\tests\\__init__.py",
+    "apps\\shared_ai\\tests\\test_advanced_rag.py",
+    "apps\\shared_ai\\tests\\test_fallback_system.py",
+    "apps\\shared_ai\\tests\\test_fast_compute.py",
+    "apps\\shared_ai\\tests\\test_full_integration.py",
+    "apps\\shared_ai\\tests\\test_integration.py",
+    "apps\\shared_ai\\tests\\test_llm_factory.py",
+    "apps\\shared_ai\\tests\\test_llm_simple.py",
+    "apps\\shared_ai\\tests\\test_rag.py",
+    "apps\\shared_ai\\tests\\test_rag_integration.py",
+    "apps\\shared_ai\\tests\\test_streaming.py",
+    "apps\\shared_ai\\tests\\__init__.py",
+    "apps\\shared_core\\tests\\test_database_session.py",
+    "apps\\shared_core\\tests\\test_env_loading.py",
+    "apps\\shared_core\\tests\\test_xai_models.py",
+    "apps\\shared_core\\tests\\__init__.py",
+    "apps\\simulation\\tests\\__init__.py",
+    "apps\\users\\tests\\test_users.py",
+    "apps\\users\\tests\\test_users_service.py",
+    "apps\\users\\tests\\__init__.py"
+  ],
+  "doc_files": [
+    "apps\\dependency_report.txt",
+    "apps\\cms\\README.md",
+    "apps\\web\\INSTALL.fa.md",
+    "apps\\web\\verification_report\\report.md"
+  ],
+  "ci_cd": [],
+  "docker_files": [],
+  "git_info": {
+    "is_git_repo": true,
+    "branch": "blackboxai/api-contract-audit",
+    "last_commit_msg": "feat(phase-4): add frontend-backend integration layer",
+    "remote": "https://github.com/narvan2050/eco-nojin-narvan.git"
+  },
+  "directory_tree": "econojin.com/apps/\n├── ai_agents/\n│   ├── agents/\n│   ├── tests/\n│   ├── models.py\n│   ├── repository.py\n│   ├── router.py\n│   ├── schemas.py\n│   └── service.py\n├── api/\n│   └── routes/\n├── cms/\n│   ├── config/\n│   ├── package.json\n│   └── README.md\n├── library/\n│   └── package.json\n├── shared/\n│   └── ecocoin/\n├── shared_ai/\n│   ├── ai/\n│   ├── tests/\n│   └── __init__.py\n├── shared_core/\n│   ├── database/\n│   ├── tests/\n│   └── __init__.py\n├── shared_knowledge/\n│   ├── knowledge/\n│   └── __init__.py\n├── shared_sim/\n│   └── __init__.py\n├── simulation/\n│   ├── agriculture/\n│   ├── biodiversity/\n│   ├── carbon_cycle/\n│   ├── economics/\n│   ├── ecosystem_services/\n│   ├── energy/\n│   ├── hydrology/\n│   ├── soil/\n│   ├── tests/\n│   └── water_quality/\n├── users/\n│   ├── tests/\n│   ├── auth_router.py\n│   ├── dependencies.py\n│   ├── models.py\n│   ├── repository.py\n│   ├── router.py\n│   ├── schemas.py\n│   └── service.py\n├── web/\n│   ├── public/\n│   ├── src/\n│   ├── verification_report/\n│   ├── components.json\n│   ├── fix-errors.ps1\n│   ├── fix_build_errors.py\n│   ├── fix_refactor.py\n│   ├── generate_advanced.py\n│   ├── generate_batch2.py\n│   ├── generate_languages.py\n│   ├── generate_phase5.py\n│   ├── index.html\n│   ├── INSTALL.fa.md\n│   ├── package.json\n│   ├── postcss.config.js\n│   ├── tailwind.config.js\n│   ├── tsconfig.json\n│   ├── tsconfig.node.json\n│   ├── update_routes.py\n│   ├── update_routes_phase5.py\n│   ├── verify_refactor.py\n│   └── vite.config.ts\n├── __init__.py\n├── conftest.py\n├── dependency_graph.dot\n├── dependency_report.txt\n├── econojin.db\n├── main.py\n├── main.py.backup_auth\n├── main.py.backup_fix\n└── main.py.backup_force",
+  "issues": [
+    "Found 9 backup file(s) in the repo — git history is the source of truth; remove these to reduce noise. Examples: apps\\main.py.backup_auth, apps\\main.py.backup_fix, apps\\main.py.backup_force (and 6 more)",
+    "⚠️  Found 1 database file(s) committed to the repo — these may contain user data and should be in .gitignore, not in git. Files: apps\\econojin.db"
+  ],
+  "errors": []
+}

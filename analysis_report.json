@@ -1,0 +1,461 @@
+{
+  "timestamp": "2026-07-12T14:46:35.503636",
+  "project": "Eco Nojin",
+  "sections": {
+    "security": {
+      "checks": [
+        {
+          "name": "Bandit Installation",
+          "status": "FAIL",
+          "message": "Bandit not found"
+        },
+        {
+          "name": "Hardcoded Secrets",
+          "status": "PASS",
+          "message": "No hardcoded secrets"
+        },
+        {
+          "name": "JWT Security",
+          "status": "PASS",
+          "message": "JWT configured securely"
+        },
+        {
+          "name": "CORS Security",
+          "status": "PASS",
+          "message": "CORS configured securely"
+        },
+        {
+          "name": "SQL Injection Prevention",
+          "status": "PASS",
+          "message": "No SQL injection risks"
+        }
+      ],
+      "score": 4,
+      "max_score": 5,
+      "percentage": 80.0
+    },
+    "code_quality": {
+      "checks": [
+        {
+          "name": "Flake8 (PEP 8)",
+          "status": "SKIP",
+          "message": "Flake8 not installed"
+        },
+        {
+          "name": "Pylint",
+          "status": "SKIP",
+          "message": "Pylint not installed"
+        },
+        {
+          "name": "MyPy (Type Checking)",
+          "status": "SKIP",
+          "message": "MyPy not installed"
+        },
+        {
+          "name": "Radon (Complexity)",
+          "status": "SKIP",
+          "message": "Radon not installed"
+        },
+        {
+          "name": "TypeScript Quality",
+          "status": "WARNING",
+          "message": "3617 TS files, 81 issues"
+        },
+        {
+          "name": "React Best Practices",
+          "status": "WARNING",
+          "message": "85 TSX files, 3 issues"
+        }
+      ],
+      "score": 0,
+      "max_score": 2,
+      "percentage": 0.0
+    },
+    "dependencies": {
+      "checks": [
+        {
+          "name": "pip-audit (Dependency Vulnerabilities)",
+          "status": "SKIP",
+          "message": "pip-audit not installed"
+        },
+        {
+          "name": "Safety (Dependency Security)",
+          "status": "SKIP",
+          "message": "Safety not installed"
+        },
+        {
+          "name": "Outdated Packages",
+          "status": "WARNING",
+          "message": "26 outdated packages found"
+        },
+        {
+          "name": "Frontend Dependencies",
+          "status": "PASS",
+          "message": "Frontend dependencies clean"
+        }
+      ],
+      "score": 1,
+      "max_score": 2,
+      "percentage": 50.0
+    },
+    "ddd_architecture": {
+      "checks": [
+        {
+          "name": "Layer: domain",
+          "status": "FAIL",
+          "message": "domain layer missing"
+        },
+        {
+          "name": "Layer: application",
+          "status": "FAIL",
+          "message": "application layer missing"
+        },
+        {
+          "name": "Layer: infrastructure",
+          "status": "FAIL",
+          "message": "infrastructure layer missing"
+        },
+        {
+          "name": "Layer: presentation",
+          "status": "PASS",
+          "message": "presentation layer exists"
+        },
+        {
+          "name": "Layer: core",
+          "status": "PASS",
+          "message": "core layer exists"
+        },
+        {
+          "name": "Dependency Inversion",
+          "status": "WARNING",
+          "message": "Dependency inversion violations found"
+        },
+        {
+          "name": "Repository Pattern",
+          "status": "WARNING",
+          "message": "Repository pattern not found"
+        },
+        {
+          "name": "Use Cases",
+          "status": "WARNING",
+          "message": "No use cases found"
+        }
+      ],
+      "score": 2,
+      "max_score": 8,
+      "percentage": 25.0
+    },
+    "ai_models": {
+      "checks": [
+        {
+          "name": "FreeLLMAPI Integration",
+          "status": "WARNING",
+          "message": "FreeLLMAPI not found"
+        },
+        {
+          "name": "OpenRouter Integration",
+          "status": "WARNING",
+          "message": "OpenRouter not found"
+        },
+        {
+          "name": "Hugging Face Integration",
+          "status": "WARNING",
+          "message": "Hugging Face not found"
+        },
+        {
+          "name": "Zhipu GLM Integration",
+          "status": "WARNING",
+          "message": "Zhipu GLM not found"
+        },
+        {
+          "name": "LangChain Integration",
+          "status": "WARNING",
+          "message": "LangChain not found"
+        },
+        {
+          "name": "AI Orchestrator",
+          "status": "WARNING",
+          "message": "AI Orchestrator not active"
+        }
+      ],
+      "score": 0,
+      "max_score": 6,
+      "percentage": 0.0
+    },
+    "quantum_computing": {
+      "checks": [
+        {
+          "name": "Qiskit Integration",
+          "status": "WARNING",
+          "message": "Qiskit not found"
+        },
+        {
+          "name": "PennyLane Integration",
+          "status": "WARNING",
+          "message": "PennyLane not found"
+        },
+        {
+          "name": "Quantum ML Libraries",
+          "status": "WARNING",
+          "message": "No QML libraries found"
+        }
+      ],
+      "score": 0,
+      "max_score": 3,
+      "percentage": 0.0
+    },
+    "blockchain": {
+      "checks": [
+        {
+          "name": "Web3.py Integration",
+          "status": "WARNING",
+          "message": "Web3.py not found"
+        },
+        {
+          "name": "EcoCoin Contracts",
+          "status": "WARNING",
+          "message": "EcoCoin contracts not found"
+        },
+        {
+          "name": "Solidity Files",
+          "status": "WARNING",
+          "message": "No Solidity files found"
+        },
+        {
+          "name": "OpenZeppelin Integration",
+          "status": "WARNING",
+          "message": "OpenZeppelin not found"
+        },
+        {
+          "name": "Ethereum RPC Configuration",
+          "status": "WARNING",
+          "message": "Ethereum RPC not configured"
+        }
+      ],
+      "score": 0,
+      "max_score": 5,
+      "percentage": 0.0
+    },
+    "cicd": {
+      "checks": [
+        {
+          "name": "GitHub Actions",
+          "status": "PASS",
+          "message": "13 workflows found"
+        },
+        {
+          "name": "Render Configuration",
+          "status": "WARNING",
+          "message": "Render not configured"
+        },
+        {
+          "name": "Vercel Configuration",
+          "status": "WARNING",
+          "message": "Vercel not configured"
+        },
+        {
+          "name": "Docker Configuration",
+          "status": "PASS",
+          "message": "Docker configured"
+        },
+        {
+          "name": "Pre-commit Hooks",
+          "status": "PASS",
+          "message": "Pre-commit configured"
+        }
+      ],
+      "score": 3,
+      "max_score": 5,
+      "percentage": 60.0
+    },
+    "free_services": {
+      "checks": [
+        {
+          "name": "Service: Supabase (Database)",
+          "status": "WARNING",
+          "message": "Not configured"
+        },
+        {
+          "name": "Service: Google Earth Engine",
+          "status": "WARNING",
+          "message": "Not configured"
+        },
+        {
+          "name": "Service: Copernicus API",
+          "status": "WARNING",
+          "message": "Not configured"
+        },
+        {
+          "name": "Service: OpenWeatherMap",
+          "status": "WARNING",
+          "message": "Not configured"
+        },
+        {
+          "name": "Service: Alpha Vantage",
+          "status": "WARNING",
+          "message": "Not configured"
+        },
+        {
+          "name": "Service: Yahoo Finance",
+          "status": "WARNING",
+          "message": "Not configured"
+        },
+        {
+          "name": "Service: Tushare",
+          "status": "WARNING",
+          "message": "Not configured"
+        }
+      ],
+      "score": 0,
+      "max_score": 7,
+      "percentage": 0.0
+    }
+  },
+  "summary": {
+    "total_checks": 49,
+    "passed": 10,
+    "failed": 4,
+    "warnings": 29,
+    "health_score": 33.05
+  },
+  "issues": [
+    {
+      "category": "Code Quality",
+      "severity": "WARNING",
+      "message": "TypeScript: index.d.ts: 32 'any' types",
+      "file": "frontend"
+    },
+    {
+      "category": "Code Quality",
+      "severity": "WARNING",
+      "message": "TypeScript: index.d.ts: 28 'any' types",
+      "file": "frontend"
+    },
+    {
+      "category": "Code Quality",
+      "severity": "WARNING",
+      "message": "TypeScript: machine.d.ts: 8 'any' types",
+      "file": "frontend"
+    },
+    {
+      "category": "Code Quality",
+      "severity": "WARNING",
+      "message": "React: useApi.tsx: useEffect without dependencies",
+      "file": "frontend"
+    },
+    {
+      "category": "Code Quality",
+      "severity": "WARNING",
+      "message": "React: useLanguage.tsx: useEffect without dependencies",
+      "file": "frontend"
+    },
+    {
+      "category": "Code Quality",
+      "severity": "WARNING",
+      "message": "React: LanguageSwitcher.tsx: useEffect without dependencies",
+      "file": "frontend"
+    },
+    {
+      "category": "Dependencies",
+      "severity": "WARNING",
+      "message": "26 outdated packages found",
+      "file": "requirements.txt"
+    },
+    {
+      "category": "Architecture",
+      "severity": "WARNING",
+      "message": "DDD layer 'domain' is missing",
+      "file": "d:\\econojin.com\\app\\domain"
+    },
+    {
+      "category": "Architecture",
+      "severity": "WARNING",
+      "message": "DDD layer 'application' is missing",
+      "file": "d:\\econojin.com\\app\\application"
+    },
+    {
+      "category": "Architecture",
+      "severity": "WARNING",
+      "message": "DDD layer 'infrastructure' is missing",
+      "file": "d:\\econojin.com\\app\\infrastructure"
+    },
+    {
+      "category": "Architecture",
+      "severity": "WARNING",
+      "message": "Repository pattern not implemented",
+      "file": "infrastructure"
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "AI Models",
+      "message": "Integrate FreeLLMAPI for ~1.7B free tokens/month from 18 providers",
+      "priority": "high"
+    },
+    {
+      "category": "AI Models",
+      "message": "Use OpenRouter as alternative for 20+ free models",
+      "priority": "medium"
+    },
+    {
+      "category": "AI Models",
+      "message": "Integrate LangChain for AI agent orchestration",
+      "priority": "high"
+    },
+    {
+      "category": "Quantum",
+      "message": "Integrate Qiskit for quantum machine learning",
+      "priority": "medium"
+    },
+    {
+      "category": "Blockchain",
+      "message": "Install web3.py for Ethereum interaction",
+      "priority": "high"
+    },
+    {
+      "category": "Blockchain",
+      "message": "Create EcoCoin.sol and EcoChallenges.sol contracts",
+      "priority": "high"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure Supabase (Database) for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure Google Earth Engine for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure Copernicus API for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure OpenWeatherMap for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure Alpha Vantage for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure Yahoo Finance for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "Free Services",
+      "message": "Configure Tushare for free tier access",
+      "priority": "medium"
+    },
+    {
+      "category": "General",
+      "message": "Project needs significant improvement in multiple areas",
+      "priority": "high"
+    }
+  ]
+}

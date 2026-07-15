@@ -1,0 +1,849 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+============================================================
+  Econojin Cleanup Script - فاز ۰: پاکسازی و سازماندهی
+  نسخه: 1.0.0
+  سازنده: Super Z (Z.ai)
+============================================================
+
+اسکریپت پاکسازی خودکار پروژه econojin.com
+
+کارهایی که می‌کند:
+  ۱. شناسایی و حذف فایل‌های غیرضروری ریشه‌ای
+  ۲. انتقال اسکریپت‌های پراکنده به پوشه scripts/
+  ۳. شناسایی پوشه‌های پشتیبان و آرشیو (پیشنهاد حذف)
+  ۴. شناسایی فایل‌های تکراری با هش
+  ۵. پیدا کردن فایل‌های خالی
+  ۶. شناسایی فایل‌های قدیمی (بیش از ۹۰ روز تغییر نکرده)
+  ۷. بررسی .gitignore
+  ۸. تولید گزارش کامل
+
+حالت‌های اجرا:
+  --dry-run    فقط گزارش، بدون تغییر (پیش‌فرض)
+  --execute    اجرای واقعی تغییرات
+  --force      بدون تأیید برای هر مورد
+
+مثال‌ها:
+  python cleanup.py                              # فقط گزارش
+  python cleanup.py --dry-run                    # فقط گزارش
+  python cleanup.py --execute                    # اجرا با تأیید
+  python cleanup.py --execute --force            # اجرا بدون تأیید
+  python cleanup.py "D:\\econojin.com" --execute # مسیر دلخواه
+"""
+
+import os
+import sys
+import re
+import json
+import hashlib
+import argparse
+import platform
+from pathlib import Path
+from datetime import datetime, timedelta
+from collections import defaultdict
+
+
+# ============================================================
+#  تنظیمات رنگ
+# ============================================================
+class Color:
+    RESET    = "\033[0m"
+    BOLD     = "\033[1m"
+    RED      = "\033[91m"
+    GREEN    = "\033[92m"
+    YELLOW   = "\033[93m"
+    BLUE     = "\033[94m"
+    MAGENTA  = "\033[95m"
+    CYAN     = "\033[96m"
+    GRAY     = "\033[90m"
+
+    @staticmethod
+    def enable_windows():
+        if platform.system() == "Windows":
+            try:
+                import ctypes
+                kernel32 = ctypes.windll.kernel32
+                kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+            except:
+                pass
+
+    @staticmethod
+    def disable():
+        for attr in dir(Color):
+            if attr.isupper():
+                setattr(Color, attr, "")
+
+
+# ============================================================
+#  تنظیمات
+# ============================================================
+
+# فایل‌های غیرضروری ریشه‌ای (پیشنهاد حذف)
+JUNK_FILES_ROOT = {
+    # فایل‌های گزارش و موقت
+    'files.txt',
+    'report.json',
+    'orphans_list.txt',
+    'dependency_graph.dot',
+    'MERGE_PLAN.json',
+    # فایل‌های پکیج آفلاین (نباید در repo باشن)
+    'react-18.2.0.tgz',
+    # کپی اسکریپت آنالایزر بدون پسوند
+    'project_analyzer',
+    'project_analyzer.py.bak',
+}
+
+# فایل‌هایی با این الگوها که در ریشه هستن (پیشنهاد حذف)
+JUNK_FILE_PATTERNS = [
+    r'^.*\.bak$',
+    r'^.*\.tmp$',
+    r'^.*\.orig$',
+    r'^.*~$',
+    r'^.*\.swp$',
+    r'^.*\.log$',
+    r'^.*_backup.*$',
+    r'^backup_.*$',
+    r'^.*\.tar$',
+    r'^.*\.tar\.gz$',
+    r'^.*\.zip$',
+    r'^.*\.7z$',
+    r'^.*\.rar$',
+]
+
+# اسکریپت‌های پایتون ریشه‌ای که باید منتقل بشن به scripts/
+SCRIPTS_TO_MOVE = {
+    'eco.py',
+    'migration_script.py',
+    'discover.py',
+    'run_econojin.py',
+    'analyze_project.py',
+    'apps_analyzer_v1.1.py',
+    'apps_analyzer_v1.2.py',
+    'dependency_analyzer.py',
+    'deep_secret_scanner.py',
+    'project_analyzer.py',
+    'cleanup.py',  # خودش
+}
+
+# اسکریپت‌های شل/PowerShell ریشه‌ای
+SCRIPTS_TO_MOVE_PATTERNS = [
+    r'^install_.*\.(sh|ps1)$',
+    r'^setup_.*\.(sh|ps1)$',
+    r'^run_.*\.(sh|ps1)$',
+    r'^deploy_.*\.(sh|ps1)$',
+    r'^build_.*\.(sh|ps1)$',
+]
+
+# پوشه‌های پشتیبان/آرشیو (پیشنهاد حذف)
+BACKUP_DIRS = {
+    '.cleanup_backup',
+    '.migration_backup',
+    '_COLD_STORAGE',
+    'cold_storage',
+    'archive',
+}
+
+# الگوی پوشه‌های پشتیبان
+BACKUP_DIR_PATTERNS = [
+    r'^\..*backup.*$',
+    r'^.*_backup.*$',
+    r'^backup.*$',
+    r'^.*_QUARANTINE.*$',
+    r'^redundant_backups$',
+    r'^.*_archive$',
+]
+
+# پوشه‌های محیط مجازی (پیشنهاد حذف اگه در git نیستن)
+# توجه: '.venv' (بدون شماره) معمولاً محیط فعال است و نباید حذف شود
+VENV_DIRS = {
+    # '.venv',  ← محیط فعال، حذف نکنید!
+    '.venv-1', '.venv-2', '.venv-3',
+    'venv-1', 'venv-2', 'venv-3',
+    'env-1', 'env-2', 'env-3',
+    '.pnpm-store',
+}
+
+# پسوندهای فایل‌های باینری/آرشیو (نباید در repo باشن)
+BINARY_EXTENSIONS = {
+    '.safetensors', '.bin', '.pth', '.pt', '.ckpt',
+    '.exe', '.dll', '.so', '.dylib',
+    '.tar', '.gz', '.zip', '.7z', '.rar', '.bz2',
+    '.tgz',
+}
+
+# پسوندهای فایل‌های دیتابیس (نباید در repo باشن)
+DB_EXTENSIONS = {'.db', '.sqlite', '.sqlite3', '.mdb'}
+
+# پوشه‌هایی که نباید اسکن بشن
+SKIP_DIRS = {
+    'node_modules', '.git', '__pycache__', '.next', '.nuxt', 'dist',
+    'build', '.cache', '.pytest_cache', '.mypy_cache',
+    '.gradle', 'target', 'bin', 'obj',
+    'analysis_reports',  # گزارش‌های خود اسکریپت
+}
+
+# حد آستانه فایل قدیمی (روز)
+OLD_FILE_DAYS = 90
+
+# حد آستانه فایل بزرگ (مگابایت)
+LARGE_FILE_MB = 10
+
+# حد آستانه فایل تکراری (بایت) - فقط فایل‌های بزرگتر از این
+DUPLICATE_MIN_SIZE = 1024  # 1 KB
+
+
+# ============================================================
+#  کلاس اصلی Cleanup
+# ============================================================
+class ProjectCleaner:
+    def __init__(self, project_path: str, dry_run: bool = True, force: bool = False):
+        self.project_path = Path(project_path).resolve()
+        self.dry_run = dry_run
+        self.force = force
+
+        self.results = {
+            "meta": {
+                "project_path": str(self.project_path),
+                "executed_at": datetime.now().isoformat(),
+                "mode": "dry-run" if dry_run else "execute",
+                "platform": platform.system(),
+            },
+            "junk_files": [],
+            "scripts_to_move": [],
+            "backup_dirs": [],
+            "venv_dirs": [],
+            "binary_files": [],
+            "db_files": [],
+            "duplicate_files": [],
+            "empty_files": [],
+            "old_files": [],
+            "large_files": [],
+            "gitignore_issues": [],
+            "summary": {
+                "total_space_reclaimable": 0,
+                "total_files_to_remove": 0,
+                "total_files_to_move": 0,
+                "total_dirs_to_remove": 0,
+            },
+        }
+
+        self.deleted_count = 0
+        self.moved_count = 0
+        self.failed_count = 0
+
+    # ----------------------------------------------------------
+    def _should_skip_dir(self, dir_name: str) -> bool:
+        return dir_name in SKIP_DIRS
+
+    def _human_size(self, size_bytes: int) -> str:
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+            if size_bytes < 1024:
+                return f"{size_bytes:.2f} {unit}"
+            size_bytes /= 1024
+        return f"{size_bytes:.2f} PB"
+
+    def _confirm(self, message: str) -> bool:
+        """تأیید کاربر برای انجام عملیات."""
+        if self.force:
+            return True
+        response = input(f"  {Color.YELLOW}{message} (y/N): {Color.RESET}").strip().lower()
+        return response in ['y', 'yes', 'n', 'بله']
+
+    def _matches_any_pattern(self, name: str, patterns: list) -> bool:
+        for pattern in patterns:
+            if re.match(pattern, name, re.IGNORECASE):
+                return True
+        return False
+
+    # ============================================================
+    #  فاز ۱: شناسایی فایل‌های غیرضروری ریشه‌ای
+    # ============================================================
+    def find_junk_files(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۱. فایل‌های غیرضروری ریشه‌ای{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        # فایل‌های نام‌گذاری‌شده
+        for filename in JUNK_FILES_ROOT:
+            file_path = self.project_path / filename
+            if file_path.exists() and file_path.is_file():
+                size = file_path.stat().st_size
+                self.results['junk_files'].append({
+                    "file": filename,
+                    "path": str(file_path),
+                    "size": size,
+                    "size_human": self._human_size(size),
+                    "reason": "in JUNK_FILES_ROOT list",
+                })
+                self.results['summary']['total_space_reclaimable'] += size
+                self.results['summary']['total_files_to_remove'] += 1
+
+        # فایل‌های با الگو
+        for item in self.project_path.iterdir():
+            if not item.is_file():
+                continue
+            if item.name in JUNK_FILES_ROOT:
+                continue  # قبلاً اضافه شده
+            if self._matches_any_pattern(item.name, JUNK_FILE_PATTERNS):
+                size = item.stat().st_size
+                self.results['junk_files'].append({
+                    "file": item.name,
+                    "path": str(item),
+                    "size": size,
+                    "size_human": self._human_size(size),
+                    "reason": "matches junk pattern",
+                })
+                self.results['summary']['total_space_reclaimable'] += size
+                self.results['summary']['total_files_to_remove'] += 1
+
+        # نمایش
+        if self.results['junk_files']:
+            print(f"  {Color.YELLOW}تعداد: {len(self.results['junk_files'])} فایل{Color.RESET}")
+            for item in self.results['junk_files']:
+                print(f"    {Color.RED}✗{Color.RESET} {item['size_human']:>12}  {item['file']}")
+        else:
+            print(f"  {Color.GREEN}✓ فایل غیرضروری در ریشه یافت نشد.{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۲: شناسایی اسکریپت‌های پراکنده
+    # ============================================================
+    def find_scripts_to_move(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۲. اسکریپت‌های پراکنده (انتقال به scripts/){Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        for item in self.project_path.iterdir():
+            if not item.is_file():
+                continue
+            should_move = False
+            reason = ""
+
+            if item.name in SCRIPTS_TO_MOVE:
+                should_move = True
+                reason = "in SCRIPTS_TO_MOVE list"
+            elif self._matches_any_pattern(item.name, SCRIPTS_TO_MOVE_PATTERNS):
+                should_move = True
+                reason = "matches script pattern"
+
+            if should_move:
+                size = item.stat().st_size
+                self.results['scripts_to_move'].append({
+                    "file": item.name,
+                    "path": str(item),
+                    "destination": str(self.project_path / 'scripts' / item.name),
+                    "size": size,
+                    "size_human": self._human_size(size),
+                    "reason": reason,
+                })
+                self.results['summary']['total_files_to_move'] += 1
+
+        # نمایش
+        if self.results['scripts_to_move']:
+            print(f"  {Color.YELLOW}تعداد: {len(self.results['scripts_to_move'])} اسکریپت{Color.RESET}")
+            for item in self.results['scripts_to_move']:
+                print(f"    {Color.BLUE}→{Color.RESET} {item['size_human']:>12}  {item['file']}")
+        else:
+            print(f"  {Color.GREEN}✓ اسکریپت پراکنده‌ای یافت نشد.{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۳: شناسایی پوشه‌های پشتیبان
+    # ============================================================
+    def find_backup_dirs(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۳. پوشه‌های پشتیبان و آرشیو{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        for item in self.project_path.iterdir():
+            if not item.is_dir():
+                continue
+            is_backup = False
+            reason = ""
+
+            if item.name in BACKUP_DIRS:
+                is_backup = True
+                reason = "in BACKUP_DIRS list"
+            elif self._matches_any_pattern(item.name, BACKUP_DIR_PATTERNS):
+                is_backup = True
+                reason = "matches backup pattern"
+
+            if is_backup:
+                # محاسبه حجم پوشه
+                dir_size = 0
+                file_count = 0
+                try:
+                    for root, dirs, files in os.walk(item):
+                        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+                        for f in files:
+                            try:
+                                dir_size += (Path(root) / f).stat().st_size
+                                file_count += 1
+                            except:
+                                pass
+                except:
+                    pass
+
+                self.results['backup_dirs'].append({
+                    "dir": item.name,
+                    "path": str(item),
+                    "size": dir_size,
+                    "size_human": self._human_size(dir_size),
+                    "file_count": file_count,
+                    "reason": reason,
+                })
+                self.results['summary']['total_space_reclaimable'] += dir_size
+                self.results['summary']['total_dirs_to_remove'] += 1
+
+        # نمایش
+        if self.results['backup_dirs']:
+            print(f"  {Color.YELLOW}تعداد: {len(self.results['backup_dirs'])} پوشه{Color.RESET}")
+            for item in self.results['backup_dirs']:
+                print(f"    {Color.RED}✗{Color.RESET} {item['size_human']:>12}  {item['dir']}/  ({item['file_count']} فایل)")
+        else:
+            print(f"  {Color.GREEN}✓ پوشه پشتیبانی یافت نشد.{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۴: شناسایی پوشه‌های محیط مجازی
+    # ============================================================
+    def find_venv_dirs(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۴. پوشه‌های محیط مجازی و cache{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        for item in self.project_path.iterdir():
+            if not item.is_dir():
+                continue
+            if item.name in VENV_DIRS:
+                dir_size = 0
+                file_count = 0
+                try:
+                    for root, dirs, files in os.walk(item):
+                        for f in files:
+                            try:
+                                dir_size += (Path(root) / f).stat().st_size
+                                file_count += 1
+                            except:
+                                pass
+                except:
+                    pass
+
+                self.results['venv_dirs'].append({
+                    "dir": item.name,
+                    "path": str(item),
+                    "size": dir_size,
+                    "size_human": self._human_size(dir_size),
+                    "file_count": file_count,
+                })
+                self.results['summary']['total_space_reclaimable'] += dir_size
+                self.results['summary']['total_dirs_to_remove'] += 1
+
+        # نمایش
+        if self.results['venv_dirs']:
+            print(f"  {Color.YELLOW}تعداد: {len(self.results['venv_dirs'])} پوشه{Color.RESET}")
+            for item in self.results['venv_dirs']:
+                print(f"    {Color.RED}✗{Color.RESET} {item['size_human']:>12}  {item['dir']}/  ({item['file_count']} فایل)")
+        else:
+            print(f"  {Color.GREEN}✓ پوشه محیط مجازی یافت نشد.{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۵: شناسایی فایل‌های باینری و دیتابیس
+    # ============================================================
+    def find_binary_and_db_files(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۵. فایل‌های باینری و دیتابیس{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        for root, dirs, files in os.walk(self.project_path):
+            dirs[:] = [d for d in dirs if not self._should_skip_dir(d)
+                       and d not in BACKUP_DIRS and d not in VENV_DIRS]
+
+            for f in files:
+                file_path = Path(root) / f
+                ext = file_path.suffix.lower()
+
+                try:
+                    size = file_path.stat().st_size
+                except:
+                    continue
+
+                rel_path = str(file_path.relative_to(self.project_path))
+
+                if ext in BINARY_EXTENSIONS:
+                    self.results['binary_files'].append({
+                        "file": rel_path,
+                        "size": size,
+                        "size_human": self._human_size(size),
+                        "extension": ext,
+                    })
+                    self.results['summary']['total_space_reclaimable'] += size
+                    self.results['summary']['total_files_to_remove'] += 1
+
+                elif ext in DB_EXTENSIONS:
+                    self.results['db_files'].append({
+                        "file": rel_path,
+                        "size": size,
+                        "size_human": self._human_size(size),
+                    })
+                    self.results['summary']['total_space_reclaimable'] += size
+                    self.results['summary']['total_files_to_remove'] += 1
+
+        # نمایش
+        if self.results['binary_files']:
+            print(f"  {Color.YELLOW}فایل‌های باینری: {len(self.results['binary_files'])}{Color.RESET}")
+            for item in sorted(self.results['binary_files'], key=lambda x: x['size'], reverse=True)[:5]:
+                print(f"    {Color.RED}✗{Color.RESET} {item['size_human']:>12}  {item['file']}")
+
+        if self.results['db_files']:
+            print(f"\n  {Color.YELLOW}فایل‌های دیتابیس: {len(self.results['db_files'])}{Color.RESET}")
+            for item in self.results['db_files']:
+                print(f"    {Color.RED}✗{Color.RESET} {item['size_human']:>12}  {item['file']}")
+
+        if not self.results['binary_files'] and not self.results['db_files']:
+            print(f"  {Color.GREEN}✓ فایل باینری/دیتابیسی یافت نشد.{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۶: شناسایی فایل‌های تکراری (با هش)
+    # ============================================================
+    def find_duplicate_files(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۶. فایل‌های تکراری{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        # فقط فایل‌های بزرگتر از DUPLICATE_MIN_SIZE رو بررسی می‌کنیم
+        size_map = defaultdict(list)
+
+        for root, dirs, files in os.walk(self.project_path):
+            dirs[:] = [d for d in dirs if not self._should_skip_dir(d)
+                       and d not in BACKUP_DIRS and d not in VENV_DIRS]
+
+            for f in files:
+                file_path = Path(root) / f
+                try:
+                    size = file_path.stat().st_size
+                except:
+                    continue
+                if size >= DUPLICATE_MIN_SIZE:
+                    size_map[size].append(str(file_path))
+
+        # فقط فایل‌هایی با حجم مشابه رو هش می‌کنیم
+        duplicates_found = []
+        for size, paths in size_map.items():
+            if len(paths) < 2:
+                continue
+            hash_map = defaultdict(list)
+            for path in paths:
+                try:
+                    h = hashlib.md5()
+                    with open(path, 'rb') as f:
+                        for chunk in iter(lambda: f.read(8192), b''):
+                            h.update(chunk)
+                    hash_map[h.hexdigest()].append(path)
+                except:
+                    pass
+
+            for h, dup_paths in hash_map.items():
+                if len(dup_paths) >= 2:
+                    duplicates_found.append({
+                        "hash": h[:8],
+                        "size": size,
+                        "size_human": self._human_size(size),
+                        "files": dup_paths,
+                        "count": len(dup_paths),
+                    })
+
+        self.results['duplicate_files'] = duplicates_found
+
+        # نمایش
+        if duplicates_found:
+            print(f"  {Color.YELLOW}تعداد گروه‌های تکراری: {len(duplicates_found)}{Color.RESET}")
+            for dup in duplicates_found[:5]:
+                print(f"    {Color.MAGENTA}⧉{Color.RESET} {dup['size_human']:>10} × {dup['count']}  (hash: {dup['hash']})")
+                for p in dup['files'][:2]:
+                    rel = str(Path(p).relative_to(self.project_path))
+                    print(f"        {Color.GRAY}{rel}{Color.RESET}")
+                if len(dup['files']) > 2:
+                    print(f"        {Color.GRAY}... و {len(dup['files'])-2} مورد دیگر{Color.RESET}")
+        else:
+            print(f"  {Color.GREEN}✓ فایل تکراری یافت نشد.{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۷: فایل‌های خالی و قدیمی و بزرگ
+    # ============================================================
+    def find_misc_files(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۷. فایل‌های خالی، قدیمی و بزرگ{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        old_threshold = datetime.now().timestamp() - (OLD_FILE_DAYS * 86400)
+        large_threshold = LARGE_FILE_MB * 1024 * 1024
+
+        for root, dirs, files in os.walk(self.project_path):
+            dirs[:] = [d for d in dirs if not self._should_skip_dir(d)
+                       and d not in BACKUP_DIRS and d not in VENV_DIRS]
+
+            for f in files:
+                file_path = Path(root) / f
+                try:
+                    stat = file_path.stat()
+                except:
+                    continue
+
+                rel_path = str(file_path.relative_to(self.project_path))
+
+                # فایل خالی
+                if stat.st_size == 0:
+                    self.results['empty_files'].append({"file": rel_path})
+
+                # فایل قدیمی
+                elif stat.st_mtime < old_threshold:
+                    mtime = datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d')
+                    self.results['old_files'].append({
+                        "file": rel_path,
+                        "last_modified": mtime,
+                        "days_old": (datetime.now().timestamp() - stat.st_mtime) // 86400,
+                    })
+
+                # فایل بزرگ
+                if stat.st_size >= large_threshold:
+                    self.results['large_files'].append({
+                        "file": rel_path,
+                        "size": stat.st_size,
+                        "size_human": self._human_size(stat.st_size),
+                    })
+
+        # نمایش
+        print(f"  {Color.YELLOW}فایل‌های خالی:{Color.RESET} {len(self.results['empty_files'])}")
+        if self.results['empty_files']:
+            for item in self.results['empty_files'][:5]:
+                print(f"    {Color.GRAY}∅ {item['file']}{Color.RESET}")
+
+        print(f"\n  {Color.YELLOW}فایل‌های قدیمی (>{OLD_FILE_DAYS} روز):{Color.RESET} {len(self.results['old_files'])}")
+        if self.results['old_files']:
+            for item in sorted(self.results['old_files'], key=lambda x: x['days_old'], reverse=True)[:5]:
+                print(f"    {Color.GRAY}⏰ {item['days_old']:.0f} روز  {item['last_modified']}  {item['file']}{Color.RESET}")
+
+        print(f"\n  {Color.YELLOW}فایل‌های بزرگ (>{LARGE_FILE_MB}MB):{Color.RESET} {len(self.results['large_files'])}")
+        if self.results['large_files']:
+            for item in sorted(self.results['large_files'], key=lambda x: x['size'], reverse=True)[:5]:
+                print(f"    {Color.BLUE}📦 {item['size_human']:>10}  {item['file']}{Color.RESET}")
+
+    # ============================================================
+    #  فاز ۸: بررسی .gitignore
+    # ============================================================
+    def check_gitignore(self):
+        print(f"\n{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}  ۸. بررسی .gitignore{Color.RESET}")
+        print(f"{Color.CYAN}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        gitignore_path = self.project_path / '.gitignore'
+        if not gitignore_path.exists():
+            self.results['gitignore_issues'].append({
+                "issue": "فایل .gitignore وجود ندارد!",
+                "severity": "HIGH",
+            })
+            print(f"  {Color.RED}✗ فایل .gitignore وجود ندارد!{Color.RESET}")
+            return
+
+        content = gitignore_path.read_text(encoding='utf-8', errors='ignore')
+
+        # الگوهایی که باید در .gitignore باشن
+        required_patterns = {
+            'node_modules': r'node_modules',
+            '.env': r'^\.env$|^\.env\.',
+            '__pycache__': r'__pycache__',
+            '.venv': r'\.venv|venv',
+            'dist': r'^dist/?$|^build/?$',
+            '.pnpm-store': r'\.pnpm-store',
+            '*.db': r'\*\.db|\*\.sqlite',
+            '*.log': r'\*\.log',
+            '.DS_Store': r'\.DS_Store',
+        }
+
+        for name, pattern in required_patterns.items():
+            if not re.search(pattern, content, re.MULTILINE):
+                self.results['gitignore_issues'].append({
+                    "issue": f"الگوی '{name}' در .gitignore نیست",
+                    "severity": "MEDIUM",
+                    "pattern": name,
+                })
+
+        # نمایش
+        if self.results['gitignore_issues']:
+            print(f"  {Color.YELLOW}مشکلات: {len(self.results['gitignore_issues'])}{Color.RESET}")
+            for issue in self.results['gitignore_issues']:
+                print(f"    {Color.YELLOW}⚠{Color.RESET} {issue['issue']}")
+        else:
+            print(f"  {Color.GREEN}✓ .gitignore کامل است.{Color.RESET}")
+
+    # ============================================================
+    #  اجرای تغییرات (وقتی --execute فعال است)
+    # ============================================================
+    def execute_changes(self):
+        print(f"\n{Color.MAGENTA}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}  اجرای تغییرات{' (Dry Run)' if self.dry_run else ''}{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        if self.dry_run:
+            print(f"  {Color.YELLOW}حالت Dry-Run فعال است — هیچ تغییری اعمال نمی‌شود.{Color.RESET}")
+            print(f"  {Color.GRAY}برای اجرای واقعی از --execute استفاده کنید.{Color.RESET}")
+            return
+
+        # ۱. حذف فایل‌های غیرضروری
+        if self.results['junk_files']:
+            print(f"\n  {Color.YELLOW}حذف فایل‌های غیرضروری...{Color.RESET}")
+            for item in self.results['junk_files']:
+                if self._confirm(f"حذف '{item['file']}'؟"):
+                    try:
+                        Path(item['path']).unlink()
+                        self.deleted_count += 1
+                        print(f"    {Color.GREEN}✓ حذف شد:{Color.RESET} {item['file']}")
+                    except Exception as e:
+                        self.failed_count += 1
+                        print(f"    {Color.RED}✗ خطا:{Color.RESET} {item['file']} — {e}")
+
+        # ۲. انتقال اسکریپت‌ها
+        if self.results['scripts_to_move']:
+            print(f"\n  {Color.YELLOW}انتقال اسکریپت‌ها به scripts/...{Color.RESET}")
+            scripts_dir = self.project_path / 'scripts'
+            scripts_dir.mkdir(exist_ok=True)
+            for item in self.results['scripts_to_move']:
+                if self._confirm(f"انتقال '{item['file']}'؟"):
+                    try:
+                        src = Path(item['path'])
+                        dst = Path(item['destination'])
+                        src.rename(dst)
+                        self.moved_count += 1
+                        print(f"    {Color.GREEN}✓ منتقل شد:{Color.RESET} {item['file']}")
+                    except Exception as e:
+                        self.failed_count += 1
+                        print(f"    {Color.RED}✗ خطا:{Color.RESET} {item['file']} — {e}")
+
+        # ۳. حذف پوشه‌های پشتیبان
+        if self.results['backup_dirs']:
+            print(f"\n  {Color.YELLOW}حذف پوشه‌های پشتیبان...{Color.RESET}")
+            for item in self.results['backup_dirs']:
+                if self._confirm(f"حذف پوشه '{item['dir']}' ({item['size_human']})؟"):
+                    try:
+                        import shutil
+                        shutil.rmtree(item['path'])
+                        self.deleted_count += 1
+                        print(f"    {Color.GREEN}✓ حذف شد:{Color.RESET} {item['dir']}/")
+                    except Exception as e:
+                        self.failed_count += 1
+                        print(f"    {Color.RED}✗ خطا:{Color.RESET} {item['dir']} — {e}")
+
+    # ============================================================
+    #  تولید گزارش
+    # ============================================================
+    def generate_summary(self):
+        print(f"\n{Color.MAGENTA}{Color.BOLD}{'='*60}{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}  خلاصه نهایی{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}{'='*60}{Color.RESET}")
+
+        s = self.results['summary']
+        print(f"  {Color.CYAN}فایل‌های قابل حذف:{Color.RESET} {s['total_files_to_remove']}")
+        print(f"  {Color.CYAN}فایل‌های قابل انتقال:{Color.RESET} {s['total_files_to_move']}")
+        print(f"  {Color.CYAN}پوشه‌های قابل حذف:{Color.RESET} {s['total_dirs_to_remove']}")
+        print(f"  {Color.CYAN}فضای قابل بازیابی:{Color.RESET} {self._human_size(s['total_space_reclaimable'])}")
+
+        if not self.dry_run:
+            print(f"\n  {Color.GREEN}✓ فایل‌های حذف شده:{Color.RESET} {self.deleted_count}")
+            print(f"  {Color.GREEN}✓ فایل‌های منتقل شده:{Color.RESET} {self.moved_count}")
+            if self.failed_count:
+                print(f"  {Color.RED}✗ عملیات ناموفق:{Color.RESET} {self.failed_count}")
+
+    # ============================================================
+    #  ذخیره گزارش JSON
+    # ============================================================
+    def save_report(self):
+        reports_dir = self.project_path / 'analysis_reports'
+        reports_dir.mkdir(exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_path = reports_dir / f"cleanup_report_{timestamp}.json"
+
+        with open(report_path, 'w', encoding='utf-8') as f:
+            json.dump(self.results, f, ensure_ascii=False, indent=2)
+
+        print(f"\n  {Color.GREEN}✓ گزارش ذخیره شد:{Color.RESET} {report_path}")
+        return report_path
+
+    # ============================================================
+    #  اجرای کامل
+    # ============================================================
+    def run(self):
+        print(f"\n{Color.MAGENTA}{Color.BOLD}{'╔' + '═'*58 + '╗'}{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}║  🧹 Cleanup Script v1.0.0 - پاکسازی پروژه{' ' * 12}║{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}║  مسیر: {str(self.project_path):<51}║{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}║  حالت: {'Dry-Run (بدون تغییر)' if self.dry_run else 'EXECUTE (با تغییر واقعی)':<43}║{Color.RESET}")
+        print(f"{Color.MAGENTA}{Color.BOLD}{'╚' + '═'*58 + '╝'}{Color.RESET}")
+
+        if not self.project_path.exists():
+            print(f"{Color.RED}❌ خطا: مسیر پروژه وجود ندارد!{Color.RESET}")
+            return False
+
+        self.find_junk_files()
+        self.find_scripts_to_move()
+        self.find_backup_dirs()
+        self.find_venv_dirs()
+        self.find_binary_and_db_files()
+        self.find_duplicate_files()
+        self.find_misc_files()
+        self.check_gitignore()
+        self.execute_changes()
+        self.generate_summary()
+        self.save_report()
+
+        print(f"\n{Color.GREEN}{Color.BOLD}✓ پاکسازی کامل شد!{Color.RESET}\n")
+        return True
+
+
+# ============================================================
+#  نقطه ورود
+# ============================================================
+def main():
+    Color.enable_windows()
+
+    default_path = r"D:\econojin.com"
+
+    parser = argparse.ArgumentParser(
+        description='پاکسازی خودکار پروژه - Cleanup Script v1.0.0',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=f"""
+مثال‌ها:
+  python cleanup.py                                  # فقط گزارش (dry-run)
+  python cleanup.py --execute                        # اجرا با تأیید هر مورد
+  python cleanup.py --execute --force                # اجرا بدون تأیید
+  python cleanup.py "D:\\my-project" --execute       # مسیر دلخواه
+  python cleanup.py --no-color                       # بدون رنگ
+
+گزارش در analysis_reports/cleanup_report_*.json ذخیره می‌شود.
+        """
+    )
+    parser.add_argument('path', nargs='?', default=default_path,
+                        help=f'مسیر پروژه (پیش‌فرض: {default_path})')
+    parser.add_argument('--execute', action='store_true',
+                        help='اجرای واقعی تغییرات (پیش‌فرض: dry-run)')
+    parser.add_argument('--force', action='store_true',
+                        help='بدون تأیید برای هر مورد')
+    parser.add_argument('--no-color', action='store_true',
+                        help='غیرفعال کردن رنگ')
+
+    args = parser.parse_args()
+
+    if args.no_color:
+        Color.disable()
+
+    cleaner = ProjectCleaner(
+        project_path=args.path,
+        dry_run=not args.execute,
+        force=args.force,
+    )
+    success = cleaner.run()
+
+    if not success:
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

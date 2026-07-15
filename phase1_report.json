@@ -1,0 +1,92 @@
+{
+  "tool": "phase1_complete_apps.py",
+  "mode": "apply",
+  "executed_at": "2026-07-15T06:53:31",
+  "root": "D:\\econojin.com",
+  "apps_processed": 4,
+  "total_files_created_or_planned": 0,
+  "total_files_skipped": 40,
+  "total_errors": 0,
+  "apps": [
+    {
+      "name": "api",
+      "type": "backend",
+      "files_existing": 14,
+      "files_planned": 10,
+      "files_created": [],
+      "files_skipped": [
+        "__init__.py",
+        "models.py",
+        "schemas.py",
+        "repository.py",
+        "service.py",
+        "router.py",
+        "dependencies.py",
+        "tests/__init__.py",
+        "tests/test_api.py",
+        "README.md"
+      ],
+      "errors": []
+    },
+    {
+      "name": "shared",
+      "type": "backend",
+      "files_existing": 12,
+      "files_planned": 10,
+      "files_created": [],
+      "files_skipped": [
+        "__init__.py",
+        "models.py",
+        "schemas.py",
+        "repository.py",
+        "service.py",
+        "router.py",
+        "dependencies.py",
+        "tests/__init__.py",
+        "tests/test_shared.py",
+        "README.md"
+      ],
+      "errors": []
+    },
+    {
+      "name": "shared_sim",
+      "type": "shared_backend",
+      "files_existing": 10,
+      "files_planned": 10,
+      "files_created": [],
+      "files_skipped": [
+        "__init__.py",
+        "models.py",
+        "schemas.py",
+        "repository.py",
+        "service.py",
+        "router.py",
+        "dependencies.py",
+        "tests/__init__.py",
+        "tests/test_shared_sim.py",
+        "README.md"
+      ],
+      "errors": []
+    },
+    {
+      "name": "simulation",
+      "type": "backend",
+      "files_existing": 47,
+      "files_planned": 10,
+      "files_created": [],
+      "files_skipped": [
+        "__init__.py",
+        "models.py",
+        "schemas.py",
+        "repository.py",
+        "service.py",
+        "router.py",
+        "dependencies.py",
+        "tests/__init__.py",
+        "tests/test_simulation.py",
+        "README.md"
+      ],
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-07-13T01:00:11.987501",
+  "version": "3.0.0",
+  "dry_run": false,
+  "summary": {
+    "total_actions": 12,
+    "done": 7,
+    "failed": 0,
+    "skipped": 5
+  },
+  "actions": [
+    {
+      "type": "delete_file",
+      "target": "D:\\econojin.com\\apps\\web\\src\\vite-env.d.ts",
+      "description": "حذف فایل مرده: src/vite-env.d.ts",
+      "status": "done"
+    },
+    {
+      "type": "delete_file",
+      "target": "D:\\econojin.com\\apps\\web\\src\\pages\\Chat.tsx",
+      "description": "حذف فایل مرده: src/pages/Chat.tsx",
+      "status": "done"
+    },
+    {
+      "type": "delete_file",
+      "target": "D:\\econojin.com\\apps\\web\\src\\pages\\SimulationRunner.tsx",
+      "description": "حذف فایل مرده: src/pages/SimulationRunner.tsx",
+      "status": "done"
+    },
+    {
+      "type": "delete_file",
+      "target": "D:\\econojin.com\\apps\\web\\src\\services\\blockchain.ts",
+      "description": "حذف فایل مرده: src/services/blockchain.ts",
+      "status": "done"
+    },
+    {
+      "type": "delete_file",
+      "target": "D:\\econojin.com\\apps\\web\\src\\pages\\Hydrology\\HydrologyDashboard.tsx",
+      "description": "حذف فایل مرده: src/pages/Hydrology/HydrologyDashboard.tsx",
+      "status": "done"
+    },
+    {
+      "type": "delete_file",
+      "target": "D:\\econojin.com\\apps\\web\\src\\pages\\Simulators\\Simulators.tsx",
+      "description": "حذف فایل مرده: src/pages/Simulators/Simulators.tsx",
+      "status": "done"
+    },
+    {
+      "type": "fix_useeffect",
+      "target": "D:\\econojin.com\\apps\\web\\src\\hooks\\useApi.tsx",
+      "description": "اصلاح useEffect در: src/hooks/useApi.tsx",
+      "status": "done"
+    },
+    {
+      "type": "merge_dir",
+      "target": "D:\\econojin.com\\apps\\web\\src\\i18n",
+      "description": "دایرکتوری کوچک: src\\i18n",
+      "status": "skipped"
+    },
+    {
+      "type": "merge_dir",
+      "target": "D:\\econojin.com\\apps\\web\\src\\utils",
+      "description": "دایرکتوری کوچک: src\\utils",
+      "status": "skipped"
+    },
+    {
+      "type": "merge_dir",
+      "target": "D:\\econojin.com\\apps\\web\\src\\components\\CommandPalette",
+      "description": "دایرکتوری کوچک: src\\components\\CommandPalette",
+      "status": "skipped"
+    },
+    {
+      "type": "merge_dir",
+      "target": "D:\\econojin.com\\apps\\web\\src\\pages\\AboutUs",
+      "description": "دایرکتوری کوچک: src\\pages\\AboutUs",
+      "status": "skipped"
+    },
+    {
+      "type": "merge_dir",
+      "target": "D:\\econojin.com\\apps\\web\\src\\pages\\Accounting",
+      "description": "دایرکتوری کوچک: src\\pages\\Accounting",
+      "status": "skipped"
+    }
+  ],
+  "errors": []
+}

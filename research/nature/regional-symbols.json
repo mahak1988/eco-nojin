@@ -1,0 +1,434 @@
+{
+  "metadata": {
+    "description": "Natural and cultural symbols from different world regions",
+    "last_updated": "2026-06-20T20:21:56.005999"
+  },
+  "regions": {
+    "middleEast": {
+      "name": "Middle East / Iran",
+      "name_fa": "خاورمیانه / ایران",
+      "colors": {
+        "palm": "#5A7D5A",
+        "desert": "#C9A87C",
+        "crescent": "#F4E4C1",
+        "persianBlue": "#1C39BB",
+        "turquoise": "#40E0D0",
+        "saffron": "#F4C430",
+        "pomegranate": "#C0362C"
+      },
+      "symbols": [
+        {
+          "name": "Palm Tree",
+          "name_fa": "نخل",
+          "meaning": "Resilience",
+          "sdg": [
+            2,
+            15
+          ]
+        },
+        {
+          "name": "Crescent Moon",
+          "name_fa": "هلال ماه",
+          "meaning": "Cycles",
+          "sdg": [
+            16
+          ]
+        },
+        {
+          "name": "Star",
+          "name_fa": "ستاره",
+          "meaning": "Guidance",
+          "sdg": [
+            4
+          ]
+        },
+        {
+          "name": "Persian Garden",
+          "name_fa": "باغ ایرانی",
+          "meaning": "Harmony",
+          "sdg": [
+            11,
+            15
+          ]
+        },
+        {
+          "name": "Qanat",
+          "name_fa": "قنات",
+          "meaning": "Water management",
+          "sdg": [
+            6,
+            9
+          ]
+        },
+        {
+          "name": "Cypress",
+          "name_fa": "سرو",
+          "meaning": "Eternity",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Rose",
+          "name_fa": "گل محمدی",
+          "meaning": "Beauty",
+          "sdg": [
+            11
+          ]
+        },
+        {
+          "name": "Farvahar",
+          "name_fa": "فروهر",
+          "meaning": "Good thoughts",
+          "sdg": [
+            16
+          ]
+        }
+      ]
+    },
+    "eastAsia": {
+      "name": "East Asia",
+      "name_fa": "شرق آسیا",
+      "colors": {
+        "sakura": "#FFB7C5",
+        "bamboo": "#7C9A6D",
+        "fuji": "#6B8CAE",
+        "red": "#BC002D",
+        "gold": "#D4AF37",
+        "jade": "#00A86B"
+      },
+      "symbols": [
+        {
+          "name": "Cherry Blossom",
+          "meaning": "Transience",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Bamboo",
+          "meaning": "Flexibility",
+          "sdg": [
+            9,
+            15
+          ]
+        },
+        {
+          "name": "Lotus",
+          "meaning": "Purity",
+          "sdg": [
+            14
+          ]
+        },
+        {
+          "name": "Crane",
+          "meaning": "Longevity",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Dragon",
+          "meaning": "Wisdom",
+          "sdg": [
+            9
+          ]
+        },
+        {
+          "name": "Mount Fuji",
+          "meaning": "Stability",
+          "sdg": [
+            11
+          ]
+        }
+      ]
+    },
+    "africa": {
+      "name": "Africa",
+      "name_fa": "آفریقا",
+      "colors": {
+        "baobab": "#8B7355",
+        "savanna": "#D4A574",
+        "nile": "#4A90A4",
+        "earth": "#6B4423",
+        "sunset": "#FF6B35",
+        "acacia": "#8FBC8F"
+      },
+      "symbols": [
+        {
+          "name": "Baobab Tree",
+          "meaning": "Life",
+          "sdg": [
+            15,
+            11
+          ]
+        },
+        {
+          "name": "Acacia",
+          "meaning": "Savanna",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Nile River",
+          "meaning": "Life source",
+          "sdg": [
+            6
+          ]
+        },
+        {
+          "name": "Elephant",
+          "meaning": "Wisdom",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Adinkra",
+          "meaning": "Proverbs",
+          "sdg": [
+            4,
+            16
+          ]
+        },
+        {
+          "name": "Sun",
+          "meaning": "Energy",
+          "sdg": [
+            7
+          ]
+        }
+      ]
+    },
+    "southAmerica": {
+      "name": "South America",
+      "name_fa": "آمریکای جنوبی",
+      "colors": {
+        "amazon": "#2D5016",
+        "toucan": "#FF6B35",
+        "river": "#0077BE",
+        "jungle": "#228B22",
+        "macaw": "#FFD700",
+        "orchid": "#DA1884"
+      },
+      "symbols": [
+        {
+          "name": "Amazon Rainforest",
+          "meaning": "Biodiversity",
+          "sdg": [
+            13,
+            15
+          ]
+        },
+        {
+          "name": "Toucan",
+          "meaning": "Colorful life",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Andes Mountains",
+          "meaning": "Strength",
+          "sdg": [
+            11
+          ]
+        },
+        {
+          "name": "Quinoa",
+          "meaning": "Sustainable food",
+          "sdg": [
+            2
+          ]
+        },
+        {
+          "name": "Condor",
+          "meaning": "Freedom",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Inca Terraces",
+          "meaning": "Agriculture",
+          "sdg": [
+            2,
+            15
+          ]
+        }
+      ]
+    },
+    "northAmerica": {
+      "name": "North America",
+      "name_fa": "آمریکای شمالی",
+      "colors": {
+        "redwood": "#8B4513",
+        "sky": "#87CEEB",
+        "prairie": "#DAA520",
+        "sequoia": "#A0522D",
+        "glacier": "#ADD8E6",
+        "maple": "#C41E3A"
+      },
+      "symbols": [
+        {
+          "name": "Redwood",
+          "meaning": "Ancient wisdom",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Bald Eagle",
+          "meaning": "Freedom",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Totem Pole",
+          "meaning": "Heritage",
+          "sdg": [
+            4,
+            11
+          ]
+        },
+        {
+          "name": "Maple Leaf",
+          "meaning": "Unity",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Buffalo",
+          "meaning": "Abundance",
+          "sdg": [
+            2,
+            15
+          ]
+        },
+        {
+          "name": "Great Lakes",
+          "meaning": "Fresh water",
+          "sdg": [
+            6
+          ]
+        }
+      ]
+    },
+    "europe": {
+      "name": "Europe",
+      "name_fa": "اروپا",
+      "colors": {
+        "alpine": "#4A7C59",
+        "mediterranean": "#006994",
+        "lavender": "#967BB6",
+        "olive": "#808000",
+        "vineyard": "#722F37",
+        "stone": "#A9A9A9"
+      },
+      "symbols": [
+        {
+          "name": "Oak Tree",
+          "meaning": "Strength",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Olive Branch",
+          "meaning": "Peace",
+          "sdg": [
+            16
+          ]
+        },
+        {
+          "name": "Alpine Flowers",
+          "meaning": "Resilience",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Windmill",
+          "meaning": "Renewable energy",
+          "sdg": [
+            7
+          ]
+        },
+        {
+          "name": "Vineyard",
+          "meaning": "Agriculture",
+          "sdg": [
+            2,
+            12
+          ]
+        },
+        {
+          "name": "Cathedral",
+          "meaning": "Heritage",
+          "sdg": [
+            11
+          ]
+        }
+      ]
+    },
+    "oceania": {
+      "name": "Oceania / Pacific",
+      "name_fa": "اقیانوسیه",
+      "colors": {
+        "coral": "#FF7F50",
+        "lagoon": "#00CED1",
+        "sand": "#F4A460",
+        "palm": "#228B22",
+        "volcanic": "#8B0000",
+        "ocean": "#006994"
+      },
+      "symbols": [
+        {
+          "name": "Coral Reef",
+          "meaning": "Marine biodiversity",
+          "sdg": [
+            14
+          ]
+        },
+        {
+          "name": "Palm Tree",
+          "meaning": "Island life",
+          "sdg": [
+            15
+          ]
+        },
+        {
+          "name": "Whale",
+          "meaning": "Ocean wisdom",
+          "sdg": [
+            14
+          ]
+        },
+        {
+          "name": "Volcano",
+          "meaning": "Earth power",
+          "sdg": [
+            13
+          ]
+        },
+        {
+          "name": "Turtle",
+          "meaning": "Navigation",
+          "sdg": [
+            14
+          ]
+        },
+        {
+          "name": "Tapa Cloth",
+          "meaning": "Heritage",
+          "sdg": [
+            11
+          ]
+        }
+      ]
+    }
+  }
+}
