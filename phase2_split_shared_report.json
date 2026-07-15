@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-12T21:45:05.041718",
+  "version": "2.0.0",
+  "dry_run": false,
+  "backup_created": false,
+  "backup_path": null,
+  "summary": {
+    "total_files_migrated": 0,
+    "total_failed": 0,
+    "total_imports_updated": 0,
+    "modules_created": 4
+  },
+  "files_migrated": [],
+  "imports_updated": 0,
+  "dependency_graph": {},
+  "errors": [
+    "تست import ناموفق: from apps.shared_core.database.session import get_db",
+    "تست import ناموفق: from apps.shared_ai.llm.llm_factory import get_llm",
+    "تست import ناموفق: from apps.main import app"
+  ],
+  "warnings": []
+}

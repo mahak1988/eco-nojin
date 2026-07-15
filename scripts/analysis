@@ -1,0 +1,420 @@
+"""
+اسکریپت آنالیز وابستگی‌ها برای ادغام DDD
+بررسی کامل ساختار فعلی و پیشنهاد نقشه ادغام
+"""
+
+import sys
+from pathlib import Path
+import os
+import re
+import json
+from collections import defaultdict, Counter
+from datetime import datetime
+from typing import Dict, List, Set, Tuple
+
+
+class DependencyAnalyzer:
+    """آنالایزر وابستگی‌ها برای ادغام."""
+    
+    def __init__(self, project_root: Path):
+        self.project_root = project_root
+        self.apps_dir = project_root / 'apps'
+        
+        self.files_info = {}
+        self.imports_map = defaultdict(set)
+        self.reverse_imports = defaultdict(set)  # چه فایل‌هایی این فایل را import می‌کنند
+        self.unused_files = []
+        self.merge_plan = []
+        
+        # ساختار نهایی
+        self.target_structure = {
+            'apps/api/app/domain/ai_agents/': 'apps/ai_agents/',
+            'apps/api/app/domain/user/': 'apps/users/',
+            'apps/api/app/infrastructure/ai/': 'apps/shared/ai/',
+            'apps/api/app/infrastructure/database/': 'apps/shared/database/',
+            'apps/api/app/infrastructure/knowledge/': 'apps/shared/knowledge/',
+            'apps/api/app/scientific/': 'apps/simulation/',
+        }
+    
+    def _extract_imports(self, file_path: Path) -> Set[str]:
+        """استخراج import ها از فایل Python."""
+        imports = set()
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # import statements
+            patterns = [
+                r'^from\s+([\w\.]+)\s+import',
+                r'^import\s+([\w\.]+)',
+            ]
+            
+            for pattern in patterns:
+                for match in re.finditer(pattern, content, re.MULTILINE):
+                    module = match.group(1)
+                    imports.add(module)
+            
+            return imports
+        except Exception as e:
+            return set()
+    
+    def _is_internal_import(self, module: str) -> bool:
+        """بررسی اینکه آیا import داخلی است."""
+        return module.startswith('apps.') or module.startswith('app.')
+    
+    def scan_all_files(self):
+        """اسکن تمام فایل‌های Python."""
+        print("🔍 در حال اسکن فایل‌ها...")
+        
+        for file_path in self.apps_dir.rglob('*.py'):
+            # نادیده گرفتن کش
+            if any(part in {'__pycache__', '.venv', 'venv', 'node_modules'} 
+                   for part in file_path.parts):
+                continue
+            
+            rel_path = file_path.relative_to(self.project_root)
+            
+            # استخراج اطلاعات
+            imports = self._extract_imports(file_path)
+            internal_imports = {imp for imp in imports if self._is_internal_import(imp)}
+            
+            self.files_info[str(rel_path)] = {
+                'path': file_path,
+                'rel_path': str(rel_path),
+                'size': file_path.stat().st_size,
+                'imports': internal_imports,
+                'category': self._categorize_file(file_path),
+            }
+            
+            # ساخت reverse imports
+            for imp in internal_imports:
+                self.reverse_imports[imp].add(str(rel_path))
+        
+        print(f"✅ {len(self.files_info)} فایل اسکن شد")
+    
+    def _categorize_file(self, file_path: Path) -> str:
+        """دسته‌بندی فایل."""
+        path_str = str(file_path).lower()
+        name = file_path.name.lower()
+        
+        if 'test' in name or 'test' in path_str:
+            return 'test'
+        elif 'ai_agents' in path_str:
+            return 'ai_agents'
+        elif 'users' in path_str:
+            return 'users'
+        elif 'shared' in path_str:
+            return 'shared'
+        elif 'simulation' in path_str:
+            return 'simulation'
+        elif 'api/app' in path_str:
+            return 'api_app'
+        elif 'frontend' in path_str:
+            return 'frontend'
+        else:
+            return 'other'
+    
+    def find_unused_files(self):
+        """یافتن فایل‌های استفاده‌نشده."""
+        print("\n🔎 در حال یافتن فایل‌های استفاده‌نشده...")
+        
+        for rel_path, info in self.files_info.items():
+            # فایل‌های اصلی را نادیده بگیر
+            if any(x in rel_path for x in ['main.py', '__init__.py', 'test_', 'conftest.py']):
+                continue
+            
+            # بررسی اینکه آیا این فایل import شده است
+            module_path = rel_path.replace('/', '.').replace('\\', '.').replace('.py', '')
+            
+            is_imported = False
+            for imp_key, importers in self.reverse_imports.items():
+                if module_path in imp_key or imp_key in module_path:
+                    is_imported = True
+                    break
+            
+            if not is_imported:
+                self.unused_files.append(rel_path)
+        
+        print(f"⚠️  {len(self.unused_files)} فایل استفاده‌نشده یافت شد")
+    
+    def analyze_conflicts(self) -> List[Dict]:
+        """تحلیل تداخل‌ها بین دو ساختار."""
+        print("\n⚔️  در حال تحلیل تداخل‌ها...")
+        
+        conflicts = []
+        
+        # بررسی تداخل users
+        users_in_apps = [p for p in self.files_info if 'apps/users/' in p]
+        users_in_api = [p for p in self.files_info if 'apps/api/app/domain/user/' in p]
+        
+        if users_in_apps and users_in_api:
+            conflicts.append({
+                'type': 'duplicate_module',
+                'module': 'users',
+                'paths': {
+                    'apps/': users_in_apps,
+                    'apps/api/app/': users_in_api,
+                },
+                'recommendation': 'ادغام apps/users/ با apps/api/app/domain/user/'
+            })
+        
+        # بررسی تداخل models
+        models_in_apps = [p for p in self.files_info if p.endswith('models.py') and 'apps/' in p and 'api/app' not in p]
+        models_in_api = [p for p in self.files_info if p.endswith('models.py') and 'apps/api/app/' in p]
+        
+        if models_in_apps or models_in_api:
+            conflicts.append({
+                'type': 'duplicate_models',
+                'paths': {
+                    'apps/': models_in_apps,
+                    'apps/api/app/': models_in_api,
+                },
+                'recommendation': 'ادغام مدل‌ها در apps/api/app/infrastructure/persistence/models/'
+            })
+        
+        print(f"⚠️  {len(conflicts)} تداخل شناسایی شد")
+        return conflicts
+    
+    def generate_merge_plan(self) -> Dict:
+        """ایجاد نقشه ادغام."""
+        print("\n📝 در حال ایجاد نقشه ادغام...")
+        
+        plan = {
+            'generated_at': datetime.now().isoformat(),
+            'statistics': {
+                'total_files': len(self.files_info),
+                'unused_files': len(self.unused_files),
+            },
+            'moves': [],
+            'deletes': [],
+            'updates': [],
+        }
+        
+        # برنامه انتقال
+        moves = [
+            {
+                'from': 'apps/ai_agents/',
+                'to': 'apps/api/app/domain/ai_agents/',
+                'reason': 'ادغام در لایه domain',
+                'files_count': len([p for p in self.files_info if p.startswith('apps/ai_agents/')]),
+            },
+            {
+                'from': 'apps/users/',
+                'to': 'apps/api/app/domain/user/',
+                'reason': 'ادغام با ساختار DDD موجود',
+                'files_count': len([p for p in self.files_info if p.startswith('apps/users/')]),
+            },
+            {
+                'from': 'apps/shared/ai/',
+                'to': 'apps/api/app/infrastructure/ai/',
+                'reason': 'انتقال به infrastructure',
+                'files_count': len([p for p in self.files_info if p.startswith('apps/shared/ai/')]),
+            },
+            {
+                'from': 'apps/shared/database/',
+                'to': 'apps/api/app/infrastructure/database/',
+                'reason': 'انتقال به infrastructure',
+                'files_count': len([p for p in self.files_info if p.startswith('apps/shared/database/')]),
+            },
+            {
+                'from': 'apps/shared/knowledge/',
+                'to': 'apps/api/app/infrastructure/knowledge/',
+                'reason': 'انتقال به infrastructure',
+                'files_count': len([p for p in self.files_info if p.startswith('apps/shared/knowledge/')]),
+            },
+            {
+                'from': 'apps/simulation/',
+                'to': 'apps/api/app/scientific/',
+                'reason': 'ادغام با scientific wrappers',
+                'files_count': len([p for p in self.files_info if p.startswith('apps/simulation/')]),
+            },
+        ]
+        
+        plan['moves'] = moves
+        
+        # حذف فایل‌های استفاده‌نشده
+        plan['deletes'] = self.unused_files[:20]  # محدود به 20 تا
+        
+        # به‌روزرسانی imports
+        plan['updates'] = [
+            {
+                'pattern': 'from apps.ai_agents.',
+                'replace': 'from apps.api.app.domain.ai_agents.',
+                'count': 0,
+            },
+            {
+                'pattern': 'from apps.users.',
+                'replace': 'from apps.api.app.domain.user.',
+                'count': 0,
+            },
+            {
+                'pattern': 'from apps.shared.ai.',
+                'replace': 'from apps.api.app.infrastructure.ai.',
+                'count': 0,
+            },
+            {
+                'pattern': 'from apps.shared.database.',
+                'replace': 'from apps.api.app.infrastructure.database.',
+                'count': 0,
+            },
+            {
+                'pattern': 'from apps.shared.knowledge.',
+                'replace': 'from apps.api.app.infrastructure.knowledge.',
+                'count': 0,
+            },
+            {
+                'pattern': 'from apps.simulation.',
+                'replace': 'from apps.api.app.scientific.',
+                'count': 0,
+            },
+        ]
+        
+        # شمارش تعداد به‌روزرسانی‌ها
+        for update in plan['updates']:
+            count = 0
+            for rel_path, info in self.files_info.items():
+                try:
+                    with open(info['path'], 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        count += content.count(update['pattern'])
+                except:
+                    pass
+            update['count'] = count
+        
+        return plan
+    
+    def save_report(self, output_file: Path = None):
+        """ذخیره گزارش کامل."""
+        if output_file is None:
+            output_file = self.project_root / 'MERGE_PLAN.json'
+        
+        report = {
+            'files_info': {k: {
+                'size': v['size'],
+                'imports': list(v['imports']),
+                'category': v['category'],
+            } for k, v in self.files_info.items()},
+            'unused_files': self.unused_files,
+            'conflicts': self.analyze_conflicts(),
+            'merge_plan': self.generate_merge_plan(),
+        }
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=2, ensure_ascii=False, default=str)
+        
+        print(f"\n💾 گزارش ذخیره شد: {output_file}")
+    
+    def print_summary(self):
+        """چاپ خلاصه آنالیز."""
+        print("\n" + "=" * 70)
+        print("📊 خلاصه آنالیز وابستگی‌ها")
+        print("=" * 70)
+        
+        # آمار بر اساس دسته
+        categories = Counter(info['category'] for info in self.files_info.values())
+        
+        print("\n📁 فایل‌ها بر اساس دسته:")
+        for category, count in categories.most_common():
+            print(f"  • {category}: {count} فایل")
+        
+        # بزرگترین فایل‌ها
+        print("\n📏 ۱۰ فایل برتر بر اساس اندازه:")
+        sorted_files = sorted(
+            self.files_info.items(),
+            key=lambda x: x[1]['size'],
+            reverse=True
+        )[:10]
+        
+        for rel_path, info in sorted_files:
+            size_kb = info['size'] / 1024
+            print(f"  • {rel_path}: {size_kb:.1f} KB")
+        
+        # فایل‌های با بیشترین import
+        print("\n🔗 ۱۰ فایل با بیشترین وابستگی:")
+        sorted_by_imports = sorted(
+            self.files_info.items(),
+            key=lambda x: len(x[1]['imports']),
+            reverse=True
+        )[:10]
+        
+        for rel_path, info in sorted_by_imports:
+            print(f"  • {rel_path}: {len(info['imports'])} import")
+        
+        # فایل‌های استفاده‌نشده
+        if self.unused_files:
+            print(f"\n⚠️  فایل‌های استفاده‌نشده ({len(self.unused_files)}):")
+            for file_path in self.unused_files[:10]:
+                print(f"  • {file_path}")
+            if len(self.unused_files) > 10:
+                print(f"  ... و {len(self.unused_files) - 10} فایل دیگر")
+
+
+def main():
+    """تابع اصلی."""
+    print("=" * 70)
+    print("🔍 آنالایزر وابستگی‌ها برای ادغام DDD")
+    print("=" * 70)
+    
+    # پیدا کردن ریشه پروژه
+    current_file = Path(__file__).resolve()
+    project_root = current_file.parent.parent
+    
+    print(f"\n📁 ریشه پروژه: {project_root}")
+    
+    # ایجاد آنالایزر
+    analyzer = DependencyAnalyzer(project_root)
+    
+    # اسکن
+    analyzer.scan_all_files()
+    
+    # یافتن فایل‌های استفاده‌نشده
+    analyzer.find_unused_files()
+    
+    # چاپ خلاصه
+    analyzer.print_summary()
+    
+    # ذخیره گزارش
+    analyzer.save_report()
+    
+    # ایجاد نقشه ادغام
+    merge_plan = analyzer.generate_merge_plan()
+    
+    # ذخیره نقشه ادغام به صورت Markdown
+    merge_md = project_root / 'MERGE_PLAN.md'
+    with open(merge_md, 'w', encoding='utf-8') as f:
+        f.write("# 📋 نقشه ادغام DDD\n\n")
+        f.write(f"تولید شده در: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        
+        f.write("## 📊 آمار\n\n")
+        f.write(f"- تعداد کل فایل‌ها: {merge_plan['statistics']['total_files']}\n")
+        f.write(f"- فایل‌های استفاده‌نشده: {merge_plan['statistics']['unused_files']}\n\n")
+        
+        f.write("## 🔄 برنامه انتقال\n\n")
+        for move in merge_plan['moves']:
+            f.write(f"### {move['from']} → {move['to']}\n\n")
+            f.write(f"- **دلیل**: {move['reason']}\n")
+            f.write(f"- **تعداد فایل‌ها**: {move['files_count']}\n\n")
+        
+        f.write("## 🗑️ فایل‌های حذف‌شدنی\n\n")
+        for file_path in merge_plan['deletes'][:20]:
+            f.write(f"- `{file_path}`\n")
+        
+        f.write("\n## 🔧 به‌روزرسانی Imports\n\n")
+        f.write("| الگوی قدیمی | الگوی جدید | تعداد |\n")
+        f.write("|-------------|------------|-------|\n")
+        for update in merge_plan['updates']:
+            f.write(f"| `{update['pattern']}` | `{update['replace']}` | {update['count']} |\n")
+    
+    print(f"\n📝 نقشه ادغام ذخیره شد: {merge_md}")
+    
+    print("\n" + "=" * 70)
+    print("✅ آنالیز کامل شد!")
+    print("=" * 70)
+    print("\n📌 گام‌های بعدی:")
+    print("1. بررسی MERGE_PLAN.md")
+    print("2. تأیید نقشه ادغام")
+    print("3. شروع انتقال مرحله‌ای")
+
+
+if __name__ == "__main__":
+    main()

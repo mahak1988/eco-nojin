@@ -1,0 +1,67 @@
+/**
+ * ============================================================================
+ *  useAuth — React Query hooks for authentication
+ * ============================================================================
+ */
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  login,
+  register,
+  logout,
+  getCurrentUser,
+} from "@/services/authService";
+import type { AuthCredentials, RegisterPayload, User } from "@/types";
+
+export const authKeys = {
+  all: ["auth"] as const,
+  currentUser: () => [...authKeys.all, "currentUser"] as const,
+};
+
+export const useAuth = () => {
+  return useQuery<User | null>({
+    queryKey: authKeys.currentUser(),
+    queryFn: async () => {
+      try {
+        return await getCurrentUser();
+      } catch {
+        return null;
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+};
+
+export const useLogin = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (credentials: AuthCredentials) => login(credentials),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+    },
+  });
+};
+
+export const useRegister = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (payload: RegisterPayload) => register(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+    },
+  });
+};
+
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      queryClient.clear();
+    },
+  });
+};

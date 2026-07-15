@@ -1,0 +1,42 @@
+{
+  "name": "Welcome Email on Registration",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-registered",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "subject": "Welcome to Eco Nojin!",
+        "text": "Hi {{$json.username}},\\n\\nYour account has been created. Start exploring the platform!"
+      },
+      "name": "SendWelcomeEmail",
+      "type": "n8n-nodes-base.emailSend",
+      "position": [
+        600,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "SendWelcomeEmail",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  }
+}

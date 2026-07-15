@@ -1,0 +1,21 @@
+{
+  "root": "D:\\econojin.com",
+  "mode": "apply",
+  "executed_at": "2026-07-15T08:25:32",
+  "total_workflows_before": 6,
+  "total_workflows_after": 6,
+  "files_kept": [
+    "03-quality-gates.yml",
+    "02-security-scan.yml",
+    "06-scheduled-tasks.yml",
+    "01-ci-main.yml",
+    "04-deploy-staging.yml",
+    "05-deploy-production.yml"
+  ],
+  "files_archived": [],
+  "files_modified": [],
+  "jobs_migrated": [],
+  "parse_errors": [],
+  "version_fixes_applied": [],
+  "errors": []
+}

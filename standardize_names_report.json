@@ -1,0 +1,34 @@
+{
+  "root": "D:\\econojin.com",
+  "mode": "dry-run",
+  "executed_at": "2026-07-15T08:42:46",
+  "old_name": "hydrology-frontend",
+  "new_name": "@econojin/web",
+  "files_scanned": 1035,
+  "files_with_matches": 2,
+  "files_modified": 0,
+  "total_replacements": 2,
+  "changes": [
+    {
+      "file": "apps_report.json",
+      "matches": 1,
+      "line_numbers": [
+        169
+      ],
+      "sample_lines": [
+        "L169: \"name\": \"hydrology-frontend\","
+      ]
+    },
+    {
+      "file": "apps/web/package.json",
+      "matches": 1,
+      "line_numbers": [
+        2
+      ],
+      "sample_lines": [
+        "L2: \"name\": \"hydrology-frontend\","
+      ]
+    }
+  ],
+  "errors": []
+}
