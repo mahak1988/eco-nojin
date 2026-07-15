@@ -1,0 +1,388 @@
+{
+  "root": "D:\\econojin.com\\apps\\web",
+  "total_files_expected": 42,
+  "passed": true,
+  "summary": "42 files expected — 0 missing, 0 errored, 0 warned, i18n parity OK",
+  "i18n_parity_ok": true,
+  "i18n_missing_keys": [],
+  "files": [
+    {
+      "rel_path": ".env.example",
+      "exists": true,
+      "size_bytes": 417,
+      "line_count": 13,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "INSTALL.fa.md",
+      "exists": true,
+      "size_bytes": 1611,
+      "line_count": 58,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "tsconfig.json",
+      "exists": true,
+      "size_bytes": 1324,
+      "line_count": 44,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "tsconfig.node.json",
+      "exists": true,
+      "size_bytes": 524,
+      "line_count": 17,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "postcss.config.js",
+      "exists": true,
+      "size_bytes": 195,
+      "line_count": 10,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "tailwind.config.js",
+      "exists": true,
+      "size_bytes": 1688,
+      "line_count": 54,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "vite.config.ts",
+      "exists": true,
+      "size_bytes": 814,
+      "line_count": 30,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/main.tsx",
+      "exists": true,
+      "size_bytes": 1649,
+      "line_count": 49,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/App.tsx",
+      "exists": true,
+      "size_bytes": 5409,
+      "line_count": 146,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/i18n/index.ts",
+      "exists": true,
+      "size_bytes": 6680,
+      "line_count": 174,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/i18n/locales/fa.json",
+      "exists": true,
+      "size_bytes": 19110,
+      "line_count": 388,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/i18n/locales/en.json",
+      "exists": true,
+      "size_bytes": 14781,
+      "line_count": 388,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/lib/utils.ts",
+      "exists": true,
+      "size_bytes": 842,
+      "line_count": 40,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/lib/i18n-utils.ts",
+      "exists": true,
+      "size_bytes": 4572,
+      "line_count": 131,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/styles/index.css",
+      "exists": true,
+      "size_bytes": 3710,
+      "line_count": 129,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/types/index.ts",
+      "exists": true,
+      "size_bytes": 6345,
+      "line_count": 231,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/types/api.ts",
+      "exists": true,
+      "size_bytes": 3531,
+      "line_count": 141,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/types/ethereum.d.ts",
+      "exists": true,
+      "size_bytes": 1711,
+      "line_count": 64,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/services/authService.ts",
+      "exists": true,
+      "size_bytes": 5857,
+      "line_count": 194,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/hooks/useApi.tsx",
+      "exists": true,
+      "size_bytes": 3420,
+      "line_count": 123,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/hooks/useAuth.tsx",
+      "exists": true,
+      "size_bytes": 4078,
+      "line_count": 155,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/hooks/useLanguage.tsx",
+      "exists": true,
+      "size_bytes": 2376,
+      "line_count": 72,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/common/ErrorBoundary.tsx",
+      "exists": true,
+      "size_bytes": 2277,
+      "line_count": 67,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/common/ErrorFallback.tsx",
+      "exists": true,
+      "size_bytes": 1752,
+      "line_count": 47,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/common/LoadingSpinner.tsx",
+      "exists": true,
+      "size_bytes": 2632,
+      "line_count": 78,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/common/PagePlaceholder.tsx",
+      "exists": true,
+      "size_bytes": 1895,
+      "line_count": 60,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/common/LanguageSwitcher.tsx",
+      "exists": true,
+      "size_bytes": 4841,
+      "line_count": 134,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/Layout/Header.tsx",
+      "exists": true,
+      "size_bytes": 8566,
+      "line_count": 256,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/Layout/Sidebar.tsx",
+      "exists": true,
+      "size_bytes": 6252,
+      "line_count": 195,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/Layout/Footer.tsx",
+      "exists": true,
+      "size_bytes": 4478,
+      "line_count": 126,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/components/Layout/Layout.tsx",
+      "exists": true,
+      "size_bytes": 1446,
+      "line_count": 41,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Dashboard.tsx",
+      "exists": true,
+      "size_bytes": 5390,
+      "line_count": 149,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Documents.tsx",
+      "exists": true,
+      "size_bytes": 9369,
+      "line_count": 246,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Login.tsx",
+      "exists": true,
+      "size_bytes": 7963,
+      "line_count": 225,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Register/Register.tsx",
+      "exists": true,
+      "size_bytes": 11939,
+      "line_count": 333,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Carbon/CarbonDashboard.tsx",
+      "exists": true,
+      "size_bytes": 9388,
+      "line_count": 228,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Hydrology/WatershedList.tsx",
+      "exists": true,
+      "size_bytes": 10827,
+      "line_count": 265,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Soil/SoilDashboard.tsx",
+      "exists": true,
+      "size_bytes": 9687,
+      "line_count": 209,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/AboutUs/AboutUs.tsx",
+      "exists": true,
+      "size_bytes": 6557,
+      "line_count": 158,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Accounting/Accounting.tsx",
+      "exists": true,
+      "size_bytes": 11747,
+      "line_count": 267,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/AgricultureSchools/AgricultureSchools.tsx",
+      "exists": true,
+      "size_bytes": 9166,
+      "line_count": 260,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    },
+    {
+      "rel_path": "src/pages/Animations/Animations.tsx",
+      "exists": true,
+      "size_bytes": 6568,
+      "line_count": 156,
+      "issues": [],
+      "warnings": [],
+      "status": "ok"
+    }
+  ]
+}
