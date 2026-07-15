@@ -1,4 +1,0 @@
-Files with >10 dependencies: 2
-
-apps_analyzer_v1.2.py: 13 imports
-apps_analyzer_v1.1.py: 12 imports
