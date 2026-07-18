@@ -1,5 +1,5 @@
-﻿# AI Agent Dependencies - Flexible Versions
-langgraph>=0.0.40
+# AI Agent Dependencies - Flexible Versions
+langgraph>=0.6.11
 langchain>=0.2.0
 langchain-openai>=0.1.0
 langchain-community>=0.2.0
