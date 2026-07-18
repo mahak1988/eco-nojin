@@ -1,57 +1,71 @@
-"""Alembic Environment Configuration"""
-from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
-from alembic import context
+"""Alembic Environment Configuration — Econojin"""
 import os
 import sys
+from logging.config import fileConfig
 
+from sqlalchemy import engine_from_config, pool
+from alembic import context
+
+# Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+# Load all models so Base.metadata is populated
+from apps.shared_core.database.session import Base
+
+# Import all model modules to register them with Base
+import apps.shared_core.models
+# import apps.users.models
+# import apps.ai_agents.models
+# import apps.simulation.models
+# import apps.shared_ai.models
+# import apps.shared_knowledge.models
+# import apps.shared_sim.models
+# import apps.api.models
+
 try:
-    from apps.shared_core.database.session import Base
-    import apps.shared_core.models  # noqa: F401
+    import apps.shared_ai.ai.rag.models
 except ImportError:
-    from sqlalchemy.ext.declarative import declarative_base
-    Base = declarative_base()
+    pass
+
+try:
+    import apps.shared_knowledge.knowledge.models
+except ImportError:
+    pass
 
 config = context.config
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Auto-import all db_models
-try:
-    from apps.app.domains.dashboard.models.db_models import *
-    from apps.app.domains.hydrology.models.db_models import *
-    from apps.app.domains.iot.models.db_models import *
-    from apps.app.domains.logframe.models.db_models import *
-    from apps.app.domains.mrv.models.db_models import *
-    from apps.app.domains.pilots.models.db_models import *
-    from apps.app.domains.psychology.models.db_models import *
-    from apps.app.domains.remote_sensing.models.db_models import *
-    from apps.app.domains.safeguards.models.db_models import *
-    from apps.app.domains.training.models.db_models import *
-    from apps.app.domains.lms.models.db_models import *
-except ImportError as e:
-    print(f"Warning: {e}")
-
 target_metadata = Base.metadata
 
-def run_migrations_offline():
+
+def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
     with context.begin_transaction():
         context.run_migrations()
 
-def run_migrations_online():
+
+def run_migrations_online() -> None:
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+        )
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()
