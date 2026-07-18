@@ -8,7 +8,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 try:
-    from apps.app.core.database import Base
+    from apps.shared_core.database.session import Base
+    import apps.shared_core.models  # noqa: F401
 except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
     Base = declarative_base()

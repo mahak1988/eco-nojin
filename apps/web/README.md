@@ -1,47 +1,60 @@
 # web | اپلیکیشن web
 
-Part of the **Eco Nojin** platform.
+Front-end application of the **Eco Nojin** platform.
 
 ## Overview
 
-This is the web frontend application, built with:
+This app is built with:
 - React 18
 - TypeScript
 - Vite
 - Tailwind CSS
-- TanStack Query (React Query)
+- Axios
+- `@supabase/supabase-js`
+- `@tanstack/react-query`
 
 ## Structure
 
 ```
 web/
+├── public/             # Static assets
 ├── src/
-│   ├── pages/           # Route-level components
-│   ├── components/      # Reusable UI components
-│   ├── hooks/           # React Query hooks
-│   ├── api/             # API client
-│   ├── types/           # TypeScript types
-│   └── lib/             # Utility functions
-└── __tests__/           # Vitest tests
+│   ├── api/            # Axios API clients
+│   ├── components/     # Reusable UI components
+│   ├── hooks/          # Custom React hooks
+│   ├── lib/            # Utility functions and helpers
+│   ├── services/       # service clients (Supabase, API integration)
+│   ├── types/          # shared TypeScript types
+│   └── pages/          # route-level components
+└── __tests__/          # test files
 ```
+
+## Environment
+
+Copy `apps/web/.env.example` to `apps/web/.env.local` and configure:
+- `VITE_API_BASE_URL`
+- `VITE_DEFAULT_LANG`
+- Optional: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Optional: `VITE_SENTRY_DSN`, `VITE_GA_MEASUREMENT_ID`
 
 ## Development
 
 ```bash
-# Install dependencies (from repo root)
+# Install dependencies from repo root
 pnpm install
 
-# Run dev server
-pnpm --filter web dev
+# Run the frontend
+pnpm --filter @econojin/web dev
 
 # Build for production
-pnpm --filter web build
+pnpm --filter @econojin/web build
 
-# Run tests
-pnpm --filter web test
+# Lint TypeScript and files
+pnpm --filter @econojin/web lint
 ```
 
-## Auto-scaffolded
+## Notes
 
-This module was auto-scaffolded by `scripts/phase1_complete_apps.py`.
-Adjust the templates to match your actual UI requirements.
+- API calls are configured through `VITE_API_BASE_URL`.
+- Supabase client is implemented in `src/services/supabase.ts`.
+- The app uses alias imports configured in `vite.config.ts`.

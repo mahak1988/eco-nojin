@@ -23,6 +23,10 @@
     "english": "English",
     "toman": "Toman"
   },
+  "theme": {
+    "light": "Switch to light mode",
+    "dark": "Switch to dark mode"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "documents": "Documents",
@@ -35,7 +39,76 @@
     "agricultureSchools": "Agriculture Schools",
     "blog": "Blog",
     "contact": "Contact",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "admin": "Admin"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "subtitle": "System metrics, user health, settings and audit logs.",
+      "userCount": "Total users",
+      "activeUsers": "Active users",
+      "superusers": "Superusers",
+      "settingsCount": "Admin settings",
+      "auditLogCount": "Audit log entries",
+      "reportsCount": "System reports"
+    },
+    "tabs": {
+      "ariaLabel": "Admin panel sections",
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "settings": "Settings",
+      "audit": "Audit logs",
+      "reports": "Reports"
+    },
+    "users": {
+      "searchPlaceholder": "Search by email or name…",
+      "colEmail": "Email",
+      "colName": "Name",
+      "colStatus": "Status",
+      "colRole": "Role",
+      "colCreated": "Created",
+      "colActions": "Actions",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "roleSuperuser": "Superuser",
+      "roleUser": "User",
+      "deactivateAction": "Deactivate",
+      "cannotDeactivateSuperuser": "Superuser accounts cannot be deactivated",
+      "noResults": "No users found"
+    },
+    "settings": {
+      "searchPlaceholder": "Search by key or description…",
+      "colKey": "Key",
+      "colValue": "Value",
+      "colDescription": "Description",
+      "colActive": "Active",
+      "colActions": "Actions",
+      "toggleActive": "Active",
+      "statusOn": "On",
+      "statusOff": "Off",
+      "noResults": "No settings found"
+    },
+    "audit": {
+      "allEventTypes": "All event types",
+      "unknownActor": "System",
+      "eventData": "Event payload",
+      "noResults": "No audit logs found"
+    },
+    "reports": {
+      "createdAt": "Created",
+      "completedAt": "Completed",
+      "payload": "Report payload",
+      "id": "ID",
+      "noResults": "No reports found",
+      "status": {
+        "pending": "Pending",
+        "running": "Running",
+        "completed": "Completed",
+        "failed": "Failed",
+        "unknown": "Unknown"
+      }
+    }
   },
   "navGroups": {
     "main": "Main menu",
@@ -114,7 +187,11 @@
     "quickAccess": "Quick access",
     "viewReports": "View reports",
     "welcomeBannerTitle": "Welcome to the Econojin green community",
-    "welcomeBannerText": "Contribute to environmental reporting and monitoring data to help protect Iran's nature — and earn EcoCoin rewards."
+    "welcomeBannerText": "Contribute to environmental reporting and monitoring data to help protect Iran's nature — and earn EcoCoin rewards.",
+    "activityChart": "Environmental activity",
+    "activityChartDesc": "Weekly monitoring & reporting trend",
+    "recentActivity": "Recent activity",
+    "viewAll": "View all"
   },
   "documents": {
     "title": "Documents",

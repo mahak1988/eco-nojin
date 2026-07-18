@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- *  Type Definitions — Core types for the Eco Nojin platform
+ *  Type Definitions — Core types for the Econojin platform
  * ============================================================================
  */
 
@@ -99,4 +99,41 @@ export interface PaginatedResponse<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface AdminDashboardSummary {
+  user_count: number;
+  active_user_count: number;
+  superuser_count: number;
+  total_settings: number;
+  total_audit_logs: number;
+  total_reports: number;
+}
+
+export interface AdminSetting {
+  id: number;
+  key: string;
+  value: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuditLog {
+  id: number;
+  actor_id?: number;
+  actor_email?: string;
+  event_type: string;
+  event_data?: string;
+  created_at: string;
+}
+
+export interface SystemReport {
+  id: number;
+  report_name: string;
+  status: string;
+  report_data?: string;
+  created_at: string;
+  completed_at?: string;
 }

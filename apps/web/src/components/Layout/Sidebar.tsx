@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 
 import { NAV_ITEMS, type NavItem } from "@/components/Layout/Header";
+import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAlerts } from "@/alerts/useAlerts";
 import { cn } from "@/lib/utils";
@@ -116,6 +117,7 @@ const AUDIENCE_NAV_ITEMS: readonly NavItem[] = [
 function SidebarContent({ onNavigate }: { onNavigate: () => void }): JSX.Element {
   const { t } = useLanguage();
   const { unreadCount } = useAlerts();
+  const { user } = useAuth();
 
   return (
     <nav className="flex h-full flex-col gap-2 overflow-y-auto p-3" aria-label={t("navGroups.main")}>
@@ -123,6 +125,13 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }): JSX.Element
         {NAV_ITEMS.map((item) => (
           <SidebarLink key={item.to} item={item} onClick={onNavigate} />
         ))}
+        {user?.is_superuser && (
+          <SidebarLink
+            key="/admin"
+            item={{ to: "/admin", labelKey: "nav.admin", icon: "Users" }}
+            onClick={onNavigate}
+          />
+        )}
       </SidebarSection>
 
       <SidebarSection titleKey="navGroups.tools">
@@ -213,7 +222,7 @@ export function Sidebar({ open, onClose }: SidebarProps): JSX.Element {
     <>
       <aside
         dir={dir}
-        className="hidden w-64 shrink-0 border-e border-gray-200 bg-white md:block"
+        className="hidden w-64 shrink-0 border-e border-gray-200 bg-white/90 backdrop-blur-md dark:border-gray-800 dark:bg-gray-950/90 md:block"
         aria-label="Sidebar"
       >
         <SidebarContent onNavigate={() => {}} />

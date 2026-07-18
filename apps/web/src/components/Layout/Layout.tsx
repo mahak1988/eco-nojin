@@ -23,7 +23,7 @@ export function Layout({ children }: LayoutProps): JSX.Element {
   const palette = useCommandPalette();
 
   return (
-    <div dir={dir} className="flex min-h-screen flex-col bg-gray-50">
+    <div dir={dir} className="flex min-h-screen flex-col bg-gray-50 mesh-bg dark:bg-gray-950">
       <Header onToggleSidebar={() => setSidebarOpen((v) => !v)} />
 
       <div className="flex flex-1 overflow-hidden">

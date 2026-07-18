@@ -29,6 +29,14 @@ import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { queryClient } from "@/lib/query-client";
 import "@/styles/index.css";
 
+// Apply saved theme before first paint to avoid flash
+(function initTheme() {
+  const stored = localStorage.getItem("econojin-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = stored === "dark" || stored === "light" ? stored : prefersDark ? "dark" : "light";
+  document.documentElement.classList.toggle("dark", theme === "dark");
+})();
+
 // ---------------------------------------------------------------------------
 // Root element
 // ---------------------------------------------------------------------------
