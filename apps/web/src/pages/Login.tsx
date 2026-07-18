@@ -11,8 +11,11 @@
 
 import { useState, startTransition, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Leaf, Shield, Sparkles, Waves } from "lucide-react";
 
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { useAuth, isAuthError } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { cn } from "@/lib/utils";
@@ -169,8 +172,60 @@ export function Login(): JSX.Element {
   };
 
   return (
-    <div dir={dir} className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-12">
-      <div className="w-full max-w-md">
+    <div dir={dir} className="relative flex min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="absolute end-4 top-4 z-20">
+        <ThemeToggle compact />
+      </div>
+
+      {/* Decorative panel — desktop only */}
+      <motion.aside
+        initial={{ opacity: 0, x: -40 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative hidden w-1/2 overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900 lg:flex lg:flex-col lg:justify-between lg:p-12"
+      >
+        <div className="pointer-events-none absolute inset-0 opacity-30">
+          <div className="absolute -start-20 top-20 h-72 w-72 rounded-full bg-emerald-400/30 blur-3xl" />
+          <div className="absolute bottom-0 end-0 h-96 w-96 rounded-full bg-teal-300/20 blur-3xl" />
+        </div>
+        <div className="relative">
+          <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
+            <Leaf className="h-7 w-7" />
+          </span>
+          <h2 className="mt-8 max-w-md text-3xl font-bold leading-tight text-white">
+            {t("common.appTagline")}
+          </h2>
+          <p className="mt-4 max-w-sm text-sm leading-7 text-emerald-100/90">
+            {t("home.hero.subtitle")}
+          </p>
+        </div>
+        <div className="relative grid gap-4">
+          {[
+            { icon: Sparkles, label: t("home.features.items.ai.title") },
+            { icon: Waves, label: t("home.features.items.gis.title") },
+            { icon: Shield, label: t("home.features.items.alert.title") },
+          ].map(({ icon: Icon, label }, i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.1 }}
+              className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm"
+            >
+              <Icon className="h-5 w-5 text-emerald-200" />
+              <span className="text-sm font-medium text-white">{label}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.aside>
+
+      <div className="flex flex-1 items-center justify-center px-4 py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
         {/* Brand */}
         <div className="mb-8 text-center">
           <span className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-600 text-white">
@@ -183,7 +238,7 @@ export function Login(): JSX.Element {
         </div>
 
         {/* Form card */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl dark:border-gray-800 dark:bg-gray-900">
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {serverError && (
               <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -231,7 +286,7 @@ export function Login(): JSX.Element {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition hover:from-emerald-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-60 dark:shadow-emerald-900/30"
             >
               {isSubmitting ? (
                 <LoadingSpinner size="sm" variant="white" label={t("auth.loginLoading")} />
@@ -248,6 +303,7 @@ export function Login(): JSX.Element {
             </Link>
           </p>
         </div>
+      </motion.div>
       </div>
     </div>
   );

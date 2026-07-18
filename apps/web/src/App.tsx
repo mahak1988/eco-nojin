@@ -37,10 +37,11 @@ const DashboardPage = lazy(() => import("@/pages/Dashboard").then((m) => ({ defa
 const ProfilePage = lazy(() => import("@/pages/Profile/Profile").then((m) => ({ default: m.Profile })));
 const SimulatorsPage = lazy(() => import("@/simulators/pages/SimulatorsIndexPage").then((m) => ({ default: m.SimulatorsIndexPage })));
 const AlertsPage = lazy(() => import("@/alerts/AlertsPanel").then((m) => ({ default: m.AlertsPanel })));
+const AdminPanelPage = lazy(() => import("@/pages/Admin/AdminPanelPage").then((m) => ({ default: m.AdminPanelPage })));
 
 // Fallback Loading Component
 const PageLoader = () => (
-  <div className="flex min-h-screen items-center justify-center bg-gray-50">
+  <div className="flex min-h-screen items-center justify-center bg-gray-50 mesh-bg dark:bg-gray-950">
     <LoadingSpinner size="lg" label="Loading..." />
   </div>
 );
@@ -100,6 +101,14 @@ export function App(): JSX.Element {
                   <Route 
                     path="/researcher" 
                     element={<ProtectedRoute allowedRoles={['researcher', 'expert', 'manager']}><ResearcherDashboard /></ProtectedRoute>} 
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute requireSuperuser>
+                        <AdminPanelPage />
+                      </ProtectedRoute>
+                    }
                   />
 
                   {/* Catch All */}

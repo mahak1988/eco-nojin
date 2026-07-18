@@ -22,6 +22,7 @@ import type { UserRole } from "@/types";
 export interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: UserRole[];
+  requireSuperuser?: boolean;
   fallbackPath?: string;
 }
 
@@ -59,6 +60,7 @@ function hasRequiredRole(userRole: UserRole, allowedRoles: UserRole[]): boolean 
 export function ProtectedRoute({ 
   children, 
   allowedRoles, 
+  requireSuperuser,
   fallbackPath = "/unauthorized" 
 }: ProtectedRouteProps): JSX.Element {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -80,6 +82,13 @@ export function ProtectedRoute({
   }
 
   // ۳. بررسی نقش‌های مجاز
+  if (requireSuperuser && user && !user.is_superuser) {
+    console.warn(
+      `[RBAC] Access denied: User tried to access superuser route "${location.pathname}" without superuser privileges.`,
+    );
+    return <Navigate to={fallbackPath} replace />;
+  }
+
   if (allowedRoles && user && user.role) {
     const userRole = user.role as UserRole;
     const hasAccess = hasRequiredRole(userRole, allowedRoles);
@@ -91,7 +100,7 @@ export function ProtectedRoute({
       
       console.warn(
         `[RBAC] Access denied: User with role "${userRole}" tried to access route "${location.pathname}" ` +
-        `which requires roles: [${allowedRoles.join(', ')}]. Redirecting to "${defaultDashboard}".`
+        `which requires roles: [${allowedRoles.join(', ')}]. Redirecting to "${defaultDashboard}".`,
       );
       
       return <Navigate to={defaultDashboard} replace />;

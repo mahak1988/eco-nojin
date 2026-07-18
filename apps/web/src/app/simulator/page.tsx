@@ -18,12 +18,20 @@ export default function SimulatorDashboard() {
       <PageHeader title='شبیه‌سازها' description='ابزارهای شبیه‌سازی و پایش بوم‌شناختی' icon={Leaf} />
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
         {sims.map((sim, i) => {
-          const Icon = sim.icon
+          const Icon = sim.icon;
           return (
-            <motion.div key={i} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} whileHover={{ y: -8, scale: 1.02 }}>
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+            >
               <a href={sim.href}>
                 <Card className='overflow-hidden cursor-pointer h-full'>
-                  <div className={`h-32 bg-gradient-to-br ${sim.color} flex items-center justify-center'><Icon className='w-16 h-16 text-white' /></div>
+                  <div className={`h-32 bg-gradient-to-br ${sim.color} flex items-center justify-center`}>
+                    <Icon className='w-16 h-16 text-white' />
+                  </div>
                   <CardContent className='p-6'>
                     <h3 className='text-xl font-bold mb-2'>{sim.title}</h3>
                     <p className='text-sm text-muted-foreground'>{sim.desc}</p>
@@ -32,7 +40,7 @@ export default function SimulatorDashboard() {
                 </Card>
               </a>
             </motion.div>
-          )
+          );
         })}
       </div>
     </div>

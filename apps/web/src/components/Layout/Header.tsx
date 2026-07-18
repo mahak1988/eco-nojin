@@ -16,6 +16,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { cn } from "@/lib/utils";
 import type { User } from "@/types";
 
@@ -192,12 +193,17 @@ export interface HeaderProps {
 }
 
 export function Header({ onToggleSidebar, showDesktopNav = true }: HeaderProps): JSX.Element {
+  const { user } = useAuth();
   const { t, dir } = useLanguage();
+
+  const navItems = user?.is_superuser
+    ? [...NAV_ITEMS, { to: "/admin", labelKey: "nav.admin", icon: "Users" }]
+    : NAV_ITEMS;
 
   return (
     <header
       dir={dir}
-      className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm"
+      className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200/80 bg-white/80 px-4 shadow-sm backdrop-blur-xl dark:border-gray-800/80 dark:bg-gray-950/80"
     >
       {/* Start side (right in RTL, left in LTR): hamburger + brand */}
       <div className="flex items-center gap-3">
@@ -220,23 +226,21 @@ export function Header({ onToggleSidebar, showDesktopNav = true }: HeaderProps):
               <path d="M10 2L3 7v6c0 4.4 3.1 8.3 7 9 3.9-.7 7-4.6 7-9V7l-7-5z" />
             </svg>
           </span>
-          <span className="text-lg font-bold text-gray-900">{t("common.appName")}</span>
+          <span className="text-lg font-bold text-gray-900 dark:text-white">{t("common.appName")}</span>
         </Link>
       </div>
 
       {/* Center: desktop nav */}
       {showDesktopNav && (
         <nav className="hidden items-center gap-1 md:flex" aria-label={t("navGroups.main")}>
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  "rounded-md px-3 py-2 text-sm font-medium transition",
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                  "rounded-full px-4 py-2 text-sm font-medium transition",
+                  isActive ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "text-gray-700 hover:text-emerald-600 dark:text-gray-300 dark:hover:text-emerald-400",
                 )
               }
             >
@@ -248,6 +252,7 @@ export function Header({ onToggleSidebar, showDesktopNav = true }: HeaderProps):
 
       {/* End side: language switcher + user menu */}
       <div className="flex items-center gap-2">
+        <ThemeToggle compact />
         <LanguageSwitcher compact />
         <UserMenu />
       </div>

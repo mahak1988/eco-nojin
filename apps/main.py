@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Eco Nojin - نقطه ورود اصلی بک‌اند
+Econojin - نقطه ورود اصلی بک‌اند
 ==================================
 """
 
@@ -42,7 +42,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("=" * 60)
-    logger.info("🚀 Eco Nojin API - شروع راه‌اندازی")
+    logger.info("🚀 Econojin API - شروع راه‌اندازی")
     logger.info("=" * 60)
     
     start_time = time.time()
@@ -66,7 +66,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield  # اینجا اپلیکیشن در حال اجرا است
     
     logger.info("=" * 60)
-    logger.info("🛑 Eco Nojin API - در حال خاموش شدن")
+    logger.info("🛑 Econojin API - در حال خاموش شدن")
     logger.info("=" * 60)
     
     try:
@@ -83,7 +83,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 # ایجاد اپلیکیشن FastAPI
 # ============================================================
 app = FastAPI(
-    title="Eco Nojin API",
+    title="Econojin API",
     description="پلتفرم جامع کشاورزی، آب، محیط‌زیست و اقتصاد",
     version="2.0.0",
     docs_url="/docs",
@@ -157,7 +157,15 @@ try:
 except Exception as e:
     logger.warning(f"⚠️  ai_agents: {e}")
 
-# ۴. ماژول Simulation
+# ۴. ماژول Admin Panel
+try:
+    from apps.admin_panel.router import router as admin_router
+    app.include_router(admin_router, prefix="/api/v1", tags=["🛠️ Admin"])
+    logger.info("✅ admin_panel: روتر بارگذاری شد")
+except Exception as e:
+    logger.warning(f"⚠️  admin_panel: {e}")
+
+# ۵. ماژول Simulation
 try:
     from apps.simulation.router import router as simulation_router
     app.include_router(simulation_router, prefix="/api/v1/simulation", tags=["🔬 Simulation"])
@@ -170,7 +178,7 @@ except Exception:
 # ============================================================
 @app.get("/", tags=["🏠 Root"])
 async def root():
-    return {"name": "Eco Nojin API", "status": "running", "version": "2.0.0", "docs": "/docs"}
+    return {"name": "Econojin API", "status": "running", "version": "2.0.0", "docs": "/docs"}
 
 @app.get("/health", tags=["🏥 Health"])
 async def health():

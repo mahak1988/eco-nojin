@@ -4,42 +4,34 @@ Part of the **Eco Nojin** platform.
 
 ## Overview
 
-This module provides api functionality for the Econojin platform.
-It follows the standard layered architecture:
+This package contains a generic backend API module scaffold.
+It is designed to work with the main FastAPI application located in `apps/main.py`.
+
+## Structure
 
 ```
 api/
-├── __init__.py        # Module init
-├── router.py          # FastAPI router (HTTP endpoints)
-├── schemas.py         # Pydantic validation models
-├── service.py         # Business logic
-├── repository.py      # Database access (SQLAlchemy)
-├── models.py          # ORM models
-├── dependencies.py    # FastAPI dependencies (auth, etc.)
-└── tests/             # Pytest tests
+├── __init__.py        # package init
+├── router.py          # FastAPI router for API endpoints
+├── schemas.py         # Pydantic request/response models
+├── service.py         # Business logic layer
+├── repository.py      # Database access logic
+├── models.py          # SQLAlchemy ORM models
+├── dependencies.py    # FastAPI dependencies
+└── tests/             # Pytest tests for the API module
 ```
 
-## Endpoints
+## Running
 
-| Method | Path                  | Description          |
-|--------|-----------------------|----------------------|
-| GET    | `/api`         | List with pagination |
-| GET    | `/api/{id}`  | Get by ID            |
-| POST   | `/api`         | Create               |
-| PATCH  | `/api/{id}`  | Update               |
-| DELETE | `/api/{id}`  | Delete               |
-
-## Development
+From the repository root:
 
 ```bash
-# Run tests
-pytest apps/api/tests/ -v
-
-# Run the dev server (from repo root)
 uvicorn apps.main:app --reload
 ```
 
-## Auto-scaffolded
+The primary backend server is defined in `apps/main.py`, which loads application routers and shared services.
 
-This module was auto-scaffolded by `scripts/phase1_complete_apps.py`.
-Adjust the templates to match your actual domain model.
+## Notes
+
+- `apps/main.py` is the canonical FastAPI entrypoint for this workspace.
+- This package provides a template for API CRUD behavior and can be extended by other modules.

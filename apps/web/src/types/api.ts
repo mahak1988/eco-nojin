@@ -49,6 +49,20 @@ export const API_ENDPOINTS = {
     forgotPassword: "/auth/forgot-password",
     resetPassword: "/auth/reset-password",
   },
+  users: {
+    list: "/users",
+    byId: (id: string | number): string => `/users/${id}`,
+    me: "/users/me",
+    register: "/users/register",
+    login: "/users/login",
+  },
+  admin: {
+    dashboard: "/admin",
+    settings: "/admin/settings",
+    settingByKey: (key: string): string => `/admin/settings/${encodeURIComponent(key)}`,
+    auditLogs: "/admin/audit-logs",
+    reports: "/admin/reports",
+  },
   documents: {
     list: "/documents",
     byId: (id: string): string => `/documents/${id}`,

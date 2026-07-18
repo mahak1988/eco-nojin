@@ -47,6 +47,22 @@ export default {
       },
       boxShadow: {
         card: "0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)",
+        glow: "0 0 40px -10px rgb(16 185 129 / 0.35)",
+        "glow-lg": "0 0 60px -15px rgb(16 185 129 / 0.4)",
+      },
+      animation: {
+        float: "float 6s ease-in-out infinite",
+        shimmer: "shimmer 2.5s linear infinite",
+      },
+      keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
     },
   },
