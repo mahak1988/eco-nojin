@@ -21,7 +21,12 @@
     "language": "Language",
     "persian": "فارسی",
     "english": "English",
-    "toman": "Toman"
+    "toman": "Toman",
+    "relativeTime": {
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    }
   },
   "theme": {
     "light": "Switch to light mode",
@@ -33,6 +38,17 @@
     "carbon": "Carbon",
     "watersheds": "Watersheds",
     "soil": "Soil",
+    "landRegistry": "Land Registry",
+    "farmers": "Farmers",
+    "plantingSeasons": "Planting Seasons",
+    "harvestMonitoring": "Harvest Monitoring",
+    "fertilizer": "Fertilizer Management",
+    "waterIrrigation": "Water & Irrigation",
+    "productionAnalytics": "Production Analytics",
+    "gisExplorer": "GIS Explorer",
+    "aiInsights": "AI Insights",
+    "reports": "Reports",
+    "administration": "Administration",
     "animations": "Animations",
     "about": "About",
     "accounting": "Accounting",

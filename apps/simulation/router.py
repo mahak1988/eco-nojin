@@ -1,108 +1,102 @@
 """
-simulation router | روتر simulation
-=================================
-FastAPI router exposing simulation endpoints.
-
-Endpoints:
-    GET    /simulation          List with pagination
-    GET    /simulation/{id}    Get by ID
-    POST   /simulation          Create
-    PATCH  /simulation/{id}    Update
-    DELETE /simulation/{id}    Delete
+Simulation API Router
+=====================
+Exposes all 28 simulators via REST API endpoints.
 """
 
-from typing import Annotated
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from apps.simulation.registry import register_all_simulators
+from apps.simulation.base import SimulationRegistry
 
-# Adjust this import to match your project's database session dependency
-try:
-    from apps.shared_core.database.session import get_db_session
-except ImportError:
-    # Fallback stub — replace with real implementation
-    from typing import AsyncGenerator
-    async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
-        raise NotImplementedError("Wire up get_db_session in apps.shared_core.database.session")
-
-from apps.simulation.schemas import (
-    SimulationCreate,
-    SimulationUpdate,
-    SimulationResponse,
-    SimulationListResponse,
-)
-from apps.simulation.service import SimulationService
-
-router = APIRouter(prefix="/simulation", tags=["simulation"])
+router = APIRouter(prefix="/api/v1/simulation", tags=["🔬 Simulation"])
 
 
-@router.get("", response_model=SimulationListResponse)
-async def list_simulation(
-    skip: int = 0,
-    limit: int = 100,
-    session: AsyncSession = Depends(get_db_session),
-):
-    """List simulation records with pagination."""
-    service = SimulationService(session)
-    items, total = await service.list(skip=skip, limit=limit)
-    return SimulationListResponse(
-        items=[SimulationResponse.model_validate(item) for item in items],
-        total=total, skip=skip, limit=limit,
+class SimulationRunRequest(BaseModel):
+    """Request body for running a simulation."""
+    simulator_id: str
+    parameters: dict[str, Any]
+
+
+class SimulationRunResponse(BaseModel):
+    """Response from a simulation run."""
+    run_id: str
+    simulator_id: str
+    simulator_name: str
+    status: str
+    outputs: dict[str, Any] = {}
+    metrics: dict[str, float] = {}
+    charts: dict[str, list] = {}
+    error: Optional[str] = None
+    execution_time_ms: float = 0.0
+
+
+@router.get("/simulators", summary="List all available simulators")
+async def list_simulators():
+    """Get metadata for all 28 registered simulators."""
+    simulators = register_all_simulators()
+    return {
+        "total": len(simulators),
+        "simulators": simulators,
+    }
+
+
+@router.get("/simulators/{simulator_id}", summary="Get simulator details")
+async def get_simulator(simulator_id: str):
+    """Get detailed information about a specific simulator."""
+    params = SimulationRegistry.get_parameters(simulator_id)
+    if not params:
+        raise HTTPException(status_code=404, detail=f"Simulator '{simulator_id}' not found")
+    
+    sim_class = SimulationRegistry.get(simulator_id)
+    sim = sim_class()
+    
+    return {
+        "metadata": sim.get_metadata(),
+        "parameters": params,
+    }
+
+
+@router.post("/run", summary="Run a simulation")
+async def run_simulation(request: SimulationRunRequest) -> SimulationRunResponse:
+    """Execute a simulation with the given parameters."""
+    sim_class = SimulationRegistry.get(request.simulator_id)
+    if not sim_class:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Simulator '{request.simulator_id}' not found. Available: {[s['id'] for s in register_all_simulators()]}",
+        )
+    
+    sim = sim_class()
+    result = await sim.run(request.parameters)
+    
+    return SimulationRunResponse(
+        run_id=result.run_id,
+        simulator_id=result.simulator_id,
+        simulator_name=result.simulator_name,
+        status=result.status.value,
+        outputs=result.outputs,
+        metrics=result.metrics,
+        charts=result.charts,
+        error=result.error,
+        execution_time_ms=result.execution_time_ms,
     )
 
 
-@router.get("/{item_id}", response_model=SimulationResponse)
-async def get_simulation(
-    item_id: int,
-    session: AsyncSession = Depends(get_db_session),
-):
-    """Get a single simulation by ID."""
-    service = SimulationService(session)
-    try:
-        item = await service.get(item_id)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    return SimulationResponse.model_validate(item)
-
-
-@router.post("", response_model=SimulationResponse, status_code=status.HTTP_201_CREATED)
-async def create_simulation(
-    payload: SimulationCreate,
-    session: AsyncSession = Depends(get_db_session),
-):
-    """Create a new simulation."""
-    service = SimulationService(session)
-    item = await service.create(payload)
-    await session.commit()
-    return SimulationResponse.model_validate(item)
-
-
-@router.patch("/{item_id}", response_model=SimulationResponse)
-async def update_simulation(
-    item_id: int,
-    payload: SimulationUpdate,
-    session: AsyncSession = Depends(get_db_session),
-):
-    """Update an existing simulation."""
-    service = SimulationService(session)
-    try:
-        item = await service.update(item_id, payload)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    await session.commit()
-    return SimulationResponse.model_validate(item)
-
-
-@router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_simulation(
-    item_id: int,
-    session: AsyncSession = Depends(get_db_session),
-):
-    """Delete a simulation by ID."""
-    service = SimulationService(session)
-    try:
-        await service.delete(item_id)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    await session.commit()
-    return None
+@router.get("/categories", summary="List simulator categories")
+async def list_categories():
+    """Get all simulator categories with counts."""
+    simulators = register_all_simulators()
+    categories: dict[str, list] = {}
+    for sim in simulators:
+        cat = sim.get("category", "other")
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(sim["id"])
+    
+    return {
+        "total_categories": len(categories),
+        "categories": {k: {"count": len(v), "simulators": v} for k, v in categories.items()},
+    }

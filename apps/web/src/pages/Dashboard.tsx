@@ -1,286 +1,271 @@
-/**
- * ============================================================================
- *  Dashboard — main landing page after login (i18n-aware, premium UI)
- * ============================================================================
- */
-
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
-  Activity,
-  ArrowUpRight,
-  Coins,
-  FileText,
-  Leaf,
-  MapPin,
-  TrendingUp,
-  Waves,
-} from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  Area, AreaChart, CartesianGrid, Cell, Pie, PieChart,
+  ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from 'recharts'
+import { ArrowUpRight } from 'lucide-react'
+import Header from '../components/Header'
+import { productionTrend, cropVariety, fieldStatus } from '../lib/data'
+import { formatNumber } from '../lib/utils'
+import DashboardMap from '../components/DashboardMap'
 
-import { ChartCard } from "@/components/shared/ChartCard";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { StatCard } from "@/components/shared/StatCard";
-import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerChildren";
-import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/hooks/useLanguage";
-import { formatNumber } from "@/lib/i18n-utils";
+/* ── Sparkline data ──────────────────────────────────────── */
+const waterSpark  = [{v:98},{v:105},{v:112},{v:118},{v:109},{v:115},{v:125},{v:132}]
+const fertSpark   = [{v:38},{v:42},{v:46},{v:50},{v:48},{v:43},{v:46},{v:50}]
+const scoreSpark  = [{v:79},{v:82},{v:80},{v:83},{v:84},{v:85},{v:86},{v:87}]
 
-interface QuickLink {
-  to: string;
-  titleKey: string;
-  descriptionKey: string;
-  icon: typeof Leaf;
-  gradient: string;
+/* ── Donut slice label ───────────────────────────────────── */
+const R = Math.PI / 180
+const sliceLabel = ({ cx,cy,midAngle,innerRadius,outerRadius,percent }: any) => {
+  if (percent < 0.07) return null
+  const r = innerRadius + (outerRadius - innerRadius) * 0.55
+  return (
+    <text x={cx + r*Math.cos(-midAngle*R)} y={cy + r*Math.sin(-midAngle*R)}
+      fill="white" textAnchor="middle" dominantBaseline="central" fontSize={9} fontWeight={700}>
+      {(percent*100).toFixed(0)}%
+    </text>
+  )
 }
 
-const QUICK_LINKS: readonly QuickLink[] = [
-  {
-    to: "/carbon",
-    titleKey: "nav.carbon",
-    descriptionKey: "carbon.subtitle",
-    icon: Leaf,
-    gradient: "from-orange-500 to-rose-500",
-  },
-  {
-    to: "/hydrology/watersheds",
-    titleKey: "nav.watersheds",
-    descriptionKey: "hydrology.subtitle",
-    icon: Waves,
-    gradient: "from-blue-500 to-cyan-500",
-  },
-  {
-    to: "/soil",
-    titleKey: "nav.soil",
-    descriptionKey: "soil.subtitle",
-    icon: Activity,
-    gradient: "from-emerald-500 to-teal-500",
-  },
-  {
-    to: "/documents",
-    titleKey: "nav.documents",
-    descriptionKey: "documents.subtitle",
-    icon: FileText,
-    gradient: "from-violet-500 to-indigo-500",
-  },
-] as const;
+/* ── Recent activities ───────────────────────────────────── */
+const ACTIVITIES = [
+  { title:'Field ID F-2025-0012', desc:'Planting recorded',              time:'2 hours ago', bg:'bg-green-500',  emoji:'🌱' },
+  { title:'Field ID F-2025-0456', desc:'Harvest recorded',               time:'5 hours ago', bg:'bg-amber-500',  emoji:'🌾' },
+  { title:'Fertilizer distribution', desc:'Urea 5 ton to Desa Karangampel', time:'1 day ago', bg:'bg-blue-500',   emoji:'🧪' },
+  { title:'Water usage updated',  desc:'Irrigation Pump 03',             time:'1 day ago',   bg:'bg-cyan-500',   emoji:'💧' },
+]
 
-const ACTIVITY_DATA = [
-  { day: "Sat", value: 42 },
-  { day: "Sun", value: 58 },
-  { day: "Mon", value: 51 },
-  { day: "Tue", value: 67 },
-  { day: "Wed", value: 74 },
-  { day: "Thu", value: 63 },
-  { day: "Fri", value: 81 },
-];
-
-const RECENT_ACTIVITY = [
-  { id: 1, titleKey: "nav.carbon", timeKey: "dashboard.newReports", icon: Leaf, color: "text-orange-500", bg: "bg-orange-500/10" },
-  { id: 2, titleKey: "nav.watersheds", timeKey: "dashboard.newRegions", icon: Waves, color: "text-blue-500", bg: "bg-blue-500/10" },
-  { id: 3, titleKey: "nav.documents", timeKey: "dashboard.newReports", icon: FileText, color: "text-violet-500", bg: "bg-violet-500/10" },
-] as const;
-
-function QuickLinkCard({ link, index }: { link: QuickLink; index: number }): JSX.Element {
-  const { t, dir } = useLanguage();
-  const Icon = link.icon;
-
+export default function Dashboard() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 + index * 0.08, duration: 0.45 }}
-      whileHover={{ y: -4 }}
-    >
-      <Link
-        to={link.to}
-        dir={dir}
-        className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-emerald-200 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:hover:border-emerald-800"
-      >
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${link.gradient} text-white shadow-md`}>
-          <Icon className="h-6 w-6" />
+    /* Full-height flex column — NO scroll on outer container */
+    <div className="flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-gray-900">
+      <Header title="Dashboard" subtitle="Overview of agricultural activities and key metrics" />
+
+      {/* ── Body: fixed flex-col, no scroll ────────────────── */}
+      <div className="flex-1 flex flex-col overflow-hidden p-3 gap-3 min-h-0">
+
+        {/* ── ROW 1: 5 KPI cards ── */}
+        <div className="grid grid-cols-5 gap-3 shrink-0">
+          {[
+            { label:'Total Area',           value:'12,543', unit:'ha',  sub:'+2.35% from last season', icon:'🌳', bg:'bg-green-900/30'   },
+            { label:'Active Fields',         value:'8,921',  unit:'ha',  sub:'71.1% of total area',     icon:'🌿', bg:'bg-emerald-900/30' },
+            { label:'Registered Farmers',    value:'4,782',  unit:'',    sub:'+120 new this season',    icon:'👨‍🌾',bg:'bg-blue-900/30'    },
+            { label:'Estimated Production',  value:'45,682', unit:'ton', sub:'+8.45% from last season', icon:'🌾', bg:'bg-amber-900/30'   },
+            { label:'Season Progress',       value:'63',     unit:'%',   sub:'Growing Period',          icon:'📊', bg:'bg-violet-900/30'  },
+          ].map(({ label, value, unit, sub, icon, bg }) => (
+            <div key={label} className="card p-3.5 flex items-start justify-between hover:shadow-card-hover transition-shadow">
+              <div className="min-w-0">
+                <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500">{label}</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5 tracking-tight leading-none">
+                  {value}<span className="text-xs font-normal text-gray-400 ml-1">{unit}</span>
+                </p>
+                <p className="text-[10px] text-green-600 dark:text-green-400 font-medium mt-1 flex items-center gap-0.5">
+                  <ArrowUpRight className="w-2.5 h-2.5" />{sub}
+                </p>
+              </div>
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 ${bg}`}>
+                {icon}
+              </div>
+            </div>
+          ))}
         </div>
-        <h3 className="mt-4 text-base font-semibold text-gray-900 dark:text-white">{t(link.titleKey)}</h3>
-        <p className="mt-1 flex-1 text-sm text-gray-600 dark:text-gray-400">{t(link.descriptionKey)}</p>
-        <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 transition group-hover:gap-2 dark:text-emerald-400">
-          {t("common.back")}
-          <ArrowUpRight className="h-3.5 w-3.5" />
-        </span>
-      </Link>
-    </motion.div>
-  );
-}
 
-export function Dashboard(): JSX.Element {
-  const { user } = useAuth();
-  const { t, dir, language } = useLanguage();
+        {/* ── ROW 2: 3 Sparkline cards ── */}
+        <div className="grid grid-cols-3 gap-3 shrink-0">
+          {[
+            { label:'Water Usage',        value:'1,250,000', unit:'m³',  sub:'+5.2% from last season', data:waterSpark },
+            { label:'Fertilizer Usage',   value:'2,345',     unit:'ton', sub:'+6.1% from last season', data:fertSpark  },
+            { label:'Productivity Score', value:'87',        unit:'/100',sub:'Very Good',              data:scoreSpark },
+          ].map(({ label, value, unit, sub, data }) => (
+            <div key={label} className="card px-4 py-3 flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-medium text-gray-400 dark:text-gray-500">{label}</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white mt-0.5 tracking-tight leading-none">
+                  {value}<span className="text-xs font-normal text-gray-400 ml-1">{unit}</span>
+                </p>
+                <p className="text-[10px] text-green-600 dark:text-green-400 font-medium mt-1 flex items-center gap-0.5">
+                  <ArrowUpRight className="w-2.5 h-2.5"/>{sub}
+                </p>
+              </div>
+              <div className="w-24 h-10 shrink-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={data} margin={{top:2,right:2,left:2,bottom:2}}>
+                    <defs>
+                      <linearGradient id={`sg${label}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor="#16a34a" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#16a34a" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area type="monotone" dataKey="v" stroke="#16a34a" strokeWidth={1.5}
+                      fill={`url(#sg${label})`} dot={false}/>
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ))}
+        </div>
 
-  if (!user) return <></>;
+        {/* ── ROW 3: Charts (flex-1 so they grow) ── */}
+        <div className="grid grid-cols-3 gap-3 flex-1 min-h-0">
 
-  const hour = new Date().getHours();
-  const greetingKey =
-    hour < 12 ? "dashboard.greetingMorning" : hour < 18 ? "dashboard.greetingNoon" : "dashboard.greetingEvening";
-
-  const stats = [
-    {
-      label: t("dashboard.sustainabilityScore"),
-      value: `${formatNumber(78, language)}/100`,
-      icon: TrendingUp,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-500/10",
-      trend: 4,
-    },
-    {
-      label: t("dashboard.activeReports"),
-      value: formatNumber(12, language),
-      icon: FileText,
-      color: "text-blue-600",
-      bgColor: "bg-blue-500/10",
-      trend: 12,
-    },
-    {
-      label: t("dashboard.monitoredRegions"),
-      value: formatNumber(47, language),
-      icon: MapPin,
-      color: "text-violet-600",
-      bgColor: "bg-violet-500/10",
-      trend: 5,
-    },
-    {
-      label: t("dashboard.ecoCoin"),
-      value: formatNumber(1250, language),
-      icon: Coins,
-      color: "text-amber-600",
-      bgColor: "bg-amber-500/10",
-      trend: 18,
-    },
-  ];
-
-  return (
-    <div dir={dir} className="mx-auto max-w-7xl px-4 py-8">
-      <PageHeader
-        title={`${t(greetingKey)}، ${user.displayName} 👋`}
-        description={t("dashboard.welcomeMessage")}
-        icon={Activity}
-        color="text-emerald-600"
-      />
-
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <StatCard key={stat.label} {...stat} delay={index * 0.08} />
-        ))}
-      </div>
-
-      <div className="mb-8 grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ChartCard
-            title={t("dashboard.activityChart")}
-            icon={Activity}
-            iconColor="text-emerald-600"
-            delay={0.15}
-          >
-            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">{t("dashboard.activityChartDesc")}</p>
-            <div className="h-64 w-full">
+          {/* Production Trend */}
+          <div className="card p-4 flex flex-col min-h-0">
+            <div className="flex items-center justify-between mb-2 shrink-0">
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-white">
+                Production Trend <span className="text-gray-400 font-normal">(Ton)</span>
+              </h3>
+              <div className="flex items-center gap-3 text-[10px] text-gray-400">
+                <span className="flex items-center gap-1">
+                  <svg width="14" height="2"><line x1="0" y1="1" x2="14" y2="1" stroke="#9ca3af" strokeWidth="2" strokeDasharray="3 2"/></svg>2024
+                </span>
+                <span className="flex items-center gap-1">
+                  <svg width="14" height="2"><line x1="0" y1="1" x2="14" y2="1" stroke="#16a34a" strokeWidth="2"/></svg>2025
+                </span>
+              </div>
+            </div>
+            <div className="flex-1 min-h-0">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={ACTIVITY_DATA} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                <AreaChart data={productionTrend} margin={{top:4,right:4,left:-24,bottom:0}}>
                   <defs>
-                    <linearGradient id="activityFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
-                      <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                    <linearGradient id="g25" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#16a34a" stopOpacity={0.12}/>
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-800" />
-                  <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="#94a3b8" />
-                  <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: "12px",
-                      border: "1px solid rgb(229 231 235)",
-                      background: "rgba(255,255,255,0.95)",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#059669"
-                    strokeWidth={2.5}
-                    fill="url(#activityFill)"
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false}/>
+                  <XAxis dataKey="month" tick={{fontSize:9,fill:'#9ca3af'}} axisLine={false} tickLine={false}/>
+                  <YAxis tick={{fontSize:9,fill:'#9ca3af'}} axisLine={false} tickLine={false}
+                    tickFormatter={(v:number)=>`${v/1000}k`}/>
+                  <Tooltip formatter={(v)=>formatNumber(Number(v))+' ton'}
+                    contentStyle={{borderRadius:8,border:'none',fontSize:10,boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}/>
+                  <Area type="monotone" dataKey="2024" stroke="#e5e7eb" strokeWidth={1.5}
+                    strokeDasharray="4 2" fill="none" dot={false}/>
+                  <Area type="monotone" dataKey="2025" stroke="#16a34a" strokeWidth={2}
+                    fill="url(#g25)" dot={{r:2.5,fill:'#16a34a',stroke:'white',strokeWidth:1.5}} activeDot={{r:4}}/>
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </ChartCard>
-        </div>
+          </div>
 
-        <ChartCard title={t("dashboard.recentActivity")} icon={FileText} iconColor="text-blue-600" delay={0.25}>
-          <StaggerContainer className="space-y-3">
-            {RECENT_ACTIVITY.map((item) => {
-              const Icon = item.icon;
-              return (
-                <StaggerItem key={item.id}>
-                  <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-3 dark:border-gray-800 dark:bg-gray-900/60">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${item.bg}`}>
-                      <Icon className={`h-5 w-5 ${item.color}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{t(item.titleKey)}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{t(item.timeKey, { value: "2" })}</p>
+          {/* Crop Variety Distribution */}
+          <div className="card p-4 flex flex-col min-h-0">
+            <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2 shrink-0">Crop Variety Distribution</h3>
+            <div className="flex-1 flex items-center gap-2 min-h-0">
+              <div className="shrink-0" style={{width:110,height:110}}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={cropVariety} cx="50%" cy="50%" innerRadius={32} outerRadius={50}
+                      dataKey="value" paddingAngle={2} labelLine={false} label={sliceLabel}>
+                      {cropVariety.map((e,i)=><Cell key={i} fill={e.color}/>)}
+                    </Pie>
+                    <text x="50%" y="47%" textAnchor="middle" dominantBaseline="middle"
+                      fill="#111827" fontSize={11} fontWeight={700}>45,682</text>
+                    <text x="50%" y="60%" textAnchor="middle" dominantBaseline="middle"
+                      fill="#9ca3af" fontSize={8}>ton</text>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex-1 space-y-1.5 min-w-0">
+                {cropVariety.map(({name,value,color})=>(
+                  <div key={name} className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400 min-w-0">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{background:color}}/>
+                      <span className="truncate">{name}</span>
+                    </span>
+                    <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300 ml-1 shrink-0">{value}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Fields Status */}
+          <div className="card p-4 flex flex-col min-h-0">
+            <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2 shrink-0">Fields Status</h3>
+            <div className="flex-1 flex items-center gap-2 min-h-0">
+              <div className="shrink-0" style={{width:110,height:110}}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={fieldStatus} cx="50%" cy="50%" innerRadius={32} outerRadius={50}
+                      dataKey="value" paddingAngle={2} labelLine={false} label={sliceLabel}>
+                      {fieldStatus.map((e,i)=><Cell key={i} fill={e.color}/>)}
+                    </Pie>
+                    <text x="50%" y="47%" textAnchor="middle" dominantBaseline="middle"
+                      fill="#111827" fontSize={11} fontWeight={700}>12,543</text>
+                    <text x="50%" y="60%" textAnchor="middle" dominantBaseline="middle"
+                      fill="#9ca3af" fontSize={8}>ha</text>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex-1 space-y-1.5 min-w-0">
+                {fieldStatus.map(({name,value,pct,color})=>(
+                  <div key={name} className="flex items-start gap-1.5">
+                    <span className="w-2 h-2 rounded-full shrink-0 mt-0.5" style={{background:color}}/>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 leading-tight truncate">{name}</p>
+                      <p className="text-[10px] text-gray-400">{formatNumber(value)} ha ({pct}%)</p>
                     </div>
                   </div>
-                </StaggerItem>
-              );
-            })}
-          </StaggerContainer>
-          <Link
-            to="/documents"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
-          >
-            {t("dashboard.viewAll")}
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </ChartCard>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── ROW 4: Map + Recent Activities (flex-1, fills rest) ── */}
+        <div className="grid grid-cols-3 gap-3 flex-1 min-h-0">
+
+          {/* Map card */}
+          <div className="card col-span-2 flex flex-col overflow-hidden min-h-0">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 shrink-0">
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-white">Field Map Overview</h3>
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"/><path strokeLinecap="round" d="M21 21l-4.35-4.35"/>
+                  </svg>
+                  <input placeholder="Search location…"
+                    className="pl-7 pr-3 py-1 text-[11px] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg w-36 focus:outline-none text-gray-600 placeholder-gray-400"/>
+                </div>
+                <button className="w-6 h-6 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 transition-colors">
+                  <svg className="w-3 h-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            {/* Map fills remaining height */}
+            <div className="flex-1 min-h-0 relative">
+              <div style={{position:'absolute',inset:0}}>
+                <DashboardMap />
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activities */}
+          <div className="card p-4 flex flex-col min-h-0 overflow-hidden">
+            <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 shrink-0">Recent Activities</h3>
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {ACTIVITIES.map(({title,desc,time,emoji,bg})=>(
+                <div key={title} className="flex gap-2.5 items-start">
+                  <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center text-sm shrink-0`}>
+                    {emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{title}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5 truncate">{desc}</p>
+                    <p className="text-[9px] text-gray-300 dark:text-gray-600 mt-0.5">{time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="mt-3 text-[11px] text-green-600 dark:text-green-400 font-semibold hover:underline shrink-0">
+              View all activities →
+            </button>
+          </div>
+        </div>
+
       </div>
-
-      <section className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">{t("dashboard.quickAccess")}</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {QUICK_LINKS.map((link, index) => (
-            <QuickLinkCard key={link.to} link={link} index={index} />
-          ))}
-        </div>
-      </section>
-
-      <motion.section
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-8 text-white shadow-glow-lg"
-      >
-        <div className="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-20 -start-10 h-56 w-56 rounded-full bg-teal-400/20 blur-3xl" />
-        <div className="relative">
-          <h2 className="text-xl font-bold sm:text-2xl">{t("dashboard.welcomeBannerTitle")}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-emerald-50 sm:text-base">
-            {t("dashboard.welcomeBannerText")}
-          </p>
-          <Link
-            to="/documents"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 hover:shadow-lg"
-          >
-            {t("dashboard.viewReports")}
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </motion.section>
     </div>
-  );
+  )
 }

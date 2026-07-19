@@ -1,102 +1,101 @@
 """
-ماژول مدارس کشاورزی Econojin — API endpoints with database persistence
+Agriculture Schools Router - Database backed
+==========================================
+RESTful endpoints for agricultural education institutions.
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, text
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from datetime import datetime
 
 from apps.shared_core.database.session import get_db_session
+from apps.api.schemas.agriculture_school import (
+    AgricultureSchoolCreate, AgricultureSchoolUpdate,
+    AgricultureSchoolResponse, AgricultureSchoolListResponse, SchoolStats
+)
+from apps.api.services.agriculture_school import AgricultureSchoolService
 
 router = APIRouter(prefix="/api/v1/agriculture-schools", tags=["🏯 Agriculture Schools"])
 
 
-# Schemas
-class SchoolBase(BaseModel):
-    name: str = Field(..., max_length=255)
-    province: str = Field(..., max_length=128)
-    city: str = Field(..., max_length=128)
-    type: str = Field("university", pattern="^(university|institute|training-center)$")
-    established: Optional[int] = None
-    students_count: int = Field(0, ge=0)
-    fields: List[str] = Field(default_factory=list)
-    website: Optional[str] = None
-    logo: str = Field("📣", max_length=10)
-
-class SchoolCreate(SchoolBase):
-    pass
-
-class SchoolResponse(SchoolBase):
-    id: int
-    created_at: datetime
-    updated_at: datetime
-    model_config = {"from_attributes": True}
-
-
-# In-memory fallback (dev without DB)
-_fallback_schools = [
-    {"id": 1, "name": "دامرحلای کشاورزی ایراقرو ثهران", "province": "تهران", "city": "کرذ",
-     "type": "university", "established": 1963, "students_count": 4200,
-     "fields": ["آثتاشک", "حاة-ظانبال", "باا-بانال", "غاامی-ؼشااه",
-     "website": "https://abf.ut.ac.ir", "logo": "📣",
-     "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00"},
-    {"id": 2, "name": "دامربمشای وعدم کشاورزی وبماوال", "province": "وتیلان", "city": "وبماوال",
-     "type": "university", "established": 1957, "students_count": 6800,
-     "fields": ["جلهدامشی", "محیطضست", "وشیکات", "آثتاشک"],
-     "website": "https://gau.ac.ir", "logo": "��",
-     "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00"},
-    {"id": 3, "name": "دامرامشای کشاورزی ایراقرو وننابال", "province": "فارم", "city": "نناوال",
-     "type": "university", "established": 1955, "students_count": 3100,
-     "fields": ["رمارم", "باا-بانال", "مههنشث دانال", "غاامی-ؼراماه"],
-     "website": "https://agri.shirazu.ac.ir", "logo": "😎",
-     "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00"},
-    {"id": 4, "name": "کلماوش آموزش عال-ال کشاورزی عدذاریه", "province": "امفهان", "city": "امفهان",
-     "type": "institute", "established": 2011, "students_count": 450,
-     "fields": ["کشاورزی ارگانیه", "پرماوتالیه", "اقتصاد سار"],
-     "website": "https://saii.ir", "logo": "😱",
-     "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00"},
-    {"id": 5, "name": "کمرد اقرائنی کوشاویاراوتی حکولاری رووت", "province": "موالاال", "city": "روتی",
-     "type": "training-center", "established": 1998, "students_count": 820,
-     "fields": ["رنگاری", "ایای گاری", "نوصادری", "دامی ورتارذ"],
-     "website": "https://rasht-agri.ir", "logo": "🌿",
-     "created_at": "2024-01-01T00:00:00", "updated_at": "2024-01-01T00:00:00"},
-]
-
-
-@router.get("/")
+@router.get("/", response_model=AgricultureSchoolListResponse)
 async def list_schools(
-    search: Optional[str] = Query(None,
-        description="Search by name, province, or city"),
-    type: Optional[str] = Query(None,
-        pattern="^(university|institute|training-center)$"),
+    skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-):
-    result = _fallback_schools
-    if search:
-        s = search.lower()
-        result = [r for r in result
-                  if s in r["name"].lower()
-                  or s in r[
-            "province"].lower()
-                  or s in r["city"].lower()]
-    if type:
-        result = [r for r in result if r["type"] == type]
-    return {"schools": result[offset:offset+limit], "total": len(result)}
+    search: Optional[str] = Query(None, description="Search by name, province, or city"),
+    school_type: Optional[str] = Query(None, pattern="^(university|institute|training-center)$"),
+    session: AsyncSession = Depends(get_db_session)
+) -> AgricultureSchoolListResponse:
+    """List agriculture schools with optional search and filtering."""
+    service = AgricultureSchoolService(session)
+    schools, total = await service.list(skip, limit, search, school_type)
+    
+    # Transform to response format
+    items = [AgricultureSchoolResponse.model_validate(s) for s in schools]
+    
+    return AgricultureSchoolListResponse(items=items, total=total, skip=skip, limit=limit)
 
 
-@router.get("/stats")
-async def get_stats():
-    schools = _fallback_schools
-    provinces = set(s["province"] for s in schools)
-    types = {}
-    for s in schools:
-        types[s["type"]] = types.get(s["type"], 0) + 1
-    return {
-        "total_schools": len(schools),
-        "total_students": sum(s["students_count"] for s in schools),
-        "provinces_count": len(provinces),
-        "by_type": types,
-    }
+@router.get("/stats", response_model=SchoolStats)
+async def get_stats(session: AsyncSession = Depends(get_db_session)) -> SchoolStats:
+    """Get statistics about agriculture schools."""
+    service = AgricultureSchoolService(session)
+    stats = await service.get_stats()
+    return SchoolStats(**stats)
+
+
+@router.post("/", response_model=AgricultureSchoolResponse, status_code=status.HTTP_201_CREATED)
+async def create_school(
+    payload: AgricultureSchoolCreate,
+    session: AsyncSession = Depends(get_db_session)
+) -> AgricultureSchoolResponse:
+    """Create a new agriculture school."""
+    service = AgricultureSchoolService(session)
+    school = await service.create(payload)
+    await session.commit()
+    return AgricultureSchoolResponse.model_validate(school)
+
+
+@router.get("/{school_id}", response_model=AgricultureSchoolResponse)
+async def get_school(
+    school_id: int,
+    session: AsyncSession = Depends(get_db_session)
+) -> AgricultureSchoolResponse:
+    """Get a specific agriculture school by ID."""
+    service = AgricultureSchoolService(session)
+    try:
+        school = await service.get(school_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    return AgricultureSchoolResponse.model_validate(school)
+
+
+@router.patch("/{school_id}", response_model=AgricultureSchoolResponse)
+async def update_school(
+    school_id: int,
+    payload: AgricultureSchoolUpdate,
+    session: AsyncSession = Depends(get_db_session)
+) -> AgricultureSchoolResponse:
+    """Update an existing agriculture school."""
+    service = AgricultureSchoolService(session)
+    try:
+        school = await service.update(school_id, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    await session.commit()
+    return AgricultureSchoolResponse.model_validate(school)
+
+
+@router.delete("/{school_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_school(
+    school_id: int,
+    session: AsyncSession = Depends(get_db_session)
+) -> None:
+    """Delete an agriculture school."""
+    service = AgricultureSchoolService(session)
+    try:
+        await service.delete(school_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    await session.commit()

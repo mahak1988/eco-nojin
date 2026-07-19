@@ -23,7 +23,12 @@
     "language": "زبان",
     "persian": "فارسی",
     "english": "انگلیسی",
-    "toman": "تومان"
+    "toman": "تومان",
+    "relativeTime": {
+      "minutesAgo": "{{count}} دقیقه پیش",
+      "hoursAgo": "{{count}} ساعت پیش",
+      "daysAgo": "{{count}} روز پیش"
+    }
   },
   "theme": {
     "light": "تغییر به حالت روشن",
@@ -54,6 +59,17 @@
     "carbon": "کربن",
     "watersheds": "آبخیزها",
     "soil": "خاک",
+    "landRegistry": "ثبت اراضی",
+    "farmers": "کشاورزان",
+    "plantingSeasons": "فصل‌های کشت",
+    "harvestMonitoring": "پایش برداشت",
+    "fertilizer": "مدیریت کود",
+    "waterIrrigation": "آب و آبیاری",
+    "productionAnalytics": "تحلیل تولید",
+    "gisExplorer": "اکسپلورر GIS",
+    "aiInsights": "بینش‌های هوش مصنوعی",
+    "reports": "گزارش‌ها",
+    "administration": "مدیریت سامانه",
     "animations": "انیمیشن‌ها",
     "about": "درباره ما",
     "accounting": "حسابداری",

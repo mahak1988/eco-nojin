@@ -1,50 +1,114 @@
 version: "3.9"
 
-# Stack for apps/web + api/ (current monorepo layout)
+# ============================================================
+# Econojin - Docker Compose for Local Development
+# ============================================================
+# Adapted from fastapi/full-stack-fastapi-template
+# Services: db (PostGIS), redis, api (FastAPI), web (Vite/React)
+
 services:
+  # ── Database ──────────────────────────────────────────────
   db:
     image: postgis/postgis:17-3.5
+    restart: always
     environment:
-      POSTGRES_DB: econojin
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: econojin_pass
+      POSTGRES_DB: ${POSTGRES_DB:-econojin}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-econojin_pass}
     ports: ["5432:5432"]
-    volumes: [pgdata:/var/lib/postgresql/data]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-econojin}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  # ── Redis (for Celery/caching) ────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       retries: 5
 
-  redis:
-    image: redis:7-alpine
-    ports: ["6379:6379"]
-
+  # ── API (FastAPI Backend) ─────────────────────────────────
   api:
     build:
       context: .
       dockerfile: docker/Dockerfile.api
+    restart: always
     ports: ["8000:8000"]
     environment:
-      DATABASE_URL: sqlite+aiosqlite:///./data/econojin.db
-      JWT_SECRET: change-me-in-production
-      DEBUG: "true"
+      # Database
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:econojin_pass@db:5432/econojin}
+      POSTGRES_SERVER: db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-econojin_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-econojin}
+      # Security
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      ENVIRONMENT: ${ENVIRONMENT:-local}
+      # CORS
+      FRONTEND_HOST: http://web:5173
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      # AI
+      LLM_PROVIDER: ${LLM_PROVIDER:-fake}
+      # SMS
+      SMS_PROVIDER: ${SMS_PROVIDER:-mock}
       OTP_DEV_MODE: "true"
-      ALLOWED_ORIGINS: http://localhost:3001,http://localhost:3000
+      # Feature flags
+      REQUIRE_AUTH_FOR_WRITES: "false"
     volumes:
+      - ./apps:/app/apps
       - ./data:/app/data
     depends_on:
-      redis: { condition: service_started }
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
+  # ── Web (Vite/React Frontend) ─────────────────────────────
   web:
     image: node:20-alpine
     working_dir: /app
-    command: sh -c "corepack enable && pnpm install && pnpm --filter @econojin/web dev"
-    ports: ["3001:3001"]
+    command: sh -c "corepack enable && pnpm install && pnpm --filter @econojin/web dev --host 0.0.0.0"
+    ports: ["5173:5173"]
     environment:
-      NEXT_PUBLIC_API_URL: http://api:8000
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+      VITE_DEFAULT_LANG: ${VITE_DEFAULT_LANG:-fa}
     volumes:
       - .:/app
-    depends_on: [api]
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    depends_on:
+      - api
+
+  # ── Adminer (Database Management UI) ──────────────────────
+  adminer:
+    image: adminer
+    restart: always
+    ports: ["8080:8080"]
+    depends_on:
+      - db
+    environment:
+      ADMINER_DESIGN: pepa-linha-dark
+
+  # ── Frontend Production (Nginx) ────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    image: ghcr.io/econojin/frontend:latest
+    restart: always
+    ports: ["3000:80"]
+    environment:
+      NODE_ENV: production
+    depends_on:
+      - api
 
 volumes:
   pgdata:

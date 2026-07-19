@@ -17,20 +17,15 @@ const SEVERITY_CONFIG: Record<AlertSeverity, { icon: string; className: string }
   critical: { icon: "🔴", className: "border-red-200 bg-red-50" },
 };
 
-function formatRelativeTime(iso: string, language: string): string {
+function formatRelativeTime(iso: string, language: string, t: (key: string, vars?: any) => string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (language === "fa") {
-    if (minutes < 60) return `${minutes} دقیقه پیش`;
-    if (hours < 24) return `${hours} ساعت پیش`;
-    return `${days} روز پیش`;
-  }
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
+  if (minutes < 60) return t("common.relativeTime.minutesAgo", { count: minutes, lng: language });
+  if (hours < 24) return t("common.relativeTime.hoursAgo", { count: hours, lng: language });
+  return t("common.relativeTime.daysAgo", { count: days, lng: language });
 }
 
 export function AlertsPanel(): JSX.Element {
@@ -67,7 +62,7 @@ export function AlertsPanel(): JSX.Element {
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-semibold text-gray-900">{t(alert.titleKey)}</h3>
                     <span className="shrink-0 text-xs text-gray-500">
-                      {formatRelativeTime(alert.triggeredAt, language)}
+                      {formatRelativeTime(alert.triggeredAt, language, t)}
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-gray-600">{t(alert.descriptionKey)}</p>

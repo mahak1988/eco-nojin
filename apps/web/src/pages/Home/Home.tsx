@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { TypographicLogoIcon } from "@/components/common/TypographicLogo";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { StaggerContainer, StaggerItem } from "@/components/motion/StaggerChildren";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -22,11 +23,7 @@ export function Home(): JSX.Element {
       <nav className="fixed top-0 z-50 w-full border-b border-white/10 glass-panel">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-200">
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2L3 7v6c0 4.4 3.1 8.3 7 9 3.9-.7 7-4.6 7-9V7l-7-5z" />
-              </svg>
-            </div>
+            <TypographicLogoIcon size="md" />
             <span className="text-xl font-extrabold tracking-tight text-gray-900">{t("home.nav.brand")}</span>
           </div>
           
@@ -208,9 +205,7 @@ export function Home(): JSX.Element {
           <div className="grid gap-8 md:grid-cols-4">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-2 mb-4 text-white">
-                <svg className="h-6 w-6 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 2L3 7v6c0 4.4 3.1 8.3 7 9 3.9-.7 7-4.6 7-9V7l-7-5z" />
-                </svg>
+                <TypographicLogoIcon size="sm" />
                 <span className="text-xl font-bold">{t("home.nav.brand")}</span>
               </div>
               <p className="max-w-xs text-sm leading-relaxed">

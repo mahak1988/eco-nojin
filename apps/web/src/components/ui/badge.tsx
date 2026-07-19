@@ -18,7 +18,8 @@ export type BadgeVariant =
   | "sky"
   | "amber"
   | "rose"
-  | "violet";
+  | "violet"
+  | "outline";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
@@ -33,6 +34,7 @@ const VARIANT_STYLES: Record<BadgeVariant, string> = {
   amber: "bg-amber-100 text-amber-700",
   rose: "bg-rose-100 text-rose-700",
   violet: "bg-violet-100 text-violet-700",
+  outline: "border border-gray-300 bg-transparent text-gray-700",
 };
 
 const DOT_STYLES: Record<BadgeVariant, string> = {
@@ -42,6 +44,7 @@ const DOT_STYLES: Record<BadgeVariant, string> = {
   amber: "bg-amber-500",
   rose: "bg-rose-500",
   violet: "bg-violet-500",
+  outline: "bg-gray-500",
 };
 
 export function Badge({

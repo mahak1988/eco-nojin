@@ -94,20 +94,70 @@
  * ------------------------------------------------------------------------- */
 
 @layer components {
+  /* ===== Enhanced Card Styles ===== */
   .card {
-    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm;
+    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300;
   }
 
+  .card-hover {
+    @apply rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-emerald-200 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-emerald-800;
+  }
+
+  /* Premium interactive card with glow effect */
+  .card-elevated {
+    @apply rounded-2xl border border-gray-200/80 bg-white/90 p-6 shadow-lg backdrop-blur-sm transition-all duration-500 hover:shadow-xl dark:border-gray-700/50 dark:bg-gray-900/90;
+  }
+
+  /* Navigation card styles */
+  .nav-card {
+    @apply flex items-center gap-4 rounded-xl border border-gray-200/60 bg-white/80 p-4 transition-all duration-300 hover:border-emerald-200/80 hover:bg-white hover:shadow-md dark:border-gray-700/40 dark:bg-gray-900/60 dark:hover:border-emerald-700/50;
+  }
+
+  /* Stats card with gradient accent */
+  .stats-card {
+    @apply relative overflow-hidden rounded-2xl border border-gray-200/70 bg-white p-5 dark:border-gray-700/50 dark:bg-gray-900;
+  }
+  .stats-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gradient-aurora);
+  }
+
+  /* ===== Enhanced Button Styles ===== */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:from-emerald-600 hover:to-teal-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-60;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgb(16 185 129 / 0.4);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-60 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300/70 bg-white/90 px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-60 dark:border-gray-600/50 dark:bg-gray-800/80 dark:text-gray-200 dark:hover:border-emerald-600/60 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-300;
+  }
+  .btn-secondary:hover {
+    transform: translateY(-1px);
   }
 
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/60 dark:hover:text-white;
+  }
+
+  /* ===== Enhanced Glass Panel ===== */
   .glass-panel {
-    @apply border border-white/20 bg-white/70 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/70;
+    @apply border border-white/30 bg-white/80 shadow-md backdrop-blur-xl transition-all duration-300 dark:border-white/15 dark:bg-gray-900/80;
+  }
+  .glass-panel:hover {
+    @apply border-white/40 bg-white/85 dark:border-white/20 dark:bg-gray-900/85;
+  }
+
+  /* Frosted glass card */
+  .glass-card {
+    @apply rounded-2xl border border-white/40 bg-white/70 shadow-md backdrop-blur-xl dark:border-white/15 dark:bg-gray-900/70;
   }
 
   .mesh-bg {
@@ -123,6 +173,115 @@
       radial-gradient(at 80% 0%, rgb(20 184 166 / 0.06) 0, transparent 45%),
       radial-gradient(at 0% 50%, rgb(52 211 153 / 0.05) 0, transparent 50%);
   }
+
+  /* ---- Econojin Design System — premium component utilities ------------- */
+
+  /* Card with soft eco glow on hover + subtle gradient top accent */
+  .eco-card-hover {
+    @apply relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:border-emerald-200 hover:shadow-[0_20px_50px_-15px_rgb(16_185_129/0.25)] dark:border-gray-800 dark:bg-gray-900 dark:hover:border-emerald-800;
+  }
+  .eco-card-hover::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 3px;
+    background: var(--gradient-emerald);
+    transform: scaleX(0);
+    transform-origin: inline-start;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .eco-card-hover:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Shimmering text — animated gradient sweep */
+  .shimmer-text {
+    background: linear-gradient(
+      110deg,
+      currentColor 35%,
+      rgb(255 255 255 / 0.85) 50%,
+      currentColor 65%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer-emerald 3s linear infinite;
+  }
+
+  /* Animated gradient border (uses padding-box/mask trick) */
+  .gradient-border {
+    position: relative;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--card, white), var(--card, white)) padding-box,
+      var(--gradient-aurora) border-box;
+  }
+  .dark .gradient-border {
+    background:
+      linear-gradient(rgb(17 24 39), rgb(17 24 39)) padding-box,
+      var(--gradient-aurora) border-box;
+  }
+
+  /* Soft aurora background — large blurred animated blobs */
+  .aurora-bg {
+    position: relative;
+    isolation: isolate;
+  }
+  .aurora-bg::before,
+  .aurora-bg::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .aurora-bg::before {
+    inset-block-start: -20%;
+    inset-inline-end: -10%;
+    width: 40vw;
+    height: 40vw;
+    max-width: 600px;
+    max-height: 600px;
+    background: radial-gradient(circle, rgb(16 185 129 / 0.5), transparent 70%);
+    animation: aurora 18s ease-in-out infinite;
+  }
+  .aurora-bg::after {
+    inset-block-end: -20%;
+    inset-inline-start: -10%;
+    width: 35vw;
+    height: 35vw;
+    max-width: 500px;
+    max-height: 500px;
+    background: radial-gradient(circle, rgb(6 182 212 / 0.45), transparent 70%);
+    animation: aurora 22s ease-in-out infinite reverse;
+  }
+  .dark .aurora-bg::before,
+  .dark .aurora-bg::after {
+    opacity: 0.3;
+  }
+
+  /* Glass card — frosted panel with gradient edge highlight */
+  .glass-card {
+    @apply rounded-2xl border border-white/40 bg-white/60 backdrop-blur-xl dark:border-white/10 dark:bg-gray-900/50;
+    box-shadow: var(--shadow-glass), var(--shadow-inner-glow);
+  }
+
+  /* Glow button — emerald shimmer ring */
+  .glow-btn {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all;
+    background: var(--gradient-emerald);
+    background-size: 200% auto;
+    box-shadow: var(--shadow-glow-emerald);
+  }
+  .glow-btn:hover {
+    background-position: 100% center;
+    box-shadow: 0 0 50px -6px rgb(16 185 129 / 0.7);
+    transform: translateY(-1px);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -135,6 +294,28 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* Animated gradient text helper */
+  .text-gradient-emerald {
+    background: var(--gradient-emerald);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-aurora {
+    background: var(--gradient-aurora);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-pan 6s ease infinite;
+  }
+
+  /* Drop-shadow tinted with brand emerald */
+  .drop-shadow-glow {
+    filter: drop-shadow(0 4px 16px rgb(16 185 129 / 0.35));
   }
 
   /* Respect reduced-motion users */

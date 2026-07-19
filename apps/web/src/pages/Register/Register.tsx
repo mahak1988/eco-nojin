@@ -8,6 +8,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { TypographicLogo } from "@/components/common/TypographicLogo";
 import { useAuth, isAuthError } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { cn } from "@/lib/utils";
@@ -60,9 +61,7 @@ export function Register(): JSX.Element {
       <div className="w-full max-w-3xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-200">
-            <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2L3 7v6c0 4.4 3.1 8.3 7 9 3.9-.7 7-4.6 7-9V7l-7-5z" /></svg>
-          </div>
+          <TypographicLogo size="lg" className="mx-auto" />
           <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-gray-900">{t("auth.registerTitle")}</h1>
           <p className="mt-2 text-base text-gray-600">{t("auth.registerSubtitle")}</p>
         </div>

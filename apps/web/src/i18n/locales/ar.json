@@ -21,7 +21,12 @@
     "language": "اللغة",
     "persian": "فارسی",
     "english": "English",
-    "toman": "تومان"
+    "toman": "تومان",
+    "relativeTime": {
+      "minutesAgo": "{{count}} دقيقة مضت",
+      "hoursAgo": "{{count}} ساعة مضت",
+      "daysAgo": "{{count}} يوم مضت"
+    }
   },
   "nav": {
     "dashboard": "لوحة التحكم",

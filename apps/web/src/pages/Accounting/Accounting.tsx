@@ -1,10 +1,10 @@
 /**
  * ============================================================================
- *  Accounting — user financial dashboard (i18n-aware)
+ *  Accounting — user financial dashboard (API-connected)
  * ============================================================================
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -13,55 +13,120 @@ import { formatNumber } from "@/lib/i18n-utils";
 import { cn } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
-// Types + mock data
+// Types (matching API schemas)
 // ---------------------------------------------------------------------------
-
-type TxType = "credit" | "debit";
-type TxStatus = "completed" | "pending" | "failed";
 
 interface Transaction {
   id: string;
-  type: TxType;
-  descriptionKey: string;
+  type: "credit" | "debit";
+  description: string;
   amount: number;
-  status: TxStatus;
+  status: "completed" | "pending" | "failed";
   date: string;
 }
-
-const TRANSACTIONS: readonly Transaction[] = [
-  { id: "tx-1", type: "credit", descriptionKey: "accounting.tx1", amount: 250, status: "completed", date: "2024-07-01" },
-  { id: "tx-2", type: "debit", descriptionKey: "accounting.tx2", amount: 80, status: "completed", date: "2024-06-28" },
-  { id: "tx-3", type: "credit", descriptionKey: "accounting.tx3", amount: 45, status: "completed", date: "2024-06-25" },
-  { id: "tx-4", type: "debit", descriptionKey: "accounting.tx4", amount: 150, status: "pending", date: "2024-06-20" },
-  { id: "tx-5", type: "credit", descriptionKey: "accounting.tx5", amount: 100, status: "completed", date: "2024-06-15" },
-] as const;
 
 interface Invoice {
   id: string;
   number: string;
-  descriptionKey: string;
-  amount: number;
-  date: string;
-  status: "paid" | "unpaid" | "overdue";
+  client_name: string;
+  total: number;
+  status: "paid" | "unpaid" | "overdue" | "draft" | "pending" | "cancelled";
+  issue_date: string;
+  due_date: string;
 }
 
-const INVOICES: readonly Invoice[] = [
-  { id: "inv-1", number: "ECO-2024-07-001", descriptionKey: "accounting.inv1", amount: 150000, date: "2024-07-01", status: "paid" },
-  { id: "inv-2", number: "ECO-2024-06-008", descriptionKey: "accounting.inv2", amount: 150000, date: "2024-06-01", status: "paid" },
-  { id: "inv-3", number: "ECO-2024-05-012", descriptionKey: "accounting.inv3", amount: 150000, date: "2024-05-01", status: "paid" },
-] as const;
+interface DashboardSummary {
+  total_income: number;
+  total_expense: number;
+  net_profit: number;
+  eco_rewards_distributed: number;
+  carbon_credits_value: number;
+  transactions_count: number;
+  current_balance: number;
+}
 
-const TX_STATUS_CLASS: Record<TxStatus, string> = {
+const TX_STATUS_CLASS: Record<string, string> = {
   completed: "bg-emerald-100 text-emerald-700",
   pending: "bg-amber-100 text-amber-700",
   failed: "bg-red-100 text-red-700",
 };
 
-const INVOICE_STATUS_CLASS: Record<Invoice["status"], string> = {
+const INVOICE_STATUS_CLASS: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
   unpaid: "bg-amber-100 text-amber-700",
   overdue: "bg-red-100 text-red-700",
 };
+
+// ---------------------------------------------------------------------------
+// API hooks
+// ---------------------------------------------------------------------------
+
+function useAccountingApi() {
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  const fetchSummary = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/accounting/summary");
+      if (response.ok) {
+        const data = await response.json();
+        setSummary(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch summary:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch("/api/accounting/journal-entries?limit=50");
+      if (response.ok) {
+        const data = await response.json();
+        // Transform to transaction format
+        const txs: Transaction[] = data.items?.map((entry: any) => ({
+          id: entry.id,
+          type: "credit",
+          description: entry.description,
+          amount: Number(entry.total_credits || 0),
+          status: entry.is_posted ? "completed" : "pending",
+          date: entry.date,
+        })) || [];
+        setTransactions(txs);
+      }
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+    }
+  };
+
+  const fetchInvoices = async () => {
+    try {
+      const response = await fetch("/api/accounting/invoices?limit=50");
+      if (response.ok) {
+        const data = await response.json();
+        setInvoices(data.items || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch invoices:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSummary();
+    fetchTransactions();
+    fetchInvoices();
+  }, []);
+
+  return { loading, summary, transactions, invoices, refetch: () => {
+    fetchSummary();
+    fetchTransactions();
+    fetchInvoices();
+  }};
+}
 
 // ---------------------------------------------------------------------------
 // Subcomponents
@@ -105,7 +170,7 @@ function StatCard({ label, value, icon, trend }: { label: string; value: string;
   );
 }
 
-function TransactionsTable({ items }: { items: readonly Transaction[] }): JSX.Element {
+function TransactionsTable({ items }: { items: Transaction[] }): JSX.Element {
   const { t, dir, language } = useLanguage();
   return (
     <div dir={dir} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -126,7 +191,7 @@ function TransactionsTable({ items }: { items: readonly Transaction[] }): JSX.El
           <tbody className="divide-y divide-gray-100">
             {items.map((tx) => (
               <tr key={tx.id} className="hover:bg-gray-50">
-                <td className="px-5 py-3 font-medium text-gray-900">{t(tx.descriptionKey)}</td>
+                <td className="px-5 py-3 font-medium text-gray-900">{tx.description}</td>
                 <td className="px-5 py-3">
                   <span className={cn(
                     "rounded-full px-2 py-0.5 text-xs font-medium",
@@ -156,7 +221,7 @@ function TransactionsTable({ items }: { items: readonly Transaction[] }): JSX.El
   );
 }
 
-function InvoicesTable({ items }: { items: readonly Invoice[] }): JSX.Element {
+function InvoicesTable({ items }: { items: Invoice[] }): JSX.Element {
   const { t, dir, language } = useLanguage();
   return (
     <div dir={dir} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -179,9 +244,9 @@ function InvoicesTable({ items }: { items: readonly Invoice[] }): JSX.Element {
             {items.map((inv) => (
               <tr key={inv.id} className="hover:bg-gray-50">
                 <td className="px-5 py-3 font-mono text-xs text-gray-600" dir="ltr">{inv.number}</td>
-                <td className="px-5 py-3 font-medium text-gray-900">{t(inv.descriptionKey)}</td>
-                <td className="px-5 py-3 text-gray-700">{formatNumber(inv.amount, language)} {t("common.toman")}</td>
-                <td className="px-5 py-3 text-gray-500" dir="ltr">{inv.date}</td>
+                <td className="px-5 py-3 font-medium text-gray-900">{inv.client_name}</td>
+                <td className="px-5 py-3 text-gray-700">{formatNumber(inv.total, language)} {t("common.toman")}</td>
+                <td className="px-5 py-3 text-gray-500" dir="ltr">{inv.issue_date}</td>
                 <td className="px-5 py-3">
                   <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", INVOICE_STATUS_CLASS[inv.status])}>
                     {t(`accounting.invoiceStatuses.${inv.status}`)}
@@ -209,6 +274,7 @@ export function Accounting(): JSX.Element {
   const { user } = useAuth();
   const { t, dir, language } = useLanguage();
   const [tab, setTab] = useState<"transactions" | "invoices">("transactions");
+  const { loading, summary, transactions, invoices } = useAccountingApi();
 
   if (!user) {
     return (
@@ -227,41 +293,49 @@ export function Accounting(): JSX.Element {
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1"><BalanceCard balance={1250} /></div>
-        <div className="grid grid-cols-2 gap-4 lg:col-span-2 lg:grid-cols-3">
-          <StatCard label={t("accounting.incomeThisMonth")} value={`${formatNumber(395, language)} ECO`} icon="📈" trend="↗ 22%" />
-          <StatCard label={t("accounting.expenseThisMonth")} value={`${formatNumber(230, language)} ECO`} icon="📉" trend="↘ 8%" />
-          <StatCard label={t("accounting.transactions")} value={formatNumber(TRANSACTIONS.length, language)} icon="🔄" />
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <LoadingSpinner size="lg" label={t("common.loading")} />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1"><BalanceCard balance={Number(summary?.current_balance || 0)} /></div>
+            <div className="grid grid-cols-2 gap-4 lg:col-span-2 lg:grid-cols-3">
+              <StatCard label={t("accounting.incomeThisMonth")} value={`${formatNumber(summary?.total_income || 0, language)} ECO`} icon="📈" trend="↗ 22%" />
+              <StatCard label={t("accounting.expenseThisMonth")} value={`${formatNumber(summary?.total_expense || 0, language)} ECO`} icon="📉" trend="↘ 8%" />
+              <StatCard label={t("accounting.transactions")} value={formatNumber(summary?.transactions_count || 0, language)} icon="🔄" />
+            </div>
+          </div>
 
-      <div dir={dir} className="mt-8 flex gap-1 rounded-lg border border-gray-200 bg-white p-1">
-        <button
-          type="button"
-          onClick={() => setTab("transactions")}
-          className={cn(
-            "rounded-md px-4 py-2 text-sm font-medium transition",
-            tab === "transactions" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:text-gray-900",
-          )}
-        >
-          {t("accounting.transactions")}
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("invoices")}
-          className={cn(
-            "rounded-md px-4 py-2 text-sm font-medium transition",
-            tab === "invoices" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:text-gray-900",
-          )}
-        >
-          {t("accounting.invoices")}
-        </button>
-      </div>
+          <div dir={dir} className="mt-8 flex gap-1 rounded-lg border border-gray-200 bg-white p-1">
+            <button
+              type="button"
+              onClick={() => setTab("transactions")}
+              className={cn(
+                "rounded-md px-4 py-2 text-sm font-medium transition",
+                tab === "transactions" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:text-gray-900",
+              )}
+            >
+              {t("accounting.transactions")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("invoices")}
+              className={cn(
+                "rounded-md px-4 py-2 text-sm font-medium transition",
+                tab === "invoices" ? "bg-emerald-50 text-emerald-700" : "text-gray-600 hover:text-gray-900",
+              )}
+            >
+              {t("accounting.invoices")}
+            </button>
+          </div>
 
-      <div className="mt-4">
-        {tab === "transactions" ? <TransactionsTable items={TRANSACTIONS} /> : <InvoicesTable items={INVOICES} />}
-      </div>
+          <div className="mt-4">
+            {tab === "transactions" ? <TransactionsTable items={transactions} /> : <InvoicesTable items={invoices} />}
+          </div>
+        </>
+      )}
     </div>
   );
 }

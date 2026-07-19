@@ -16,6 +16,7 @@ import { Leaf, Shield, Sparkles, Waves } from "lucide-react";
 
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { TypographicLogo } from "@/components/common/TypographicLogo";
 import { useAuth, isAuthError } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { cn } from "@/lib/utils";
@@ -228,11 +229,7 @@ export function Login(): JSX.Element {
       >
         {/* Brand */}
         <div className="mb-8 text-center">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-600 text-white">
-            <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2L3 7v6c0 4.4 3.1 8.3 7 9 3.9-.7 7-4.6 7-9V7l-7-5z" />
-            </svg>
-          </span>
+          <TypographicLogo size="lg" className="mx-auto" />
           <h1 className="mt-4 text-2xl font-bold text-gray-900">{t("auth.loginTitle")}</h1>
           <p className="mt-1 text-sm text-gray-600">{t("auth.loginSubtitle")}</p>
         </div>
