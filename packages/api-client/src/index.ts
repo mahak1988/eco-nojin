@@ -15,3 +15,4 @@ export * from './modules/safeguards.api';
 export * from './modules/pilots.api';
 export * from './modules/logframe.api';
 export * from './modules/gateway.api';
+export * from './modules/accounting.api';

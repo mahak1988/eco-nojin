@@ -21,7 +21,12 @@
     "language": "Язык",
     "persian": "فارسی",
     "english": "English",
-    "toman": "Томан"
+    "toman": "Томан",
+    "relativeTime": {
+      "minutesAgo": "{{count}} мин назад",
+      "hoursAgo": "{{count}} ч назад",
+      "daysAgo": "{{count}} дн назад"
+    }
   },
   "nav": {
     "dashboard": "Панель управления",

@@ -1,7 +1,7 @@
 /**
  * Agriculture Schools API Service
  */
-const API_BASE = (import.meta as any)?.env/?VITE_API_BASE_URL || "";
+const API_BASE = (import.meta as any)?.env?.VITE_API_BASE_URL || "";
 
 export interface School {
   id: number;

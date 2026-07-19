@@ -21,7 +21,12 @@
     "language": "Langue",
     "persian": "فارسی",
     "english": "English",
-    "toman": "Toman"
+    "toman": "Toman",
+    "relativeTime": {
+      "minutesAgo": "Il y a {{count}} min",
+      "hoursAgo": "Il y a {{count}} h",
+      "daysAgo": "Il y a {{count}} j"
+    }
   },
   "nav": {
     "dashboard": "Tableau de bord",

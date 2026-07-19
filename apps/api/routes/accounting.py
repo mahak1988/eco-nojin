@@ -1,129 +1,266 @@
-"""ماژول حسابداری Econojin"""
-from fastapi import APIRouter, HTTPException, UploadFile, File
-from pydantic import BaseModel
-from typing import Optional
+"""
+Accounting Router | روتر حسابداری
+===================================
+FastAPI router exposing accounting endpoints.
+"""
+
 from datetime import datetime
-from enum import Enum
+from decimal import Decimal
+from typing import Optional, Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from apps.shared_core.database.session import get_db_session
+from apps.api.models.accounting import Account, AccountType, InvoiceStatus, JournalEntry
+from apps.api.schemas.accounting import (
+    AccountCreate, AccountUpdate, AccountResponse, AccountListResponse,
+    JournalEntryCreate, JournalEntryResponse, JournalEntryListResponse,
+    InvoiceCreate, InvoiceUpdate, InvoiceResponse, InvoiceListResponse,
+    PaymentCreate, PaymentResponse, PaymentListResponse,
+    BudgetCreate, BudgetUpdate, BudgetResponse, BudgetListResponse,
+    DashboardSummaryResponse,
+)
+from apps.api.services.accounting import (
+    AccountService, JournalEntryService, InvoiceService,
+    PaymentService, BudgetService
+)
 
 router = APIRouter(prefix="/api/accounting", tags=["accounting"])
 
 
-class TransactionType(str, Enum):
-    INCOME = "income"
-    EXPENSE = "expense"
-    TRANSFER = "transfer"
-    ECO_REWARD = "eco_reward"
-    CARBON_CREDIT = "carbon_credit"
+# ── Accounts ─────────────────────────────────────────────────────
+@router.get("/accounts", response_model=AccountListResponse)
+async def list_accounts(
+    skip: int = 0,
+    limit: int = 100,
+    account_type: Optional[AccountType] = None,
+    session: AsyncSession = Depends(get_db_session)
+) -> AccountListResponse:
+    """List accounts with pagination."""
+    service = AccountService(session)
+    accounts, total = await service.list(skip, limit, account_type)
+    return AccountListResponse(
+        items=[AccountResponse.model_validate(acc) for acc in accounts],
+        total=total, skip=skip, limit=limit
+    )
 
 
-class Transaction(BaseModel):
-    id: Optional[str] = None
-    type: TransactionType
-    amount: float
-    currency: str = "ECO"
-    description: str
-    category: str
-    date: datetime
-    status: str = "confirmed"
+@router.get("/accounts/{account_id}", response_model=AccountResponse)
+async def get_account(
+    account_id: str,
+    session: AsyncSession = Depends(get_db_session)
+) -> AccountResponse:
+    """Get a single account by ID."""
+    service = AccountService(session)
+    try:
+        account = await service.get(account_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    return AccountResponse.model_validate(account)
 
 
-_sample_tx = [
-    {"id": "TX001", "type": "eco_reward", "amount": 45.5, "currency": "ECO",
-     "description": "مراقبت روزانه - آمازون", "category": "stewardship",
-     "date": "2026-07-14T10:00:00", "status": "confirmed"},
-    {"id": "TX002", "type": "carbon_credit", "amount": 1200, "currency": "USD",
-     "description": "فروش اعتبار کربن", "category": "carbon_sales",
-     "date": "2026-07-13T14:00:00", "status": "confirmed"},
-    {"id": "TX003", "type": "expense", "amount": 350, "currency": "USD",
-     "description": "هزینه ماهواره", "category": "operations",
-     "date": "2026-07-12T09:00:00", "status": "confirmed"},
-    {"id": "TX004", "type": "income", "amount": 5000, "currency": "USD",
-     "description": "سرمایه‌گذاری ESG", "category": "investment",
-     "date": "2026-07-11T16:00:00", "status": "confirmed"},
-    {"id": "TX005", "type": "transfer", "amount": 100, "currency": "ECO",
-     "description": "انتقال به کیف پول", "category": "transfer",
-     "date": "2026-07-10T12:00:00", "status": "confirmed"},
-]
+@router.post("/accounts", response_model=AccountResponse, status_code=status.HTTP_201_CREATED)
+async def create_account(
+    payload: AccountCreate,
+    session: AsyncSession = Depends(get_db_session)
+) -> AccountResponse:
+    """Create a new account."""
+    service = AccountService(session)
+    try:
+        account = await service.create(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    await session.commit()
+    return AccountResponse.model_validate(account)
 
 
-@router.get("/transactions")
-async def list_transactions(limit: int = 50, offset: int = 0, type: Optional[TransactionType] = None):
-    result = _sample_tx
-    if type:
-        result = [t for t in result if t["type"] == type.value]
-    return {"transactions": result[offset:offset+limit], "total": len(result)}
+@router.patch("/accounts/{account_id}", response_model=AccountResponse)
+async def update_account(
+    account_id: str,
+    payload: AccountUpdate,
+    session: AsyncSession = Depends(get_db_session)
+) -> AccountResponse:
+    """Update an existing account."""
+    service = AccountService(session)
+    try:
+        account = await service.update(account_id, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    await session.commit()
+    return AccountResponse.model_validate(account)
 
 
-@router.get("/transactions/{tx_id}")
-async def get_transaction(tx_id: str):
-    for t in _sample_tx:
-        if t["id"] == tx_id:
-            return t
-    raise HTTPException(status_code=404, detail="Not found")
+# ── Journal Entries ─────────────────────────────────────────────
+@router.get("/journal-entries", response_model=JournalEntryListResponse)
+async def list_journal_entries(
+    skip: int = 0,
+    limit: int = 100,
+    is_posted: Optional[bool] = None,
+    session: AsyncSession = Depends(get_db_session)
+) -> JournalEntryListResponse:
+    """List journal entries with pagination."""
+    service = JournalEntryService(session)
+    entries, total = await service.list(skip, limit, is_posted)
+    return JournalEntryListResponse(
+        items=[JournalEntryResponse.model_validate(entry) for entry in entries],
+        total=total, skip=skip, limit=limit
+    )
 
 
-@router.post("/transactions")
-async def create_transaction(tx: Transaction):
-    tx.id = f"TX{len(_sample_tx)+1:03d}"
-    _sample_tx.append(tx.dict())
-    return {"status": "created", "transaction": tx}
+@router.post("/journal-entries", response_model=JournalEntryResponse, status_code=status.HTTP_201_CREATED)
+async def create_journal_entry(
+    payload: JournalEntryCreate,
+    session: AsyncSession = Depends(get_db_session)
+) -> JournalEntryResponse:
+    """Create a new journal entry (double-entry)."""
+    service = JournalEntryService(session)
+    try:
+        entry = await service.create(payload)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    await session.commit()
+    return JournalEntryResponse.model_validate(entry)
 
 
-@router.get("/summary")
-async def get_summary():
-    return {
-        "total_income": 6200.0,
-        "total_expense": 350.0,
-        "net_profit": 5850.0,
-        "eco_rewards_distributed": 45.5,
-        "carbon_credits_value": 1200.0,
-        "transactions_count": len(_sample_tx),
-    }
+# ── Invoices ─────────────────────────────────────────────────────
+@router.get("/invoices", response_model=InvoiceListResponse)
+async def list_invoices(
+    skip: int = 0,
+    limit: int = 100,
+    status_filter: Optional[InvoiceStatus] = None,
+    session: AsyncSession = Depends(get_db_session)
+) -> InvoiceListResponse:
+    """List invoices with pagination."""
+    service = InvoiceService(session)
+    invoices, total = await service.list(skip, limit, status_filter)
+    return InvoiceListResponse(
+        items=[InvoiceResponse.model_validate(inv) for inv in invoices],
+        total=total, skip=skip, limit=limit
+    )
 
 
-@router.get("/charts/income-expense")
-async def get_income_expense_chart():
-    return {
-        "labels": ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور"],
-        "income": [4500, 5200, 4800, 6200, 5800, 6500],
-        "expense": [1200, 1100, 1350, 1400, 980, 1100],
-        "profit": [3300, 4100, 3450, 4800, 4820, 5400],
-    }
+@router.post("/invoices", response_model=InvoiceResponse, status_code=status.HTTP_201_CREATED)
+async def create_invoice(
+    payload: InvoiceCreate,
+    session: AsyncSession = Depends(get_db_session)
+) -> InvoiceResponse:
+    """Create a new invoice."""
+    service = InvoiceService(session)
+    invoice = await service.create(payload)
+    await session.commit()
+    return InvoiceResponse.model_validate(invoice)
 
 
-@router.get("/charts/category-distribution")
-async def get_category_distribution():
-    return [
-        {"name": "مراقبت", "value": 35, "color": "#22c55e"},
-        {"name": "کربن", "value": 25, "color": "#3b82f6"},
-        {"name": "سرمایه‌گذاری", "value": 20, "color": "#a855f7"},
-        {"name": "عملیات", "value": 12, "color": "#f59e0b"},
-        {"name": "انتقال", "value": 8, "color": "#06b6d4"},
-    ]
+@router.patch("/invoices/{invoice_id}", response_model=InvoiceResponse)
+async def update_invoice(
+    invoice_id: str,
+    payload: InvoiceUpdate,
+    session: AsyncSession = Depends(get_db_session)
+) -> InvoiceResponse:
+    """Update an existing invoice."""
+    service = InvoiceService(session)
+    try:
+        invoice = await service.update(invoice_id, payload)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    await session.commit()
+    return InvoiceResponse.model_validate(invoice)
 
 
-@router.get("/invoices")
-async def list_invoices():
-    return {"invoices": [
-        {"id": "INV001", "number": "INV-2026-001", "client": "شرکت ESG",
-         "amount": 5000, "total": 5750, "status": "paid",
-         "issue_date": "2026-07-01", "due_date": "2026-07-15"},
-        {"id": "INV002", "number": "INV-2026-002", "client": "سازمان محیط‌زیست",
-         "amount": 3200, "total": 3680, "status": "pending",
-         "issue_date": "2026-07-05", "due_date": "2026-07-20"},
-    ]}
+# ── Payments ─────────────────────────────────────────────────────
+@router.get("/payments", response_model=PaymentListResponse)
+async def list_payments(
+    skip: int = 0,
+    limit: int = 100,
+    session: AsyncSession = Depends(get_db_session)
+) -> PaymentListResponse:
+    """List payments with pagination."""
+    service = PaymentService(session)
+    payments, total = await service.list(skip, limit)
+    return PaymentListResponse(
+        items=[PaymentResponse.model_validate(pmt) for pmt in payments],
+        total=total, skip=skip, limit=limit
+    )
 
 
-@router.get("/reports/download")
-async def download_report(format: str = "json"):
-    return {"format": format, "generated_at": datetime.now().isoformat()}
+@router.post("/payments", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
+async def create_payment(
+    payload: PaymentCreate,
+    session: AsyncSession = Depends(get_db_session)
+) -> PaymentResponse:
+    """Create a new payment."""
+    service = PaymentService(session)
+    payment = await service.create(payload)
+    await session.commit()
+    return PaymentResponse.model_validate(payment)
 
 
-@router.post("/upload/statement")
-async def upload_statement(file: UploadFile = File(...)):
-    return {"status": "uploaded", "filename": file.filename, "size": file.size}
+# ── Budgets ─────────────────────────────────────────────────────
+@router.get("/budgets", response_model=BudgetListResponse)
+async def list_budgets(
+    skip: int = 0,
+    limit: int = 100,
+    session: AsyncSession = Depends(get_db_session)
+) -> BudgetListResponse:
+    """List budgets with pagination."""
+    service = BudgetService(session)
+    budgets, total = await service.list(skip, limit)
+    return BudgetListResponse(
+        items=[BudgetResponse.model_validate(budg) for budg in budgets],
+        total=total, skip=skip, limit=limit
+    )
 
 
-@router.get("/ledger")
-async def get_ledger():
-    return {"entries": _sample_tx, "balance": 5850.0}
+@router.post("/budgets", response_model=BudgetResponse, status_code=status.HTTP_201_CREATED)
+async def create_budget(
+    payload: BudgetCreate,
+    session: AsyncSession = Depends(get_db_session)
+) -> BudgetResponse:
+    """Create a new budget."""
+    service = BudgetService(session)
+    budget = await service.create(payload)
+    await session.commit()
+    return BudgetResponse.model_validate(budget)
+
+
+# ── Dashboard Summary ────────────────────────────────────────────
+@router.get("/summary", response_model=DashboardSummaryResponse)
+async def get_dashboard_summary(
+    session: AsyncSession = Depends(get_db_session)
+) -> DashboardSummaryResponse:
+    """Get accounting dashboard summary with real data."""
+    from sqlalchemy import select, func
+    from apps.api.models.accounting import JournalItem, EntryType
+    
+    # Calculate income (sum of all credits to income accounts)
+    income_result = await session.execute(
+        select(func.coalesce(func.sum(JournalItem.amount), 0))
+        .join(Account)
+        .where(Account.account_type == AccountType.INCOME)
+    )
+    total_income = Decimal(str(income_result.scalar_one()))
+    
+    # Calculate expense (sum of all debits from expense accounts)
+    expense_result = await session.execute(
+        select(func.coalesce(func.sum(JournalItem.amount), 0))
+        .join(Account)
+        .where(Account.account_type == AccountType.EXPENSE)
+    )
+    total_expense = Decimal(str(expense_result.scalar_one()))
+    
+    # Get transaction count
+    tx_count_result = await session.execute(
+        select(func.count()).select_from(JournalEntry)
+    )
+    transactions_count = tx_count_result.scalar_one()
+    
+    return DashboardSummaryResponse(
+        total_income=total_income,
+        total_expense=total_expense,
+        net_profit=total_income - total_expense,
+        eco_rewards_distributed=Decimal("0.00"),
+        carbon_credits_value=Decimal("0.00"),
+        transactions_count=transactions_count,
+        current_balance=total_income - total_expense
+    )

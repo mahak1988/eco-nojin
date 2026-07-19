@@ -21,7 +21,12 @@
     "language": "Dil",
     "persian": "فارسی",
     "english": "English",
-    "toman": "Toman"
+    "toman": "Toman",
+    "relativeTime": {
+      "minutesAgo": "{{count}} dk önce",
+      "hoursAgo": "{{count}} sa önce",
+      "daysAgo": "{{count}} gün önce"
+    }
   },
   "nav": {
     "dashboard": "Panel",

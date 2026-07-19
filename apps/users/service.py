@@ -1,101 +1,33 @@
-import bcrypt
-from datetime import datetime, timedelta
+"""
+User Service - Business Logic
+=============================
+Refactored to use centralized security and configuration.
+Uses Argon2/Bcrypt from shared_core.security with settings from config.
+"""
+
+import logging
 from typing import Optional
-from jose import JWTError, jwt
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.shared_core.security import (
+    create_access_token,
+    verify_password,
+    get_password_hash,
+    decode_token,
+)
+from apps.shared_core.config import settings
 from apps.users.models import User
 from apps.users.repository import UserRepository
 from apps.users.schemas import UserCreate, UserUpdate
 
-# ==========================================
-# Security Configuration
-# ==========================================
-SECRET_KEY = "your-secret-key-change-in-production-min-32-chars"  # TODO: Move to .env
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+logger = logging.getLogger(__name__)
 
-# ==========================================
-# Password Hashing (using bcrypt directly)
-# ==========================================
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    بررسی صحت پسورد.
-    
-    Args:
-        plain_password: پسورد plaintext
-        hashed_password: پسورد hash شده
-    
-    Returns:
-        True در صورت صحت، False در غیر این صورت
-    """
-    try:
-        return bcrypt.checkpw(
-            plain_password.encode('utf-8'),
-            hashed_password.encode('utf-8')
-        )
-    except (ValueError, TypeError):
-        return False
+# Use centralized configuration from shared_core
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
-def get_password_hash(password: str) -> str:
-    """
-    تبدیل پسورد به hash با استفاده از bcrypt.
-    
-    محدودیت 72 بایت bcrypt به صورت خودکار مدیریت می‌شود.
-    
-    Args:
-        password: پسورد plaintext
-    
-    Returns:
-        پسورد hash شده
-    """
-    # محدودیت 72 بایت bcrypt را مدیریت می‌کنیم
-    password_bytes = password.encode('utf-8')[:72]
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password_bytes, salt)
-    return hashed.decode('utf-8')
 
-# ==========================================
-# JWT Token Management
-# ==========================================
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """
-    ساخت توکن JWT.
-    
-    Args:
-        data: داده‌های داخل توکن (مثل user_id)
-        expires_delta: مدت زمان انقضا
-    
-    Returns:
-        توکن JWT به صورت string
-    """
-    to_encode = data.copy()
-    
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-def decode_access_token(token: str) -> Optional[dict]:
-    """
-    رمزگشایی توکن JWT.
-    
-    Returns:
-        دیکشنری داده‌های توکن یا None در صورت خطا
-    """
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError:
-        return None
-
-# ==========================================
-# User Service (Business Logic)
-# ==========================================
 class UserService:
     """
     سرویس مدیریت کاربران.
@@ -123,7 +55,7 @@ class UserService:
         if existing_user:
             raise ValueError("ایمیل قبلاً ثبت شده است")
         
-        # hash کردن پسورد
+        # hash کردن پسورد با Argon2/Bcrypt
         hashed_password = get_password_hash(user_in.password)
         
         # ایجاد کاربر
@@ -197,8 +129,8 @@ class UserService:
         if "password" in update_data:
             update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
         
-        user = await self.repo.update(user, update_data)
-        return user
+        updated_user = await self.repo.update(user, update_data)
+        return updated_user
     
     async def deactivate_user(self, user_id: int) -> bool:
         """

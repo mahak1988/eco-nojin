@@ -1,9 +1,61 @@
-FROM python:3.12-slim
+# =============================================================================
+# Multi-stage Dockerfile for Econojin API
+# Based on best practices from full-stack-fastapi-postgresql
+# =============================================================================
+
+# Stage 1: Builder
+FROM python:3.12-slim AS builder
+
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and build wheels
+COPY pyproject.toml .
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY api ./api
-ENV PYTHONPATH=/app
-EXPOSE 8000
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+RUN pip install --upgrade pip && \
+    pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.12-slim AS runtime
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy wheels from builder
+COPY --from=builder /wheels /wheels
+
+# Copy application code
+COPY apps/ ./apps/
+COPY alembic/ ./alembic/
+COPY alembic.ini .
+
+# Install from wheels
+RUN pip install --no-cache /wheels/* && \
+    pip install --no-cache passlib[argon2] python-jose
+
+# Security: Run as non-root user
+RUN useradd --create-home --shell /bin/bash app && \
+    chown -R app:app /app
+USER app
+
+# Environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    ENVIRONMENT=production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+# Default command
+CMD ["uvicorn", "apps.main:app", "--host", "0.0.0.0", "--port", "8000"]

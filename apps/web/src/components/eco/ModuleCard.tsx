@@ -67,14 +67,14 @@ export function ModuleCard({
           "bg-white dark:bg-eco-900",
           "shadow-eco-sm hover:shadow-eco-lg",
           "transition-all duration-300",
-          "hover:-translatey-1",
+          "hover:-translate-y-1",
           "cursor-pointer",
           "p-6 md:p-8",
           "w-full text-start",
           className
         )}
       >
-        <!-- Gradient top bar -->
+        {/* Gradient top bar */}
         <div
           className={cn(
             "absolute top-0 start-0 end-0 h-1 bg-gradient-to-r",
@@ -82,7 +82,7 @@ export function ModuleCard({
           )}
         />
 
-        <!-- Icon -->
+        {/* Icon */}
         <div
           className={cn(
             "mb-4 inline-flex rounded-xl p-3 transition-transform duration-300",
@@ -93,31 +93,31 @@ export function ModuleCard({
           <Icon className="h-6 w-6" />
         </div>
 
-        <!-- Title -->
+        {/* Title */}
         <h3 className="font-sans text-lg font-bold text-eco-900 dark:text-eco-100 mb-1">
           {title}
         </h3>
 
-        <!-- Description -->
+        {/* Description */}
         {description && (
           <p className="text-sm text-eco-600 dark:text-eco-400 leading-relaxed">
             {description}
           </p>
         )}
 
-        <!-- Badge -->
+        {/* Badge */}
         {badge && (
           <span className="badge-eco mt-3 self-start">
             {badge}
           </span>
         )}
 
-        <!-- Hover arrow -->
+        {/* Hover arrow */}
         <div
           className={cn(
             "absolute bottom-4 end-4 opacity-0 transition-all duration-300",
-            "group-hover:opacity-100 group-hover:translatex-0",
-            "rtl:-translatex-2 ltr:translatex-2"
+            "group-hover:opacity-100 group-hover:translate-x-0",
+            "rtl:-translate-x-2 ltr:translate-x-0"
           )}
         >
           <svg className="h-5 w-5 text-eco-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
