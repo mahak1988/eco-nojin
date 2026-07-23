@@ -2,25 +2,14 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: econojin_backend
+    build: .
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=sqlite:///./app.db
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+      - ENVIRONMENT=production
+      - DATABASE_URL=sqlite+aiosqlite:///./econojin.db
     volumes:
-      - ./apps/api:/app/apps/api
-      - ./frontend/dist:/app/frontend/dist  # در صورت وجود بیلد فرانت‌اند
+      - ./apps:/app/apps
+    restart: unless-stopped
 
-  # در صورت وجود فرانت‌اند، سرویس زیر را می‌توان اضافه کرد
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
+  # frontend service can be added here using Node image

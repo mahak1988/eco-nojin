@@ -18,6 +18,8 @@ import { useAnalysisStore } from '@/store/analysis';
 import type { ProfitDataPoint } from '@/lib/types/analysis';
 import { cn, formatNumber } from '@/lib/utils';
 
+import { CHART, GIS, UI } from '@econojin/ui/lib/chart-colors';
+
 export function ChartsPanel() {
   const ndviData = useAnalysisStore((state) => state.ndviData);
   const results = useAnalysisStore((state) => state.results);
@@ -30,10 +32,10 @@ export function ChartsPanel() {
     const netProfit = revenue - totalCost;
 
     return [
-      { item: 'درآمد', value: revenue, color: '#10b981' },
-      { item: 'هزینه آب', value: waterCost, color: '#3b82f6' },
-      { item: 'هزینه کارگر', value: laborCost, color: '#f59e0b' },
-      { item: 'سود خالص', value: netProfit, color: netProfit > 0 ? '#10b981' : '#ef4444' },
+      { item: 'درآمد', value: revenue, color: CHART.emerald },
+      { item: 'هزینه آب', value: waterCost, color: CHART.blue },
+      { item: 'هزینه کارگر', value: laborCost, color: CHART.amber },
+      { item: 'سود خالص', value: netProfit, color: netProfit > 0 ? CHART.emerald : CHART.red },
     ];
   }, [results]);
 
@@ -63,29 +65,29 @@ export function ChartsPanel() {
           <LineChart data={ndviData}>
             <defs>
               <linearGradient id="ndviGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
+                <stop offset="5%" stopColor={CHART.sky} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={CHART.sky} stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
-            <YAxis domain={[0, 1]} stroke="#94a3b8" fontSize={12} />
+            <XAxis dataKey="date" stroke={UI.textMuted} fontSize={12} />
+            <YAxis domain={[0, 1]} stroke={UI.textMuted} fontSize={12} />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#0f172a',
+                backgroundColor: GIS.background,
                 border: '1px solid #334155',
                 borderRadius: '8px',
-                color: '#fff',
+                color: CHART.white,
               }}
-              labelStyle={{ color: '#38bdf8' }}
+              labelStyle={{ color: CHART.sky }}
             />
             <Line
               type="monotone"
               dataKey="ndvi"
-              stroke="#38bdf8"
+              stroke={CHART.sky}
               strokeWidth={3}
-              dot={{ r: 4, fill: '#38bdf8', stroke: '#0f172a', strokeWidth: 2 }}
-              activeDot={{ r: 6, fill: '#38bdf8' }}
+              dot={{ r: 4, fill: CHART.sky, stroke: GIS.background, strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: CHART.sky }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -103,24 +105,24 @@ export function ChartsPanel() {
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
             <XAxis
               type="number"
-              stroke="#94a3b8"
+              stroke={UI.textMuted}
               tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
               fontSize={12}
             />
             <YAxis
               dataKey="item"
               type="category"
-              stroke="#94a3b8"
+              stroke={UI.textMuted}
               width={90}
               fontSize={12}
             />
             <Tooltip
               formatter={(value: number) => `${formatNumber(value)} تومان`}
               contentStyle={{
-                backgroundColor: '#0f172a',
+                backgroundColor: GIS.background,
                 border: '1px solid #334155',
                 borderRadius: '8px',
-                color: '#fff',
+                color: CHART.white,
               }}
             />
             <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={22}>

@@ -94,7 +94,7 @@ class QuizAttempt(Base):
     quiz: Mapped["Quiz"] = relationship("Quiz")
 
     def __repr__(self) -> str:
-        return f"<QuizAttempt(quiz_id={self.quiz_id}, user_id={self.user_id}, score={self.percentage}%)>">
+        return f"<QuizAttempt(quiz_id={self.quiz_id}, user_id={self.user_id}, score={self.percentage}%)>"
 
 
 class WordCategory(str):

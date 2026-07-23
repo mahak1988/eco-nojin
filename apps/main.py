@@ -233,6 +233,49 @@ try:
 except Exception:
     logger.info("ℹ️  simulation: روتر یافت نشد (اختیاری)")
 
+# ماژول Real-World Data (NASA POWER / Open-Meteo / Open-Elevation / World Bank)
+try:
+    from apps.simulation.data.router import router as data_router
+    app.include_router(data_router)
+    logger.info("✅ data: روتر بارگذاری شد")
+except Exception as e:
+    logger.warning(f"⚠️  data: {e}")
+
+# ماژول Advisory (تحلیل + توصیه + سناریو)
+try:
+    from apps.simulation.advisory.router import router as advisory_router
+    app.include_router(advisory_router)
+    logger.info("✅ advisory: روتر بارگذاری شد")
+
+except Exception as e:
+    pass
+
+# ماژول Saved Runs (داشبورد کاربر)
+try:
+    from apps.simulation.runs.router import router as runs_router
+    app.include_router(runs_router)
+    logger.info("✅ runs: روتر بارگذاری شد")
+except Exception as e:
+    pass
+
+
+# ماژول Scenario & Comparison
+try:
+    from apps.simulation.scenario.router import router as scenario_router
+    app.include_router(scenario_router)
+    logger.info("✅ scenario: روتر بارگذاری شد")
+except Exception as e:
+    logger.warning(f"⚠️  scenario: {e}")
+
+# ماژول Validation (کالیبراسیون + عدم قطعیت + حساسیت)
+try:
+    from apps.simulation.validation.router import router as validation_router
+    app.include_router(validation_router)
+    logger.info("✅ validation: روتر بارگذاری شد")
+except Exception as e:
+    logger.warning(f"⚠️  validation: {e}")
+    logger.warning(f"⚠️  runs: {e}")
+    logger.warning(f"⚠️  router block: {e}")
 # ۱۰. ماژول Agriculture Schools
 try:
     from apps.api.routes.agriculture_schools import router as ag_schools_router
@@ -240,7 +283,6 @@ try:
     logger.info("✅ agriculture_schools: روتر بارگذاری شد")
 except Exception as e:
     logger.warning(f"⚠️  agriculture_schools: {e}")
-    raise
 
 # ۱۱. ماژول Education
 try:
@@ -265,6 +307,22 @@ try:
     logger.info("✅ games: روتر بارگذاری شد")
 except Exception as e:
     logger.warning(f"⚠️  games: {e}")
+
+# ۱۴. ماژول Model Chaining (زنجیرهٔ شبیه‌سازی)
+try:
+    from apps.simulation.chain.router import router as chain_router
+    app.include_router(chain_router)
+    logger.info("✅ chain: روتر بارگذاری شد")
+except Exception as e:
+    logger.warning(f"⚠️  chain: {e}")
+
+# ۱۵. ماژول Reports (گزارش‌گیری CSV/JSON)
+try:
+    from apps.simulation.reports.router import router as reports_router
+    app.include_router(reports_router)
+    logger.info("✅ reports: روتر بارگذاری شد")
+except Exception as e:
+    logger.warning(f"⚠️  reports: {e}")
 
 
 # ============================================================

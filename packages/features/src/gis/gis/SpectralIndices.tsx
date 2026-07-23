@@ -7,6 +7,8 @@ import {
   Download, Info, Layers, Calculator
 } from "lucide-react";
 import {
+import { CHART, GIS } from '@econojin/ui/lib/chart-colors';
+
   calculateAllIndices,
   interpretNDVI,
   interpretNDWI,
@@ -37,11 +39,11 @@ const SAMPLE_REGIONS = [
 ];
 
 const INDEX_TYPES = [
-  { id: "NDVI", name: "NDVI", fullName: "Normalized Difference Vegetation Index", icon: Leaf, color: "#22c55e", category: "vegetation" },
-  { id: "EVI", name: "EVI", fullName: "Enhanced Vegetation Index", icon: Leaf, color: "#10b981", category: "vegetation" },
-  { id: "SAVI", name: "SAVI", fullName: "Soil Adjusted Vegetation Index", icon: Leaf, color: "#84cc16", category: "vegetation" },
-  { id: "NDWI", name: "NDWI", fullName: "Normalized Difference Water Index", icon: Droplets, color: "#0ea5e9", category: "water" },
-  { id: "NBR", name: "NBR", fullName: "Normalized Burn Ratio", icon: Flame, color: "#ef4444", category: "fire" },
+  { id: "NDVI", name: "NDVI", fullName: "Normalized Difference Vegetation Index", icon: Leaf, color: GIS.vegetation, category: "vegetation" },
+  { id: "EVI", name: "EVI", fullName: "Enhanced Vegetation Index", icon: Leaf, color: CHART.emerald, category: "vegetation" },
+  { id: "SAVI", name: "SAVI", fullName: "Soil Adjusted Vegetation Index", icon: Leaf, color: CHART.lime, category: "vegetation" },
+  { id: "NDWI", name: "NDWI", fullName: "Normalized Difference Water Index", icon: Droplets, color: GIS.water, category: "water" },
+  { id: "NBR", name: "NBR", fullName: "Normalized Burn Ratio", icon: Flame, color: CHART.red, category: "fire" },
 ];
 
 export default function SpectralIndices({ regionCenter, regionName }: SpectralIndicesProps) {

@@ -8,6 +8,8 @@ import { useGisStore } from '@/store/gis/useGisStore';
 import { Button } from '@/components/ui/button';
 import { Edit3, Ruler, Check, X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 
+import { CHART, GIS } from '@econojin/ui/lib/chart-colors';
+
 // Fix Leaflet default marker icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -234,7 +236,7 @@ export function InteractiveMap({ center, zoom, onCenterChange, onZoomChange }: a
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={zoom}
-        style={{ height: '100%', width: '100%', background: '#0f172a' }}
+        style={{ height: '100%', width: '100%', background: GIS.background }}
         className="z-0"
         ref={mapRef}
         zoomControl={false}
@@ -271,7 +273,7 @@ export function InteractiveMap({ center, zoom, onCenterChange, onZoomChange }: a
           <GeoJSON
             key={idx}
             data={feature}
-            style={{ color: '#10b981', weight: 2, fillOpacity: 0.3, fillColor: '#10b981' }}
+            style={{ color: CHART.emerald, weight: 2, fillOpacity: 0.3, fillColor: CHART.emerald }}
           >
             <Popup>
               <div className="text-right" dir="rtl">
@@ -289,10 +291,10 @@ export function InteractiveMap({ center, zoom, onCenterChange, onZoomChange }: a
         {currentPoints.length > 0 && (
           <>
             {drawingMode === 'line' && currentPoints.length >= 2 && (
-              <Polyline positions={currentPoints} color="#3b82f6" weight={3} />
+              <Polyline positions={currentPoints} color={CHART.blue} weight={3} />
             )}
             {drawingMode === 'polygon' && currentPoints.length >= 2 && (
-              <Polygon positions={currentPoints} color="#10b981" weight={2} fillOpacity={0.2} />
+              <Polygon positions={currentPoints} color={CHART.emerald} weight={2} fillOpacity={0.2} />
             )}
             {currentPoints.map((point, idx) => (
               <Marker key={idx} position={point}>
