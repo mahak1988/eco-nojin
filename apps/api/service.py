@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.api.models import Api
 from apps.api.repository import ApiRepository
 from apps.api.schemas import ApiCreate, ApiUpdate
+from apps.shared_core.exceptions import NotFoundError
 
 
 class ApiService:
@@ -20,12 +21,11 @@ class ApiService:
     def __init__(self, session: AsyncSession):
         self.repo = ApiRepository(session)
 
-    async def get(self, id: int) -> Optional[Api]:
+    async def get(self, id: int) -> Api:
         """Get a single record. Raises NotFoundError if missing."""
         obj = await self.repo.get_by_id(id)
         if not obj:
-            # Replace with your project's standard exception
-            raise ValueError(f"Api with id={id} not found")
+            raise NotFoundError(resource="Api", item_id=id)
         return obj
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list[Api], int]:
@@ -41,14 +41,25 @@ class ApiService:
 
     async def update(self, id: int, data: ApiUpdate) -> Api:
         """Update an existing record."""
-        return await self.get(id)  # raises if not found
-        # The line below actually performs the update
+        existing = await self.get(id)  # raises if not found
+        
+        # Business rule validation
+        update_data = data.model_dump(exclude_unset=True)
+        if not update_data:
+            return existing  # No changes needed
+        
+        # Perform the actual update
         obj = await self.repo.update(id, data)
-        if not obj:
-            raise ValueError(f"Api with id={id} not found")
+        
+        # Audit logging (optional - can be enhanced later)
+        # await self._audit_log("update", id, update_data)
+        
         return obj
 
     async def delete(self, id: int) -> None:
         """Delete a record. Raises if not found."""
-        obj = await self.get(id)
-        await self.repo.delete(id)
+        obj = await self.get(id)  # raises if not found
+        deleted = await self.repo.delete(id)
+        if not deleted:
+            raise NotFoundError(resource="Api", item_id=id)
+

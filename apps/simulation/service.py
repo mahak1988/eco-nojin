@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.simulation.models import Simulation
 from apps.simulation.repository import SimulationRepository
 from apps.simulation.schemas import SimulationCreate, SimulationUpdate
+from apps.shared_core.exceptions import NotFoundError
 
 
 class SimulationService:
@@ -20,12 +21,11 @@ class SimulationService:
     def __init__(self, session: AsyncSession):
         self.repo = SimulationRepository(session)
 
-    async def get(self, id: int) -> Optional[Simulation]:
+    async def get(self, id: int) -> Simulation:
         """Get a single record. Raises NotFoundError if missing."""
         obj = await self.repo.get_by_id(id)
         if not obj:
-            # Replace with your project's standard exception
-            raise ValueError(f"Simulation with id={id} not found")
+            raise NotFoundError(resource="Simulation", item_id=id)
         return obj
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list[Simulation], int]:
@@ -41,14 +41,24 @@ class SimulationService:
 
     async def update(self, id: int, data: SimulationUpdate) -> Simulation:
         """Update an existing record."""
-        return await self.get(id)  # raises if not found
-        # The line below actually performs the update
+        existing = await self.get(id)  # raises if not found
+        
+        # Business rule validation
+        update_data = data.model_dump(exclude_unset=True)
+        if not update_data:
+            return existing  # No changes needed
+        
+        # Perform the actual update
         obj = await self.repo.update(id, data)
-        if not obj:
-            raise ValueError(f"Simulation with id={id} not found")
+        
+        # Audit logging (optional - can be enhanced later)
+        # await self._audit_log("update", id, update_data)
+        
         return obj
 
     async def delete(self, id: int) -> None:
         """Delete a record. Raises if not found."""
-        obj = await self.get(id)
-        await self.repo.delete(id)
+        obj = await self.get(id)  # raises if not found
+        deleted = await self.repo.delete(id)
+        if not deleted:
+            raise NotFoundError(resource="Simulation", item_id=id)
