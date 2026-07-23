@@ -1,26 +1,61 @@
-```
-# Python
-__pycache__/
+# Compiled and build artifacts
 *.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
+__pycache__/
+*.o
+*.obj
+*.so
+*.a
+*.dll
+*.exe
+*.out
+
+# Dependencies
 .venv/
-.ENV
-.venv.bak/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+venv/
+.env
+.env.local
+*.env.*
+
+# Logs and temp files
 *.log
-.git/modules/
-.DS_Store
-Thumbs.db
-```
+*.tmp
+*.swp
+*.swo
+
+# Editors
+.vscode/
+.idea/
+
+# Coverage and testing
+.coverage
+coverage/
+htmlcov/
+
+# Python specific
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Security related (if applicable)
+*.pem
+*.key
+*.crt
+*.cert
+secrets/
+credentials/
