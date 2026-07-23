@@ -23,7 +23,8 @@ from apps.api.schemas.accounting import (
     PaymentCreate,
     BudgetCreate, BudgetUpdate,
     TaxRateCreate, TaxRateUpdate,
-    FixedAssetCreate, FixedAssetUpdate
+    FixedAssetCreate, FixedAssetUpdate,
+    InvoiceUpdate,
 )
 
 

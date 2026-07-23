@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { 
+import { CHART } from '@econojin/ui/lib/chart-colors';
+
   MapPin, Ruler, Square, Layers, Search, ZoomIn, ZoomOut, 
   Maximize2, Download, Eye, EyeOff
 } from "lucide-react";
@@ -43,10 +45,10 @@ const BASE_LAYERS = {
 };
 
 const OVERLAY_LAYERS = {
-  ndvi: { name: "NDVI (پوشش گیاهی)", opacity: 0.6, color: "#10b981" },
-  drought: { name: "شاخص خشکسالی", opacity: 0.5, color: "#f59e0b" },
-  elevation: { name: "مدل ارتفاعی", opacity: 0.4, color: "#8b5cf6" },
-  hydrology: { name: "شبکه آبراهه‌ها", opacity: 0.7, color: "#3b82f6" }
+  ndvi: { name: "NDVI (پوشش گیاهی)", opacity: 0.6, color: CHART.emerald },
+  drought: { name: "شاخص خشکسالی", opacity: 0.5, color: CHART.amber },
+  elevation: { name: "مدل ارتفاعی", opacity: 0.4, color: CHART.violet },
+  hydrology: { name: "شبکه آبراهه‌ها", opacity: 0.7, color: CHART.blue }
 };
 
 interface Region {
@@ -61,12 +63,12 @@ interface Region {
 }
 
 const SAMPLE_REGIONS: Region[] = [
-  { id: 1, name: "حوضه کشف‌رود", center: [36.3, 59.6], radius: 30000, ndvi: 0.62, area: "۱,۲۵۰ ha", color: "#10b981", status: "سالم" },
-  { id: 2, name: "دشت کویر", center: [33.5, 54.5], radius: 45000, ndvi: 0.28, area: "۲,۱۰۰ ha", color: "#f59e0b", status: "هشدار" },
-  { id: 3, name: "زاگرس مرکزی", center: [31.5, 51.5], radius: 35000, ndvi: 0.75, area: "۸۹۰ ha", color: "#059669", status: "عالی" },
-  { id: 4, name: "بلوچستان", center: [28.5, 60.5], radius: 40000, ndvi: 0.18, area: "۶۵۰ ha", color: "#ef4444", status: "بحرانی" },
-  { id: 5, name: "آذربایجان", center: [38.0, 46.5], radius: 28000, ndvi: 0.68, area: "۱,۱۰۰ ha", color: "#3b82f6", status: "خوب" },
-  { id: 6, name: "فارس", center: [29.6, 52.5], radius: 32000, ndvi: 0.45, area: "۱,۴۵۰ ha", color: "#8b5cf6", status: "متوسط" },
+  { id: 1, name: "حوضه کشف‌رود", center: [36.3, 59.6], radius: 30000, ndvi: 0.62, area: "۱,۲۵۰ ha", color: CHART.emerald, status: "سالم" },
+  { id: 2, name: "دشت کویر", center: [33.5, 54.5], radius: 45000, ndvi: 0.28, area: "۲,۱۰۰ ha", color: CHART.amber, status: "هشدار" },
+  { id: 3, name: "زاگرس مرکزی", center: [31.5, 51.5], radius: 35000, ndvi: 0.75, area: "۸۹۰ ha", color: CHART.emerald, status: "عالی" },
+  { id: 4, name: "بلوچستان", center: [28.5, 60.5], radius: 40000, ndvi: 0.18, area: "۶۵۰ ha", color: CHART.red, status: "بحرانی" },
+  { id: 5, name: "آذربایجان", center: [38.0, 46.5], radius: 28000, ndvi: 0.68, area: "۱,۱۰۰ ha", color: CHART.blue, status: "خوب" },
+  { id: 6, name: "فارس", center: [29.6, 52.5], radius: 32000, ndvi: 0.45, area: "۱,۴۵۰ ha", color: CHART.violet, status: "متوسط" },
 ];
 
 export default function AdvancedGISMap() {
@@ -176,20 +178,20 @@ export default function AdvancedGISMap() {
             key={idx}
             center={point}
             radius={100}
-            pathOptions={{ color: "#f59e0b", fillColor: "#f59e0b", fillOpacity: 0.8 }}
+            pathOptions={{ color: CHART.amber, fillColor: CHART.amber, fillOpacity: 0.8 }}
           />
         ))}
 
         {measureMode === "distance" && measurePoints.length >= 2 && (
           <Polyline
             positions={measurePoints}
-            pathOptions={{ color: "#f59e0b", weight: 3, dashArray: "10, 10" }}
+            pathOptions={{ color: CHART.amber, weight: 3, dashArray: "10, 10" }}
           />
         )}
         {measureMode === "area" && measurePoints.length >= 3 && (
           <Polygon
             positions={measurePoints}
-            pathOptions={{ color: "#f59e0b", weight: 3, fillColor: "#f59e0b", fillOpacity: 0.3 }}
+            pathOptions={{ color: CHART.amber, weight: 3, fillColor: CHART.amber, fillOpacity: 0.3 }}
           />
         )}
 

@@ -11,7 +11,7 @@ from typing import Any, Optional
 from apps.simulation.registry import register_all_simulators
 from apps.simulation.base import SimulationRegistry
 
-router = APIRouter(prefix="/api/v1/simulation", tags=["🔬 Simulation"])
+router = APIRouter(tags=["🔬 Simulation"])
 
 
 class SimulationRunRequest(BaseModel):

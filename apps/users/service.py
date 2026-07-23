@@ -28,6 +28,12 @@ ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
+def decode_access_token(token: str) -> dict:
+    """Decode and verify a JWT access token (wrapper around decode_token)."""
+    return decode_token(token)
+
+
+
 class UserService:
     """
     سرویس مدیریت کاربران.

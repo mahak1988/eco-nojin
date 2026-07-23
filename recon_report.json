@@ -1,0 +1,456 @@
+{
+  "project": "D:\\econojin.com",
+  "file_count": 131308,
+  "stack": [
+    "Astro",
+    "Next.js",
+    "Tailwind CSS"
+  ],
+  "js_libs": [],
+  "py_libs": [],
+  "scores": {
+    "structure": 100,
+    "semantics": 5,
+    "accessibility": 99,
+    "design_system": 50,
+    "performance": 20,
+    "seo": 58
+  },
+  "overall": 55,
+  "grade": "C",
+  "css": {
+    "unique_colors": 47,
+    "sample_colors": [
+      "000000",
+      "04141a",
+      "081b20",
+      "0c252c",
+      "0c3a40",
+      "12333b",
+      "14919b",
+      "1e293b",
+      "20180a",
+      "222222",
+      "27ae60",
+      "2980b9"
+    ],
+    "font_families": [
+      "-apple-system",
+      "BlinkMacSystemFont",
+      "Cantarell",
+      "Consolas",
+      "Courier New",
+      "Droid Sans",
+      "Fira Code",
+      "Fira Sans",
+      "Helvetica Neue",
+      "IRANSans"
+    ],
+    "important_count": 15,
+    "media_queries": 30,
+    "custom_properties": 170,
+    "total_kb": 724.2
+  },
+  "assets": {
+    "total_project_kb": 3083784,
+    "images": 4372,
+    "images_by_format": {
+      ".svg": 37,
+      ".ico": 19,
+      ".png": 240,
+      ".jpg": 3949,
+      ".jpeg": 124,
+      ".avif": 2,
+      ".webp": 1
+    },
+    "images_over_threshold": [
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Blueberry leaf\\Blueberry leaf (22).jpg",
+        12280
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Strawberry leaf\\Strawberry leaf (52).jpg",
+        9925
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Apple leaf\\Apple leaf (4).jpg",
+        8673
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Strawberry leaf\\Strawberry leaf (43).jpg",
+        8034
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Corn leaf blight\\Corn leaf blight (89).jpg",
+        6420
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Corn rust leaf\\Corn rust leaf (91).jpg",
+        6332
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\grape leaf\\grape leaf (8).jpg",
+        6081
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Tomato Septoria leaf spot\\Tomato Septoria leaf spot (56).jpg",
+        5690
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Corn Gray leaf spot\\Corn Gray leaf spot (46).jpg",
+        5560
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\test\\Apple rust leaf\\Apple rust leaf (1).jpg",
+        4801
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Tomato Septoria leaf spot\\Tomato Septoria leaf spot (95).jpg",
+        4772
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Tomato leaf\\Tomato leaf (26).jpg",
+        4558
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Apple rust leaf\\Apple rust leaf (54).jpg",
+        4512
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Squash Powdery mildew leaf\\Squash Powdery mildew leaf (64).jpg",
+        4490
+      ],
+      [
+        "repos\\AgriSync\\backend\\PlantDoc-Dataset\\train\\Squash Powdery mildew leaf\\Squash Powdery mildew leaf (4).jpg",
+        4447
+      ]
+    ],
+    "modern_format_ratio": 0.0,
+    "fonts": [],
+    "top_extensions": [
+      [
+        "",
+        101924
+      ],
+      [
+        ".json",
+        18314
+      ],
+      [
+        ".jpg",
+        3949
+      ],
+      [
+        ".tsx",
+        3903
+      ],
+      [
+        ".ts",
+        998
+      ],
+      [
+        ".py",
+        576
+      ],
+      [
+        ".mdx",
+        303
+      ],
+      [
+        ".md",
+        288
+      ]
+    ]
+  },
+  "meta": {
+    "entry_points": [
+      "index.html",
+      "main.py"
+    ],
+    "has_readme": true,
+    "has_robots": true,
+    "has_sitemap": true,
+    "has_gitignore": true,
+    "has_tests": true
+  },
+  "html_reports": [
+    {
+      "file": "analysis_report_20260712_155215.html",
+      "h1": 1,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": false,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "reference.html",
+      "h1": 1,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": true,
+      "inline_styles": 30,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": true,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": true,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": true,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": true,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": true,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    },
+    {
+      "file": "index.html",
+      "h1": 0,
+      "imgs": 0,
+      "imgs_no_alt": 0,
+      "has_lang": true,
+      "has_viewport": true,
+      "has_title": true,
+      "has_meta_desc": false,
+      "has_og": false,
+      "has_main": false,
+      "has_nav": false,
+      "has_landmarks": false,
+      "inline_styles": 0,
+      "blocking_js": 0
+    }
+  ],
+  "prescription": [
+    [
+      "03_optimize_assets.py",
+      "بالا",
+      "15 تصویر سنگین؛ تنها 0٪ فرمت مدرن"
+    ],
+    [
+      "02_design_tokens.py",
+      "متوسط",
+      "47 رنگ غیرسیستمی، 170 متغیر CSS"
+    ],
+    [
+      "04_inject_polish.py",
+      "متوسط",
+      "هیچ کتابخانهٔ حرکتی شناسایی نشد — ریویل سبک پیشنهاد می‌شود"
+    ],
+    [
+      "01_audit.py",
+      "پایانی",
+      "ممیزی زندهٔ نسخهٔ دیپلوی‌شده — همیشه گام验证 آخر"
+    ]
+  ]
+}

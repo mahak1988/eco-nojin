@@ -1,22 +1,20 @@
-FROM python:3.13-slim
+# syntax=docker/dockerfile:1
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# نصب وابستگی‌های سیستمی
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends     build-essential     && rm -rf /var/lib/apt/lists/*
 
-# نصب وابستگی‌های پایتون
+# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# کپی کردن کد پروژه
+# Copy application code
 COPY . .
 
-# تنظیم متغیر محیطی
-ENV PYTHONPATH=/app
+# Expose port
+EXPOSE 8000
 
-# اجرای بک‌اند
-CMD ["uvicorn", "apps.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application
+CMD ["uvicorn", "apps.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -164,3 +164,20 @@ export interface ExchangeResponse {
   to_amount: number;
   exchange_rate: number;
 }
+
+// Alias برای سازگاری با useEcoCoin
+export type EcoCoinBalance = EcoWallet;
+export type EcoCoinTransaction = EcoTransaction;
+export type EcoCoinTransferRequest = TransferRequest;
+export type EcoCoinTransferResponse = TransferResponse;
+export type EcoCoinReward = RewardRate;
+export type EcoCoinHistory = EcoToken[];
+
+// ====== نوع Dashboard تجمیعی ======
+export interface EcoCoinDashboard {
+  wallet: EcoWallet;
+  stats: EcoCoinStats;
+  recentTransactions: EcoTransaction[];
+  rewards: RewardRate[];
+  token: EcoToken;
+}

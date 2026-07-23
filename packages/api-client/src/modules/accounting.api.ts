@@ -77,7 +77,7 @@ export interface Payment {
   id: string;
   invoice_id?: string;
   amount: string;
-  currency: string;
+  currency?: string;
   payment_method: 'cash' | 'bank_transfer' | 'check' | 'credit_card' | 'ecocoin' | 'carbon_credit';
   reference?: string;
   notes?: string;

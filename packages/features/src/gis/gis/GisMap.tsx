@@ -6,6 +6,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { gisService } from "@/lib/api";
 
+import { CHART } from '@econojin/ui/lib/chart-colors';
+
 const icon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -123,7 +125,7 @@ export function GisMap() {
             </Marker>
           ))}
           {points.length >= 3 && (
-            <Polygon positions={points} pathOptions={{ color: "#8b5cf6" }} />
+            <Polygon positions={points} pathOptions={{ color: CHART.violet }} />
           )}
         </MapContainer>
       </div>

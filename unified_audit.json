@@ -1,0 +1,3837 @@
+{
+  "root": "D:\\econojin.com",
+  "components": [
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\badge.tsx",
+      "name": "badge",
+      "exports": [],
+      "lines": 30,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\button.tsx",
+      "name": "button",
+      "exports": [],
+      "lines": 52,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\card.tsx",
+      "name": "card",
+      "exports": [],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\input.tsx",
+      "name": "input",
+      "exports": [],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\label.tsx",
+      "name": "label",
+      "exports": [],
+      "lines": 18,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\alert.tsx",
+      "name": "alert",
+      "exports": [
+        "Alert",
+        "AlertTitle",
+        "AlertDescription"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\AnimatedStatCard.tsx",
+      "name": "AnimatedStatCard",
+      "exports": [
+        "AnimatedStatCard"
+      ],
+      "lines": 31,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\badge.tsx",
+      "name": "badge",
+      "exports": [],
+      "lines": 29,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\button.tsx",
+      "name": "button",
+      "exports": [],
+      "lines": 58,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\card.tsx",
+      "name": "card",
+      "exports": [],
+      "lines": 81,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+      "name": "ChartCard",
+      "exports": [
+        "ChartCard"
+      ],
+      "lines": 39,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 12,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\DataTable.tsx",
+      "name": "DataTable",
+      "exports": [
+        "DataTable"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\form-field.tsx",
+      "name": "form-field",
+      "exports": [
+        "FormField"
+      ],
+      "lines": 34,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 3,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\input.tsx",
+      "name": "input",
+      "exports": [],
+      "lines": 27,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\label.tsx",
+      "name": "label",
+      "exports": [
+        "Label"
+      ],
+      "lines": 10,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\LanguageSwitcher.tsx",
+      "name": "LanguageSwitcher",
+      "exports": [
+        "LanguageSwitcher"
+      ],
+      "lines": 54,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\media-hero.tsx",
+      "name": "media-hero",
+      "exports": [
+        "MediaHero"
+      ],
+      "lines": 75,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\textarea.tsx",
+      "name": "textarea",
+      "exports": [],
+      "lines": 25,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\toaster.tsx",
+      "name": "toaster",
+      "exports": [
+        "Toaster"
+      ],
+      "lines": 17,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\booking\\BookingCalendar.tsx",
+      "name": "BookingCalendar",
+      "exports": [
+        "BookingCalendar"
+      ],
+      "lines": 11,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\ui\\src\\components\\maps\\MapViewer.tsx",
+      "name": "MapViewer",
+      "exports": [
+        "MapViewer"
+      ],
+      "lines": 11,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\analysis\\AnalysisDashboard.tsx",
+      "name": "AnalysisDashboard",
+      "exports": [
+        "AnalysisDashboard"
+      ],
+      "lines": 45,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\analysis\\AnalysisForm.tsx",
+      "name": "AnalysisForm",
+      "exports": [
+        "AnalysisForm"
+      ],
+      "lines": 254,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+      "name": "ChartsPanel",
+      "exports": [
+        "ChartsPanel"
+      ],
+      "lines": 136,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\analysis\\EventsLog.tsx",
+      "name": "EventsLog",
+      "exports": [
+        "EventsLog"
+      ],
+      "lines": 91,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\analysis\\MapPanel.tsx",
+      "name": "MapPanel",
+      "exports": [
+        "MapPanel"
+      ],
+      "lines": 149,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\blockchain\\BlockchainDashboard.tsx",
+      "name": "BlockchainDashboard",
+      "exports": [
+        "BlockchainDashboard"
+      ],
+      "lines": 61,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\drought\\DroughtDashboard.tsx",
+      "name": "DroughtDashboard",
+      "exports": [
+        "DroughtDashboard"
+      ],
+      "lines": 58,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\forest\\ForestDashboard.tsx",
+      "name": "ForestDashboard",
+      "exports": [
+        "ForestDashboard"
+      ],
+      "lines": 62,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 27,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\iot\\IoTDashboard.tsx",
+      "name": "IoTDashboard",
+      "exports": [
+        "IoTDashboard"
+      ],
+      "lines": 63,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 18,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\satellite\\SatelliteDashboard.tsx",
+      "name": "SatelliteDashboard",
+      "exports": [
+        "SatelliteDashboard"
+      ],
+      "lines": 53,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 16,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\soil-water\\SoilDashboard.tsx",
+      "name": "SoilDashboard",
+      "exports": [
+        "SoilDashboard"
+      ],
+      "lines": 44,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 13,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\weather\\WeatherDashboard.tsx",
+      "name": "WeatherDashboard",
+      "exports": [
+        "WeatherDashboard"
+      ],
+      "lines": 71,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 30,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+      "name": "AdvancedGISMap",
+      "exports": [
+        "AdvancedGISMap"
+      ],
+      "lines": 339,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 43,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\GisMap.tsx",
+      "name": "GisMap",
+      "exports": [
+        "GisMap"
+      ],
+      "lines": 134,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 10,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\InteractiveMap.tsx",
+      "name": "InteractiveMap",
+      "exports": [
+        "InteractiveMap"
+      ],
+      "lines": 370,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 19,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+      "name": "ProductionGIS",
+      "exports": [
+        "ProductionGIS"
+      ],
+      "lines": 1090,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 139,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+      "name": "SpectralIndices",
+      "exports": [
+        "SpectralIndices"
+      ],
+      "lines": 367,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 71,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\layers\\SatelliteLayers.tsx",
+      "name": "SatelliteLayers",
+      "exports": [
+        "SatelliteLayers"
+      ],
+      "lines": 94,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\panels\\FarmRegistration.tsx",
+      "name": "FarmRegistration",
+      "exports": [
+        "FarmRegistration"
+      ],
+      "lines": 128,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 28,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\panels\\ManualLocationInput.tsx",
+      "name": "ManualLocationInput",
+      "exports": [
+        "ManualLocationInput"
+      ],
+      "lines": 286,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 34,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\panels\\SatelliteSources.tsx",
+      "name": "SatelliteSources",
+      "exports": [
+        "SatelliteSources"
+      ],
+      "lines": 156,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\tools\\MeasurementTools.tsx",
+      "name": "MeasurementTools",
+      "exports": [
+        "MeasurementTools"
+      ],
+      "lines": 62,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\widgets\\PredictionCards.tsx",
+      "name": "PredictionCards",
+      "exports": [
+        "PredictionCards"
+      ],
+      "lines": 97,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 16,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\widgets\\RecommendationEngine.tsx",
+      "name": "RecommendationEngine",
+      "exports": [
+        "RecommendationEngine"
+      ],
+      "lines": 85,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 13,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\widgets\\SpectralAnalysis.tsx",
+      "name": "SpectralAnalysis",
+      "exports": [
+        "SpectralAnalysis"
+      ],
+      "lines": 118,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 19,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\widgets\\TopographicAnalysis.tsx",
+      "name": "TopographicAnalysis",
+      "exports": [
+        "TopographicAnalysis"
+      ],
+      "lines": 145,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 64,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\App.tsx",
+      "name": "App",
+      "exports": [
+        "App"
+      ],
+      "lines": 124,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\main.tsx",
+      "name": "main",
+      "exports": [],
+      "lines": 69,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\__tests__\\index.test.tsx",
+      "name": "index.test",
+      "exports": [],
+      "lines": 37,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\alerts\\AlertsPanel.tsx",
+      "name": "AlertsPanel",
+      "exports": [
+        "AlertsPanel"
+      ],
+      "lines": 98,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 19,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\audiences\\ExpertDashboard.tsx",
+      "name": "ExpertDashboard",
+      "exports": [
+        "ExpertDashboard"
+      ],
+      "lines": 84,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\audiences\\FarmerDashboard.tsx",
+      "name": "FarmerDashboard",
+      "exports": [
+        "FarmerDashboard"
+      ],
+      "lines": 71,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\audiences\\ManagerDashboard.tsx",
+      "name": "ManagerDashboard",
+      "exports": [
+        "ManagerDashboard"
+      ],
+      "lines": 86,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 26,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\audiences\\ResearcherDashboard.tsx",
+      "name": "ResearcherDashboard",
+      "exports": [
+        "ResearcherDashboard"
+      ],
+      "lines": 83,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\audiences\\StudentDashboard.tsx",
+      "name": "StudentDashboard",
+      "exports": [
+        "StudentDashboard"
+      ],
+      "lines": 62,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\hooks\\useApi.tsx",
+      "name": "useApi",
+      "exports": [
+        "useApi"
+      ],
+      "lines": 124,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\hooks\\useAuth.tsx",
+      "name": "useAuth",
+      "exports": [
+        "AuthProvider",
+        "useAuth",
+        "isAuthError"
+      ],
+      "lines": 208,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\hooks\\useLanguage.tsx",
+      "name": "useLanguage",
+      "exports": [
+        "useLanguage"
+      ],
+      "lines": 73,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Dashboard.tsx",
+      "name": "Dashboard",
+      "exports": [
+        "Dashboard"
+      ],
+      "lines": 287,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 31,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Documents.tsx",
+      "name": "Documents",
+      "exports": [
+        "Documents"
+      ],
+      "lines": 246,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 33,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Home.tsx",
+      "name": "Home",
+      "exports": [],
+      "lines": 21,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\index.tsx",
+      "name": "index",
+      "exports": [
+        "HydrologyFrontendPage"
+      ],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Login.tsx",
+      "name": "Login",
+      "exports": [
+        "Login"
+      ],
+      "lines": 310,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 35,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\simulators\\components\\SimulatorRunner.tsx",
+      "name": "SimulatorRunner",
+      "exports": [
+        "SimulatorRunner"
+      ],
+      "lines": 143,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 29,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\simulators\\pages\\SimulatorsIndexPage.tsx",
+      "name": "SimulatorsIndexPage",
+      "exports": [
+        "SimulatorsIndexPage"
+      ],
+      "lines": 58,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 12,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\scenarios\\pages\\ScenarioBuilderPage.tsx",
+      "name": "ScenarioBuilderPage",
+      "exports": [
+        "ScenarioBuilderPage"
+      ],
+      "lines": 45,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 12,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\satellites\\components\\SatelliteExplorer.tsx",
+      "name": "SatelliteExplorer",
+      "exports": [
+        "SatelliteExplorer"
+      ],
+      "lines": 182,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 49,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\AboutUs\\AboutUs.tsx",
+      "name": "AboutUs",
+      "exports": [
+        "AboutUs"
+      ],
+      "lines": 159,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 33,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Accounting\\Accounting.tsx",
+      "name": "Accounting",
+      "exports": [
+        "Accounting"
+      ],
+      "lines": 268,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 61,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Admin\\AdminPanelPage.tsx",
+      "name": "AdminPanelPage",
+      "exports": [
+        "AdminPanelPage"
+      ],
+      "lines": 126,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 3,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\AgricultureSchools\\AgricultureSchools.tsx",
+      "name": "AgricultureSchools",
+      "exports": [
+        "AgricultureSchools"
+      ],
+      "lines": 258,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 31,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Animations\\Animations.tsx",
+      "name": "Animations",
+      "exports": [
+        "Animations"
+      ],
+      "lines": 157,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 32,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Biodiversity\\BiodiversityDashboard.tsx",
+      "name": "BiodiversityDashboard",
+      "exports": [
+        "BiodiversityDashboard"
+      ],
+      "lines": 130,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 39,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Blog\\Blog.tsx",
+      "name": "Blog",
+      "exports": [
+        "Blog"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Carbon\\CarbonDashboard.tsx",
+      "name": "CarbonDashboard",
+      "exports": [
+        "CarbonDashboard"
+      ],
+      "lines": 236,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 41,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Careers\\Careers.tsx",
+      "name": "Careers",
+      "exports": [
+        "Careers"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\ContactUs\\ContactUs.tsx",
+      "name": "ContactUs",
+      "exports": [
+        "ContactUs"
+      ],
+      "lines": 105,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Daneshyar\\Daneshyar.tsx",
+      "name": "Daneshyar",
+      "exports": [
+        "Daneshyar"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\DecisionYar\\DecisionYar.tsx",
+      "name": "DecisionYar",
+      "exports": [
+        "DecisionYar"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Drought\\DroughtDashboard.tsx",
+      "name": "DroughtDashboard",
+      "exports": [
+        "DroughtDashboard"
+      ],
+      "lines": 130,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 39,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EcoCoin\\Challenges.tsx",
+      "name": "Challenges",
+      "exports": [
+        "Challenges"
+      ],
+      "lines": 59,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 12,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EcoCoin\\EcoCoinDashboard.tsx",
+      "name": "EcoCoinDashboard",
+      "exports": [
+        "EcoCoinDashboard"
+      ],
+      "lines": 64,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EcoCoin\\Mining.tsx",
+      "name": "Mining",
+      "exports": [
+        "Mining"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 19,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EcoCoin\\Rewards.tsx",
+      "name": "Rewards",
+      "exports": [
+        "Rewards"
+      ],
+      "lines": 51,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 12,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EcoCoin\\Wallet.tsx",
+      "name": "Wallet",
+      "exports": [
+        "Wallet"
+      ],
+      "lines": 64,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 20,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EconomicModels\\EconomicModels.tsx",
+      "name": "EconomicModels",
+      "exports": [
+        "EconomicModels"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Ecosystem\\EcosystemDashboard.tsx",
+      "name": "EcosystemDashboard",
+      "exports": [
+        "EcosystemDashboard"
+      ],
+      "lines": 130,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 39,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\EcosystemRestoration\\EcosystemRestoration.tsx",
+      "name": "EcosystemRestoration",
+      "exports": [
+        "EcosystemRestoration"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Energy\\EnergyDashboard.tsx",
+      "name": "EnergyDashboard",
+      "exports": [
+        "EnergyDashboard"
+      ],
+      "lines": 130,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 39,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\FAQ\\FAQ.tsx",
+      "name": "FAQ",
+      "exports": [
+        "FAQ"
+      ],
+      "lines": 59,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 11,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\ForgotPassword\\ForgotPassword.tsx",
+      "name": "ForgotPassword",
+      "exports": [
+        "ForgotPassword"
+      ],
+      "lines": 84,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\GIS\\FlowAccumulationAnalysis.tsx",
+      "name": "FlowAccumulationAnalysis",
+      "exports": [
+        "FlowAccumulationAnalysis"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\GIS\\GISDashboard.tsx",
+      "name": "GISDashboard",
+      "exports": [
+        "GISDashboard"
+      ],
+      "lines": 45,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\GIS\\LandCoverAnalysis.tsx",
+      "name": "LandCoverAnalysis",
+      "exports": [
+        "LandCoverAnalysis"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\GIS\\SlopeAnalysis.tsx",
+      "name": "SlopeAnalysis",
+      "exports": [
+        "SlopeAnalysis"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\GIS\\ViewshedAnalysis.tsx",
+      "name": "ViewshedAnalysis",
+      "exports": [
+        "ViewshedAnalysis"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\GIS\\WatershedAnalysis.tsx",
+      "name": "WatershedAnalysis",
+      "exports": [
+        "WatershedAnalysis"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Home\\Home.tsx",
+      "name": "Home",
+      "exports": [
+        "Home"
+      ],
+      "lines": 243,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 86,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Hydrology\\SimulationRun.tsx",
+      "name": "SimulationRun",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Hydrology\\WatershedList.tsx",
+      "name": "WatershedList",
+      "exports": [
+        "WatershedList"
+      ],
+      "lines": 266,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 34,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Legal\\LegalLayout.tsx",
+      "name": "LegalLayout",
+      "exports": [
+        "LegalLayout",
+        "LegalSection",
+        "LegalCallout"
+      ],
+      "lines": 298,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 40,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Legal\\Privacy.tsx",
+      "name": "Privacy",
+      "exports": [
+        "Privacy"
+      ],
+      "lines": 131,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 37,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Legal\\Terms.tsx",
+      "name": "Terms",
+      "exports": [
+        "Terms"
+      ],
+      "lines": 105,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Library\\Library.tsx",
+      "name": "Library",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\BiodiversityMonitoring.tsx",
+      "name": "BiodiversityMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\CarbonMonitoring.tsx",
+      "name": "CarbonMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\DroughtMonitoring.tsx",
+      "name": "DroughtMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\EcosystemMonitoring.tsx",
+      "name": "EcosystemMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\EnergyMonitoring.tsx",
+      "name": "EnergyMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\HydrologyMonitoring.tsx",
+      "name": "HydrologyMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Monitoring\\SoilMonitoring.tsx",
+      "name": "SoilMonitoring",
+      "exports": [],
+      "lines": 14,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\News\\News.tsx",
+      "name": "News",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Partners\\Partners.tsx",
+      "name": "Partners",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Privacy\\PrivacyPolicy.tsx",
+      "name": "PrivacyPolicy",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Profile\\Profile.tsx",
+      "name": "Profile",
+      "exports": [
+        "Profile"
+      ],
+      "lines": 139,
+      "has_img": true,
+      "has_motion": true,
+      "tw_classes": 31,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Register\\Register.tsx",
+      "name": "Register",
+      "exports": [
+        "Register"
+      ],
+      "lines": 173,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 42,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\ScienceLab\\ScienceLab.tsx",
+      "name": "ScienceLab",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Shop\\Shop.tsx",
+      "name": "Shop",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Soil\\SoilDashboard.tsx",
+      "name": "SoilDashboard",
+      "exports": [
+        "SoilDashboard"
+      ],
+      "lines": 210,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 47,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Terms\\TermsAndConditions.tsx",
+      "name": "TermsAndConditions",
+      "exports": [],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Topography\\TopographyPage.tsx",
+      "name": "TopographyPage",
+      "exports": [],
+      "lines": 16,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Admin\\tabs\\AuditLogsTab.tsx",
+      "name": "AuditLogsTab",
+      "exports": [
+        "AuditLogsTab"
+      ],
+      "lines": 196,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 24,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Admin\\tabs\\DashboardTab.tsx",
+      "name": "DashboardTab",
+      "exports": [
+        "DashboardTab"
+      ],
+      "lines": 143,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 10,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Admin\\tabs\\ReportsTab.tsx",
+      "name": "ReportsTab",
+      "exports": [
+        "ReportsTab"
+      ],
+      "lines": 225,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Admin\\tabs\\SettingsTab.tsx",
+      "name": "SettingsTab",
+      "exports": [
+        "SettingsTab"
+      ],
+      "lines": 278,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 43,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Admin\\tabs\\UsersTab.tsx",
+      "name": "UsersTab",
+      "exports": [
+        "UsersTab"
+      ],
+      "lines": 241,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 41,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\charts\\ComparisonChart.tsx",
+      "name": "ComparisonChart",
+      "exports": [
+        "ComparisonChart"
+      ],
+      "lines": 70,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\charts\\HeatmapChart.tsx",
+      "name": "HeatmapChart",
+      "exports": [
+        "HeatmapChart"
+      ],
+      "lines": 87,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 8,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\charts\\TimeSeriesChart.tsx",
+      "name": "TimeSeriesChart",
+      "exports": [
+        "TimeSeriesChart"
+      ],
+      "lines": 128,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 6,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\CommandPalette\\CommandPalette.tsx",
+      "name": "CommandPalette",
+      "exports": [
+        "CommandPalette"
+      ],
+      "lines": 242,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\ErrorBoundary.tsx",
+      "name": "ErrorBoundary",
+      "exports": [],
+      "lines": 68,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\ErrorFallback.tsx",
+      "name": "ErrorFallback",
+      "exports": [
+        "ErrorFallback"
+      ],
+      "lines": 48,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 6,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\LanguageSwitcher.tsx",
+      "name": "LanguageSwitcher",
+      "exports": [
+        "LanguageSwitcher"
+      ],
+      "lines": 131,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 8,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\LoadingSpinner.tsx",
+      "name": "LoadingSpinner",
+      "exports": [
+        "LoadingSpinner"
+      ],
+      "lines": 79,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\PagePlaceholder.tsx",
+      "name": "PagePlaceholder",
+      "exports": [
+        "PagePlaceholder"
+      ],
+      "lines": 61,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\ProtectedRoute.tsx",
+      "name": "ProtectedRoute",
+      "exports": [
+        "ProtectedRoute"
+      ],
+      "lines": 114,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\common\\ThemeToggle.tsx",
+      "name": "ThemeToggle",
+      "exports": [
+        "ThemeToggle"
+      ],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\eco\\DashboardGrid.tsx",
+      "name": "DashboardGrid",
+      "exports": [
+        "DashboardGrid"
+      ],
+      "lines": 32,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\eco\\EcoButton.tsx",
+      "name": "EcoButton",
+      "exports": [
+        "EcoButton"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\eco\\HeroSection.tsx",
+      "name": "HeroSection",
+      "exports": [
+        "HeroSection"
+      ],
+      "lines": 75,
+      "has_img": true,
+      "has_motion": true,
+      "tw_classes": 10,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\eco\\ModuleCard.tsx",
+      "name": "ModuleCard",
+      "exports": [
+        "ModuleCard"
+      ],
+      "lines": 132,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ecocoin\\ConnectWallet.tsx",
+      "name": "ConnectWallet",
+      "exports": [
+        "ConnectWallet",
+        "EcoCoinBalance"
+      ],
+      "lines": 96,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 10,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\Layout\\Footer.tsx",
+      "name": "Footer",
+      "exports": [
+        "Footer"
+      ],
+      "lines": 127,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\Layout\\Header.tsx",
+      "name": "Header",
+      "exports": [
+        "NAV_ITEMS",
+        "Header"
+      ],
+      "lines": 262,
+      "has_img": true,
+      "has_motion": true,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\Layout\\Layout.tsx",
+      "name": "Layout",
+      "exports": [
+        "Layout"
+      ],
+      "lines": 43,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 3,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\Layout\\Sidebar.tsx",
+      "name": "Sidebar",
+      "exports": [
+        "Sidebar"
+      ],
+      "lines": 247,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 11,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\Legal\\LegalLayout.tsx",
+      "name": "LegalLayout",
+      "exports": [
+        "LegalLayout",
+        "LegalSection",
+        "LegalCallout"
+      ],
+      "lines": 113,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 30,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\motion\\FadeIn.tsx",
+      "name": "FadeIn",
+      "exports": [
+        "FadeIn"
+      ],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\motion\\StaggerChildren.tsx",
+      "name": "StaggerChildren",
+      "exports": [
+        "StaggerContainer",
+        "StaggerItem"
+      ],
+      "lines": 58,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\providers\\Web3Provider.tsx",
+      "name": "Web3Provider",
+      "exports": [
+        "Web3Provider"
+      ],
+      "lines": 32,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\shared\\ChartCard.tsx",
+      "name": "ChartCard",
+      "exports": [
+        "ChartCard"
+      ],
+      "lines": 25,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\shared\\FileUpload.tsx",
+      "name": "FileUpload",
+      "exports": [
+        "FileUpload"
+      ],
+      "lines": 54,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\shared\\PageHeader.tsx",
+      "name": "PageHeader",
+      "exports": [
+        "PageHeader"
+      ],
+      "lines": 22,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\shared\\StatCard.tsx",
+      "name": "StatCard",
+      "exports": [
+        "StatCard"
+      ],
+      "lines": 31,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ui\\badge.tsx",
+      "name": "badge",
+      "exports": [
+        "Badge"
+      ],
+      "lines": 75,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ui\\button.tsx",
+      "name": "button",
+      "exports": [],
+      "lines": 68,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ui\\card.tsx",
+      "name": "card",
+      "exports": [],
+      "lines": 113,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ui\\input.tsx",
+      "name": "input",
+      "exports": [
+        "Input",
+        "Textarea",
+        "Label",
+        "FieldError"
+      ],
+      "lines": 129,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ui\\modal.tsx",
+      "name": "modal",
+      "exports": [
+        "Modal"
+      ],
+      "lines": 144,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\components\\ui\\skeleton.tsx",
+      "name": "skeleton",
+      "exports": [
+        "Skeleton",
+        "SkeletonRow",
+        "SkeletonTable",
+        "SkeletonStatCard"
+      ],
+      "lines": 84,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\accounting\\page.tsx",
+      "name": "page",
+      "exports": [
+        "AccountingDashboard"
+      ],
+      "lines": 100,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\simulator\\page.tsx",
+      "name": "page",
+      "exports": [
+        "SimulatorDashboard"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\simulator\\carbon\\page.tsx",
+      "name": "page",
+      "exports": [
+        "CarbonSimulator"
+      ],
+      "lines": 106,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\monitoring\\ai\\page.tsx",
+      "name": "page",
+      "exports": [
+        "AIAnalysisPage"
+      ],
+      "lines": 61,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\monitoring\\satellite\\page.tsx",
+      "name": "page",
+      "exports": [
+        "SatelliteMonitoring"
+      ],
+      "lines": 96,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\ecocoin\\dashboard\\page.tsx",
+      "name": "page",
+      "exports": [
+        "EcoCoinDashboard"
+      ],
+      "lines": 195,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 47,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\ecocoin\\staking\\page.tsx",
+      "name": "page",
+      "exports": [
+        "EcoCoinStaking"
+      ],
+      "lines": 188,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 50,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\ecocoin\\wallet\\page.tsx",
+      "name": "page",
+      "exports": [
+        "EcoCoinWallet"
+      ],
+      "lines": 177,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 33,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\accounting\\invoices\\page.tsx",
+      "name": "page",
+      "exports": [
+        "InvoicesPage"
+      ],
+      "lines": 54,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\web\\src\\app\\accounting\\transactions\\page.tsx",
+      "name": "page",
+      "exports": [
+        "TransactionsPage"
+      ],
+      "lines": 59,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\library\\__tests__\\index.test.tsx",
+      "name": "index.test",
+      "exports": [],
+      "lines": 37,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\library\\src\\components\\Card.tsx",
+      "name": "Card",
+      "exports": [
+        "LibraryCard"
+      ],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\library\\src\\pages\\index.tsx",
+      "name": "index",
+      "exports": [
+        "LibraryPage"
+      ],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\cms\\__tests__\\index.test.tsx",
+      "name": "index.test",
+      "exports": [],
+      "lines": 37,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\cms\\src\\components\\Card.tsx",
+      "name": "Card",
+      "exports": [
+        "CmsCard"
+      ],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "__repo_sync_tmp__\\apps\\cms\\src\\pages\\index.tsx",
+      "name": "index",
+      "exports": [
+        "CmsPage"
+      ],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "src\\pages\\AgricultureSchools\\AgricultureSchools.tsx",
+      "name": "AgricultureSchools",
+      "exports": [
+        "AgricultureSchools"
+      ],
+      "lines": 260,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 31,
+      "uses_cva": false
+    },
+    {
+      "path": "src\\pages\\Carbon\\CarbonDashboard.tsx",
+      "name": "CarbonDashboard",
+      "exports": [
+        "CarbonDashboard"
+      ],
+      "lines": 236,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 41,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\badge.tsx",
+      "name": "badge",
+      "exports": [],
+      "lines": 30,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\button.tsx",
+      "name": "button",
+      "exports": [],
+      "lines": 52,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\card.tsx",
+      "name": "card",
+      "exports": [],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\input.tsx",
+      "name": "input",
+      "exports": [],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\label.tsx",
+      "name": "label",
+      "exports": [],
+      "lines": 18,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\progress.tsx",
+      "name": "progress",
+      "exports": [],
+      "lines": 22,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\select.tsx",
+      "name": "select",
+      "exports": [],
+      "lines": 119,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 3,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\toast.tsx",
+      "name": "toast",
+      "exports": [
+        "reducer",
+        "useToast"
+      ],
+      "lines": 233,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 1,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\components\\alert.tsx",
+      "name": "alert",
+      "exports": [
+        "Alert",
+        "AlertTitle",
+        "AlertDescription"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\components\\AnimatedStatCard.tsx",
+      "name": "AnimatedStatCard",
+      "exports": [
+        "AnimatedStatCard"
+      ],
+      "lines": 31,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\badge.tsx",
+      "name": "badge",
+      "exports": [],
+      "lines": 29,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\components\\button.tsx",
+      "name": "button",
+      "exports": [],
+      "lines": 58,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 0,
+      "uses_cva": true
+    },
+    {
+      "path": "packages\\ui\\src\\components\\card.tsx",
+      "name": "card",
+      "exports": [],
+      "lines": 81,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\ChartCard.tsx",
+      "name": "ChartCard",
+      "exports": [
+        "ChartCard"
+      ],
+      "lines": 39,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 12,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\DataTable.tsx",
+      "name": "DataTable",
+      "exports": [
+        "DataTable"
+      ],
+      "lines": 41,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\form-field.tsx",
+      "name": "form-field",
+      "exports": [
+        "FormField"
+      ],
+      "lines": 34,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 3,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\input.tsx",
+      "name": "input",
+      "exports": [],
+      "lines": 27,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\label.tsx",
+      "name": "label",
+      "exports": [
+        "Label"
+      ],
+      "lines": 10,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\LanguageSwitcher.tsx",
+      "name": "LanguageSwitcher",
+      "exports": [
+        "LanguageSwitcher"
+      ],
+      "lines": 54,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\media-hero.tsx",
+      "name": "media-hero",
+      "exports": [
+        "MediaHero"
+      ],
+      "lines": 75,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\textarea.tsx",
+      "name": "textarea",
+      "exports": [],
+      "lines": 25,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\toaster.tsx",
+      "name": "toaster",
+      "exports": [
+        "Toaster"
+      ],
+      "lines": 17,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\booking\\BookingCalendar.tsx",
+      "name": "BookingCalendar",
+      "exports": [
+        "BookingCalendar"
+      ],
+      "lines": 11,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\ui\\src\\components\\maps\\MapViewer.tsx",
+      "name": "MapViewer",
+      "exports": [
+        "MapViewer"
+      ],
+      "lines": 11,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\analysis\\AnalysisDashboard.tsx",
+      "name": "AnalysisDashboard",
+      "exports": [
+        "AnalysisDashboard"
+      ],
+      "lines": 45,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\analysis\\AnalysisForm.tsx",
+      "name": "AnalysisForm",
+      "exports": [
+        "AnalysisForm"
+      ],
+      "lines": 254,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\analysis\\ChartsPanel.tsx",
+      "name": "ChartsPanel",
+      "exports": [
+        "ChartsPanel"
+      ],
+      "lines": 136,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\analysis\\EventsLog.tsx",
+      "name": "EventsLog",
+      "exports": [
+        "EventsLog"
+      ],
+      "lines": 91,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\analysis\\MapPanel.tsx",
+      "name": "MapPanel",
+      "exports": [
+        "MapPanel"
+      ],
+      "lines": 149,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\blockchain\\BlockchainDashboard.tsx",
+      "name": "BlockchainDashboard",
+      "exports": [
+        "BlockchainDashboard"
+      ],
+      "lines": 61,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\drought\\DroughtDashboard.tsx",
+      "name": "DroughtDashboard",
+      "exports": [
+        "DroughtDashboard"
+      ],
+      "lines": 58,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\forest\\ForestDashboard.tsx",
+      "name": "ForestDashboard",
+      "exports": [
+        "ForestDashboard"
+      ],
+      "lines": 62,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 27,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\iot\\IoTDashboard.tsx",
+      "name": "IoTDashboard",
+      "exports": [
+        "IoTDashboard"
+      ],
+      "lines": 63,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 18,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\satellite\\SatelliteDashboard.tsx",
+      "name": "SatelliteDashboard",
+      "exports": [
+        "SatelliteDashboard"
+      ],
+      "lines": 53,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 16,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\soil-water\\SoilDashboard.tsx",
+      "name": "SoilDashboard",
+      "exports": [
+        "SoilDashboard"
+      ],
+      "lines": 44,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 13,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\weather\\WeatherDashboard.tsx",
+      "name": "WeatherDashboard",
+      "exports": [
+        "WeatherDashboard"
+      ],
+      "lines": 71,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 30,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+      "name": "AdvancedGISMap",
+      "exports": [
+        "AdvancedGISMap"
+      ],
+      "lines": 339,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 43,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\GisMap.tsx",
+      "name": "GisMap",
+      "exports": [
+        "GisMap"
+      ],
+      "lines": 134,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 10,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\InteractiveMap.tsx",
+      "name": "InteractiveMap",
+      "exports": [
+        "InteractiveMap"
+      ],
+      "lines": 370,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 19,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+      "name": "ProductionGIS",
+      "exports": [
+        "ProductionGIS"
+      ],
+      "lines": 1090,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 139,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+      "name": "SpectralIndices",
+      "exports": [
+        "SpectralIndices"
+      ],
+      "lines": 367,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 71,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\layers\\SatelliteLayers.tsx",
+      "name": "SatelliteLayers",
+      "exports": [
+        "SatelliteLayers"
+      ],
+      "lines": 94,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\panels\\FarmRegistration.tsx",
+      "name": "FarmRegistration",
+      "exports": [
+        "FarmRegistration"
+      ],
+      "lines": 128,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 28,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\panels\\ManualLocationInput.tsx",
+      "name": "ManualLocationInput",
+      "exports": [
+        "ManualLocationInput"
+      ],
+      "lines": 286,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 34,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\panels\\SatelliteSources.tsx",
+      "name": "SatelliteSources",
+      "exports": [
+        "SatelliteSources"
+      ],
+      "lines": 156,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\tools\\MeasurementTools.tsx",
+      "name": "MeasurementTools",
+      "exports": [
+        "MeasurementTools"
+      ],
+      "lines": 62,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 22,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\widgets\\PredictionCards.tsx",
+      "name": "PredictionCards",
+      "exports": [
+        "PredictionCards"
+      ],
+      "lines": 97,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 16,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\widgets\\RecommendationEngine.tsx",
+      "name": "RecommendationEngine",
+      "exports": [
+        "RecommendationEngine"
+      ],
+      "lines": 85,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 13,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\widgets\\SpectralAnalysis.tsx",
+      "name": "SpectralAnalysis",
+      "exports": [
+        "SpectralAnalysis"
+      ],
+      "lines": 118,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 19,
+      "uses_cva": false
+    },
+    {
+      "path": "packages\\features\\src\\gis\\gis\\widgets\\TopographicAnalysis.tsx",
+      "name": "TopographicAnalysis",
+      "exports": [
+        "TopographicAnalysis"
+      ],
+      "lines": 145,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 64,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\App.tsx",
+      "name": "App",
+      "exports": [
+        "App"
+      ],
+      "lines": 87,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\main.tsx",
+      "name": "main",
+      "exports": [],
+      "lines": 18,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\components\\Header.tsx",
+      "name": "Header",
+      "exports": [
+        "Header"
+      ],
+      "lines": 24,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 7,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\components\\LanguageSwitcher.tsx",
+      "name": "LanguageSwitcher",
+      "exports": [
+        "LanguageSwitcher"
+      ],
+      "lines": 45,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\components\\Sidebar.tsx",
+      "name": "Sidebar",
+      "exports": [
+        "Sidebar"
+      ],
+      "lines": 39,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\layouts\\Layout.tsx",
+      "name": "Layout",
+      "exports": [
+        "Layout"
+      ],
+      "lines": 24,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\AccountingPage.tsx",
+      "name": "AccountingPage",
+      "exports": [
+        "AccountingPage"
+      ],
+      "lines": 110,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 46,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\AccountPage.tsx",
+      "name": "AccountPage",
+      "exports": [
+        "AccountPage"
+      ],
+      "lines": 104,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 45,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\AlertsPage.tsx",
+      "name": "AlertsPage",
+      "exports": [
+        "AlertsPage"
+      ],
+      "lines": 80,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 25,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\AnalyticsPage.tsx",
+      "name": "AnalyticsPage",
+      "exports": [
+        "AnalyticsPage"
+      ],
+      "lines": 70,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 46,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\CommunityPage.tsx",
+      "name": "CommunityPage",
+      "exports": [
+        "CommunityPage"
+      ],
+      "lines": 59,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 18,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\DashboardPage.tsx",
+      "name": "DashboardPage",
+      "exports": [
+        "DashboardPage"
+      ],
+      "lines": 35,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\EcocoinPage.tsx",
+      "name": "EcocoinPage",
+      "exports": [
+        "EcocoinPage"
+      ],
+      "lines": 63,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 26,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\EducationPage.tsx",
+      "name": "EducationPage",
+      "exports": [
+        "EducationPage"
+      ],
+      "lines": 85,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 37,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\GamesPage.tsx",
+      "name": "GamesPage",
+      "exports": [
+        "GamesPage"
+      ],
+      "lines": 120,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 48,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\HomePage.tsx",
+      "name": "HomePage",
+      "exports": [
+        "HomePage"
+      ],
+      "lines": 75,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 26,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\InvoicesPage.tsx",
+      "name": "InvoicesPage",
+      "exports": [
+        "InvoicesPage"
+      ],
+      "lines": 75,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 21,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\JournalEntriesPage.tsx",
+      "name": "JournalEntriesPage",
+      "exports": [
+        "JournalEntriesPage"
+      ],
+      "lines": 82,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 30,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\LibraryPage.tsx",
+      "name": "LibraryPage",
+      "exports": [
+        "LibraryPage"
+      ],
+      "lines": 56,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 20,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\MrvPage.tsx",
+      "name": "MrvPage",
+      "exports": [
+        "MrvPage"
+      ],
+      "lines": 77,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 24,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\NewsPage.tsx",
+      "name": "NewsPage",
+      "exports": [
+        "NewsPage"
+      ],
+      "lines": 43,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 13,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\NotFoundPage.tsx",
+      "name": "NotFoundPage",
+      "exports": [
+        "NotFoundPage"
+      ],
+      "lines": 22,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\PaymentsPage.tsx",
+      "name": "PaymentsPage",
+      "exports": [
+        "PaymentsPage"
+      ],
+      "lines": 80,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 33,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\PilotsPage.tsx",
+      "name": "PilotsPage",
+      "exports": [
+        "PilotsPage"
+      ],
+      "lines": 40,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\PoliciesPage.tsx",
+      "name": "PoliciesPage",
+      "exports": [
+        "PoliciesPage"
+      ],
+      "lines": 57,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 23,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\RegionalPage.tsx",
+      "name": "RegionalPage",
+      "exports": [
+        "RegionalPage"
+      ],
+      "lines": 69,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 24,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\ReportsPage.tsx",
+      "name": "ReportsPage",
+      "exports": [
+        "ReportsPage"
+      ],
+      "lines": 85,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 38,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\RisksPage.tsx",
+      "name": "RisksPage",
+      "exports": [
+        "RisksPage"
+      ],
+      "lines": 73,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 29,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\SatelliteImageryDashboard.tsx",
+      "name": "SatelliteImageryDashboard",
+      "exports": [
+        "SatelliteImageryDashboard"
+      ],
+      "lines": 69,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 37,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\SettingsPage.tsx",
+      "name": "SettingsPage",
+      "exports": [
+        "SettingsPage"
+      ],
+      "lines": 40,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 9,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\SimulatorsPage.tsx",
+      "name": "SimulatorsPage",
+      "exports": [
+        "SimulatorsPage"
+      ],
+      "lines": 56,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\TourismPage.tsx",
+      "name": "TourismPage",
+      "exports": [
+        "TourismPage"
+      ],
+      "lines": 37,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\web\\src\\pages\\UsersPage.tsx",
+      "name": "UsersPage",
+      "exports": [
+        "UsersPage"
+      ],
+      "lines": 73,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 36,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\library\\__tests__\\index.test.tsx",
+      "name": "index.test",
+      "exports": [],
+      "lines": 37,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\library\\src\\components\\Card.tsx",
+      "name": "Card",
+      "exports": [
+        "LibraryCard"
+      ],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\library\\src\\pages\\index.tsx",
+      "name": "index",
+      "exports": [
+        "LibraryPage"
+      ],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\cms\\__tests__\\index.test.tsx",
+      "name": "index.test",
+      "exports": [],
+      "lines": 37,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\cms\\src\\components\\Card.tsx",
+      "name": "Card",
+      "exports": [
+        "CmsCard"
+      ],
+      "lines": 46,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\cms\\src\\pages\\index.tsx",
+      "name": "index",
+      "exports": [
+        "CmsPage"
+      ],
+      "lines": 23,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\ai_agents\\frontend\\src\\App.tsx",
+      "name": "App",
+      "exports": [
+        "App"
+      ],
+      "lines": 16,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\ai_agents\\frontend\\src\\main.tsx",
+      "name": "main",
+      "exports": [],
+      "lines": 18,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\ai_agents\\frontend\\src\\components\\AgentSidebar.tsx",
+      "name": "AgentSidebar",
+      "exports": [
+        "AgentSidebar"
+      ],
+      "lines": 35,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\ai_agents\\frontend\\src\\components\\Layout.tsx",
+      "name": "Layout",
+      "exports": [
+        "Layout"
+      ],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\ai_agents\\frontend\\src\\pages\\AgentMonitor.tsx",
+      "name": "AgentMonitor",
+      "exports": [
+        "AgentMonitor"
+      ],
+      "lines": 62,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 10,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\ai_agents\\frontend\\src\\pages\\AgentsDashboard.tsx",
+      "name": "AgentsDashboard",
+      "exports": [
+        "AgentsDashboard"
+      ],
+      "lines": 74,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 17,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\App.tsx",
+      "name": "App",
+      "exports": [
+        "App"
+      ],
+      "lines": 29,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 1,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\main.tsx",
+      "name": "main",
+      "exports": [],
+      "lines": 18,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 0,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\components\\AdminSidebar.tsx",
+      "name": "AdminSidebar",
+      "exports": [
+        "AdminSidebar"
+      ],
+      "lines": 36,
+      "has_img": false,
+      "has_motion": true,
+      "tw_classes": 4,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\components\\Layout.tsx",
+      "name": "Layout",
+      "exports": [
+        "Layout"
+      ],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 2,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\Dashboard.tsx",
+      "name": "Dashboard",
+      "exports": [
+        "Dashboard"
+      ],
+      "lines": 49,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 15,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\MonitoringPage.tsx",
+      "name": "MonitoringPage",
+      "exports": [
+        "MonitoringPage"
+      ],
+      "lines": 66,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 14,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\Settings.tsx",
+      "name": "Settings",
+      "exports": [
+        "Settings"
+      ],
+      "lines": 13,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 5,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\Users.tsx",
+      "name": "Users",
+      "exports": [
+        "Users"
+      ],
+      "lines": 55,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 16,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\accounting\\AccountsPage.tsx",
+      "name": "AccountsPage",
+      "exports": [
+        "AccountsPage"
+      ],
+      "lines": 147,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 41,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\accounting\\InvoicesPage.tsx",
+      "name": "InvoicesPage",
+      "exports": [
+        "InvoicesPage"
+      ],
+      "lines": 114,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 35,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\accounting\\JournalEntriesPage.tsx",
+      "name": "JournalEntriesPage",
+      "exports": [
+        "JournalEntriesPage"
+      ],
+      "lines": 72,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 26,
+      "uses_cva": false
+    },
+    {
+      "path": "apps\\admin_panel\\frontend\\src\\pages\\accounting\\PaymentsPage.tsx",
+      "name": "PaymentsPage",
+      "exports": [
+        "PaymentsPage"
+      ],
+      "lines": 67,
+      "has_img": false,
+      "has_motion": false,
+      "tw_classes": 24,
+      "uses_cva": false
+    }
+  ],
+  "theme": {
+    "source": "__repo_sync_tmp__\\apps\\web\\tailwind.config.js",
+    "version": "v3",
+    "colors": {
+      "50": "#ecfdf5",
+      "100": "#d1fae5",
+      "200": "#a7f3d0",
+      "300": "#6ee7b7",
+      "400": "#34d399",
+      "500": "#10b981",
+      "600": "#059669",
+      "700": "#047857",
+      "800": "#065f46",
+      "900": "#064e3b"
+    },
+    "fonts": [
+      "\n        fa: ['\"Vazirmatn\"', '\"IRANSans\"', \"system-ui\", \"sans-serif\"],\n        en: ['\"Inter\"', \"system-ui\", \"sans-serif\"],\n      "
+    ],
+    "raw": "/**\n * Tailwind CSS configuration — econojin.com / apps/web\n *\n * IMPORTANT (i18n): This config uses Tailwind v3.3+ LOGICAL PROPERTIES so the\n * same class works in both RTL (Persian) and LTR (English) without changes.\n * Examples:\n *   ms-2 / me-2   (margin-inline-start / end)   — instead of ml-2 / mr-2\n *   ps-2 / pe-2   (padding-inline-start / end)  — instead of pl-2 / pr-2\n *   start-0 / end-0                             — instead of left-0 / right-0\n *   text-start / text-end                       — instead of text-left / text-right\n *   border-s / border-e                         — instead of border-l / border-r\n *   rounded-s-lg / rounded-e-lg                 — instead of rounded-l-lg / rounded-r-lg\n *\n * The `dir=\"rtl|ltr\"` attribute on <html> (set by useLanguage hook) flips\n * these automatically — no extra CSS needed.\n *\n * @type {import('tailwindcss').Config}\n */\nexport default {\n  content: [\n    \"./index.html\",\n    \"./src/**/*.{ts,tsx,js,jsx}\",\n  ],\n  darkMode: \"class\",\n  theme: {\n    extend: {\n      colors: {\n        brand: {\n          50: \"#ecfdf5\",\n          100: \"#d1fae5\",\n          200: \"#a7f3d0\",\n          300: \"#6ee7b7\",\n          400: \"#34d399\",\n          500: \"#10b981\",\n          600: \"#059669\",\n          700: \"#047857\",\n          800: \"#065f46\",\n          900: \"#064e3b\",\n        },\n      },\n      fontFamily: {\n        fa: ['\"Vazirmatn\"', '\"IRANSans\"', \"system-ui\", \"sans-serif\"],\n        en: ['\"Inter\"', \"system-ui\", \"sans-serif\"],\n      },\n      borderWidth: {\n        3: \"3px\",\n      },\n      boxShadow: {\n        card: \"0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)\",\n        glow: \"0 0 40px -10px rgb(16 185 129 / 0.35)\",\n        \"glow-lg\": \"0 0 60px -15px rgb(16 185 129 / 0.4)\",\n      },\n      animation: {\n        float: \"float 6s ease-in-out infinite\",\n        shimmer: \"shimmer 2.5s linear infinite\",\n      },\n      keyframes: {\n        float: {\n          \"0%, 100%\": { transform: \"translateY(0)\" },\n          \"50%\": { transform: \"translateY(-8px)\" },\n        },\n        shimmer: {\n          \"0%\": { backgroundPosition: \"-200% 0\" },\n          \"100%\": { backgroundPosition: \"200% 0\" },\n        },\n      },\n    },\n  },\n  plugins: [],\n};\n"
+  },
+  "color_audit": {
+    "tailwind_classes": {
+      "text-sm": 690,
+      "text-xs": 334,
+      "text-white": 321,
+      "text-gray-900": 243,
+      "text-slate-400": 196,
+      "text-2xl": 192,
+      "text-gray-600": 177,
+      "text-muted-foreground": 176,
+      "bg-white": 174,
+      "border-gray-200": 166,
+      "text-center": 125,
+      "border-slate-800": 100,
+      "border-slate-700": 96,
+      "bg-card": 95,
+      "text-gray-500": 94,
+      "text-lg": 93,
+      "text-3xl": 89,
+      "text-xl": 84,
+      "bg-slate-900/50": 76,
+      "bg-slate-800/50": 72,
+      "shadow-sm": 71,
+      "text-emerald-400": 70,
+      "text-gray-700": 70,
+      "border-b": 65,
+      "text-slate-300": 56,
+      "text-right": 53,
+      "bg-gray-50": 47,
+      "text-slate-500": 46,
+      "bg-slate-800": 40,
+      "bg-emerald-600": 38
+    },
+    "arbitrary": {},
+    "inline": {
+      "#f59e0b": 18,
+      "#0f172a": 14,
+      "#10b981": 14,
+      "#3b82f6": 10,
+      "#8b5cf6": 10,
+      "#38bdf8": 6,
+      "#ef4444": 6,
+      "#fff": 4,
+      "#e2e8f0": 2,
+      "#94a3b8": 2,
+      "#059669": 2,
+      "#64748b": 2,
+      "#22c55e": 2,
+      "#84cc16": 2,
+      "#0ea5e9": 2
+    },
+    "css_hardcoded": {
+      "#f1f5f9": 2,
+      "#f8fafc": 1,
+      "#94a3b8": 1,
+      "#64748b": 1,
+      "#1e293b": 1,
+      "#e2e8f0": 1
+    },
+    "css_vars_used": {
+      "--foreground": 6,
+      "--background": 5,
+      "--radius-md": 4,
+      "--border": 4,
+      "--secondary": 3,
+      "--card": 3,
+      "--card-foreground": 3,
+      "--muted": 3,
+      "--muted-foreground": 3,
+      "--radix-accordion-content-height": 2,
+      "--primary": 2,
+      "--primary-foreground": 2,
+      "--secondary-foreground": 2,
+      "--accent": 2,
+      "--accent-foreground": 2,
+      "--font-sans": 1,
+      "--radix-select-trigger-height": 1,
+      "--radix-select-trigger-width": 1,
+      "--radix-toast-swipe-move-x": 1,
+      "--radix-toast-swipe-end-x": 1,
+      "--popover": 1,
+      "--popover-foreground": 1,
+      "--destructive": 1,
+      "--destructive-foreground": 1,
+      "--input": 1
+    },
+    "leak_locations": {
+      "#0f172a": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\InteractiveMap.tsx",
+        "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ],
+      "#e2e8f0": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css",
+        "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+        "packages\\ui\\src\\components\\ChartCard.tsx"
+      ],
+      "#94a3b8": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css",
+        "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+        "packages\\ui\\src\\components\\ChartCard.tsx"
+      ],
+      "#10b981": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\InteractiveMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx"
+      ],
+      "#3b82f6": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ],
+      "#f59e0b": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ],
+      "#fff": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ],
+      "#38bdf8": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ],
+      "#8b5cf6": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\GisMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx"
+      ],
+      "#059669": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx"
+      ],
+      "#ef4444": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx"
+      ],
+      "#64748b": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\gis\\gis\\ProductionGIS.tsx"
+      ],
+      "#22c55e": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx"
+      ],
+      "#84cc16": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx"
+      ],
+      "#0ea5e9": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx"
+      ],
+      "#f8fafc": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css"
+      ],
+      "#f1f5f9": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css"
+      ],
+      "#1e293b": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css"
+      ]
+    }
+  },
+  "consolidation": [
+    {
+      "color": "#f59e0b",
+      "total": 18,
+      "tw_arbitrary": 0,
+      "inline": 18,
+      "css": 0,
+      "nearest": "200",
+      "distance": 228.3,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ]
+    },
+    {
+      "color": "#0f172a",
+      "total": 14,
+      "tw_arbitrary": 0,
+      "inline": 14,
+      "css": 0,
+      "nearest": "900",
+      "distance": 58.3,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\InteractiveMap.tsx",
+        "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ]
+    },
+    {
+      "color": "#10b981",
+      "total": 14,
+      "tw_arbitrary": 0,
+      "inline": 14,
+      "css": 0,
+      "nearest": "500",
+      "distance": 0.0,
+      "recommendation": "مطابق 500 — مستقیماً جایگزین کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\InteractiveMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx"
+      ]
+    },
+    {
+      "color": "#3b82f6",
+      "total": 10,
+      "tw_arbitrary": 0,
+      "inline": 10,
+      "css": 0,
+      "nearest": "400",
+      "distance": 123.5,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ]
+    },
+    {
+      "color": "#8b5cf6",
+      "total": 10,
+      "tw_arbitrary": 0,
+      "inline": 10,
+      "css": 0,
+      "nearest": "300",
+      "distance": 155.3,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\GisMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx"
+      ]
+    },
+    {
+      "color": "#38bdf8",
+      "total": 6,
+      "tw_arbitrary": 0,
+      "inline": 6,
+      "css": 0,
+      "nearest": "300",
+      "distance": 94.4,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ]
+    },
+    {
+      "color": "#ef4444",
+      "total": 6,
+      "tw_arbitrary": 0,
+      "inline": 6,
+      "css": 0,
+      "nearest": "900",
+      "distance": 233.4,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx"
+      ]
+    },
+    {
+      "color": "#fff",
+      "total": 4,
+      "tw_arbitrary": 0,
+      "inline": 4,
+      "css": 0,
+      "nearest": "50",
+      "distance": 21.6,
+      "recommendation": "احتمالاً 50 — بررسی چشمی",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\analysis\\ChartsPanel.tsx",
+        "packages\\features\\src\\analysis\\ChartsPanel.tsx"
+      ]
+    },
+    {
+      "color": "#e2e8f0",
+      "total": 3,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 1,
+      "nearest": "50",
+      "distance": 23.8,
+      "recommendation": "احتمالاً 50 — بررسی چشمی",
+      "files": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css",
+        "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+        "packages\\ui\\src\\components\\ChartCard.tsx"
+      ]
+    },
+    {
+      "color": "#94a3b8",
+      "total": 3,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 1,
+      "nearest": "300",
+      "distance": 77.9,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css",
+        "__repo_sync_tmp__\\packages\\ui\\src\\components\\ChartCard.tsx",
+        "packages\\ui\\src\\components\\ChartCard.tsx"
+      ]
+    },
+    {
+      "color": "#64748b",
+      "total": 3,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 1,
+      "nearest": "600",
+      "distance": 106.5,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css",
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\ProductionGIS.tsx",
+        "packages\\features\\src\\gis\\gis\\ProductionGIS.tsx"
+      ]
+    },
+    {
+      "color": "#059669",
+      "total": 2,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 0,
+      "nearest": "600",
+      "distance": 0.0,
+      "recommendation": "مطابق 600 — مستقیماً جایگزین کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx",
+        "packages\\features\\src\\gis\\gis\\AdvancedGISMap.tsx"
+      ]
+    },
+    {
+      "color": "#22c55e",
+      "total": 2,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 0,
+      "nearest": "500",
+      "distance": 41.1,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx"
+      ]
+    },
+    {
+      "color": "#84cc16",
+      "total": 2,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 0,
+      "nearest": "400",
+      "distance": 153.7,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx"
+      ]
+    },
+    {
+      "color": "#0ea5e9",
+      "total": 2,
+      "tw_arbitrary": 0,
+      "inline": 2,
+      "css": 0,
+      "nearest": "400",
+      "distance": 99.8,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\packages\\features\\src\\gis\\gis\\SpectralIndices.tsx",
+        "packages\\features\\src\\gis\\gis\\SpectralIndices.tsx"
+      ]
+    },
+    {
+      "color": "#f1f5f9",
+      "total": 2,
+      "tw_arbitrary": 0,
+      "inline": 0,
+      "css": 2,
+      "nearest": "50",
+      "distance": 10.2,
+      "recommendation": "احتمالاً 50 — بررسی چشمی",
+      "files": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css"
+      ]
+    },
+    {
+      "color": "#f8fafc",
+      "total": 1,
+      "tw_arbitrary": 0,
+      "inline": 0,
+      "css": 1,
+      "nearest": "50",
+      "distance": 14.2,
+      "recommendation": "احتمالاً 50 — بررسی چشمی",
+      "files": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css"
+      ]
+    },
+    {
+      "color": "#1e293b",
+      "total": 1,
+      "tw_arbitrary": 0,
+      "inline": 0,
+      "css": 1,
+      "nearest": "900",
+      "distance": 44.1,
+      "recommendation": "توکن جدید تعریف کنید",
+      "files": [
+        "__repo_sync_tmp__\\apps\\web\\src\\index.css"
+      ]
+    }
+  ],
+  "assets": {
+    "count": 1,
+    "total_kb": 0,
+    "by_format": {
+      ".svg": 1
+    },
+    "heaviest": [
+      {
+        "path": "__repo_sync_tmp__\\apps\\web\\public\\vite.svg",
+        "kb": 0.1,
+        "ext": ".svg"
+      }
+    ],
+    "needs_modern": []
+  },
+  "health": {
+    "انضباط توکن": 98,
+    "تصاویر": 30,
+    "الگوی کامپوننت": 5,
+    "نشت رنگ": 24,
+    "overall": 39,
+    "grade": "D"
+  }
+}

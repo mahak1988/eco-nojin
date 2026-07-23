@@ -40,6 +40,8 @@ import {
 } from "lucide-react";
 import { gisStorage, type SavedLocation } from "@/lib/gisStorage";
 
+import { CHART, UI } from '@econojin/ui/lib/chart-colors';
+
 // ============ لایه‌های پایه ============
 const BASE_LAYERS = {
   satellite_esri: {
@@ -74,28 +76,28 @@ const OVERLAY_LAYERS = {
     name: "🌱 پوشش گیاهی",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Land_Cover/MapServer/tile/{z}/{y}/{x}",
     opacity: 0.6,
-    color: "#10b981",
+    color: CHART.emerald,
     description: "کاربری اراضی",
   },
   terrain_overlay: {
     name: "⛰️ مدل ارتفاعی",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
     opacity: 0.5,
-    color: "#8b5cf6",
+    color: CHART.violet,
     description: "توپوگرافی",
   },
   hydro: {
     name: "💧 شبکه آبراهه‌ها",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Hydrography/MapServer/tile/{z}/{y}/{x}",
     opacity: 0.8,
-    color: "#3b82f6",
+    color: CHART.blue,
     description: "رودخانه‌ها",
   },
   boundaries: {
     name: "🏛️ مرزها",
     url: "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
     opacity: 0.9,
-    color: "#ef4444",
+    color: CHART.red,
     description: "مرزهای سیاسی",
   },
 };
@@ -115,11 +117,11 @@ const HEATMAP_DATA = [
 ];
 
 const LOCATION_CATEGORIES = {
-  field: { label: "🌾 مزرعه", color: "#10b981" },
-  structure: { label: "🏗️ سازه", color: "#3b82f6" },
-  sample: { label: "🧪 نمونه", color: "#f59e0b" },
-  observation: { label: "👁️ مشاهده", color: "#8b5cf6" },
-  custom: { label: "📍 دلخواه", color: "#64748b" },
+  field: { label: "🌾 مزرعه", color: CHART.emerald },
+  structure: { label: "🏗️ سازه", color: CHART.blue },
+  sample: { label: "🧪 نمونه", color: CHART.amber },
+  observation: { label: "👁️ مشاهده", color: CHART.violet },
+  custom: { label: "📍 دلخواه", color: UI.textBody },
 };
 
 // ============ توابع کمکی ============
@@ -139,11 +141,11 @@ function createColoredIcon(color: string) {
 }
 
 function getHeatColor(intensity: number): string {
-  if (intensity < 0.2) return "#3b82f6";
+  if (intensity < 0.2) return CHART.blue;
   if (intensity < 0.4) return "#06b6d4";
-  if (intensity < 0.6) return "#10b981";
-  if (intensity < 0.8) return "#f59e0b";
-  return "#ef4444";
+  if (intensity < 0.6) return CHART.emerald;
+  if (intensity < 0.8) return CHART.amber;
+  return CHART.red;
 }
 
 // ============ کامپوننت‌های داخلی ============
@@ -560,7 +562,7 @@ ${locations
         {/* Saved Locations */}
         {savedLocations.map((loc) => {
           const cat = LOCATION_CATEGORIES[loc.category];
-          const icon = createColoredIcon(cat?.color || "#64748b");
+          const icon = createColoredIcon(cat?.color || UI.textBody);
           return (
             <Marker key={loc.id} position={loc.coordinates} icon={icon || undefined}>
               <Popup>
@@ -597,8 +599,8 @@ ${locations
                 : 80
             }
             pathOptions={{
-              color: measureMode === "radius" && idx === 0 ? "#8b5cf6" : "#f59e0b",
-              fillColor: measureMode === "radius" && idx === 0 ? "#8b5cf6" : "#f59e0b",
+              color: measureMode === "radius" && idx === 0 ? CHART.violet : CHART.amber,
+              fillColor: measureMode === "radius" && idx === 0 ? CHART.violet : CHART.amber,
               fillOpacity: idx === 0 && measureMode === "radius" ? 0.2 : 0.8,
               weight: 2,
             }}
@@ -606,17 +608,17 @@ ${locations
         ))}
 
         {measureMode === "distance" && measurePoints.length >= 2 && (
-          <Polyline positions={measurePoints} pathOptions={{ color: "#f59e0b", weight: 3, dashArray: "10, 10" }} />
+          <Polyline positions={measurePoints} pathOptions={{ color: CHART.amber, weight: 3, dashArray: "10, 10" }} />
         )}
         {measureMode === "area" && measurePoints.length >= 3 && (
           <Polygon
             positions={measurePoints}
-            pathOptions={{ color: "#f59e0b", weight: 3, fillColor: "#f59e0b", fillOpacity: 0.3 }}
+            pathOptions={{ color: CHART.amber, weight: 3, fillColor: CHART.amber, fillOpacity: 0.3 }}
           />
         )}
 
         {pendingSavePoint && (
-          <Marker position={pendingSavePoint} icon={createColoredIcon("#10b981") || undefined} />
+          <Marker position={pendingSavePoint} icon={createColoredIcon(CHART.emerald) || undefined} />
         )}
 
         <ScaleControl position="bottomright" metric={true} imperial={false} />

@@ -10,21 +10,24 @@ import type {
   EcoCoinReward,
   EcoCoinHistory,
   EcoCoinStats,
+  EcoCoinDashboard,
 } from '../types/ecocoin.types';
 
 // ============================================================================
 // Get Balance Hook
 // ============================================================================
 
-export function useEcoCoinBalance() {
-  return useQuery({
-    queryKey: ['ecocoin', 'balance'],
-    queryFn: async (): Promise<EcoCoinBalance> => {
-      const response = await apiClient.get<EcoCoinBalance>(
-        ENDPOINTS.ECOCOIN.BALANCE
+export function useEcoCoinBalance(address?: string) {
+  return useQuery<EcoCoinBalance>({
+    queryKey: ['ecocoin', 'balance', address],
+    queryFn: async () => {
+      if (!address) throw new Error('Wallet address is required');
+      const { data } = await apiClient.get<EcoCoinBalance>(
+        ENDPOINTS.ECOCOIN.BALANCE(address)
       );
-      return response;
+      return data;
     },
+    enabled: !!address,
     staleTime: 30 * 1000, // 30 seconds
     refetchInterval: 60 * 1000, // Refresh every minute
     retry: 2,
@@ -35,16 +38,17 @@ export function useEcoCoinBalance() {
 // Get Transactions Hook
 // ============================================================================
 
-export function useEcoCoinTransactions(page: number = 1, pageSize: number = 20) {
-  return useQuery({
-    queryKey: ['ecocoin', 'transactions', page, pageSize],
-    queryFn: async (): Promise<EcoCoinHistory> => {
-      const response = await apiClient.get<EcoCoinHistory>(
-        ENDPOINTS.ECOCOIN.TRANSACTIONS,
-        { page, page_size: pageSize }
+export function useEcoCoinTransactions(address?: string, limit: number = 50) {
+  return useQuery<EcoCoinHistory>({
+    queryKey: ['ecocoin', 'transactions', address, limit],
+    queryFn: async () => {
+      if (!address) throw new Error('Wallet address is required');
+      const { data } = await apiClient.get<EcoCoinHistory>(
+        ENDPOINTS.ECOCOIN.TRANSACTIONS(address, limit)
       );
-      return response;
+      return data;
     },
+    enabled: !!address,
     staleTime: 60 * 1000, // 1 minute
   });
 }
@@ -56,25 +60,24 @@ export function useEcoCoinTransactions(page: number = 1, pageSize: number = 20) 
 export function useTransferEcoCoin() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data: EcoCoinTransferRequest): Promise<EcoCoinTransferResponse> => {
-      const response = await apiClient.post<EcoCoinTransferResponse>(
+  return useMutation<EcoCoinTransferResponse, Error, EcoCoinTransferRequest>({
+    mutationFn: async (payload) => {
+      const { data } = await apiClient.post<EcoCoinTransferResponse>(
         ENDPOINTS.ECOCOIN.TRANSFER,
-        data
+        payload
       );
-      return response;
+      return data;
     },
 
     onSuccess: (data) => {
-      toast.success(`انتقال موفق! ${data.message}`);
+      toast.success(`Transfer successful: ${data.tx_hash.slice(0, 10)}...`);
       
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['ecocoin'] });
     },
 
-    onError: (error: any) => {
-      const message = error?.PersianMessage || error?.message || 'خطا در انتقال';
-      toast.error(message);
+    onError: (error) => {
+      toast.error(`Transfer failed: ${error.message}`);
     },
   });
 }
@@ -84,13 +87,13 @@ export function useTransferEcoCoin() {
 // ============================================================================
 
 export function useEcoCoinRewards() {
-  return useQuery({
+  return useQuery<EcoCoinReward[]>({
     queryKey: ['ecocoin', 'rewards'],
-    queryFn: async (): Promise<EcoCoinReward[]> => {
-      const response = await apiClient.get<EcoCoinReward[]>(
+    queryFn: async () => {
+      const { data } = await apiClient.get<EcoCoinReward[]>(
         ENDPOINTS.ECOCOIN.REWARDS
       );
-      return response;
+      return data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -101,13 +104,13 @@ export function useEcoCoinRewards() {
 // ============================================================================
 
 export function useEcoCoinStats() {
-  return useQuery({
+  return useQuery<EcoCoinStats>({
     queryKey: ['ecocoin', 'stats'],
-    queryFn: async (): Promise<EcoCoinStats> => {
-      const response = await apiClient.get<EcoCoinStats>(
-        '/ecocoin/stats'
+    queryFn: async () => {
+      const { data } = await apiClient.get<EcoCoinStats>(
+        ENDPOINTS.ECOCOIN.STATS
       );
-      return response;
+      return data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -117,9 +120,9 @@ export function useEcoCoinStats() {
 // Combined Hook for Dashboard
 // ============================================================================
 
-export function useEcoCoinDashboard() {
-  const balance = useEcoCoinBalance();
-  const transactions = useEcoCoinTransactions(1, 10);
+export function useEcoCoinDashboard(address?: string) {
+  const balance = useEcoCoinBalance(address);
+  const transactions = useEcoCoinTransactions(address, 10);
   const rewards = useEcoCoinRewards();
   const stats = useEcoCoinStats();
 
@@ -128,7 +131,11 @@ export function useEcoCoinDashboard() {
     transactions,
     rewards,
     stats,
-    isLoading: balance.isLoading || transactions.isLoading,
-    isError: balance.isError || transactions.isError,
+    isLoading:
+      balance.isLoading ||
+      transactions.isLoading ||
+      rewards.isLoading ||
+      stats.isLoading,
+    isError: !!(balance.error || transactions.error || rewards.error || stats.error),
   };
 }

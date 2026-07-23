@@ -4,6 +4,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 
+import { CHART } from '@econojin/ui/lib/chart-colors';
+
 type Props = {
   title: string;
   subtitle: string;
@@ -17,7 +19,7 @@ export function MediaHero({
   subtitle,
   imageSrc,
   videoSrc,
-  accentColor = "#3b82f6",
+  accentColor = CHART.blue,
 }: Props) {
   return (
     <motion.section

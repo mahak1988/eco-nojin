@@ -1,0 +1,14 @@
+// apps/admin_panel/frontend/tsconfig.node.json
+{
+  "compilerOptions": {
+    "composite": true,          // ← باید باشد (الزام project reference)
+    "declaration": true,        // ← اضافه کنید
+    "declarationMap": true,     // ← اضافه کنید
+    // "noEmit": true,          // ← حذف یا غیرفعال کنید
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}
