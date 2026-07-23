@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 from datetime import datetime
 from typing import Optional
+import re
 
 # ==========================================
 # Base Schemas
@@ -15,13 +16,43 @@ class UserBase(BaseModel):
 # ==========================================
 class UserCreate(UserBase):
     """اسکیمای ثبت‌نام کاربر."""
-    password: str = Field(..., min_length=8, max_length=128)
+    password: str = Field(..., min_length=12, max_length=128)
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password strength: min 12 chars, at least one uppercase, one lowercase, one digit."""
+        if len(v) < 12:
+            raise ValueError('رمز عبور باید حداقل ۱۲ کاراکتر باشد')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('رمز عبور باید حداقل یک حرف بزرگ داشته باشد')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('رمز عبور باید حداقل یک حرف کوچک داشته باشد')
+        if not re.search(r'\d', v):
+            raise ValueError('رمز عبور باید حداقل یک عدد داشته باشد')
+        return v
 
 class UserUpdate(BaseModel):
     """اسکیمای بروزرسانی پروفایل."""
     full_name: Optional[str] = Field(None, max_length=255)
     email: Optional[EmailStr] = None
-    password: Optional[str] = Field(None, min_length=8, max_length=128)
+    password: Optional[str] = Field(None, min_length=12, max_length=128)
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password_strength(cls, v: Optional[str]) -> Optional[str]:
+        """Validate password strength if provided."""
+        if v is None:
+            return v
+        if len(v) < 12:
+            raise ValueError('رمز عبور باید حداقل ۱۲ کاراکتر باشد')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('رمز عبور باید حداقل یک حرف بزرگ داشته باشد')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('رمز عبور باید حداقل یک حرف کوچک داشته باشد')
+        if not re.search(r'\d', v):
+            raise ValueError('رمز عبور باید حداقل یک عدد داشته باشد')
+        return v
 
 # ==========================================
 # Response Schemas

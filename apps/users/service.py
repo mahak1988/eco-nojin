@@ -1,4 +1,5 @@
 import bcrypt
+import os
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -11,9 +12,9 @@ from apps.users.schemas import UserCreate, UserUpdate
 # ==========================================
 # Security Configuration
 # ==========================================
-SECRET_KEY = "your-secret-key-change-in-production-min-32-chars"  # TODO: Move to .env
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production-min-32-chars")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 # ==========================================
 # Password Hashing (using bcrypt directly)

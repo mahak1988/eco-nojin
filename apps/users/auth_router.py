@@ -3,6 +3,7 @@ Eco Nojin - Authentication Router (Final Version with RBAC)
 ===========================================================
 """
 import os
+import re
 from datetime import datetime, timedelta
 from typing import Optional, Any
 
@@ -10,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr, model_validator
+from pydantic import BaseModel, EmailStr, model_validator, field_validator
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -58,6 +59,20 @@ class RegisterRequest(BaseModel):
     password: str
     full_name: Optional[str] = None
     role: str = "farmer"  # نقش پیش‌فرض
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password strength: min 12 chars, at least one uppercase, one lowercase, one digit."""
+        if len(v) < 12:
+            raise ValueError('رمز عبور باید حداقل ۱۲ کاراکتر باشد')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('رمز عبور باید حداقل یک حرف بزرگ داشته باشد')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('رمز عبور باید حداقل یک حرف کوچک داشته باشد')
+        if not re.search(r'\d', v):
+            raise ValueError('رمز عبور باید حداقل یک عدد داشته باشد')
+        return v
 
 class UserResponse(BaseModel):
     id: int
