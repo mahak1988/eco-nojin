@@ -95,10 +95,29 @@ app = FastAPI(
 # Middlewareها
 # ============================================================
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,http://localhost:8000").split(",")
+allowed_origins = [o.strip() for o in origins if o.strip()]
+
+# Validate origins to prevent security issues
+def is_valid_origin(origin: str) -> bool:
+    """Validate origin URL to prevent wildcard or insecure origins."""
+    if not origin:
+        return False
+    # Reject wildcards
+    if "*" in origin:
+        return False
+    # Must start with http:// or https://
+    if not (origin.startswith("http://") or origin.startswith("https://")):
+        return False
+    return True
+
+# Filter valid origins
+valid_origins = [o for o in allowed_origins if is_valid_origin(o)]
+if len(valid_origins) != len(allowed_origins):
+    logger.warning(f"Some origins were filtered out for security. Valid: {valid_origins}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in origins if o.strip()],
+    allow_origins=valid_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"],
