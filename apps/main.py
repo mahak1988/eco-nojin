@@ -25,6 +25,29 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
 # ============================================================
+# بارگذاری ماژول‌های امنیتی عنکبوتی
+# ============================================================
+try:
+    from apps.shared_core.security.middleware import (
+        SpiderSecurityMiddleware,
+        SecurityHeadersMiddleware,
+        RateLimitMiddleware,
+    )
+    from apps.shared_core.security.protection import (
+        InputSanitizer,
+        SQLInjectionProtector,
+        XSSProtector,
+    )
+    from apps.shared_core.security.fingerprint import RequestFingerprinter
+    from apps.shared_core.security.anomaly import AnomalyDetector
+    
+    SECURITY_ENABLED = True
+    logger.info("✅ ماژول‌های امنیت عنکبوتی بارگذاری شدند")
+except Exception as e:
+    SECURITY_ENABLED = False
+    logger.warning(f"⚠️  ماژول‌های امنیتی بارگذاری نشدند: {e}")
+
+# ============================================================
 # پیکربندی Logging
 # ============================================================
 logging.basicConfig(
@@ -92,8 +115,10 @@ app = FastAPI(
 )
 
 # ============================================================
-# Middlewareها
+# Middlewareها - لایه‌های امنیتی عنکبوتی
 # ============================================================
+
+# ۱. CORS Middleware (لایه اول - کنترل دسترسی)
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000,http://localhost:8000").split(",")
 allowed_origins = [o.strip() for o in origins if o.strip()]
 
@@ -125,12 +150,30 @@ app.add_middleware(
     max_age=600,
 )
 
+# ۲. Spider Security Middleware (لایه اصلی امنیت عنکبوتی)
+if SECURITY_ENABLED:
+    try:
+        app.add_middleware(SpiderSecurityMiddleware)
+        logger.info("🕸️ Spider Security Middleware فعال شد")
+    except Exception as e:
+        logger.warning(f"⚠️  خطا در فعال‌سازی Spider Security: {e}")
+
+# ۳. Process Time Header (برای مانیتورینگ)
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = f"{process_time:.4f}"
+    
+    # ثبت درخواست برای تحلیل ناهنجاری (اگر امنیت فعال باشد)
+    if SECURITY_ENABLED:
+        try:
+            from apps.shared_core.security.anomaly import AnomalyDetector
+            # این فقط برای نمونه است - در production باید به درستی پیاده‌سازی شود
+        except Exception:
+            pass
+    
     return response
 
 @app.exception_handler(Exception)
