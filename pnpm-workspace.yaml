@@ -1,6 +1,8 @@
 packages:
   - "apps/*"
+  - "apps/*/frontend"
   - "packages/*"
+  - "contracts"
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
@@ -8,5 +10,12 @@ allowBuilds:
   core-js: true
   core-js-pure: true
   esbuild: true
+  keccak: true
+  secp256k1: true
   sharp: true
   unrs-resolver: true
+
+# یکپارچه‌سازی نسخهٔ @types/react در کل monorepo
+overrides:
+  "@types/react": "18.3.3"
+  "@types/react-dom": "18.3.0"

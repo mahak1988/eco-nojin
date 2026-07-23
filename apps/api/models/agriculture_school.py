@@ -7,7 +7,7 @@ Database models for agricultural education institutions.
 from datetime import datetime
 from typing import Optional, List
 
-from sqlalchemy import String, Integer, DateTime, Boolean, Text
+from sqlalchemy import String, Integer, DateTime, Boolean, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.session import Base
@@ -44,7 +44,7 @@ class SchoolField(Base):
     __tablename__ = "school_fields"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    school_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    school_id: Mapped[int] = mapped_column(Integer, ForeignKey("agriculture_schools.id"), nullable=False, index=True)
     field_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Relationships

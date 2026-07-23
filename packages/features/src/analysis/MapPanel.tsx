@@ -6,6 +6,8 @@ import { Map as MapIcon } from 'lucide-react';
 import { useAnalysisStore } from '@/store/analysis';
 import { formatNumber } from '@/lib/utils';
 
+import { CHART } from '@econojin/ui/lib/chart-colors';
+
 interface MapPoint {
   region: string;
   lat: number;
@@ -38,10 +40,10 @@ export function MapPanel() {
   }, [analyses, regions]);
 
   const getMarkerColor = (ndvi: number): string => {
-    if (ndvi >= 0.6) return '#10b981';
-    if (ndvi >= 0.4) return '#84cc16';
-    if (ndvi >= 0.2) return '#f59e0b';
-    return '#ef4444';
+    if (ndvi >= 0.6) return CHART.emerald;
+    if (ndvi >= 0.4) return CHART.lime;
+    if (ndvi >= 0.2) return CHART.amber;
+    return CHART.red;
   };
 
   const getMarkerRadius = (ndvi: number): number => 8 + ndvi * 10;
@@ -69,10 +71,10 @@ export function MapPanel() {
           <h4 className="font-bold text-white">نقشه پراکندگی مناطق</h4>
         </div>
         <div className="flex items-center gap-3 text-xs flex-wrap">
-          <Legend color="#10b981" label="عالی (≥0.6)" />
-          <Legend color="#84cc16" label="خوب (≥0.4)" />
-          <Legend color="#f59e0b" label="متوسط (≥0.2)" />
-          <Legend color="#ef4444" label="ضعیف (<0.2)" />
+          <Legend color={CHART.emerald} label="عالی (≥0.6)" />
+          <Legend color={CHART.lime} label="خوب (≥0.4)" />
+          <Legend color={CHART.amber} label="متوسط (≥0.2)" />
+          <Legend color={CHART.red} label="ضعیف (<0.2)" />
         </div>
       </div>
 

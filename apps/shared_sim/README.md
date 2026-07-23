@@ -1,45 +1,83 @@
-# shared_sim | ماژول shared_sim
+# shared_sim | ماژول شبیه‌سازی اشتراکی Econojin
 
-Part of the **Eco Nojin** platform.
+> **نکته:** این ماژول **لایه شبیه‌سازی اشتراکی** پلتفرم Econojin است.
+> شامل مدل‌ها، سرویس‌ها و ابزارهای مشترک برای تمام ماژول‌های شبیه‌سازی.
 
-## Overview
+## مسئولیت‌ها
 
-This module provides shared_sim functionality for the Econojin platform.
-It follows the standard layered architecture:
+این ماژول سه وظیفه‌ی اصلی دارد:
+
+1. **مدل‌های اشتراکی شبیه‌سازی** (`models.py`, `repository.py`, `service.py`)
+   - ذخیره‌سازی داده‌های مشترک شبیه‌سازی
+   - CRUD کامل با صفحه‌بندی و فیلتر
+
+2. **API شبیه‌سازی اشتراکی** (`router.py`)
+   - ارائه endpointهای RESTful برای دسترسی به داده‌های شبیه‌سازی
+   - پشتیبانی از صفحه‌بندی
+
+3. **یکپارچگی با ماژول‌های شبیه‌سازی** (`dependencies.py`)
+   - Dependency Injection برای استفاده در `apps/simulation/`
+   - اشتراک‌گذاری سرویس‌های شبیه‌سازی
+
+## ساختار
 
 ```
 shared_sim/
-├── __init__.py        # Module init
-├── router.py          # FastAPI router (HTTP endpoints)
-├── schemas.py         # Pydantic validation models
-├── service.py         # Business logic
-├── repository.py      # Database access (SQLAlchemy)
-├── models.py          # ORM models
-├── dependencies.py    # FastAPI dependencies (auth, etc.)
-└── tests/             # Pytest tests
+├── __init__.py                # Module init
+├── router.py                  # ★ FastAPI router (HTTP endpoints)
+├── schemas.py                 # Pydantic validation models
+├── service.py                 # Business logic
+├── repository.py              # Database access (SQLAlchemy)
+├── models.py                  # ★ ORM model SharedSim
+├── dependencies.py            # FastAPI dependencies
+└── tests/                     # Pytest tests
+    ├── test_shared_sim.py
+    └── ...
 ```
 
-## Endpoints
+## مدل داده (`models.py`)
 
-| Method | Path                  | Description          |
-|--------|-----------------------|----------------------|
-| GET    | `/shared_sim`         | List with pagination |
-| GET    | `/shared_sim/{id}`  | Get by ID            |
-| POST   | `/shared_sim`         | Create               |
-| PATCH  | `/shared_sim/{id}`  | Update               |
-| DELETE | `/shared_sim/{id}`  | Delete               |
+```python
+class SharedSim(Base):
+    """مدل اشتراکی شبیه‌سازی."""
+    
+    __tablename__ = "shared_sim"
+    
+    id: int                    # شناسه یکتا
+    name: str                  # نام (index)
+    description: str | None    # توضیحات
+    is_active: bool            # وضعیت فعال (پیش‌فرض: True)
+    created_at: datetime       # تاریخ ایجاد
+    updated_at: datetime       # تاریخ بروزرسانی
+```
 
-## Development
+## Endpointهای API
+
+| Method | Path | توضیح |
+|--------|------|--------|
+| GET | `/shared_sim` | لیست با صفحه‌بندی |
+| GET | `/shared_sim/{id}` | دریافت بر اساس ID |
+| POST | `/shared_sim` | ایجاد جدید |
+| PATCH | `/shared_sim/{id}` | بروزرسانی |
+| DELETE | `/shared_sim/{id}` | حذف |
+
+## توسعه و تست
 
 ```bash
-# Run tests
+# از ریشه‌ی پروژه
+cd d:\econojin.com
+
+# اجرای تست‌ها
 pytest apps/shared_sim/tests/ -v
 
-# Run the dev server (from repo root)
-uvicorn apps.main:app --reload
+# اجرای سرور توسعه
+python apps/main.py
+# یا
+uvicorn apps.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## Auto-scaffolded
+## تغییرات مهم
 
-This module was auto-scaffolded by `scripts/phase1_complete_apps.py`.
-Adjust the templates to match your actual domain model.
+- **فاز ۲:** بازنویسی کامل با معماری لایه‌ای (router → service → repository)
+- **فاز ۲:** افزودن صفحه‌بندی به endpointها
+- **فاز ۲:** بهبود Dependency Injection

@@ -1,0 +1,17 @@
+{
+  "app": "econojin-platform",
+  "port": 8000,
+  "python": {
+    "version": "3.11",
+    "mirror": false
+  },
+  "build": {
+    "location": "iran"
+  },
+  "disks": [
+    {
+      "name": "database",
+      "mountTo": "apps/shared_core/database"
+    }
+  ]
+}

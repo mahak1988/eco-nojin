@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-50:#ecfdf5;--brand-100:#d1fae5;--brand-200:#a7f3d0;--brand-300:#6ee7b7;
+    --brand-400:#34d399;--brand-500:#10b981;--brand-600:#059669;--brand-700:#047857;
+    --brand-800:#065f46;--brand-900:#064e3b;
+    --water-400:#38bdf8;--water-500:#0ea5e9;--water-600:#0284c7;
+    --sun-300:#fcd34d;--sun-400:#fbbf24;--sun-500:#f59e0b;--sun-600:#d97706;
+    --rose-400:#fb7185;--rose-500:#f43f5e;
+    /* رنگ‌های سیر تیره */
+    --v-red:#b91c1c;--v-blue:#1d4ed8;--v-green:#15803d;--v-amber:#c2410c;--v-ink:#1c1208;
+    /* کاغذ گرم */
+    --surface:#faf7f1;--surface-raised:#fffdf8;--surface-overlay:rgba(255,253,248,.80);
+    --text-1:#1c1208;--text-2:#2a1d0f;--text-3:#5b4632;
+    --border:#e7ddca;--border-subtle:#f0e8d8;
+    /* بلوک تیره (پنل‌ها) */
+    --ink-900:#0a0f0d;--ink-800:#0e1714;--ink-700:#13211c;--ink-line:rgba(255,255,255,.10);
+    --ink-text-1:#f7f5f0;--ink-text-2:#e2ddd2;--ink-text-3:#b8b1a4;
+    /* سایه‌ها */
+    --shadow-sm:0 1px 3px rgba(28,18,8,.08),0 1px 2px rgba(28,18,8,.06);
+    --shadow-md:0 6px 16px -6px rgba(28,18,8,.16);
+    --shadow-lg:0 16px 32px -12px rgba(28,18,8,.22);
+    --shadow-xl:0 28px 50px -16px rgba(28,18,8,.30);
+    --shadow-glow:0 0 44px -8px rgba(16,185,129,.40);
+    --shadow-warm:0 0 44px -10px rgba(245,158,11,.40);
+    /* شعاع/حرکت/فونت */
+    --r-sm:12px;--r-md:18px;--r-lg:24px;--r-xl:32px;--r-full:9999px;
+    --ease-out:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
+    --dur-fast:160ms;--dur-base:340ms;--dur-slow:640ms;
+    --font-fa-body:"Vazirmatn",system-ui,sans-serif;
+    --font-fa-display:"Lalezar","Vazirmatn",system-ui,sans-serif;
+    --font-en-body:"Inter",system-ui,sans-serif;
+    --font-en-display:"Space Grotesk","Inter",system-ui,sans-serif;
+  }
+  .dark {
+    --surface:#0a0f0d;--surface-raised:#13211c;--surface-overlay:rgba(14,23,20,.74);
+    --text-1:#f7f5f0;--text-2:#e2ddd2;--text-3:#b8b1a4;
+    --border:#26302b;--border-subtle:#1a241f;
+  }
+  * { border-color: var(--border); }
+  html { scroll-behavior:smooth; }
+  body { background:var(--surface); color:var(--text-1);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; line-height:1.75; }
+  html[lang^="fa"] body, html[lang^="ar"] body { font-family:var(--font-fa-body); }
+  html[lang^="en"] body { font-family:var(--font-en-body); }
+}
+
+@layer components {
+  .font-display { font-weight:400; letter-spacing:.01em; line-height:1.25; }
+  html[lang^="fa"] .font-display, html[lang^="ar"] .font-display { font-family:var(--font-fa-display); }
+  html[lang^="en"] .font-display { font-family:var(--font-en-display); font-weight:700; }
+  .txt-red { color:var(--v-red); } .txt-blue { color:var(--v-blue); }
+  .txt-green { color:var(--v-green); } .txt-amber { color:var(--v-amber); }
+  .txt-ink { color:var(--v-ink); }
+  .glass { background:var(--surface-overlay); backdrop-filter:blur(18px) saturate(1.5);
+    -webkit-backdrop-filter:blur(18px) saturate(1.5); border:1px solid rgba(28,18,8,.07); }
+  .glass-ink { background:rgba(255,255,255,.05); backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px); border:1px solid var(--ink-line); }
+  .card-hover { transition:transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); }
+  .card-hover:hover { transform:translateY(-6px); box-shadow:var(--shadow-xl); border-color:rgba(21,128,61,.5); }
+  .gradient-text { background:linear-gradient(115deg,var(--v-red),var(--v-blue) 50%,var(--v-green));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+  .text-balance { text-wrap:balance; }
+  .drop-soft { text-shadow:0 2px 18px rgba(0,0,0,.5); }
+  /* ConceptExplorer — رنگ فعال از --step (color-mix، کار با var) */
+  .step-card { background:var(--surface-raised); border:1px solid var(--border);
+    transition:all var(--dur-base) var(--ease-out); }
+  .step-card:hover { border-color:color-mix(in srgb, var(--step, var(--v-green)) 40%, var(--border)); }
+  .step-card.active {
+    background:color-mix(in srgb, var(--step) 9%, var(--surface-raised));
+    border-color:color-mix(in srgb, var(--step) 55%, transparent);
+    box-shadow:0 0 0 1px color-mix(in srgb, var(--step) 28%, transparent),
+               0 14px 30px -16px color-mix(in srgb, var(--step) 60%, transparent); }
+  .step-show {
+    background:color-mix(in srgb, var(--step) 7%, var(--surface-raised));
+    border:1px solid color-mix(in srgb, var(--step) 32%, transparent);
+    box-shadow:var(--shadow-lg); }
+  @media (prefers-reduced-motion:reduce) {
+    html { scroll-behavior:auto; }
+    .card-hover:hover { transform:none; }
+  }
+}
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+@keyframes float-x { 0%,100%{transform:translate(0,0)} 50%{transform:translate(10px,-12px)} }
+@keyframes pulse-glow { 0%,100%{box-shadow:0 0 26px -8px rgba(16,185,129,.45)} 50%{box-shadow:0 0 56px -4px rgba(16,185,129,.65)} }
+@keyframes pulse-warm { 0%,100%{box-shadow:0 0 26px -8px rgba(245,158,11,.45)} 50%{box-shadow:0 0 56px -4px rgba(245,158,11,.6)} }
+@keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+@keyframes fade-in { from{opacity:0} to{opacity:1} }
+@keyframes ping-soft { 0%{transform:scale(1);opacity:.7} 75%,100%{transform:scale(2.6);opacity:0} }
+@keyframes dash { to { stroke-dashoffset:0; } }
+@keyframes gradient-shift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+/* eco-settings-overrides */
+.eco-reduce-motion *, .eco-reduce-motion *::before, .eco-reduce-motion *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+html.eco-fs-lg { font-size: 18px; }

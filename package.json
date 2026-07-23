@@ -1,20 +1,24 @@
 {
-    "name":  "econojin-monorepo",
-    "version":  "1.0.0",
-    "private":  true,
-    "scripts":  {
-                    "dev":  "turbo run dev",
-                    "build":  "turbo run build",
-                    "lint":  "turbo run lint",
-                    "type-check":  "turbo run type-check",
-                    "clean":  "turbo run clean",
-                    "dev:web":  "pnpm --filter @econojin/web dev",
-                    "build:web":  "pnpm --filter @econojin/web build",
-                    "dev:admin":  "pnpm --filter @econojin/admin dev",
-                    "dev:cms":  "pnpm --filter @econojin/cms develop"
-                },
-    "devDependencies":  {
-                            "turbo":  "^2.0.0"
-                        },
-    "packageManager":  "pnpm@11.4.0"
+  "name": "econojin-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "dev:web": "pnpm --filter @econojin/web dev",
+    "build:web": "pnpm --filter @econojin/web build",
+    "dev:admin": "pnpm --filter @econojin/admin dev",
+    "dev:cms": "pnpm --filter @econojin/cms develop",
+    "dev:admin-panel": "pnpm --filter @econojin/admin-panel dev",
+    "dev:ai-agents": "pnpm --filter @econojin/ai-agents dev",
+    "build:admin-panel": "pnpm --filter @econojin/admin-panel build",
+    "build:ai-agents": "pnpm --filter @econojin/ai-agents build"
+  },
+  "devDependencies": {
+    "turbo": "^2.10.5"
+  },
+  "packageManager": "pnpm@11.4.0"
 }

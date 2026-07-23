@@ -1,0 +1,76 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/web/**'
+      - 'apps/admin_panel/frontend/**'
+      - 'apps/ai_agents/frontend/**'
+      - 'packages/ui/**'
+      - 'packages/hooks/**'
+      - 'packages/types/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/web/**'
+      - 'apps/admin_panel/frontend/**'
+      - 'apps/ai_agents/frontend/**'
+      - 'packages/ui/**'
+      - 'packages/hooks/**'
+      - 'packages/types/**'
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm install
+      - run: pnpm --filter @econojin/web exec eslint .
+      - run: pnpm --filter @econojin/web exec tsc --noEmit
+      - run: pnpm --filter @econojin/admin-panel exec tsc --noEmit
+      - run: pnpm --filter @econojin/ai-agents exec tsc --noEmit
+
+  build:
+    name: Build Frontend Apps
+    runs-on: ubuntu-latest
+    needs: lint-and-typecheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm install
+      - run: pnpm build:web
+      - run: pnpm build:admin-panel
+      - run: pnpm build:ai-agents
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm install
+      - run: pnpm audit --audit-level moderate || true
