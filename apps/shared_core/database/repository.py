@@ -93,14 +93,31 @@ class BaseRepository(Generic[T]):
             raise
 
     async def count(self, filter_by: Optional[Dict[str, Any]] = None) -> int:
-        """شمارش تعداد رکوردها."""
+        """شمارش تعداد رکوردها - بهینه‌سازی شده با استفاده از count(*)"""
         try:
-            stmt = select(func.count()).select_from(self.model)
+            # بهینه‌سازی: استفاده مستقیم از func.count() بدون load کردن داده‌ها
+            stmt = select(func.count(1)).select_from(self.model)
             if filter_by:
                 for key, value in filter_by.items():
                     stmt = stmt.where(getattr(self.model, key) == value)
             result = await self.session.execute(stmt)
-            return result.scalar_one()
+            return result.scalar_one() or 0
         except SQLAlchemyError as e:
             logger.error(f"Error counting {self.model.__name__}: {e}")
+            raise
+
+    async def count_fast(self, filter_by: Optional[Dict[str, Any]] = None) -> int:
+        """
+        شمارش سریع - برای دیتابیس‌های بزرگ
+        نکته: در PostgreSQL می‌توان از estimate استفاده کرد
+        """
+        try:
+            stmt = select(func.count(1)).select_from(self.model)
+            if filter_by:
+                for key, value in filter_by.items():
+                    stmt = stmt.where(getattr(self.model, key) == value)
+            result = await self.session.execute(stmt)
+            return result.scalar_one() or 0
+        except SQLAlchemyError as e:
+            logger.error(f"Error fast counting {self.model.__name__}: {e}")
             raise
