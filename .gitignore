@@ -1,100 +1,126 @@
-```
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
 .Python
-env/
-venv/
-.venv/
-.env
-.env.local
-.env.*
-.pytest_cache/
-.mypy_cache/
-.coverage
-htmlcov/
-
-# Build artifacts
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
+.installed.cfg
+*.egg
 
-# Logs
-*.log
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
 
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Editors
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
 
 # Coverage
-coverage/
+.coverage
+htmlcov/
+.coverage.*
+.cache
 
 # Distribution / packaging
-*.tar.gz
-*.whl
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Pytest
+.pytest_cache/
+pytestdebug.log
+
+# Mypy
+.mypy_cache/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.fseventsd
+*.nfs
+
+# Documentation
+docs/_build/
 
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# mypy
-.dmypy.json
-dmypy.json
-
-# pytest
-.pytest_cache/
-
-# tox
-.tox/
-
-# coverage
-.coverage.*
+# Local configuration
+local_settings.py
+.settings/
+*.sublime-workspace
 
 # Django
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+media/
+staticfiles/
 
 # Flask
 instance/
 .webassets-cache
-
-# Scrapy
-.scrapy
-
-# Sphinx
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter
-.ipynb_checkpoints
 
 # Celery
 celerybeat-schedule
 celerybeat.pid
 
 # Sage
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+.hgcheck
+.hgcheck.draft
 
 # Spyder project settings
 .spyderproject
@@ -114,20 +140,311 @@ dmypy.json
 # Pyre
 .pyre/
 
-# IDE
-.vscode/
-.idea/
+# Pylance
+.lsp
 
-# Temporary files
+# FastAPI
+*.db
+*.db-journal
+
+# SQLAlchemy
+*.db
+*.db-journal
+
+# General build outputs
+target/
+out/
+bin/
+obj/
+tmp/
+temp/
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+node_modules/
+dist/
+coverage/
+.nyc_output
+coverage/
+.nyc_output/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.o
+*.a
+*.lib
+*.obj
+*.ilk
+*.pdb
+*.idb
+*.res
+*.pch
 *.tmp
-*.temp
-*.bak
-*.backup
-
-# System
+*.log
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
+target/
+.gradle/
+build/
+out/
+*.iml
+*.ipr
+*.iws
+.idea/
+nbproject/
+nbbuild/
+nbdist/
+nbreleases/
+*.orig
+*~
+.DS_Store
+Thumbs.db
+
+# Go
+*.o
+*.a
+*.so
+*.exe
+*.dll
+*.dylib
+*.test
+*.prof
+vendor/
+Godeps/
+bin/
+
+# C/C++
+*.o
+*.a
+*.so
+*.lo
+*.la
+.so.*
+*.dylib
+*.dll
+*.def
+*.exp
+*.ilk
+*.lib
+*.map
+*.mod
+*.obj
+*.o
+*.opendb
+*.orig
+*.rej
+*.so
+*.toc
+*.tmp
+*.d
+*.gcno
+*.gcda
+*.gcov
+*.lcov
+*.info
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info
+*.egg-info/
+build/
+dist/
+*.tar.gz
+*.whl
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv/
+.env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+.cache
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+*.temp
+*~
+*.log
+local_settings.py
+.env
+.env.local
+*.env.*
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+coverage/
+.nyc_output
+*.nfs
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 ehthumbs.db
-Icon?
-apidoc/
-```
+Thumbs.db
+.fseventsd
+*.nfs
+settings.xml
+*.tmproj
+*.xcodeproj
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.hprof
+*.pydevproject
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~
+.project
+.pydevproject
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~
+.project
+.tm_properties
+*.rbc
+_saved_session.rds
+.Rhistory
+.RData
+.Rproj.user/
+.Rprofile
+.Renviron
+.Rbuildignore
+.gitattributes
+.stestr.conf
+.tox/
+.coverage
+.coverage.*
+.cache
+.nox/
+.pytest_cache/
+.hypothesis/
+.coverage.xml
+.coverage.json
+.coverage.lcov
+.coverage.txt
+.coverage.html
+.coverage.svg
+.coverage.png
+.coverage.pdf
+.coverage.doc
+.coverage.rtf
+.coverage.odt
+.coverage.xls
+.coverage.xlsx
+.coverage.csv
+.coverage.tsv
+.coverage.yml
+.coverage.yaml
+.coverage.toml
+.coverage.ini
+.coverage.cfg
+.coverage.conf
+.coverage.properties
+.coverage.xml
+.coverage.json
+.coverage.lcov
+.coverage.txt
+.coverage.html
+.coverage.svg
+.coverage.png
+.coverage.pdf
+.coverage.doc
+.coverage.rtf
+.coverage.odt
+.coverage.xls
+.coverage.xlsx
+.coverage.csv
+.coverage.tsv
+.coverage.yml
+.coverage.yaml
+.coverage.toml
+.coverage.ini
+.coverage.cfg
+.coverage.conf
+.coverage.properties
