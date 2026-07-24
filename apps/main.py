@@ -25,6 +25,16 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
 # ============================================================
+# پیکربندی Logging
+# ============================================================
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger("econojin")
+
+# ============================================================
 # بارگذاری ماژول‌های امنیتی عنکبوتی
 # ============================================================
 try:
@@ -46,16 +56,6 @@ try:
 except Exception as e:
     SECURITY_ENABLED = False
     logger.warning(f"⚠️  ماژول‌های امنیتی بارگذاری نشدند: {e}")
-
-# ============================================================
-# پیکربندی Logging
-# ============================================================
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
-logger = logging.getLogger("econojin")
 
 load_dotenv(PROJECT_ROOT / ".env")
 
