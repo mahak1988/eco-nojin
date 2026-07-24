@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "D:\\econojin.com\\contracts\\contracts\\EcoCoin.sol": {
-      "lastModificationDate": 1784787209860,
-      "contentHash": "3d048967b4b42b564e4a6704f68e1725",
+      "lastModificationDate": 1784931607406,
+      "contentHash": "aaa5ba2ecff16b4ac1ad29a014b28529",
       "sourceName": "contracts/EcoCoin.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -151,8 +151,8 @@
       ]
     },
     "D:\\econojin.com\\contracts\\contracts\\VerificationOracle.sol": {
-      "lastModificationDate": 1784787209861,
-      "contentHash": "b0b9ae17d8146fdccd28503c8ac30c4b",
+      "lastModificationDate": 1784931607407,
+      "contentHash": "75cbfc3f640160a972e80835a82ea9b7",
       "sourceName": "contracts/VerificationOracle.sol",
       "solcConfig": {
         "version": "0.8.20",

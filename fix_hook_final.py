@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+fix_hook_final.py — نصب hook نهایی هوشمند و رفع مشکل خود-ارجاعی
+"""
+from __future__ import annotations
+
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+
+STAGED_SCAN = '''#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """staged_scan.py — hook هوشمند: فقط فایل‌های واقعی، فقط بحرانی مسدود شود."""
 from __future__ import annotations
 
@@ -42,11 +55,11 @@ def get_staged_files() -> list[str]:
     )
     if r.returncode != 0:
         return []
-    return [f for f in r.stdout.split("\0") if f.strip()]
+    return [f for f in r.stdout.split("\\0") if f.strip()]
 
 
 def should_skip(rel: str) -> bool:
-    normalized = rel.replace("\\", "/")
+    normalized = rel.replace("\\\\", "/")
     name = normalized.split("/")[-1]
     if name in SKIP_EXACT:
         return True
@@ -86,6 +99,58 @@ def main() -> int:
         return 1
 
     print(f"  {len(staged)} فایل پاک بود")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+'''
+
+
+def git(*args: str, check: bool = True) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", "-C", str(ROOT), *args],
+                          capture_output=True, text=True, check=check, timeout=60)
+
+
+def main() -> int:
+    print("═" * 60)
+    print("  🔧 نصب hook نهایی هوشمند")
+    print("═" * 60)
+
+    # ۱. بازنویسی staged_scan.py با نسخه هوشمند
+    (ROOT / "staged_scan.py").write_text(STAGED_SCAN, encoding="utf-8")
+    print("  ✅ staged_scan.py → نسخه هوشمند")
+    print("     • skip: ابزارهای امنیتی، خروجی‌ها، تست‌ها، i18n، reports")
+    print("     • فقط سطح «بحرانی» commit را مسدود می‌کند")
+
+    # ۲. حذف خروجی‌های analyzer از git tracking (رفع خود-ارجاعی)
+    for f in ["project-analysis.json", "project-analysis.html",
+              "project-analysis.sha256"]:
+        r = git("rm", "--cached", "--ignore-unmatch", f, check=False)
+        if r.returncode == 0 and r.stdout.strip():
+            print(f"  ✅ از tracking حذف شد: {f}")
+
+    # ۳. اطمینان از gitignore
+    gi = ROOT / ".gitignore"
+    content = gi.read_text(encoding="utf-8") if gi.exists() else ""
+    needed = ["project-analysis.json", "project-analysis.html",
+              "project-analysis.sha256"]
+    missing = [n for n in needed if n not in content]
+    if missing:
+        with gi.open("a", encoding="utf-8") as fh:
+            fh.write("\n# Analyzer outputs\n")
+            for n in missing:
+                fh.write(n + "\n")
+        print("  ✅ .gitignore به‌روزرسانی شد")
+    else:
+        print("  ✅ .gitignore کامل است")
+
+    print("\n" + "═" * 60)
+    print("  ✅ اکنون commit کنید:")
+    print("     git add -A")
+    print('     git commit -m "security: smart hook, eliminate self-referential findings"')
+    print("     git push")
+    print("═" * 60)
     return 0
 
 

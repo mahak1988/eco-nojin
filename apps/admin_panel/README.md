@@ -177,7 +177,7 @@ admin_panel/
 # دریافت توکن superuser
 TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "admin@econojin.com", "password": "changethis"}' \
+  -d '{"email": "admin@econojin.com", "password": "*****"}' \
   | python -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
 
 # داشبورد
@@ -206,7 +206,7 @@ import httpx
 
 # احراز هویت superuser
 response = httpx.post("http://localhost:8000/api/v1/auth/login",
-    json={"email": "admin@econojin.com", "password": "changethis"})
+    json={"email": "admin@econojin.com", "password": "*****"})
 token = response.json()["access_token"]
 headers = {"Authorization": f"Bearer {token}"}
 

@@ -4,7 +4,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
 import Layout from "./layouts/Layout";
 
-// ── lazy pages (درس Vite: version-skew / network → error boundary + fallback) ──
+// ── Lazy Pages (با fallback برای خطاهای شبکه یا version-skew در Vite) ──
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
@@ -49,12 +49,12 @@ function ScrollToTop() {
 function PageLoader() {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-green-600" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-emerald-600" />
     </div>
   );
 }
 
-// ── Error boundary (درس Vite: graceful fallback برای chunk‌های گم‌شده) ──
+// ── Error boundary (جلوگیری از کرش کامل در صورت خطای لود Chunk) ──
 interface EBProps { children: ReactNode; }
 interface EBState { hasError: boolean; }
 
@@ -70,13 +70,13 @@ class ErrorBoundary extends Component<EBProps, EBState> {
     if (this.state.hasError) {
       return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-          <p className="font-display text-2xl text-stone-800">مشکلی پیش آمد</p>
-          <p className="max-w-sm text-sm text-stone-600">
-            ممکن است نسخهٔ جدیدی از برنامه منتشر شده باشد. لطفاً صفحه را دوباره بارگذاری کنید.
+          <p className="font-display text-2xl text-stone-800 dark:text-stone-100">مشکلی پیش آمد</p>
+          <p className="max-w-sm text-sm text-stone-600 dark:text-stone-400">
+            ممکن است نسخهٔ جدیدی از برنامه منتشر شده باشد یا اتصال شبکه قطع باشد. لطفاً صفحه را دوباره بارگذاری کنید.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="rounded-xl bg-green-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-green-700"
+            className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
           >
             بارگذاری مجدد
           </button>
@@ -87,7 +87,7 @@ class ErrorBoundary extends Component<EBProps, EBState> {
   }
 }
 
-// ── App ──
+// ── App Component ──
 export default function App() {
   return (
     <LanguageProvider>
@@ -110,9 +110,10 @@ export default function App() {
               <Route path="regional" element={<RegionalPage />} />
               <Route path="satellite" element={<SatelliteImageryDashboard />} />
               <Route path="simulators" element={<SimulatorsPage />} />
-            <Route path="/simulators/:id" element={<SimulatorDetailPage />} />
-            <Route path="/my-simulations" element={<MySimulationsPage />} />
-            <Route path="/comparison" element={<ComparisonDashboard />} />
+              {/* اصلاح مسیرهای تو در تو به فرمت نسبی */}
+              <Route path="simulators/:id" element={<SimulatorDetailPage />} />
+              <Route path="my-simulations" element={<MySimulationsPage />} />
+              <Route path="comparison" element={<ComparisonDashboard />} />
               <Route path="tourism" element={<TourismPage />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="accounting" element={<AccountingPage />} />

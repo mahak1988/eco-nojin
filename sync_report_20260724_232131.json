@@ -1,0 +1,18 @@
+{
+  "started_at": "2026-07-24T23:21:30",
+  "finished_at": "2026-07-24T23:21:31",
+  "branch": "main",
+  "dry_run": false,
+  "backup_dir": "D:\\econojin.com\\.sync_backup_20260724_232130",
+  "summary": {
+    "total_scanned": 1059,
+    "replaced": 0,
+    "new_files": 0,
+    "identical": 1059,
+    "excluded": 0,
+    "errors": 0
+  },
+  "replaced_files": [],
+  "new_files": [],
+  "errors": []
+}

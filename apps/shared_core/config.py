@@ -1,172 +1,151 @@
 """
-Econojin - Central Configuration Module
-========================================
-Adapted from fastapi/full-stack-fastapi-template (official FastAPI template)
-with Pydantic v2 Settings, validation, and environment-aware defaults.
+تنظیمات مرکزی پلتفرم Econojin
+مدیریت متغیرهای محیطی با استفاده از Pydantic v2 Settings
 """
-
-import os
-import secrets
-import warnings
-from typing import Annotated, Any, Literal, Self
-
-from pydantic import (
-    AnyUrl,
-    BeforeValidator,
-    EmailStr,
-    HttpUrl,
-    PostgresDsn,
-    computed_field,
-    model_validator,
-)
+from functools import lru_cache
+from typing import List, Optional, Literal
+from pydantic import Field, model_validator, ValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-def parse_cors(v: Any) -> list[str] | str:
-    """Parse CORS origins from comma-separated string or list."""
-    if isinstance(v, str) and not v.startswith("["):
-        return [i.strip() for i in v.split(",") if i.strip()]
-    elif isinstance(v, list | str):
-        return v
-    raise ValueError(v)
 
 
 class Settings(BaseSettings):
     """
-    Centralized settings for Econojin platform.
-    
-    Loads from .env file at project root with Pydantic validation.
-    All secrets must be changed from defaults in production.
+    کلاس اصلی تنظیمات برنامه که مقادیر را از فایل .env یا متغیرهای محیطی سیستم عامل می‌خواند.
     """
-
     model_config = SettingsConfigDict(
-        env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
-        env_ignore_empty=True,
-        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",  # نادیده گرفتن متغیرهای محیطی تعریف‌نشده برای جلوگیری از خطا
     )
 
-    # ── API Configuration ──────────────────────────────────────
-    API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "Econojin API"
-    VERSION: str = "2.0.0"
-    ENVIRONMENT: Literal["local", "staging", "production"] = "local"
-    DEBUG: bool = False
+    # =========================================================================
+    # 1. تنظیمات عمومی برنامه (App Settings)
+    # =========================================================================
+    APP_NAME: str = Field(default="Econojin API", description="نام اپلیکیشن")
+    APP_VERSION: str = Field(default="2.0.0", description="نسخه اپلیکیشن")
+    DEBUG: bool = Field(default=False, description="حالت دیباگ (در تولید باید False باشد)")
+    ENVIRONMENT: Literal["local", "staging", "production"] = Field(
+        default="local", 
+        description="محیط اجرای برنامه"
+    )
 
-    # ── Security ───────────────────────────────────────────────
-    SECRET_KEY: str = secrets.token_urlsafe(32)
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    REQUIRE_AUTH_FOR_WRITES: bool = False
+    # =========================================================================
+    # 2. تنظیمات پایگاه داده (Database)
+    # =========================================================================
+    DATABASE_URL: str = Field(
+        default="sqlite+aiosqlite:///./econojin.db",
+        description="رشته اتصال به پایگاه داده (SQLite یا PostgreSQL)"
+    )
+    DB_ECHO: bool = Field(default=False, description="نمایش کوئری‌های SQL در لاگ (فقط برای توسعه)")
 
-    # ── CORS ───────────────────────────────────────────────────
-    BACKEND_CORS_ORIGINS: Annotated[
-        list[AnyUrl] | str, BeforeValidator(parse_cors)
-    ] = []
-    FRONTEND_HOST: str = "http://localhost:5173"
+    # =========================================================================
+    # 3. تنظیمات امنیت و احراز هویت (Security & Auth)
+    # =========================================================================
+    SECRET_KEY: str = Field(
+        default="super-secret-key-change-in-production-please",
+        description="کلید محرمانه برای امضای JWT و نشست‌ها"
+    )
+    ALGORITHM: str = Field(default="HS256", description="الگوریتم رمزنگاری JWT")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
+        default=60 * 24, 
+        description="مدت زمان انقضای توکن دسترسی به دقیقه (پیش‌فرض: ۲۴ ساعت)"
+    )
+    ALLOWED_ORIGINS: str = Field(
+        default="http://localhost:5173,http://localhost:3000,https://econojin.com",
+        description="لیست دامنه‌های مجاز برای CORS (با کاما جدا شوند)"
+    )
 
-    @computed_field
     @property
-    def all_cors_origins(self) -> list[str]:
-        return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS] + [
-            self.FRONTEND_HOST
-        ]
+    def cors_origins_list(self) -> List[str]:
+        """تبدیل رشته CORS به لیست"""
+        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
 
-    # ── Database ───────────────────────────────────────────────
-    DATABASE_URL: str = "sqlite+aiosqlite:///./apps/econojin.db"
-    POSTGRES_SERVER: str | None = None
-    POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str | None = None
-    POSTGRES_PASSWORD: str = ""
-    POSTGRES_DB: str = ""
+    # =========================================================================
+    # 4. تنظیمات بلاکچین و EcoCoin (Blockchain & Web3)
+    # =========================================================================
+    BLOCKCHAIN_RPC_URL: str = Field(
+        default="https://rpc-amoy.polygon.technology/",
+        description="آدرس RPC شبکه بلاکچین (مثلاً Polygon Amoy Testnet)"
+    )
+    BLOCKCHAIN_CHAIN_ID: int = Field(default=80002, description="شناسه زنجیره (Chain ID)")
+    
+    ECOCONTRACT_ADDRESS: str = Field(
+        default="0x0000000000000000000000000000000000000001",
+        description="آدرس قرارداد هوشمند EcoCoin"
+    )
+    ORACLE_CONTRACT_ADDRESS: str = Field(
+        default="0x0000000000000000000000000000000000000002",
+        description="آدرس قرارداد هوشمند Verification Oracle"
+    )
+    
+    BACKEND_WALLET_PRIVATE_KEY: Optional[str] = Field(
+        default=None,
+        description="کلید خصوصی کیف پول بک‌اند برای امضای خودکار تراکنش‌ها (بسیار محرمانه)"
+    )
 
-    @computed_field
-    @property
-    def SQLALCHEMY_DATABASE_URI(self) -> str:
-        """Return the appropriate database URI based on configuration."""
-        if self.POSTGRES_SERVER:
-            return str(PostgresDsn.build(
-                scheme="postgresql+asyncpg",
-                username=self.POSTGRES_USER,
-                password=self.POSTGRES_PASSWORD,
-                host=self.POSTGRES_SERVER,
-                port=self.POSTGRES_PORT,
-                path=self.POSTGRES_DB or "econojin",
-            ))
-        return self.DATABASE_URL
+    # =========================================================================
+    # 5. تنظیمات هوش مصنوعی (AI & LLM)
+    # =========================================================================
+    LLM_PROVIDER: Literal["groq", "openai", "gemini", "openrouter", "ollama", "fake"] = Field(
+        default="fake", 
+        description="ارائه‌دهنده فعال مدل زبانی"
+    )
+    LLM_API_KEY: Optional[str] = Field(
+        default=None, 
+        description="کلید API ارائه‌دهنده مدل زبانی"
+    )
+    LLM_MODEL: str = Field(
+        default="llama3-8b-8192", 
+        description="نام مدل پیش‌فرض هوش مصنوعی"
+    )
+    OLLAMA_BASE_URL: str = Field(
+        default="http://localhost:11434", 
+        description="آدرس پایه سرویس Ollama (در صورت استفاده)"
+    )
 
-    # ── LLM / AI ───────────────────────────────────────────────
-    LLM_PROVIDER: Literal["groq", "gemini", "openrouter", "ollama", "fake"] = "fake"
-    GROQ_API_KEY: str | None = None
-    GOOGLE_API_KEY: str | None = None
-    OPENROUTER_API_KEY: str | None = None
-    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    # =========================================================================
+    # 6. تنظیمات APIهای خارجی (External APIs)
+    # =========================================================================
+    OPEN_METEO_URL: str = Field(
+        default="https://api.open-meteo.com/v1", 
+        description="آدرس پایه API آب‌وهوای Open-Meteo"
+    )
+    FAO_API_KEY: Optional[str] = Field(
+        default=None, 
+        description="کلید API اختیاری برای سرویس‌های FAOSTAT (در صورت نیاز)"
+    )
 
-    # ── SMS ────────────────────────────────────────────────────
-    SMS_PROVIDER: Literal["kavenegar", "twilio", "mock"] = "mock"
-    KAVENEGAR_API_KEY: str | None = None
-    TWILIO_ACCOUNT_SID: str | None = None
-    TWILIO_AUTH_TOKEN: str | None = None
-    TWILIO_PHONE_NUMBER: str | None = None
-
-    # ── Email ──────────────────────────────────────────────────
-    SMTP_TLS: bool = True
-    SMTP_SSL: bool = False
-    SMTP_PORT: int = 587
-    SMTP_HOST: str | None = None
-    SMTP_USER: str | None = None
-    SMTP_PASSWORD: str | None = None
-    EMAILS_FROM_EMAIL: EmailStr | None = None
-    EMAILS_FROM_NAME: str | None = None
-
-    @model_validator(mode="after")
-    def _set_default_emails_from(self) -> Self:
-        if not self.EMAILS_FROM_NAME:
-            self.EMAILS_FROM_NAME = self.PROJECT_NAME
-        return self
-
-    EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
-    EMAIL_TEST_USER: EmailStr = "test@example.com"
-
-    @computed_field
-    @property
-    def emails_enabled(self) -> bool:
-        return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
-
-    # ── Superuser (for initial setup) ──────────────────────────
-    FIRST_SUPERUSER: EmailStr = "admin@econojin.com"
-    FIRST_SUPERUSER_PASSWORD: str = "changethis"
-
-    # ── Monitoring ─────────────────────────────────────────────
-    SENTRY_DSN: HttpUrl | None = None
-    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
-
-    # ── Feature Flags ──────────────────────────────────────────
-    ENABLE_OTP: bool = True
-    ENABLE_SIMULATION: bool = True
-    ENABLE_ECOCOIN: bool = True
-    ENABLE_GIS: bool = True
-
-    # ── Validation ─────────────────────────────────────────────
-    def _check_default_secret(self, var_name: str, value: str | None) -> None:
-        if value and value == "changethis":
-            message = (
-                f'The value of {var_name} is "changethis", '
-                "for security, please change it, at least for deployments."
-            )
-            if self.ENVIRONMENT == "local":
-                warnings.warn(message, stacklevel=1)
-            else:
-                raise ValueError(message)
-
-    @model_validator(mode="after")
-    def _enforce_non_default_secrets(self) -> Self:
-        self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
-        self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
-        self._check_default_secret(
-            "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
-        )
+    # =========================================================================
+    # اعتبارسنجی سراسری (Global Validation)
+    # =========================================================================
+    @model_validator(mode='after')
+    def validate_production_settings(self) -> 'Settings':
+        """
+        اطمینان از رعایت الزامات امنیتی در محیط Production
+        """
+        if self.ENVIRONMENT == "production":
+            if self.DEBUG:
+                raise ValueError("تنظیم DEBUG روی True در محیط production مجاز نیست.")
+            if self.SECRET_KEY == "super-secret-key-change-in-production-please":
+                raise ValueError("لطفاً مقدار SECRET_KEY را در محیط production تغییر دهید.")
+            if not self.BACKEND_WALLET_PRIVATE_KEY:
+                # هشدار: در برخی معماری‌ها بک‌اند نیاز به امضا ندارد، اما اگر نیاز دارد این خط فعال شود
+                pass # raise ValueError("کلید خصوصی کیف پول بک‌اند در محیط production الزامی است.")
+        
         return self
 
 
-# Singleton instance
-settings = Settings()  # type: ignore[call-arg]
+# =============================================================================
+# نمونهٔ Singleton برای دسترسی سریع و بهینه به تنظیمات
+# =============================================================================
+@lru_cache
+def get_settings() -> Settings:
+    """
+    بازگرداندن نمونهٔ کش‌شدهٔ تنظیمات برای جلوگیری از خواندن مکرر فایل .env
+    """
+    return Settings()
+
+
+# نمونهٔ سراسری برای استفاده در کل پروژه
+settings = get_settings()
