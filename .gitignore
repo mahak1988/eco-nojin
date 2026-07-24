@@ -218,3 +218,9 @@ __repo_sync_tmp__/
 # ── Reports with potential secrets ──
 reports/guardian_*.md
 # ── Logs ──
+
+# Analyzer outputs (prevent self-referential findings)
+project-analysis.json
+project-analysis.html
+project-analysis.sha256
+.security_backup/

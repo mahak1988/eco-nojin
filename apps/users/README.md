@@ -80,7 +80,7 @@ class User(Base):
 // POST /api/v1/users/register
 {
     "email": "user@example.com",
-    "password": "mysecurepassword123",
+    "password": "*****",
     "full_name": "کاربر نمونه"  // اختیاری
 }
 // Response 201
@@ -99,7 +99,7 @@ class User(Base):
 // POST /api/v1/auth/login
 {
     "email": "user@example.com",
-    "password": "mysecurepassword123"
+    "password": "*****"
 }
 // Response 200
 {
@@ -206,12 +206,12 @@ async def admin_endpoint(
 # 1. ثبت‌نام
 curl -X POST http://localhost:8000/api/v1/users/register \
   -H "Content-Type: application/json" \
-  -d '{"email": "test@econojin.com", "password": "Test1234!", "full_name": "کاربر تست"}'
+  -d '{"email": "test@econojin.com", "password": "*****", "full_name": "کاربر تست"}'
 
 # 2. ورود و دریافت توکن
 TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "test@econojin.com", "password": "Test1234!"}' \
+  -d '{"email": "test@econojin.com", "password": "*****"}' \
   | python -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
 
 # 3. دریافت اطلاعات کاربر
@@ -227,13 +227,13 @@ import httpx
 # ثبت‌نام
 response = httpx.post(
     "http://localhost:8000/api/v1/users/register",
-    json={"email": "user@example.com", "password": "SecurePass123"}
+    json={"email": "user@example.com", "password": "*****"}
 )
 
 # ورود
 response = httpx.post(
     "http://localhost:8000/api/v1/auth/login",
-    json={"email": "user@example.com", "password": "SecurePass123"}
+    json={"email": "user@example.com", "password": "*****"}
 )
 token = response.json()["access_token"]
 

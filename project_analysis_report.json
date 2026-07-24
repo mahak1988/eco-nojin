@@ -1,0 +1,355 @@
+{
+  "stats": {
+    "total_files": 1080,
+    "files_by_ext": {
+      ".yaml": 8,
+      ".py": 379,
+      ".json": 122,
+      ".yml": 29,
+      ".md": 109,
+      ".ts": 212,
+      ".tsx": 210,
+      ".js": 9,
+      ".sol": 2
+    },
+    "total_size_bytes": 13189585,
+    "total_size_mb": 12.58
+  },
+  "findings": {
+    "smart_contracts": [
+      {
+        "path": "contracts\\contracts\\EcoCoin.sol",
+        "name": "EcoCoin.sol",
+        "size_kb": 7.71,
+        "contracts": [
+          "EcoCoin"
+        ],
+        "functions": [
+          {
+            "name": "transfer",
+            "params": "address to, uint256 amount",
+            "modifiers": "external returns"
+          },
+          {
+            "name": "approve",
+            "params": "address spender, uint256 amount",
+            "modifiers": "external returns"
+          },
+          {
+            "name": "transferFrom",
+            "params": "address from, address to, uint256 amount",
+            "modifiers": "external returns"
+          },
+          {
+            "name": "mint",
+            "params": "address to,\n        uint256 amount,\n        uint256 projectId,\n        string calldata reason,\n        bytes calldata proof",
+            "modifiers": "external onlyOracle"
+          },
+          {
+            "name": "burn",
+            "params": "uint256 amount",
+            "modifiers": "external"
+          },
+          {
+            "name": "stake",
+            "params": "uint256 tierId",
+            "modifiers": "external nonReentrant"
+          },
+          {
+            "name": "unstake",
+            "params": "uint256 tierId",
+            "modifiers": "external nonReentrant"
+          },
+          {
+            "name": "calculateReward",
+            "params": "uint256 amount, uint256 tierId, uint256 duration",
+            "modifiers": "public view returns"
+          },
+          {
+            "name": "setOracle",
+            "params": "address newOracle",
+            "modifiers": "external onlySteward"
+          },
+          {
+            "name": "totalMinted",
+            "params": "",
+            "modifiers": "external view returns"
+          },
+          {
+            "name": "totalBurned",
+            "params": "",
+            "modifiers": "external view returns"
+          },
+          {
+            "name": "getStakeInfo",
+            "params": "address user, uint256 tierId",
+            "modifiers": "external view returns"
+          }
+        ],
+        "events": [
+          {
+            "name": "Minted",
+            "params": "address indexed to, uint256 amount, uint256 projectId, string reason"
+          },
+          {
+            "name": "Burned",
+            "params": "address indexed from, uint256 amount"
+          },
+          {
+            "name": "Staked",
+            "params": "address indexed user, uint256 amount, uint256 tierId"
+          },
+          {
+            "name": "Unstaked",
+            "params": "address indexed user, uint256 amount, uint256 reward"
+          },
+          {
+            "name": "OracleUpdated",
+            "params": "address indexed newOracle"
+          },
+          {
+            "name": "Approval",
+            "params": "address indexed owner, address indexed spender, uint256 value"
+          },
+          {
+            "name": "Transfer",
+            "params": "address indexed from, address indexed to, uint256 value"
+          }
+        ],
+        "modifiers": [
+          "onlySteward",
+          "onlyOracle"
+        ],
+        "security_issues": [
+          "CWE-862: فقدان کنترل دسترسی در تابع public"
+        ]
+      },
+      {
+        "path": "contracts\\contracts\\VerificationOracle.sol",
+        "name": "VerificationOracle.sol",
+        "size_kb": 5.03,
+        "contracts": [
+          "VerificationOracle"
+        ],
+        "functions": [
+          {
+            "name": "registerProject",
+            "params": "string calldata name,\n        string calldata region,\n        string calldata ipfsHash,\n        uint256 creditType",
+            "modifiers": "external onlySteward returns"
+          },
+          {
+            "name": "verify",
+            "params": "uint256 projectId,\n        uint256 value,\n        bytes32 dataHash",
+            "modifiers": "external onlyVerifier"
+          },
+          {
+            "name": "addVerifier",
+            "params": "address verifier",
+            "modifiers": "external onlySteward"
+          },
+          {
+            "name": "removeVerifier",
+            "params": "address verifier",
+            "modifiers": "external onlySteward"
+          },
+          {
+            "name": "getProject",
+            "params": "uint256 projectId",
+            "modifiers": "external view returns"
+          },
+          {
+            "name": "getVerifications",
+            "params": "uint256 projectId",
+            "modifiers": "external view returns"
+          },
+          {
+            "name": "calculateCredits",
+            "params": "uint256 /* projectId */,\n        uint256 value,\n        bytes32 /* dataHash */",
+            "modifiers": "public pure returns"
+          }
+        ],
+        "events": [
+          {
+            "name": "ProjectRegistered",
+            "params": "uint256 indexed id, string name, uint256 creditType"
+          },
+          {
+            "name": "Verified",
+            "params": "uint256 indexed projectId, address indexed verifier, uint256 value"
+          },
+          {
+            "name": "VerifierAdded",
+            "params": "address indexed verifier"
+          },
+          {
+            "name": "VerifierRemoved",
+            "params": "address indexed verifier"
+          }
+        ],
+        "modifiers": [
+          "onlySteward",
+          "onlyVerifier"
+        ],
+        "security_issues": [
+          "CWE-862: فقدان کنترل دسترسی در تابع public"
+        ]
+      }
+    ],
+    "api_endpoints_count": 200,
+    "database_models_count": 200,
+    "frontend_components_count": 150,
+    "security_issues": [
+      {
+        "file": "contracts\\contracts\\EcoCoin.sol",
+        "issue": "CWE-862: فقدان کنترل دسترسی در تابع public"
+      },
+      {
+        "file": "contracts\\contracts\\VerificationOracle.sol",
+        "issue": "CWE-862: فقدان کنترل دسترسی در تابع public"
+      }
+    ],
+    "dependencies": {
+      "python": [],
+      "node": [
+        "zod",
+        "typescript",
+        "@econojin/lib",
+        "@econojin/types",
+        "hardhat",
+        "@econojin/features",
+        "@types/react",
+        "styled-components",
+        "@radix-ui/react-slot",
+        "tailwindcss",
+        "@econojin/hooks",
+        "@types/node",
+        "react-dom",
+        "hardhat-gas-reporter",
+        "@types/react-dom",
+        "postcss",
+        "recharts",
+        "@vitejs/plugin-react",
+        "react-hot-toast",
+        "solidity-coverage",
+        "clsx",
+        "@strapi/strapi",
+        "dotenv",
+        "@nomicfoundation/hardhat-toolbox",
+        "turbo",
+        "@turbo/codemod",
+        "@tanstack/react-query",
+        "tailwind-merge",
+        "react-router-dom",
+        "lucide-react",
+        "@econojin/ui",
+        "@types/jest",
+        "react-i18next",
+        "@nomicfoundation/hardhat-chai-matchers",
+        "axios",
+        "vite",
+        "i18next-browser-languagedetector",
+        "react",
+        "autoprefixer",
+        "@radix-ui/react-progress",
+        "@radix-ui/react-select",
+        "class-variance-authority",
+        "@radix-ui/react-label",
+        "@openzeppelin/contracts",
+        "i18next",
+        "ts-node",
+        "eslint"
+      ],
+      "blockchain": []
+    },
+    "keyword_matches": {
+      "ecocoin": [
+        "analyze_ecocoin_v2.py",
+        "current_snapshot.json",
+        "PLAN.md",
+        "project_analyzer.py",
+        "README.md",
+        "TODO.md",
+        "triage_report.md",
+        "unified_audit.json",
+        ".sync_backup_20260724_060347\\PLAN.md",
+        "apps\\main.py",
+        "contracts\\package.json",
+        "contracts\\README.md",
+        "contracts\\SECURITY_REPORT.md",
+        "docs\\ROADMAP_FA.md",
+        "reports\\COMPARATIVE_ANALYSIS.md",
+        "reports\\LOCALHOST_5174_ANALYSIS_REPORT.md",
+        "reports\\analysis_v2\\ecocoin_analysis_v2.json",
+        "reports\\analysis_v2\\ecocoin_analysis_v2.md",
+        "reports\\ecocoin_analysis\\ecocoin_analysis.json",
+        "reports\\ecocoin_analysis\\ecocoin_analysis.md"
+      ],
+      "blockchain": [
+        "analyze_ecocoin_v2.py",
+        "current_snapshot.json",
+        "docker-compose.prod.yml",
+        "merge_branches.py",
+        "PLAN.md",
+        "pnpm-lock.yaml",
+        "project_analyzer.py",
+        "unified_audit.json",
+        ".sync_backup_20260724_060347\\PLAN.md",
+        "contracts\\hardhat.config.ts",
+        "contracts\\package.json",
+        "contracts\\README.md",
+        "contracts\\SECURITY_REPORT.md",
+        "docs\\FRONTEND_EXTRACTION_PLAN.md",
+        "knowledge_hub\\README.md",
+        "monitoring\\prometheus.yml",
+        "reports\\COMPARATIVE_ANALYSIS.md",
+        "reports\\LOCALHOST_5174_ANALYSIS_REPORT.md",
+        "scripts\\builders\\contracts_builder.py",
+        "reports\\analysis_v2\\ecocoin_analysis_v2.json"
+      ],
+      "deployment": [
+        "analyze_ecocoin_v2.py",
+        "current_snapshot.json",
+        "docker-compose.apps.yml",
+        "docker-compose.prod.yml",
+        "IMPROVEMENT_REPORT.md",
+        "monorepo_scan.json",
+        "PHASE2_COMPLETED.md",
+        "PLAN.md",
+        "pnpm-lock.yaml",
+        "project_analyzer.py",
+        "README.md",
+        "sync_report_20260724_060311.json",
+        "sync_report_20260724_060347.json",
+        "TODO.md",
+        ".github\\dependabot.yml",
+        ".sync_backup_20260724_060347\\IMPROVEMENT_REPORT.md",
+        ".sync_backup_20260724_060347\\PHASE2_COMPLETED.md",
+        ".sync_backup_20260724_060347\\PLAN.md",
+        "contracts\\README.md",
+        "contracts\\SECURITY_REPORT.md"
+      ],
+      "mrv": [
+        "current_snapshot.json",
+        "PLAN.md",
+        "pnpm-lock.yaml",
+        "project_analyzer.py",
+        "sync_report_20260724_060311.json",
+        "sync_report_20260724_060347.json",
+        "unified_audit.json",
+        ".sync_backup_20260724_060347\\PLAN.md",
+        "contracts\\package.json",
+        "contracts\\README.md",
+        "contracts\\SECURITY_REPORT.md",
+        "knowledge_hub\\README.md",
+        "legal\\privacy_policy.md",
+        "output\\dataset_metadata.json",
+        "reports\\COMPARATIVE_ANALYSIS.md",
+        "reports\\import_health_20260530_203447.md",
+        "reports\\LOCALHOST_5174_ANALYSIS_REPORT.md",
+        "scripts\\generate_simulators.py",
+        "src\\pages\\Carbon\\CarbonDashboard.tsx",
+        "scalability\\international\\INTERNATIONAL_FRAMEWORKS_ALIGNMENT.md"
+      ]
+    }
+  }
+}

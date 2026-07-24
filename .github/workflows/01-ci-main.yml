@@ -124,7 +124,7 @@ jobs:
           --health-retries 5
     
     env:
-      DATABASE_URL: postgresql://test:test@localhost:5432/econojin_test
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       REDIS_URL: redis://localhost:6379
       ENVIRONMENT: test
       PYTHONPATH: ${{ github.workspace }}
