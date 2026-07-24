@@ -1,8 +1,55 @@
 /**
  * ============================================================================
  *  Type Definitions — Core types for the Econojin platform
+ *  تعاریف نوع برای پلتفرم اکونوجین
  * ============================================================================
  */
+
+// Export backend types
+export type {
+  BackendUser,
+  LoginRequest,
+  RegisterPayload as RegisterRequest,
+  RefreshRequest,
+  AuthResponse,
+  ApiResponse,
+  ErrorResponse,
+  AdminDashboardSummary,
+  AdminSetting,
+  AdminSettingUpdate,
+  AuditLog,
+  SystemReport,
+  PaginatedResponse,
+  AgentType,
+  AIAgent,
+  MessageResponse,
+  ConversationCreate,
+  ConversationResponse,
+  ConversationDetail,
+  ChatRequest as AIChatRequest,
+  ChatResponse as AIChatResponse,
+  Simulation,
+  SimulationCreate,
+  SimulationUpdate,
+  SimulationListResponse,
+} from "./backend";
+
+// Re-export existing types
+export type {
+  User,
+  AuthCredentials,
+  AuthSession,
+  RegisterPayload,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  MeResponse,
+  ApiError,
+  PaginatedResponse as LegacyPaginatedResponse,
+  AdminDashboardSummary as LegacyAdminDashboardSummary,
+  AdminSetting as LegacyAdminSetting,
+  AuditLog as LegacyAuditLog,
+  SystemReport as LegacySystemReport,
+} from "./index_original";
 
 // ---------------------------------------------------------------------------
 // User Roles
@@ -10,130 +57,67 @@
 
 export type UserRole = 'farmer' | 'student' | 'expert' | 'manager' | 'researcher' | 'user';
 
-export interface User {
-  id: string | number;
-  email: string;
-  username?: string;
-  displayName?: string;
-  full_name?: string;
-  role: UserRole;
-  status?: string;
-  is_active?: boolean;
-  is_superuser?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  emailVerified?: boolean;
+// ---------------------------------------------------------------------------
+// Document Types
+// ---------------------------------------------------------------------------
+
+export interface Document {
+  id: string;
+  title: string;
+  description?: string;
+  url: string;
+  tags: string[];
+  status: 'draft' | 'published' | 'archived';
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ---------------------------------------------------------------------------
-// Authentication Types
+// Watershed Types
 // ---------------------------------------------------------------------------
 
-export interface AuthCredentials {
-  email?: string;
-  username?: string;
-  password: string;
-  rememberMe?: boolean;
-}
-
-export interface AuthSession {
-  accessToken: string;
-  refreshToken?: string;
-  user: User;
-  expiresAt?: number;
-}
-
-export interface RegisterPayload {
-  email: string;
-  password: string;
-  full_name?: string;
-  role?: UserRole;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  token: string;
-  new_password: string;
-}
-
-export interface MeResponse {
-  id: string | number;
-  email: string;
-  username?: string;
-  full_name?: string;
-  role?: UserRole;
-  is_active?: boolean;
-  is_superuser?: boolean;
-  created_at?: string;
-  updated_at?: string;
-  email_verified?: boolean;
+export interface Watershed {
+  id: string;
+  name: string;
+  province: string;
+  area: number;
+  status: 'monitored' | 'unmonitored' | 'critical';
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
 }
 
 // ---------------------------------------------------------------------------
-// API Error Types
+// Carbon & Soil Metrics
 // ---------------------------------------------------------------------------
 
-export interface ApiError {
-  statusCode: number;
-  error: string;
-  message: string | string[];
-  detail?: string | Record<string, any>;
+export interface CarbonMetric {
+  id: string;
+  location: string;
+  value: number;
+  unit: string;
+  timestamp: string;
+}
+
+export interface SoilMetric {
+  id: string;
+  location: string;
+  ph: number;
+  organicMatter: number;
+  nitrogen: number;
+  phosphorus: number;
+  potassium: number;
+  timestamp: string;
 }
 
 // ---------------------------------------------------------------------------
 // Common Types
 // ---------------------------------------------------------------------------
 
-export interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  status: 'success' | 'error';
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
+export interface PaginationMeta {
   page: number;
   pageSize: number;
+  total: number;
   totalPages: number;
-}
-
-export interface AdminDashboardSummary {
-  user_count: number;
-  active_user_count: number;
-  superuser_count: number;
-  total_settings: number;
-  total_audit_logs: number;
-  total_reports: number;
-}
-
-export interface AdminSetting {
-  id: number;
-  key: string;
-  value: string;
-  description?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface AuditLog {
-  id: number;
-  actor_id?: number;
-  actor_email?: string;
-  event_type: string;
-  event_data?: string;
-  created_at: string;
-}
-
-export interface SystemReport {
-  id: number;
-  report_name: string;
-  status: string;
-  report_data?: string;
-  created_at: string;
-  completed_at?: string;
 }
