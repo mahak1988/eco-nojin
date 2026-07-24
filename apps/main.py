@@ -153,6 +153,8 @@ app.add_middleware(
 # ۲. Spider Security Middleware (لایه اصلی امنیت عنکبوتی)
 if SECURITY_ENABLED:
     try:
+        app.add_middleware(SecurityHeadersMiddleware)
+        logger.info("🔒 Security Headers Middleware فعال شد")
         app.add_middleware(SpiderSecurityMiddleware)
         logger.info("🕸️ Spider Security Middleware فعال شد")
     except Exception as e:

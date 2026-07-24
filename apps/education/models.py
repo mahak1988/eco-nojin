@@ -631,7 +631,7 @@ class Certificate(Base):
     verification_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     
     # متادیتا
-    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    extra_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     
     # timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

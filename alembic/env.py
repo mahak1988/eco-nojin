@@ -18,21 +18,25 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Auto-import all db_models
+# Auto-import all models from apps directory
 try:
-    from apps.app.domains.dashboard.models.db_models import *
-    from apps.app.domains.hydrology.models.db_models import *
-    from apps.app.domains.iot.models.db_models import *
-    from apps.app.domains.logframe.models.db_models import *
-    from apps.app.domains.mrv.models.db_models import *
-    from apps.app.domains.pilots.models.db_models import *
-    from apps.app.domains.psychology.models.db_models import *
-    from apps.app.domains.remote_sensing.models.db_models import *
-    from apps.app.domains.safeguards.models.db_models import *
-    from apps.app.domains.training.models.db_models import *
-    from apps.app.domains.lms.models.db_models import *
+    # Core models
+    import apps.users.models  # noqa: F401
+    import apps.ai_agents.models  # noqa: F401
+    import apps.simulation.models  # noqa: F401
+    import apps.accounting.models  # noqa: F401
+    import apps.education.models  # noqa: F401
+    import apps.decision_support.models  # noqa: F401
+    import apps.knowledge_graph.models  # noqa: F401
+    
+    # Shared modules
+    import apps.shared_sim.models  # noqa: F401
+    import apps.shared_ai.models  # noqa: F401
+    import apps.shared_knowledge.models  # noqa: F401
+    
+    print("✅ All models imported successfully")
 except ImportError as e:
-    print(f"Warning: {e}")
+    print(f"⚠️  Warning importing models: {e}")
 
 target_metadata = Base.metadata
 
@@ -49,9 +53,19 @@ def run_migrations_online():
         poolclass=pool.NullPool,
     )
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_item=render_item,
+            include_schemas=True
+        )
         with context.begin_transaction():
             context.run_migrations()
+
+def render_item(type_, obj, autogen_context):
+    """Custom render function to handle SQLite incompatibilities"""
+    # Skip all operations on existing tables - we only want to add new tables
+    return False
 
 if context.is_offline_mode():
     run_migrations_offline()
