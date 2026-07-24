@@ -205,3 +205,16 @@ build/
 .env
 .env.local
 apps/web/.env
+
+# ── Added by secure_fix.py ──
+# ── Secrets & environment ──
+.env.*
+*.p12
+*.pfx
+# ── Backups & temp ──
+.sync_backup_*/
+__repo_sync_tmp__/
+# ── Dependencies & stores ──
+# ── Reports with potential secrets ──
+reports/guardian_*.md
+# ── Logs ──
