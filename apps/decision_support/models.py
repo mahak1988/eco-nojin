@@ -123,7 +123,7 @@ class DecisionCriterion(Base):
     max_value: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     
     # متادیتای اضافی
-    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    extra_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     
     # timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -166,7 +166,7 @@ class DecisionAlternative(Base):
     
     # متادیتا و اطلاعات تکمیلی
     category: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    extra_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     
     # timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -358,10 +358,10 @@ class DecisionTemplate(Base):
 
 # جدول ارتباطی برای گروه‌بندی معیارها
 criterion_groups = Table(
-    'criterion_groups',
+    'criterion_group_criteria',  # renamed to avoid conflict with CriterionGroup table
     Base.metadata,
     Column('criterion_id', Integer, ForeignKey('decision_criteria.id'), primary_key=True),
-    Column('group_id', Integer, ForeignKey('criterion_group.id'), primary_key=True)
+    Column('group_id', Integer, ForeignKey('criterion_groups.id'), primary_key=True)
 )
 
 

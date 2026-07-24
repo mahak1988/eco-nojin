@@ -97,7 +97,7 @@ class Concept(Base):
     # متادیتا
     synonyms: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
     abbreviations: Mapped[Optional[List[str]]] = mapped_column(JSON, nullable=True)
-    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    extra_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     
     # وضعیت
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -192,7 +192,7 @@ class SemanticRelation(Base):
     source_reference: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     
     # متادیتا
-    metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    extra_data: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     
     # وضعیت
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)

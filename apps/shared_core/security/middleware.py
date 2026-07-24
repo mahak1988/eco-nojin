@@ -65,10 +65,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Referrer Policy
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         
-        # HSTS (فقط در production)
-        if self.is_production:
-            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
-        
+        # HSTS (enabled for all environments)
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
         # Permissions Policy
         response.headers["Permissions-Policy"] = (
             "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
@@ -298,7 +296,7 @@ class SpiderSecurityMiddleware(BaseHTTPMiddleware):
         self.blacklisted_ips: set = self._load_blacklist()
         
         # لیست سفید IPها (برای تست)
-        whitelist_env = os.getenv("SECURITY_WHITELIST_IPS", "")
+        whitelist_env = os.getenv("SECURITY_WHITELIST_IPS", "127.0.0.1,::1")
         self.whitelisted_ips = set(ip.strip() for ip in whitelist_env.split(",") if ip.strip())
         
     def _load_blacklist(self) -> set:
