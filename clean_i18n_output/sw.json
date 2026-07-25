@@ -1,0 +1,247 @@
+{
+  "auth": {
+    "welcome": "Karibu",
+    "rememberMe": "Nikumbuke",
+    "continueWithGoogle": "[SW] ادامه با گوگل",
+    "confirmPassword": "[SW] تکرار رمز عبور",
+    "email": "Barua pepe",
+    "noAccount": "[SW] حساب کاربری ندارید؟",
+    "haveAccount": "[SW] قبلاً ثبت‌نام کرده‌اید؟",
+    "or": "[SW] یا",
+    "forgotPassword": "Umesahau nenosiri?",
+    "login": {
+      "title": "[SW] ورود به حساب کاربری",
+      "subtitle": "[SW] به پنل خود وارد شوید"
+    },
+    "register": {
+      "title": "[SW] ایجاد حساب کاربری"
+    },
+    "password": "Nenosiri",
+    "signIn": "Ingia",
+    "continueWithGithub": "[SW] ادامه با گیت‌هاب",
+    "signUp": "Jisajili"
+  },
+  "nav": {
+    "tasks": "Kazi",
+    "map": "Ramani",
+    "help": "Msaada",
+    "profile": "Wasifu",
+    "logout": "Ondoka",
+    "home": "Nyumbani",
+    "register": "Jisajili",
+    "reports": "Ripoti",
+    "users": "Watumiaji",
+    "dashboard": "Dashibodi",
+    "analytics": "Uchambuzi",
+    "settings": "Mipangilio",
+    "notifications": "Arifa",
+    "language": "Lugha",
+    "projects": "Miradi",
+    "login": "Ingia"
+  },
+  "pages": {
+    "payments": {
+      "desc": "[SW] مدیریت تمام تراکنش‌های پرداخت",
+      "title": "[SW] پرداخت‌ها"
+    },
+    "risks": {
+      "title": "[SW] مدیریت ریسک",
+      "desc": "[SW] شناسایی و کاهش ریسک‌های پروژه"
+    },
+    "games": {
+      "desc": "[SW] چالش‌های اکولوگی، تابلوهای برتری و جایزه‌ها",
+      "title": "[SW] بازی‌سازی"
+    },
+    "simulators": {
+      "desc": "[SW] شبیه‌سازهای آب‌وهوا، آب و کشاورزی",
+      "title": "[SW] شبیه‌سازها"
+    },
+    "tourism": {
+      "desc": "[SW] گردشگری پایدار و نقشه‌برداری",
+      "title": "[SW] گردشگری اکولوژیک"
+    },
+    "ecocoin": {
+      "title": "[SW] اکولکوین",
+      "desc": "[SW] پاداش‌های رمزارز و تراکنش‌ها"
+    },
+    "library": {
+      "title": "[SW] مرکز دانش",
+      "desc": "[SW] مواد آموزشی، مستندات و کتابخانه"
+    },
+    "mrv": {
+      "desc": "[SW] پایش، گزارش‌دهی و تأیید",
+      "title": "[SW] MRV و حمایت‌ها"
+    },
+    "accounting": {
+      "title": "[SW] داشبورد مالی",
+      "desc": "[SW] حسابداری، فاکتورها، سندها، پرداخت‌ها"
+    },
+    "account": {
+      "title": "[SW] تنظیمات حساب",
+      "desc": "[SW] مدیریت پروفایل و ترجیحات"
+    },
+    "pilots": {
+      "desc": "[SW] پروژه‌های فعال و ابتکارات",
+      "title": "[SW] پروژه‌های آزمایشی"
+    },
+    "alerts": {
+      "title": "[SW] هشدارها و اعلان‌ها",
+      "desc": "[SW] هشدارهای زنده و هشدارهای پیش‌بینی"
+    },
+    "education": {
+      "desc": "[SW] یادگیری درباره پایداری و دریافت گواهینامه",
+      "title": "[SW] آموزش و آموزش"
+    },
+    "users": {
+      "desc": "[SW] نقش‌ها، دسترسی‌ها و تعامل اجتماعی",
+      "title": "[SW] مدیریت کاربران"
+    },
+    "analytics": {
+      "desc": "[SW] بینش و معیارهای جامع داده",
+      "title": "[SW] داشبورد تحلیلی"
+    },
+    "news": {
+      "desc": "[SW] آخرین اخبار، هشدارها و اعلانیه‌ها",
+      "title": "[SW] اخبار و به‌روزرسانی‌ها"
+    },
+    "community": {
+      "desc": "[SW] انجمن‌ها، بحث‌ها و همکاری",
+      "title": "[SW] جامعه"
+    },
+    "invoices": {
+      "title": "[SW] فاکتورها",
+      "desc": "[SW] مدیریت و پیگیری تمام فاکتورها"
+    },
+    "satellite": {
+      "desc": "[SW] داده‌های زنده ماهواره و تحلیل NDVI",
+      "title": "[SW] تصاویر ماهواره‌ای"
+    },
+    "policies": {
+      "desc": "[SW] بازنگری و مدیریت سیاست‌های پروژه",
+      "title": "[SW] سیاست‌ها و قانونی"
+    },
+    "regional": {
+      "desc": "[SW] افغانستان، عراق، اردن، شبکه مENA ILM",
+      "title": "[SW] پیاده‌سازی منطقه‌ای"
+    },
+    "reports": {
+      "desc": "[SW] تولید و دانلود گزارش‌های پروژه",
+      "title": "[SW] گزارش‌ها"
+    },
+    "journal": {
+      "desc": "[SW] مشاهده و مدیریت سندهای حسابرسی",
+      "title": "[SW] سندهای حسابرسی"
+    }
+  },
+  "settings": {
+    "security": "[SW] امنیت",
+    "title": "[SW] تنظیمات",
+    "theme": "[SW] رنگ و تم",
+    "notifications": "[SW] اعلان‌ها",
+    "lightMode": "[SW] حالت روشن",
+    "system": "[SW] سیستم",
+    "profile": "[SW] تنظیمات پروفایل",
+    "darkMode": "[SW] حالت تاریک",
+    "language": "[SW] زبان"
+  },
+  "common": {
+    "next": "Inayofuata",
+    "error": "Hitilafu!",
+    "itemsPerPage": "[SW] تعداد در صفحه",
+    "sort": "Panga",
+    "noData": "Hakuna data",
+    "export": "Hamisha",
+    "deselectAll": "[SW] لغو انتخاب همه",
+    "success": "Imefanikiwa",
+    "upload": "Pakia",
+    "search": "Tafuta",
+    "of": "[SW] از",
+    "update": "Sasisha",
+    "page": "[SW] صفحه",
+    "noResults": "Hakuna matokeo yaliyopatikana",
+    "print": "Chapisha",
+    "loading": "Inapakia...",
+    "delete": "Futa",
+    "previous": "Iliyotangulia",
+    "yes": "Ndiyo",
+    "create": "Unda",
+    "selectAll": "[SW] انتخاب همه",
+    "back": "Rudi",
+    "save": "Hifadhi",
+    "import": "Ingiza",
+    "total": "[SW] مجموع",
+    "no": "Hapana",
+    "confirm": "Thibitisha",
+    "edit": "Hariri",
+    "reset": "Weka upya",
+    "filter": "Chuja",
+    "close": "Funga",
+    "cancel": "Ghairi",
+    "submit": "Wasilisha",
+    "download": "Pakua",
+    "open": "Fungua"
+  },
+  "dashboard": {
+    "welcome": "Karibu kwenye Dashibodi ya EcoNojin",
+    "overview": "Muhtasari",
+    "revenue": "[SW] درآمد",
+    "activeUsers": "Watumiaji Wanaofanya Kazi",
+    "title": "Dashibodi",
+    "recentActivity": "[SW] فعالیت‌های اخیر",
+    "totalUsers": "Jumla ya Watumiaji",
+    "viewAll": "Tazama Zote",
+    "performance": "[SW] عملکرد",
+    "totalProjects": "Jumla ya Miradi",
+    "growth": "[SW] رشد"
+  },
+  "theme": {
+    "purple": "[SW] بنفش",
+    "system": "[SW] سیستم",
+    "light": "[SW] روشن",
+    "orange": "[SW] نارنجی",
+    "blue": "[SW] آبی",
+    "green": "[SW] سبز (پیش‌فرض)",
+    "dark": "[SW] تاریک"
+  },
+  "map": {
+    "terrain": "[SW] زمینی",
+    "street": "[SW] خیابانی",
+    "fullscreen": "[SW] تمام صفحه",
+    "title": "[SW] نقشه GIS",
+    "zoomIn": "[SW] بزرگنمایی +",
+    "satellite": "[SW] ماهواره‌ای",
+    "zoomOut": "[SW] کوچکنمایی -",
+    "layers": "[SW] لایه‌ها"
+  },
+  "error": {
+    "500": {
+      "title": "[SW] خطای سرور",
+      "description": "[SW] متأسفانه مشکلی در سرور رخ داده است. لطفاً بعداً تلاش کنید."
+    },
+    "goHome": "[SW] بازگشت به خانه",
+    "404": {
+      "description": "[SW] صفحه‌ای که به دنبال آن هستید وجود ندارد یا حذف شده است.",
+      "title": "[SW] صفحه مورد نظر یافت نشد"
+    },
+    "tryAgain": "[SW] تلاش مجدد"
+  },
+  "footer": {
+    "terms": "[SW] شرایط استفاده",
+    "about": "[SW] درباره ما",
+    "privacy": "[SW] حریم خصوصی",
+    "copyright": "[SW] © ۲۰۲۶ اکونوژین. تمامی حقوق محفوظ است.",
+    "contact": "[SW] تماس با ما"
+  },
+  "app": {
+    "description": "EcoNojin ni jukwaa kamili la kufuatilia, kuchambua na kusimamia kwa uendelevu rasilimali za asili, kilimo cha kisasa na mazingira.",
+    "tagline": "Jukwaa la Akili kwa Usimamizi Endelevu wa Rasilimali za Asili na Mazingira",
+    "name": "EcoNojin"
+  },
+  "validation": {
+    "email": "[SW] لطفاً یک ایمیل معتبر وارد کنید",
+    "maxLength": "[SW] حداکثر {{count}} کاراکتر allowed",
+    "minLength": "[SW] حداقل {{count}} کاراکتر required",
+    "passwordMatch": "[SW] رمز عبور مطابقت ندارد",
+    "required": "[SW] این فیلد الزامی است"
+  }
+}
