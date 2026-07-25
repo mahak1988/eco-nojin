@@ -1,123 +1,247 @@
 {
-  "app.name": "Эконожин",
-  "app.tagline": "Умная платформа для устойчивого управления природными ресурсами и окружающей средой",
-  "app.description": "EcoNojin is a comprehensive platform for monitoring, analyzing and sustainably managing natural resources, smart agriculture and the environment",
-  "nav.home": "Главная",
-  "nav.dashboard": "Панель управления",
-  "nav.analytics": "Аналитика",
-  "nav.map": "Карта",
-  "nav.reports": "Отчеты",
-  "nav.settings": "Настройки",
-  "nav.profile": "Профиль",
-  "nav.users": "Пользователи",
-  "nav.projects": "Проекты",
-  "nav.tasks": "Задачи",
-  "nav.notifications": "Уведомления",
-  "nav.help": "Помощь",
-  "nav.logout": "Выйти",
-  "nav.login": "Войти",
-  "nav.register": "Регистрация",
-  "nav.language": "Язык",
-  "auth.welcome": "Добро пожаловать",
-  "auth.login.title": "Вход в систему",
-  "auth.login.subtitle": "Sign in to your account",
-  "auth.register.title": "Create Account",
-  "auth.forgotPassword": "Forgot password?",
-  "auth.email": "Эл. почта",
-  "auth.password": "Пароль",
-  "auth.confirmPassword": "Confirm Password",
-  "auth.rememberMe": "Remember me",
-  "auth.noAccount": "Don't have an account?",
-  "auth.haveAccount": "Already have an account?",
-  "auth.signUp": "Зарегистрироваться",
-  "auth.signIn": "Войти",
-  "auth.or": "или",
-  "auth.continueWithGoogle": "Continue with Google",
-  "auth.continueWithGithub": "Continue with GitHub",
-  "dashboard.title": "Панель управления",
-  "dashboard.overview": "Обзор",
-  "dashboard.welcome": "Добро пожаловать в панель управления Эконожин",
-  "dashboard.totalUsers": "Всего пользователей",
-  "dashboard.activeUsers": "Активные пользователи",
-  "dashboard.totalProjects": "Всего проектов",
-  "dashboard.revenue": "Доход",
-  "dashboard.growth": "Growth",
-  "dashboard.performance": "Performance",
-  "dashboard.recentActivity": "Recent Activity",
-  "dashboard.viewAll": "View All",
-  "common.loading": "Загрузка...",
-  "common.error": "Ошибка!",
-  "common.success": "Успешно",
-  "common.save": "Сохранить",
-  "common.cancel": "Отмена",
-  "common.delete": "Удалить",
-  "common.edit": "Редактировать",
-  "common.create": "Создать",
-  "common.update": "Update",
-  "common.search": "Поиск",
-  "common.filter": "Фильтр",
-  "common.sort": "Sort",
-  "common.export": "Export",
-  "common.import": "Import",
-  "common.print": "Print",
-  "common.back": "Back",
-  "common.next": "Next",
-  "common.previous": "Previous",
-  "common.close": "Закрыть",
-  "common.open": "Open",
-  "common.yes": "Да",
-  "common.no": "Нет",
-  "common.confirm": "Подтвердить",
-  "common.submit": "Submit",
-  "common.reset": "Reset",
-  "common.download": "Download",
-  "common.upload": "Upload",
-  "common.selectAll": "Select All",
-  "common.deselectAll": "Deselect All",
-  "common.noData": "Нет данных",
-  "common.noResults": "No results found",
-  "common.page": "Page",
-  "common.of": "of",
-  "common.itemsPerPage": "Items per page",
-  "common.total": "Total",
-  "validation.required": "This field is required",
-  "validation.email": "Please enter a valid email",
-  "validation.minLength": "Minimum {{count}} characters required",
-  "validation.maxLength": "Maximum {{count}} characters allowed",
-  "validation.passwordMatch": "Passwords do not match",
-  "settings.title": "Настройки",
-  "settings.profile": "Profile Settings",
-  "settings.security": "Security",
-  "settings.notifications": "Notifications",
-  "settings.theme": "Theme",
-  "settings.language": "Язык",
-  "settings.darkMode": "Темная тема",
-  "settings.lightMode": "Светлая тема",
-  "settings.system": "System",
-  "theme.light": "Светлая",
-  "theme.dark": "Темная",
-  "theme.system": "Системная",
-  "theme.green": "Green (Default)",
-  "theme.blue": "Blue",
-  "theme.purple": "Purple",
-  "theme.orange": "Orange",
-  "map.title": "GIS карта",
-  "map.satellite": "Спутник",
-  "map.terrain": "Terrain",
-  "map.street": "Street",
-  "map.layers": "Layers",
-  "map.zoomIn": "Zoom In",
-  "map.zoomOut": "Zoom Out",
-  "map.fullscreen": "Fullscreen",
-  "error.404.title": "Страница не найдена",
-  "error.404.description": "The page you are looking for does not exist or has been removed.",
-  "error.500.title": "Server Error",
-  "error.500.description": "Sorry, something went wrong on our end. Please try again later.",
-  "error.goHome": "На главную",
-  "error.tryAgain": "Try Again",
-  "footer.copyright": "© 2026 Эконожин. Все права защищены.",
-  "footer.privacy": "Privacy Policy",
-  "footer.terms": "Terms of Service",
-  "footer.contact": "Contact Us",
-  "footer.about": "About Us"
+  "app": {
+    "name": "Эконожин",
+    "tagline": "Умная платформа для устойчивого управления природными ресурсами и окружающей средой",
+    "description": "EcoNojin is a comprehensive platform for monitoring, analyzing and sustainably managing natural resources, smart agriculture and the environment"
+  },
+  "nav": {
+    "home": "Главная",
+    "dashboard": "Панель управления",
+    "analytics": "Аналитика",
+    "map": "Карта",
+    "reports": "Отчеты",
+    "settings": "Настройки",
+    "profile": "Профиль",
+    "users": "Пользователи",
+    "projects": "Проекты",
+    "tasks": "Задачи",
+    "notifications": "Уведомления",
+    "help": "Помощь",
+    "logout": "Выйти",
+    "login": "Войти",
+    "register": "Регистрация",
+    "language": "Язык"
+  },
+  "auth": {
+    "welcome": "Добро пожаловать",
+    "login": {
+      "title": "Вход в систему",
+      "subtitle": "Sign in to your account"
+    },
+    "register": {
+      "title": "Create Account"
+    },
+    "forgotPassword": "Forgot password?",
+    "email": "Эл. почта",
+    "password": "Пароль",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember me",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signUp": "Зарегистрироваться",
+    "signIn": "Войти",
+    "or": "или",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "overview": "Обзор",
+    "welcome": "Добро пожаловать в панель управления Эконожин",
+    "totalUsers": "Всего пользователей",
+    "activeUsers": "Активные пользователи",
+    "totalProjects": "Всего проектов",
+    "revenue": "Доход",
+    "growth": "Growth",
+    "performance": "Performance",
+    "recentActivity": "Recent Activity",
+    "viewAll": "View All"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка!",
+    "success": "Успешно",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "update": "Update",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "print": "Print",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Закрыть",
+    "open": "Open",
+    "yes": "Да",
+    "no": "Нет",
+    "confirm": "Подтвердить",
+    "submit": "Submit",
+    "reset": "Reset",
+    "download": "Download",
+    "upload": "Upload",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "noData": "Нет данных",
+    "noResults": "No results found",
+    "page": "Page",
+    "of": "of",
+    "itemsPerPage": "Items per page",
+    "total": "Total"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "minLength": "Minimum {{count}} characters required",
+    "maxLength": "Maximum {{count}} characters allowed",
+    "passwordMatch": "Passwords do not match"
+  },
+  "settings": {
+    "title": "Настройки",
+    "profile": "Profile Settings",
+    "security": "Security",
+    "notifications": "Notifications",
+    "theme": "Theme",
+    "language": "Язык",
+    "darkMode": "Темная тема",
+    "lightMode": "Светлая тема",
+    "system": "System"
+  },
+  "theme": {
+    "light": "Светлая",
+    "dark": "Темная",
+    "system": "Системная",
+    "green": "Green (Default)",
+    "blue": "Blue",
+    "purple": "Purple",
+    "orange": "Orange"
+  },
+  "map": {
+    "title": "GIS карта",
+    "satellite": "Спутник",
+    "terrain": "Terrain",
+    "street": "Street",
+    "layers": "Layers",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fullscreen": "Fullscreen"
+  },
+  "error": {
+    "404": {
+      "title": "Страница не найдена",
+      "description": "The page you are looking for does not exist or has been removed."
+    },
+    "500": {
+      "title": "Server Error",
+      "description": "Sorry, something went wrong on our end. Please try again later."
+    },
+    "goHome": "На главную",
+    "tryAgain": "Try Again"
+  },
+  "footer": {
+    "copyright": "© 2026 Эконожин. Все права защищены.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "about": "About Us"
+  },
+  "pages": {
+    "analytics": {
+      "title": "داشبورد تحلیلی",
+      "desc": "بینش و معیارهای جامع داده"
+    },
+    "policies": {
+      "title": "سیاست‌ها و قانونی",
+      "desc": "بازنگری و مدیریت سیاست‌های پروژه"
+    },
+    "reports": {
+      "title": "گزارش‌ها",
+      "desc": "تولید و دانلود گزارش‌های پروژه"
+    },
+    "invoices": {
+      "title": "فاکتورها",
+      "desc": "مدیریت و پیگیری تمام فاکتورها"
+    },
+    "community": {
+      "title": "جامعه",
+      "desc": "انجمن‌ها، بحث‌ها و همکاری"
+    },
+    "simulators": {
+      "desc": "شبیه‌سازهای آب‌وهوا، آب و کشاورزی",
+      "title": "شبیه‌سازها"
+    },
+    "users": {
+      "title": "مدیریت کاربران",
+      "desc": "نقش‌ها، دسترسی‌ها و تعامل اجتماعی"
+    },
+    "mrv": {
+      "desc": "پایش، گزارش‌دهی و تأیید",
+      "title": "MRV و حمایت‌ها"
+    },
+    "games": {
+      "desc": "چالش‌های اکولوگی، تابلوهای برتری و جایزه‌ها",
+      "title": "بازی‌سازی"
+    },
+    "account": {
+      "title": "تنظیمات حساب",
+      "desc": "مدیریت پروفایل و ترجیحات"
+    },
+    "tourism": {
+      "title": "گردشگری اکولوژیک",
+      "desc": "گردشگری پایدار و نقشه‌برداری"
+    },
+    "accounting": {
+      "desc": "حسابداری، فاکتورها، سندها، پرداخت‌ها",
+      "title": "داشبورد مالی"
+    },
+    "education": {
+      "desc": "یادگیری درباره پایداری و دریافت گواهینامه",
+      "title": "آموزش و آموزش"
+    },
+    "pilots": {
+      "desc": "پروژه‌های فعال و ابتکارات",
+      "title": "پروژه‌های آزمایشی"
+    },
+    "library": {
+      "desc": "مواد آموزشی، مستندات و کتابخانه",
+      "title": "مرکز دانش"
+    },
+    "satellite": {
+      "desc": "داده‌های زنده ماهواره و تحلیل NDVI",
+      "title": "تصاویر ماهواره‌ای"
+    },
+    "journal": {
+      "desc": "مشاهده و مدیریت سندهای حسابرسی",
+      "title": "سندهای حسابرسی"
+    },
+    "ecocoin": {
+      "title": "اکولکوین",
+      "desc": "پاداش‌های رمزارز و تراکنش‌ها"
+    },
+    "news": {
+      "title": "اخبار و به‌روزرسانی‌ها",
+      "desc": "آخرین اخبار، هشدارها و اعلانیه‌ها"
+    },
+    "risks": {
+      "desc": "شناسایی و کاهش ریسک‌های پروژه",
+      "title": "مدیریت ریسک"
+    },
+    "regional": {
+      "title": "پیاده‌سازی منطقه‌ای",
+      "desc": "افغانستان، عراق، اردن، شبکه مENA ILM"
+    },
+    "payments": {
+      "desc": "مدیریت تمام تراکنش‌های پرداخت",
+      "title": "پرداخت‌ها"
+    },
+    "alerts": {
+      "title": "هشدارها و اعلان‌ها",
+      "desc": "هشدارهای زنده و هشدارهای پیش‌بینی"
+    }
+  }
 }

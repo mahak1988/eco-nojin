@@ -432,6 +432,16 @@ class ProjectAnalyzer:
     # ── ثبت یافته (thread-safe با حذف تکراری) ──
     def _add_finding(self, severity: str, category: str, title: str,
                      file: str, line: int, snippet: str, cwe: str = "") -> None:
+        # internal-http-allowlist
+        if category == "transport" and severity == "low":
+            _internal = re.compile(
+                r"http://(api|web|db|postgres|admin|n8n|"
+                r"supabase-studio|api_backend|localhost|test|"
+                r"my-service)[.:]"
+            )
+            if hasattr(self, "_current_line") and _internal.search(str(self._current_line)):
+                severity = "info"
+
         # test-files-downgrade
         # کاهش severity فایل‌های تست (رمزهای ساختگی)
         if hasattr(self, "_current_file") and self._current_file:
