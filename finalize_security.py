@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -114,7 +115,7 @@ def manual_actions() -> None:
      ۱. apps/shared_core/config.py:137 — حذف default password:
         ┌─────────────────────────────────────────────────────────┐
         │ # قبل:                                                  │
-        │ FIRST_SUPERUSER_PASSWORD: str = "changeme"              │
+        │ FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD", "")  # SEC: from env              │
         │ # بعد (pydantic از env می‌خواند):                       │
         │ FIRST_SUPERUSER_PASSWORD: str                           │
         └─────────────────────────────────────────────────────────┘
