@@ -1,0 +1,247 @@
+{
+  "auth": {
+    "welcome": "[AR] خوش آمدید",
+    "rememberMe": "[AR] مرا به خاطر بسپار",
+    "continueWithGoogle": "[AR] ادامه با گوگل",
+    "confirmPassword": "[AR] تکرار رمز عبور",
+    "email": "[AR] ایمیل",
+    "noAccount": "[AR] حساب کاربری ندارید؟",
+    "haveAccount": "[AR] قبلاً ثبت‌نام کرده‌اید؟",
+    "or": "[AR] یا",
+    "forgotPassword": "[AR] رمز عبور را فراموش کرده‌اید؟",
+    "login": {
+      "title": "[AR] ورود به حساب کاربری",
+      "subtitle": "[AR] به پنل خود وارد شوید"
+    },
+    "register": {
+      "title": "[AR] ایجاد حساب کاربری"
+    },
+    "password": "[AR] رمز عبور",
+    "signIn": "[AR] ورود",
+    "continueWithGithub": "[AR] ادامه با گیت‌هاب",
+    "signUp": "[AR] ثبت‌نام"
+  },
+  "nav": {
+    "tasks": "[AR] وظایف",
+    "map": "[AR] نقشه",
+    "help": "[AR] راهنما",
+    "profile": "[AR] پروفایل",
+    "logout": "[AR] خروج",
+    "home": "[AR] خانه",
+    "register": "[AR] ثبت‌نام",
+    "reports": "[AR] گزارش‌ها",
+    "users": "[AR] کاربران",
+    "dashboard": "[AR] داشبورد",
+    "analytics": "[AR] تحلیل‌ها",
+    "settings": "[AR] تنظیمات",
+    "notifications": "[AR] اعلان‌ها",
+    "language": "[AR] زبان",
+    "projects": "[AR] پروژه‌ها",
+    "login": "[AR] ورود"
+  },
+  "pages": {
+    "payments": {
+      "desc": "[AR] مدیریت تمام تراکنش‌های پرداخت",
+      "title": "[AR] پرداخت‌ها"
+    },
+    "risks": {
+      "title": "[AR] مدیریت ریسک",
+      "desc": "[AR] شناسایی و کاهش ریسک‌های پروژه"
+    },
+    "games": {
+      "desc": "[AR] چالش‌های اکولوگی، تابلوهای برتری و جایزه‌ها",
+      "title": "[AR] بازی‌سازی"
+    },
+    "simulators": {
+      "desc": "[AR] شبیه‌سازهای آب‌وهوا، آب و کشاورزی",
+      "title": "[AR] شبیه‌سازها"
+    },
+    "tourism": {
+      "desc": "[AR] گردشگری پایدار و نقشه‌برداری",
+      "title": "[AR] گردشگری اکولوژیک"
+    },
+    "ecocoin": {
+      "title": "[AR] اکولکوین",
+      "desc": "[AR] پاداش‌های رمزارز و تراکنش‌ها"
+    },
+    "library": {
+      "title": "[AR] مرکز دانش",
+      "desc": "[AR] مواد آموزشی، مستندات و کتابخانه"
+    },
+    "mrv": {
+      "desc": "[AR] پایش، گزارش‌دهی و تأیید",
+      "title": "[AR] MRV و حمایت‌ها"
+    },
+    "accounting": {
+      "title": "[AR] داشبورد مالی",
+      "desc": "[AR] حسابداری، فاکتورها، سندها، پرداخت‌ها"
+    },
+    "account": {
+      "title": "[AR] تنظیمات حساب",
+      "desc": "[AR] مدیریت پروفایل و ترجیحات"
+    },
+    "pilots": {
+      "desc": "[AR] پروژه‌های فعال و ابتکارات",
+      "title": "[AR] پروژه‌های آزمایشی"
+    },
+    "alerts": {
+      "title": "[AR] هشدارها و اعلان‌ها",
+      "desc": "[AR] هشدارهای زنده و هشدارهای پیش‌بینی"
+    },
+    "education": {
+      "desc": "[AR] یادگیری درباره پایداری و دریافت گواهینامه",
+      "title": "[AR] آموزش و آموزش"
+    },
+    "users": {
+      "desc": "[AR] نقش‌ها، دسترسی‌ها و تعامل اجتماعی",
+      "title": "[AR] مدیریت کاربران"
+    },
+    "analytics": {
+      "desc": "[AR] بینش و معیارهای جامع داده",
+      "title": "[AR] داشبورد تحلیلی"
+    },
+    "news": {
+      "desc": "[AR] آخرین اخبار، هشدارها و اعلانیه‌ها",
+      "title": "[AR] اخبار و به‌روزرسانی‌ها"
+    },
+    "community": {
+      "desc": "[AR] انجمن‌ها، بحث‌ها و همکاری",
+      "title": "[AR] جامعه"
+    },
+    "invoices": {
+      "title": "[AR] فاکتورها",
+      "desc": "[AR] مدیریت و پیگیری تمام فاکتورها"
+    },
+    "satellite": {
+      "desc": "[AR] داده‌های زنده ماهواره و تحلیل NDVI",
+      "title": "[AR] تصاویر ماهواره‌ای"
+    },
+    "policies": {
+      "desc": "[AR] بازنگری و مدیریت سیاست‌های پروژه",
+      "title": "[AR] سیاست‌ها و قانونی"
+    },
+    "regional": {
+      "desc": "[AR] افغانستان، عراق، اردن، شبکه مENA ILM",
+      "title": "[AR] پیاده‌سازی منطقه‌ای"
+    },
+    "reports": {
+      "desc": "[AR] تولید و دانلود گزارش‌های پروژه",
+      "title": "[AR] گزارش‌ها"
+    },
+    "journal": {
+      "desc": "[AR] مشاهده و مدیریت سندهای حسابرسی",
+      "title": "[AR] سندهای حسابرسی"
+    }
+  },
+  "settings": {
+    "security": "[AR] امنیت",
+    "title": "[AR] تنظیمات",
+    "theme": "[AR] رنگ و تم",
+    "notifications": "[AR] اعلان‌ها",
+    "lightMode": "[AR] حالت روشن",
+    "system": "[AR] سیستم",
+    "profile": "[AR] تنظیمات پروفایل",
+    "darkMode": "[AR] حالت تاریک",
+    "language": "[AR] زبان"
+  },
+  "common": {
+    "next": "[AR] بعدی",
+    "error": "[AR] خطا!",
+    "itemsPerPage": "[AR] تعداد در صفحه",
+    "sort": "[AR] مرتب‌سازی",
+    "noData": "[AR] داده‌ای وجود ندارد",
+    "export": "[AR] خروجی",
+    "deselectAll": "[AR] لغو انتخاب همه",
+    "success": "[AR] موفقیت",
+    "upload": "[AR] آپلود",
+    "search": "[AR] جستجو",
+    "of": "[AR] از",
+    "update": "[AR] به‌روزرسانی",
+    "page": "[AR] صفحه",
+    "noResults": "[AR] نتیجه‌ای یافت نشد",
+    "print": "[AR] چاپ",
+    "loading": "[AR] در حال بارگذاری...",
+    "delete": "[AR] حذف",
+    "previous": "[AR] قبلی",
+    "yes": "[AR] بله",
+    "create": "[AR] ایجاد",
+    "selectAll": "[AR] انتخاب همه",
+    "back": "[AR] بازگشت",
+    "save": "[AR] ذخیره",
+    "import": "[AR] ورودی",
+    "total": "[AR] مجموع",
+    "no": "[AR] خیر",
+    "confirm": "[AR] تأیید",
+    "edit": "[AR] ویرایش",
+    "reset": "[AR] بازنشانی",
+    "filter": "[AR] فیلتر",
+    "close": "[AR] بستن",
+    "cancel": "[AR] لغو",
+    "submit": "[AR] ارسال",
+    "download": "[AR] دانلود",
+    "open": "[AR] باز کردن"
+  },
+  "dashboard": {
+    "welcome": "[AR] به داشبورد اکونوژین خوش آمدید",
+    "overview": "[AR] نمای کلی",
+    "revenue": "[AR] درآمد",
+    "activeUsers": "[AR] کاربران فعال",
+    "title": "[AR] داشبورد",
+    "recentActivity": "[AR] فعالیت‌های اخیر",
+    "totalUsers": "[AR] کل کاربران",
+    "viewAll": "[AR] مشاهده همه",
+    "performance": "[AR] عملکرد",
+    "totalProjects": "[AR] کل پروژه‌ها",
+    "growth": "[AR] رشد"
+  },
+  "theme": {
+    "purple": "[AR] بنفش",
+    "system": "[AR] سیستم",
+    "light": "[AR] روشن",
+    "orange": "[AR] نارنجی",
+    "blue": "[AR] آبی",
+    "green": "[AR] سبز (پیش‌فرض)",
+    "dark": "[AR] تاریک"
+  },
+  "map": {
+    "terrain": "[AR] زمینی",
+    "street": "[AR] خیابانی",
+    "fullscreen": "[AR] تمام صفحه",
+    "title": "[AR] نقشه GIS",
+    "zoomIn": "[AR] بزرگنمایی +",
+    "satellite": "[AR] ماهواره‌ای",
+    "zoomOut": "[AR] کوچکنمایی -",
+    "layers": "[AR] لایه‌ها"
+  },
+  "error": {
+    "500": {
+      "title": "[AR] خطای سرور",
+      "description": "[AR] متأسفانه مشکلی در سرور رخ داده است. لطفاً بعداً تلاش کنید."
+    },
+    "goHome": "[AR] بازگشت به خانه",
+    "404": {
+      "description": "[AR] صفحه‌ای که به دنبال آن هستید وجود ندارد یا حذف شده است.",
+      "title": "[AR] صفحه مورد نظر یافت نشد"
+    },
+    "tryAgain": "[AR] تلاش مجدد"
+  },
+  "footer": {
+    "terms": "[AR] شرایط استفاده",
+    "about": "[AR] درباره ما",
+    "privacy": "[AR] حریم خصوصی",
+    "copyright": "[AR] © ۲۰۲۶ اکونوژین. تمامی حقوق محفوظ است.",
+    "contact": "[AR] تماس با ما"
+  },
+  "app": {
+    "description": "[AR] اکونوژین یک پلتفرم جامع برای پایش، تحلیل و مدیریت پایدار منابع طبیعی، کشاورزی هوشمند و محیط زیست است",
+    "tagline": "[AR] پلتفرم هوشمند مدیریت پایدار منابع طبیعی و محیط زیست",
+    "name": "[AR] اکونوژین"
+  },
+  "validation": {
+    "email": "[AR] لطفاً یک ایمیل معتبر وارد کنید",
+    "maxLength": "[AR] حداکثر {{count}} کاراکتر allowed",
+    "minLength": "[AR] حداقل {{count}} کاراکتر required",
+    "passwordMatch": "[AR] رمز عبور مطابقت ندارد",
+    "required": "[AR] این فیلد الزامی است"
+  }
+}

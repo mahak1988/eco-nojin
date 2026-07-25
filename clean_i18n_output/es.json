@@ -1,0 +1,247 @@
+{
+  "auth": {
+    "welcome": "[ES] خوش آمدید",
+    "rememberMe": "[ES] مرا به خاطر بسپار",
+    "continueWithGoogle": "[ES] ادامه با گوگل",
+    "confirmPassword": "[ES] تکرار رمز عبور",
+    "email": "[ES] ایمیل",
+    "noAccount": "[ES] حساب کاربری ندارید؟",
+    "haveAccount": "[ES] قبلاً ثبت‌نام کرده‌اید؟",
+    "or": "[ES] یا",
+    "forgotPassword": "[ES] رمز عبور را فراموش کرده‌اید؟",
+    "login": {
+      "title": "[ES] ورود به حساب کاربری",
+      "subtitle": "[ES] به پنل خود وارد شوید"
+    },
+    "register": {
+      "title": "[ES] ایجاد حساب کاربری"
+    },
+    "password": "[ES] رمز عبور",
+    "signIn": "[ES] ورود",
+    "continueWithGithub": "[ES] ادامه با گیت‌هاب",
+    "signUp": "[ES] ثبت‌نام"
+  },
+  "nav": {
+    "tasks": "[ES] وظایف",
+    "map": "[ES] نقشه",
+    "help": "[ES] راهنما",
+    "profile": "[ES] پروفایل",
+    "logout": "[ES] خروج",
+    "home": "[ES] خانه",
+    "register": "[ES] ثبت‌نام",
+    "reports": "[ES] گزارش‌ها",
+    "users": "[ES] کاربران",
+    "dashboard": "[ES] داشبورد",
+    "analytics": "[ES] تحلیل‌ها",
+    "settings": "[ES] تنظیمات",
+    "notifications": "[ES] اعلان‌ها",
+    "language": "[ES] زبان",
+    "projects": "[ES] پروژه‌ها",
+    "login": "[ES] ورود"
+  },
+  "pages": {
+    "payments": {
+      "desc": "[ES] مدیریت تمام تراکنش‌های پرداخت",
+      "title": "[ES] پرداخت‌ها"
+    },
+    "risks": {
+      "title": "[ES] مدیریت ریسک",
+      "desc": "[ES] شناسایی و کاهش ریسک‌های پروژه"
+    },
+    "games": {
+      "desc": "[ES] چالش‌های اکولوگی، تابلوهای برتری و جایزه‌ها",
+      "title": "[ES] بازی‌سازی"
+    },
+    "simulators": {
+      "desc": "[ES] شبیه‌سازهای آب‌وهوا، آب و کشاورزی",
+      "title": "[ES] شبیه‌سازها"
+    },
+    "tourism": {
+      "desc": "[ES] گردشگری پایدار و نقشه‌برداری",
+      "title": "[ES] گردشگری اکولوژیک"
+    },
+    "ecocoin": {
+      "title": "[ES] اکولکوین",
+      "desc": "[ES] پاداش‌های رمزارز و تراکنش‌ها"
+    },
+    "library": {
+      "title": "[ES] مرکز دانش",
+      "desc": "[ES] مواد آموزشی، مستندات و کتابخانه"
+    },
+    "mrv": {
+      "desc": "[ES] پایش، گزارش‌دهی و تأیید",
+      "title": "[ES] MRV و حمایت‌ها"
+    },
+    "accounting": {
+      "title": "[ES] داشبورد مالی",
+      "desc": "[ES] حسابداری، فاکتورها، سندها، پرداخت‌ها"
+    },
+    "account": {
+      "title": "[ES] تنظیمات حساب",
+      "desc": "[ES] مدیریت پروفایل و ترجیحات"
+    },
+    "pilots": {
+      "desc": "[ES] پروژه‌های فعال و ابتکارات",
+      "title": "[ES] پروژه‌های آزمایشی"
+    },
+    "alerts": {
+      "title": "[ES] هشدارها و اعلان‌ها",
+      "desc": "[ES] هشدارهای زنده و هشدارهای پیش‌بینی"
+    },
+    "education": {
+      "desc": "[ES] یادگیری درباره پایداری و دریافت گواهینامه",
+      "title": "[ES] آموزش و آموزش"
+    },
+    "users": {
+      "desc": "[ES] نقش‌ها، دسترسی‌ها و تعامل اجتماعی",
+      "title": "[ES] مدیریت کاربران"
+    },
+    "analytics": {
+      "desc": "[ES] بینش و معیارهای جامع داده",
+      "title": "[ES] داشبورد تحلیلی"
+    },
+    "news": {
+      "desc": "[ES] آخرین اخبار، هشدارها و اعلانیه‌ها",
+      "title": "[ES] اخبار و به‌روزرسانی‌ها"
+    },
+    "community": {
+      "desc": "[ES] انجمن‌ها، بحث‌ها و همکاری",
+      "title": "[ES] جامعه"
+    },
+    "invoices": {
+      "title": "[ES] فاکتورها",
+      "desc": "[ES] مدیریت و پیگیری تمام فاکتورها"
+    },
+    "satellite": {
+      "desc": "[ES] داده‌های زنده ماهواره و تحلیل NDVI",
+      "title": "[ES] تصاویر ماهواره‌ای"
+    },
+    "policies": {
+      "desc": "[ES] بازنگری و مدیریت سیاست‌های پروژه",
+      "title": "[ES] سیاست‌ها و قانونی"
+    },
+    "regional": {
+      "desc": "[ES] افغانستان، عراق، اردن، شبکه مENA ILM",
+      "title": "[ES] پیاده‌سازی منطقه‌ای"
+    },
+    "reports": {
+      "desc": "[ES] تولید و دانلود گزارش‌های پروژه",
+      "title": "[ES] گزارش‌ها"
+    },
+    "journal": {
+      "desc": "[ES] مشاهده و مدیریت سندهای حسابرسی",
+      "title": "[ES] سندهای حسابرسی"
+    }
+  },
+  "settings": {
+    "security": "[ES] امنیت",
+    "title": "[ES] تنظیمات",
+    "theme": "[ES] رنگ و تم",
+    "notifications": "[ES] اعلان‌ها",
+    "lightMode": "[ES] حالت روشن",
+    "system": "[ES] سیستم",
+    "profile": "[ES] تنظیمات پروفایل",
+    "darkMode": "[ES] حالت تاریک",
+    "language": "[ES] زبان"
+  },
+  "common": {
+    "next": "[ES] بعدی",
+    "error": "[ES] خطا!",
+    "itemsPerPage": "[ES] تعداد در صفحه",
+    "sort": "[ES] مرتب‌سازی",
+    "noData": "[ES] داده‌ای وجود ندارد",
+    "export": "[ES] خروجی",
+    "deselectAll": "[ES] لغو انتخاب همه",
+    "success": "[ES] موفقیت",
+    "upload": "[ES] آپلود",
+    "search": "[ES] جستجو",
+    "of": "[ES] از",
+    "update": "[ES] به‌روزرسانی",
+    "page": "[ES] صفحه",
+    "noResults": "[ES] نتیجه‌ای یافت نشد",
+    "print": "[ES] چاپ",
+    "loading": "[ES] در حال بارگذاری...",
+    "delete": "[ES] حذف",
+    "previous": "[ES] قبلی",
+    "yes": "[ES] بله",
+    "create": "[ES] ایجاد",
+    "selectAll": "[ES] انتخاب همه",
+    "back": "[ES] بازگشت",
+    "save": "[ES] ذخیره",
+    "import": "[ES] ورودی",
+    "total": "[ES] مجموع",
+    "no": "[ES] خیر",
+    "confirm": "[ES] تأیید",
+    "edit": "[ES] ویرایش",
+    "reset": "[ES] بازنشانی",
+    "filter": "[ES] فیلتر",
+    "close": "[ES] بستن",
+    "cancel": "[ES] لغو",
+    "submit": "[ES] ارسال",
+    "download": "[ES] دانلود",
+    "open": "[ES] باز کردن"
+  },
+  "dashboard": {
+    "welcome": "[ES] به داشبورد اکونوژین خوش آمدید",
+    "overview": "[ES] نمای کلی",
+    "revenue": "[ES] درآمد",
+    "activeUsers": "[ES] کاربران فعال",
+    "title": "[ES] داشبورد",
+    "recentActivity": "[ES] فعالیت‌های اخیر",
+    "totalUsers": "[ES] کل کاربران",
+    "viewAll": "[ES] مشاهده همه",
+    "performance": "[ES] عملکرد",
+    "totalProjects": "[ES] کل پروژه‌ها",
+    "growth": "[ES] رشد"
+  },
+  "theme": {
+    "purple": "[ES] بنفش",
+    "system": "[ES] سیستم",
+    "light": "[ES] روشن",
+    "orange": "[ES] نارنجی",
+    "blue": "[ES] آبی",
+    "green": "[ES] سبز (پیش‌فرض)",
+    "dark": "[ES] تاریک"
+  },
+  "map": {
+    "terrain": "[ES] زمینی",
+    "street": "[ES] خیابانی",
+    "fullscreen": "[ES] تمام صفحه",
+    "title": "[ES] نقشه GIS",
+    "zoomIn": "[ES] بزرگنمایی +",
+    "satellite": "[ES] ماهواره‌ای",
+    "zoomOut": "[ES] کوچکنمایی -",
+    "layers": "[ES] لایه‌ها"
+  },
+  "error": {
+    "500": {
+      "title": "[ES] خطای سرور",
+      "description": "[ES] متأسفانه مشکلی در سرور رخ داده است. لطفاً بعداً تلاش کنید."
+    },
+    "goHome": "[ES] بازگشت به خانه",
+    "404": {
+      "description": "[ES] صفحه‌ای که به دنبال آن هستید وجود ندارد یا حذف شده است.",
+      "title": "[ES] صفحه مورد نظر یافت نشد"
+    },
+    "tryAgain": "[ES] تلاش مجدد"
+  },
+  "footer": {
+    "terms": "[ES] شرایط استفاده",
+    "about": "[ES] درباره ما",
+    "privacy": "[ES] حریم خصوصی",
+    "copyright": "[ES] © ۲۰۲۶ اکونوژین. تمامی حقوق محفوظ است.",
+    "contact": "[ES] تماس با ما"
+  },
+  "app": {
+    "description": "[ES] اکونوژین یک پلتفرم جامع برای پایش، تحلیل و مدیریت پایدار منابع طبیعی، کشاورزی هوشمند و محیط زیست است",
+    "tagline": "[ES] پلتفرم هوشمند مدیریت پایدار منابع طبیعی و محیط زیست",
+    "name": "[ES] اکونوژین"
+  },
+  "validation": {
+    "email": "[ES] لطفاً یک ایمیل معتبر وارد کنید",
+    "maxLength": "[ES] حداکثر {{count}} کاراکتر allowed",
+    "minLength": "[ES] حداقل {{count}} کاراکتر required",
+    "passwordMatch": "[ES] رمز عبور مطابقت ندارد",
+    "required": "[ES] این فیلد الزامی است"
+  }
+}

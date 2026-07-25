@@ -1,0 +1,247 @@
+{
+  "app": {
+    "name": "[TR] EcoNojin",
+    "tagline": "[TR] Smart Platform for Sustainable Natural Resource & Environmental Management",
+    "description": "[TR] EcoNojin is a comprehensive platform for monitoring, analyzing, and sustainably managing natural resources, smart agriculture, and the environment"
+  },
+  "nav": {
+    "home": "[TR] Home",
+    "dashboard": "[TR] Dashboard",
+    "analytics": "[TR] Analytics",
+    "map": "[TR] Map",
+    "reports": "[TR] Reports",
+    "settings": "[TR] Settings",
+    "profile": "[TR] Profile",
+    "users": "[TR] Users",
+    "projects": "[TR] Projects",
+    "tasks": "[TR] Tasks",
+    "notifications": "[TR] Notifications",
+    "help": "[TR] Help",
+    "logout": "[TR] Logout",
+    "login": "[TR] Login",
+    "register": "[TR] Register",
+    "language": "[TR] Language"
+  },
+  "auth": {
+    "welcome": "[TR] Welcome",
+    "login": {
+      "title": "[TR] Sign In",
+      "subtitle": "[TR] Sign in to your account"
+    },
+    "register": {
+      "title": "[TR] Create Account"
+    },
+    "forgotPassword": "[TR] Forgot password?",
+    "email": "[TR] Email",
+    "password": "[TR] Password",
+    "confirmPassword": "[TR] Confirm Password",
+    "rememberMe": "[TR] Remember me",
+    "noAccount": "[TR] Don't have an account?",
+    "haveAccount": "[TR] Already have an account?",
+    "signUp": "[TR] Sign Up",
+    "signIn": "[TR] Sign In",
+    "or": "[TR] or",
+    "continueWithGoogle": "[TR] Continue with Google",
+    "continueWithGithub": "[TR] Continue with GitHub"
+  },
+  "dashboard": {
+    "title": "[TR] Dashboard",
+    "overview": "[TR] Overview",
+    "welcome": "[TR] Welcome to EcoNojin Dashboard",
+    "totalUsers": "[TR] Total Users",
+    "activeUsers": "[TR] Active Users",
+    "totalProjects": "[TR] Total Projects",
+    "revenue": "[TR] Revenue",
+    "growth": "[TR] Growth",
+    "performance": "[TR] Performance",
+    "recentActivity": "[TR] Recent Activity",
+    "viewAll": "[TR] View All"
+  },
+  "common": {
+    "loading": "[TR] Loading...",
+    "error": "[TR] Error!",
+    "success": "[TR] Success",
+    "save": "[TR] Save",
+    "cancel": "[TR] Cancel",
+    "delete": "[TR] Delete",
+    "edit": "[TR] Edit",
+    "create": "[TR] Create",
+    "update": "[TR] Update",
+    "search": "[TR] Search",
+    "filter": "[TR] Filter",
+    "sort": "[TR] Sort",
+    "export": "[TR] Export",
+    "import": "[TR] Import",
+    "print": "[TR] Print",
+    "back": "[TR] Back",
+    "next": "[TR] Next",
+    "previous": "[TR] Previous",
+    "close": "[TR] Close",
+    "open": "[TR] Open",
+    "yes": "[TR] Yes",
+    "no": "[TR] No",
+    "confirm": "[TR] Confirm",
+    "submit": "[TR] Submit",
+    "reset": "[TR] Reset",
+    "download": "[TR] Download",
+    "upload": "[TR] Upload",
+    "selectAll": "[TR] Select All",
+    "deselectAll": "[TR] Deselect All",
+    "noData": "[TR] No data available",
+    "noResults": "[TR] No results found",
+    "page": "[TR] Page",
+    "of": "[TR] of",
+    "itemsPerPage": "[TR] Items per page",
+    "total": "[TR] Total"
+  },
+  "validation": {
+    "required": "[TR] This field is required",
+    "email": "[TR] Please enter a valid email",
+    "minLength": "[TR] Minimum {{count}} characters required",
+    "maxLength": "[TR] Maximum {{count}} characters allowed",
+    "passwordMatch": "[TR] Passwords do not match"
+  },
+  "settings": {
+    "title": "[TR] Settings",
+    "profile": "[TR] Profile Settings",
+    "security": "[TR] Security",
+    "notifications": "[TR] Notifications",
+    "theme": "[TR] Theme",
+    "language": "[TR] Language",
+    "darkMode": "[TR] Dark Mode",
+    "lightMode": "[TR] Light Mode",
+    "system": "[TR] System"
+  },
+  "theme": {
+    "light": "[TR] Light",
+    "dark": "[TR] Dark",
+    "system": "[TR] System",
+    "green": "[TR] Green (Default)",
+    "blue": "[TR] Blue",
+    "purple": "[TR] Purple",
+    "orange": "[TR] Orange"
+  },
+  "map": {
+    "title": "[TR] GIS Map",
+    "satellite": "[TR] Satellite",
+    "terrain": "[TR] Terrain",
+    "street": "[TR] Street",
+    "layers": "[TR] Layers",
+    "zoomIn": "[TR] Zoom In",
+    "zoomOut": "[TR] Zoom Out",
+    "fullscreen": "[TR] Fullscreen"
+  },
+  "error": {
+    "404": {
+      "title": "[TR] Page Not Found",
+      "description": "[TR] The page you are looking for does not exist or has been removed."
+    },
+    "500": {
+      "title": "[TR] Server Error",
+      "description": "[TR] Sorry, something went wrong on our end. Please try again later."
+    },
+    "goHome": "[TR] Go Home",
+    "tryAgain": "[TR] Try Again"
+  },
+  "footer": {
+    "copyright": "[TR] © 2026 EcoNojin. All rights reserved.",
+    "privacy": "[TR] Privacy Policy",
+    "terms": "[TR] Terms of Service",
+    "contact": "[TR] Contact Us",
+    "about": "[TR] About Us"
+  },
+  "pages": {
+    "satellite": {
+      "title": "[TR] Satellite Imagery",
+      "desc": "[TR] Live satellite data and NDVI analysis"
+    },
+    "regional": {
+      "title": "[TR] Regional Implementation",
+      "desc": "[TR] Afghanistan, Iraq, Jordan, MENA ILM Network"
+    },
+    "accounting": {
+      "title": "[TR] Financial Dashboard",
+      "desc": "[TR] Accounting, invoices, documents, payments"
+    },
+    "users": {
+      "title": "[TR] User Management",
+      "desc": "[TR] Roles, permissions, and social interaction"
+    },
+    "games": {
+      "title": "[TR] Gamification",
+      "desc": "[TR] Ecological challenges, leaderboards, and rewards"
+    },
+    "library": {
+      "title": "[TR] Knowledge Hub",
+      "desc": "[TR] Educational materials, documentation, and library"
+    },
+    "news": {
+      "title": "[TR] News & Updates",
+      "desc": "[TR] Latest news, alerts, and announcements"
+    },
+    "mrv": {
+      "title": "[TR] MRV & Support",
+      "desc": "[TR] Monitoring, Reporting, and Verification"
+    },
+    "pilots": {
+      "title": "[TR] Pilot Projects",
+      "desc": "[TR] Active projects and initiatives"
+    },
+    "simulators": {
+      "title": "[TR] Simulators",
+      "desc": "[TR] Climate, water, and agriculture simulators"
+    },
+    "community": {
+      "title": "[TR] Community",
+      "desc": "[TR] Forums, discussions, and collaboration"
+    },
+    "ecocoin": {
+      "title": "[TR] EcoCoin",
+      "desc": "[TR] Cryptocurrency rewards and transactions"
+    },
+    "alerts": {
+      "title": "[TR] Alerts & Notifications",
+      "desc": "[TR] Live alerts and predictive warnings"
+    },
+    "tourism": {
+      "title": "[TR] Ecological Tourism",
+      "desc": "[TR] Sustainable tourism and mapping"
+    },
+    "account": {
+      "title": "[TR] Account Settings",
+      "desc": "[TR] Manage profile and preferences"
+    },
+    "invoices": {
+      "title": "[TR] Invoices",
+      "desc": "[TR] Manage and track all invoices"
+    },
+    "journal": {
+      "title": "[TR] Audit Documents",
+      "desc": "[TR] View and manage audit documents"
+    },
+    "payments": {
+      "title": "[TR] Payments",
+      "desc": "[TR] Manage all payment transactions"
+    },
+    "education": {
+      "title": "[TR] Education & Training",
+      "desc": "[TR] Learn about sustainability and earn certifications"
+    },
+    "analytics": {
+      "title": "[TR] Analytics Dashboard",
+      "desc": "[TR] Comprehensive data insights and metrics"
+    },
+    "reports": {
+      "title": "[TR] Reports",
+      "desc": "[TR] Generate and download project reports"
+    },
+    "risks": {
+      "title": "[TR] Risk Management",
+      "desc": "[TR] Identify and mitigate project risks"
+    },
+    "policies": {
+      "title": "[TR] Policies & Legal",
+      "desc": "[TR] Review and manage project policies"
+    }
+  }
+}
