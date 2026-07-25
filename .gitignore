@@ -224,3 +224,14 @@ project-analysis.json
 project-analysis.html
 project-analysis.sha256
 .security_backup/
+
+# Analysis reports & temp files (may contain secrets)
+project_analysis_report.json
+project_analysis_report.md
+project-analysis.json
+project-analysis.html
+project-analysis.sha256
+current_snapshot.json
+previous_snapshot.json
+sync_report_*.json
+contracts/artifacts/
