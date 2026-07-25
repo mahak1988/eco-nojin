@@ -1,3 +1,5 @@
+"""base_agent module."""
+
 from typing import TypedDict, Annotated, Sequence, Any, List, AsyncGenerator
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, ToolMessage
 from langgraph.graph import StateGraph, END, START
@@ -22,6 +24,7 @@ class ModularAgentBuilder:
     
     def __init__(self, llm: Any, tools: List[Any], system_prompt: str = "") -> None:
         self.llm = llm.bind_tools(tools) if tools else llm
+        """Handle __init__ (llm, tools, system_prompt)."""
         self.tools = {t.name: t for t in tools}
         self.system_prompt = system_prompt
         self.graph = None

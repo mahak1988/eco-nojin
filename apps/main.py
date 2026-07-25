@@ -45,6 +45,7 @@ from apps.shared_core.config import settings
 # ============================================================
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Handle lifespan (app)."""
     logger.info("=" * 60)
     logger.info(f"🚀 Econojin API v{settings.VERSION} - شروع راه‌اندازی")
     logger.info(f"🌍 Environment: {settings.ENVIRONMENT}")
@@ -129,6 +130,7 @@ app.add_middleware(
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next) -> None:
+    """Handle add_process_time_header (request, call_next)."""
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
@@ -137,6 +139,7 @@ async def add_process_time_header(request: Request, call_next) -> None:
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> None:
+    """Handle global_exception_handler (request, exc)."""
     logger.error(f"❌ خطای پیش‌بینی‌نشده: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -145,6 +148,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> None:
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception) -> None:
+    """Handle not_found_handler (request, exc)."""
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={"error": "Not Found", "message": f"مسیر {request.url.path} یافت نشد"},
@@ -320,6 +324,7 @@ except Exception as e:
 # ============================================================
 @app.get("/", tags=["🏠 Root"])
 async def root() -> None:
+    """Handle root."""
     return {
         "name": settings.PROJECT_NAME,
         "status": "running",
@@ -330,6 +335,7 @@ async def root() -> None:
 
 @app.get("/health", tags=["🏥 Health"])
 async def health() -> None:
+    """Handle health."""
     return {
         "status": "healthy",
         "version": settings.VERSION,
@@ -338,6 +344,7 @@ async def health() -> None:
 
 @app.get("/modules", tags=["📦 Modules"])
 async def list_modules() -> None:
+    """Handle list_modules."""
     return {
         "modules": [
             "users", "auth", "ai_agents", "accounting", "ecocoin",

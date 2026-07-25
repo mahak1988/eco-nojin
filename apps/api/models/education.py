@@ -37,6 +37,7 @@ class Course(Base):
     enrollments: Mapped[List["Enrollment"]] = relationship("Enrollment", back_populates="course", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<Course(id={self.id}, title={self.title!r})>"
 
 
@@ -57,6 +58,7 @@ class Lesson(Base):
     course: Mapped["Course"] = relationship("Course", back_populates="lessons")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<Lesson(course_id={self.course_id}, title={self.title!r})>"
 
 
@@ -76,6 +78,7 @@ class Enrollment(Base):
     course: Mapped["Course"] = relationship("Course", back_populates="enrollments")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<Enrollment(course_id={self.course_id}, user_id={self.user_id})>"
 
 

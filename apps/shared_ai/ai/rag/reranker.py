@@ -13,6 +13,7 @@ class CrossEncoderReranker:
     """Reranker با استفاده از Cross-Encoder."""
     
     def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2") -> None:
+        """Handle __init__ (model_name)."""
         self.model_name = model_name
         self._model = None
     

@@ -22,6 +22,7 @@ from apps.simulation.base import (
 
 
 def _noise(i: int, seed: int) -> float:
+    """Handle _noise (i, seed)."""
     h = hashlib.sha256(f"{seed}:{i}".encode()).hexdigest()
     return (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
 
@@ -30,28 +31,35 @@ def _noise(i: int, seed: int) -> float:
 class DSSATSimulator(BaseSimulator):
     @property
     def id(self) -> str:
+        """Handle id."""
         return "dssat"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "DSSAT (Crop Growth & Yield)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "agriculture"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Thermal-time (GDD) crop growth with water and nitrogen limitation; logistic biomass."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(name="crop", label="Crop", type="select", options=["wheat", "maize", "rice"], default="wheat", description="Crop type"),
             SimulationParameter(name="gdd_required", label="GDD Required (C.day)", type="float", default=1500.0, min_value=500.0, max_value=3000.0, unit="C.day", description="Growing degree days to maturity"),
@@ -63,6 +71,7 @@ class DSSATSimulator(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         start = time.time()
         errors = self.validate(parameters)
         if errors:
@@ -82,6 +91,7 @@ class DSSATSimulator(BaseSimulator):
                 execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         gdd_req = params.get("gdd_required", 1500.0); base_t = params.get("base_temp", 5.0)
         mean_t = params.get("mean_temp", 22.0); wf = params.get("water_factor", 0.85)
         nf = params.get("nitrogen_factor", 0.9); pot_yield = params.get("potential_yield", 10.0)
@@ -112,7 +122,9 @@ class DSSATSimulator(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         return {k: float(v) for k, v in outputs.get("metrics", {}).items() if isinstance(v, (int, float))}
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {s["key"]: s["values"] for s in outputs.get("series", [])}

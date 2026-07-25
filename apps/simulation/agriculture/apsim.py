@@ -27,25 +27,31 @@ class APSIMSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "apsim"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "APSIM (Agricultural Production Systems Simulator)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "agriculture"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "APSIM is a modular modelling framework for agricultural systems. Simulates crop growth, soil water, nitrogen, and management practices."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

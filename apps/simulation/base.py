@@ -41,6 +41,7 @@ class SimulationParameter:
     required: bool = True
 
     def to_dict(self) -> dict:
+        """Handle to_dict."""
         return asdict(self)
 
 
@@ -60,9 +61,11 @@ class SimulationResult:
     execution_time_ms: float = 0.0
 
     def to_dict(self) -> dict:
+        """Handle to_dict."""
         return asdict(self)
 
     def to_json(self) -> str:
+        """Handle to_json."""
         return json.dumps(self.to_dict(), indent=2)
 
 
@@ -79,6 +82,7 @@ class SimulationRegistry:
 
     @classmethod
     def get(cls, simulator_id: str) -> Optional[type["BaseSimulator"]]:
+        """Handle get (cls, simulator_id)."""
         return cls._simulators.get(simulator_id)
 
     @classmethod

@@ -21,6 +21,7 @@ class SharedAiRepository:
     """Repository for SharedAi entities."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, id: int) -> Optional[SharedAi]:

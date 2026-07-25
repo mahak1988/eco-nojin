@@ -1,3 +1,5 @@
+"""data_analyst module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -83,6 +85,7 @@ class DataAnalystAgent:
     
     def __init__(self, llm: Any) -> None:
         self.llm = llm
+        """Handle __init__ (llm)."""
         self.tools: List[BaseTool] = [
             # ابزارهای سریع (Numba)
             fast_statistics,

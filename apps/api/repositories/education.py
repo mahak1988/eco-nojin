@@ -20,11 +20,13 @@ class EducationRepository:
     """Repository for Education entities."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.session = session
 
     # ==================== Course Operations ====================
 
     async def get_course_by_id(self, course_id: int) -> Optional[Course]:
+        """Handle get_course_by_id (course_id)."""
         result = await self.session.execute(
             select(Course).where(Course.id == course_id)
         )
@@ -38,6 +40,7 @@ class EducationRepository:
         category: Optional[str] = None,
         level: Optional[str] = None
     ) -> tuple[List[Course], int]:
+        """Handle list_courses (skip, limit, search, category, level)."""
         query = select(Course)
 
         if search:
@@ -76,6 +79,7 @@ class EducationRepository:
         return items, total
 
     async def create_course(self, data: CourseCreate) -> Course:
+        """Handle create_course (data)."""
         obj = Course(**data.model_dump(exclude={"lessons"}))
         self.session.add(obj)
         await self.session.flush()
@@ -83,6 +87,7 @@ class EducationRepository:
         return obj
 
     async def update_course(self, course_id: int, data: CourseUpdate) -> Optional[Course]:
+        """Handle update_course (course_id, data)."""
         obj = await self.get_course_by_id(course_id)
         if not obj:
             return None
@@ -96,6 +101,7 @@ class EducationRepository:
         return obj
 
     async def delete_course(self, course_id: int) -> bool:
+        """Handle delete_course (course_id)."""
         obj = await self.get_course_by_id(course_id)
         if not obj:
             return False
@@ -106,6 +112,7 @@ class EducationRepository:
     # ==================== Lesson Operations ====================
 
     async def get_lesson_by_id(self, lesson_id: int) -> Optional[Lesson]:
+        """Handle get_lesson_by_id (lesson_id)."""
         result = await self.session.execute(
             select(Lesson).where(Lesson.id == lesson_id)
         )
@@ -114,6 +121,7 @@ class EducationRepository:
     async def list_lessons_by_course(
         self, course_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[Lesson], int]:
+        """Handle list_lessons_by_course (course_id, skip, limit)."""
         query = select(Lesson).where(Lesson.course_id == course_id)
         query = query.order_by(Lesson.order).offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -125,6 +133,7 @@ class EducationRepository:
         return items, total
 
     async def create_lesson(self, course_id: int, data: dict) -> Lesson:
+        """Handle create_lesson (course_id, data)."""
         obj = Lesson(course_id=course_id, **data)
         self.session.add(obj)
         await self.session.flush()
@@ -132,6 +141,7 @@ class EducationRepository:
         return obj
 
     async def update_lesson(self, lesson_id: int, data: dict) -> Optional[Lesson]:
+        """Handle update_lesson (lesson_id, data)."""
         from apps.api.schemas.education import LessonUpdate
         obj = await self.get_lesson_by_id(lesson_id)
         if not obj:
@@ -147,6 +157,7 @@ class EducationRepository:
         return obj
 
     async def delete_lesson(self, lesson_id: int) -> bool:
+        """Handle delete_lesson (lesson_id)."""
         obj = await self.get_lesson_by_id(lesson_id)
         if not obj:
             return False
@@ -157,6 +168,7 @@ class EducationRepository:
     # ==================== Enrollment Operations ====================
 
     async def get_enrollment_by_id(self, enrollment_id: int) -> Optional[Enrollment]:
+        """Handle get_enrollment_by_id (enrollment_id)."""
         result = await self.session.execute(
             select(Enrollment).where(Enrollment.id == enrollment_id)
         )
@@ -165,6 +177,7 @@ class EducationRepository:
     async def list_enrollments_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[Enrollment], int]:
+        """Handle list_enrollments_by_user (user_id, skip, limit)."""
         query = select(Enrollment).where(Enrollment.user_id == user_id)
         query = query.order_by(Enrollment.enrolled_at.desc()).offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -176,6 +189,7 @@ class EducationRepository:
         return items, total
 
     async def get_user_enrollment(self, course_id: int, user_id: int) -> Optional[Enrollment]:
+        """Handle get_user_enrollment (course_id, user_id)."""
         result = await self.session.execute(
             select(Enrollment).where(
                 Enrollment.course_id == course_id,
@@ -185,6 +199,7 @@ class EducationRepository:
         return result.scalar_one_or_none()
 
     async def create_enrollment(self, course_id: int, user_id: int) -> Enrollment:
+        """Handle create_enrollment (course_id, user_id)."""
         obj = Enrollment(course_id=course_id, user_id=user_id)
         self.session.add(obj)
         await self.session.flush()
@@ -192,6 +207,7 @@ class EducationRepository:
         return obj
 
     async def update_enrollment(self, enrollment_id: int, data: dict) -> Optional[Enrollment]:
+        """Handle update_enrollment (enrollment_id, data)."""
         from apps.api.schemas.education import EnrollmentUpdate
         obj = await self.get_enrollment_by_id(enrollment_id)
         if not obj:
@@ -207,6 +223,7 @@ class EducationRepository:
         return obj
 
     async def delete_enrollment(self, enrollment_id: int) -> bool:
+        """Handle delete_enrollment (enrollment_id)."""
         obj = await self.get_enrollment_by_id(enrollment_id)
         if not obj:
             return False
@@ -215,6 +232,7 @@ class EducationRepository:
         return True
 
     async def get_stats(self) -> dict:
+        """Handle get_stats."""
         result = await self.session.execute(select(Course))
         courses = result.scalars().all()
 

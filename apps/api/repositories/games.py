@@ -20,11 +20,13 @@ class GamesRepository:
     """Repository for Games entities."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.session = session
 
     # ==================== Vocabulary Operations ====================
 
     async def get_vocabulary_by_id(self, word_id: int) -> Optional[VocabularyWord]:
+        """Handle get_vocabulary_by_id (word_id)."""
         result = await self.session.execute(
             select(VocabularyWord).where(VocabularyWord.id == word_id)
         )
@@ -37,6 +39,7 @@ class GamesRepository:
         search: Optional[str] = None,
         category: Optional[str] = None
     ) -> tuple[List[VocabularyWord], int]:
+        """Handle list_vocabulary (skip, limit, search, category)."""
         query = select(VocabularyWord)
 
         if search:
@@ -68,6 +71,7 @@ class GamesRepository:
         return items, total
 
     async def create_vocabulary(self, data: VocabularyWordCreate) -> VocabularyWord:
+        """Handle create_vocabulary (data)."""
         obj = VocabularyWord(**data.model_dump())
         self.session.add(obj)
         await self.session.flush()
@@ -75,6 +79,7 @@ class GamesRepository:
         return obj
 
     async def update_vocabulary(self, word_id: int, data: VocabularyWordUpdate) -> Optional[VocabularyWord]:
+        """Handle update_vocabulary (word_id, data)."""
         obj = await self.get_vocabulary_by_id(word_id)
         if not obj:
             return None
@@ -88,6 +93,7 @@ class GamesRepository:
         return obj
 
     async def delete_vocabulary(self, word_id: int) -> bool:
+        """Handle delete_vocabulary (word_id)."""
         obj = await self.get_vocabulary_by_id(word_id)
         if not obj:
             return False
@@ -98,6 +104,7 @@ class GamesRepository:
     # ==================== Quiz Operations ====================
 
     async def get_quiz_by_id(self, quiz_id: int) -> Optional[Quiz]:
+        """Handle get_quiz_by_id (quiz_id)."""
         result = await self.session.execute(
             select(Quiz).where(Quiz.id == quiz_id)
         )
@@ -111,6 +118,7 @@ class GamesRepository:
         category: Optional[str] = None,
         difficulty: Optional[str] = None
     ) -> tuple[List[Quiz], int]:
+        """Handle list_quizzes (skip, limit, search, category, difficulty)."""
         query = select(Quiz)
 
         if search:
@@ -141,6 +149,7 @@ class GamesRepository:
         return items, total
 
     async def create_quiz(self, data: dict) -> Quiz:
+        """Handle create_quiz (data)."""
         obj = Quiz(**data)
         self.session.add(obj)
         await self.session.flush()
@@ -148,6 +157,7 @@ class GamesRepository:
         return obj
 
     async def update_quiz(self, quiz_id: int, data: dict) -> Optional[Quiz]:
+        """Handle update_quiz (quiz_id, data)."""
         from apps.api.schemas.games import QuizUpdate
         obj = await self.get_quiz_by_id(quiz_id)
         if not obj:
@@ -163,6 +173,7 @@ class GamesRepository:
         return obj
 
     async def delete_quiz(self, quiz_id: int) -> bool:
+        """Handle delete_quiz (quiz_id)."""
         obj = await self.get_quiz_by_id(quiz_id)
         if not obj:
             return False
@@ -173,6 +184,7 @@ class GamesRepository:
     # ==================== Quiz Question Operations ====================
 
     async def get_question_by_id(self, question_id: int) -> Optional[QuizQuestion]:
+        """Handle get_question_by_id (question_id)."""
         result = await self.session.execute(
             select(QuizQuestion).where(QuizQuestion.id == question_id)
         )
@@ -181,6 +193,7 @@ class GamesRepository:
     async def list_questions_by_quiz(
         self, quiz_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[QuizQuestion], int]:
+        """Handle list_questions_by_quiz (quiz_id, skip, limit)."""
         query = select(QuizQuestion).where(QuizQuestion.quiz_id == quiz_id)
         query = query.order_by(QuizQuestion.order).offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -192,6 +205,7 @@ class GamesRepository:
         return items, total
 
     async def create_question(self, quiz_id: int, data: dict) -> QuizQuestion:
+        """Handle create_question (quiz_id, data)."""
         obj = QuizQuestion(quiz_id=quiz_id, **data)
         self.session.add(obj)
         await self.session.flush()
@@ -199,6 +213,7 @@ class GamesRepository:
         return obj
 
     async def update_question(self, question_id: int, data: dict) -> Optional[QuizQuestion]:
+        """Handle update_question (question_id, data)."""
         from apps.api.schemas.games import QuizQuestionUpdate
         obj = await self.get_question_by_id(question_id)
         if not obj:
@@ -214,6 +229,7 @@ class GamesRepository:
         return obj
 
     async def delete_question(self, question_id: int) -> bool:
+        """Handle delete_question (question_id)."""
         obj = await self.get_question_by_id(question_id)
         if not obj:
             return False
@@ -224,6 +240,7 @@ class GamesRepository:
     # ==================== Quiz Attempt Operations ====================
 
     async def create_attempt(self, quiz_id: int, user_id: int, data: dict) -> QuizAttempt:
+        """Handle create_attempt (quiz_id, user_id, data)."""
         from apps.api.schemas.games import QuizAttemptCreate
         obj = QuizAttempt(quiz_id=quiz_id, user_id=user_id, **data)
         self.session.add(obj)
@@ -234,6 +251,7 @@ class GamesRepository:
     async def list_attempts_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[QuizAttempt], int]:
+        """Handle list_attempts_by_user (user_id, skip, limit)."""
         query = select(QuizAttempt).where(QuizAttempt.user_id == user_id)
         query = query.order_by(QuizAttempt.completed_at.desc()).offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -245,6 +263,7 @@ class GamesRepository:
         return items, total
 
     async def get_stats(self) -> dict:
+        """Handle get_stats."""
         vocab_result = await self.session.execute(select(VocabularyWord))
         vocab = vocab_result.scalars().all()
 

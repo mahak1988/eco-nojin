@@ -38,6 +38,7 @@ class AgricultureSchool(Base):
     fields: Mapped[List["SchoolField"]] = relationship("SchoolField", back_populates="school", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<AgricultureSchool(id={self.id}, name={self.name!r})>"
 
 
@@ -54,6 +55,7 @@ class SchoolField(Base):
     school: Mapped["AgricultureSchool"] = relationship("AgricultureSchool", back_populates="fields")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<SchoolField(school_id={self.school_id}, field={self.field_name!r})>"
 
 

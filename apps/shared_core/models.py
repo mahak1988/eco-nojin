@@ -33,6 +33,7 @@ class SharedCore(Base):
     )
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<SharedCore(id={self.id}, name={self.name!r})>"
 
 
@@ -52,6 +53,7 @@ class AdminSetting(Base):
     )
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<AdminSetting(id={self.id}, key={self.key!r})>"
 
 
@@ -68,6 +70,7 @@ class AuditLog(Base):
     )
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<AuditLog(id={self.id}, event_type={self.event_type!r})>"
 
 
@@ -84,6 +87,7 @@ class SystemReport(Base):
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<SystemReport(id={self.id}, report_name={self.report_name!r}, status={self.status!r})>"
 
     def to_dict(self) -> dict:

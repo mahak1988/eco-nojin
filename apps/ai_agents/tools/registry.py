@@ -19,6 +19,7 @@ class AgentToolRegistry:
     def register(cls, name: str) -> Callable:
         """Register a tool function by name."""
         def decorator(fn: Callable) -> Callable:
+            """Handle decorator (fn)."""
             cls._tools[name] = fn
             logger.info(f"Registered agent tool: {name}")
             return fn

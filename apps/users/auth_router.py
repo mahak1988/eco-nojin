@@ -44,6 +44,7 @@ class LoginRequest(BaseModel):
     @model_validator(mode='before')
     @classmethod
     def check_email_or_username(cls, values: Any) -> Any:
+        """Handle check_email_or_username (cls, values)."""
         if isinstance(values, dict):
             has_email = bool(values.get('email'))
             has_username = bool(values.get('username'))
@@ -84,18 +85,22 @@ class RefreshRequest(BaseModel):
 # Helpers
 # ---------------------------------------------------------------------------
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Handle verify_password (plain_password, hashed_password)."""
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password: str) -> str:
+    """Handle get_password_hash (password)."""
     return pwd_context.hash(password)
 
 def create_access_token(data: dict) -> str:
+    """Handle create_access_token (data)."""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire, "type": "access"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def create_refresh_token(data: dict) -> str:
+    """Handle create_refresh_token (data)."""
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "refresh"})
@@ -105,6 +110,7 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_db)
 ) -> User:
+    """Handle get_current_user (credentials, db)."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -129,6 +135,7 @@ async def get_current_user(
 # ---------------------------------------------------------------------------
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)) -> None:
+    """Handle register (request, db)."""
     result = await db.execute(select(User).where(User.email == request.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -168,6 +175,7 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
 
 @router.post("/login", response_model=AuthResponse)
 async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> None:
+    """Handle login (request, db)."""
     identifier = request.email or request.username
     
     if not identifier:
@@ -208,6 +216,7 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> No
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)) -> None:
+    """Handle get_me (current_user)."""
     return UserResponse(
         id=current_user.id,
         email=current_user.email,
@@ -221,10 +230,12 @@ async def get_me(current_user: User = Depends(get_current_user)) -> None:
 
 @router.post("/logout")
 async def logout(current_user: User = Depends(get_current_user)) -> None:
+    """Handle logout (current_user)."""
     return {"message": "Successfully logged out"}
 
 @router.post("/refresh", response_model=AuthResponse)
 async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)) -> None:
+    """Handle refresh_token (request, db)."""
     try:
         payload = jwt.decode(request.refreshToken, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")

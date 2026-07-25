@@ -41,6 +41,7 @@ class UserService:
     """
     
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = UserRepository(session)
     
     async def register_user(self, user_in: UserCreate) -> User:

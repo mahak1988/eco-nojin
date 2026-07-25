@@ -54,6 +54,7 @@ class ClimateAgent:
     """ایجنت تحلیلگر آب و هوا با ابزارهای هوشمند."""
 
     def __init__(self, llm: Any) -> None:
+        """Handle __init__ (llm)."""
         self.llm = llm
         self.tools: List[BaseTool] = [
             get_weather_data,

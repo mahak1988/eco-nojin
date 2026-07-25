@@ -18,6 +18,7 @@ class SemanticChunker:
         chunk_overlap: int = 50,
         separator: str = "\n\n"
     ):
+        """Handle __init__ (chunk_size, chunk_overlap, separator)."""
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.separator = separator

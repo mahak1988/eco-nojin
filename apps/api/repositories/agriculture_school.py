@@ -22,9 +22,11 @@ class AgricultureSchoolRepository:
     """Repository for AgricultureSchool entities."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, school_id: int) -> Optional[AgricultureSchool]:
+        """Handle get_by_id (school_id)."""
         result = await self.session.execute(
             select(AgricultureSchool).where(AgricultureSchool.id == school_id)
         )
@@ -37,6 +39,7 @@ class AgricultureSchoolRepository:
         search: Optional[str] = None,
         school_type: Optional[str] = None
     ) -> tuple[List[AgricultureSchool], int]:
+        """Handle list (skip, limit, search, school_type)."""
         query = select(AgricultureSchool)
         
         if search:
@@ -70,6 +73,7 @@ class AgricultureSchoolRepository:
         return items, total
 
     async def create(self, data: AgricultureSchoolCreate) -> AgricultureSchool:
+        """Handle create (data)."""
         obj = AgricultureSchool(**data.model_dump(exclude={"fields"}))
         
         # Add fields
@@ -82,6 +86,7 @@ class AgricultureSchoolRepository:
         return obj
 
     async def update(self, school_id: int, data: AgricultureSchoolUpdate) -> Optional[AgricultureSchool]:
+        """Handle update (school_id, data)."""
         obj = await self.get_by_id(school_id)
         if not obj:
             return None
@@ -95,6 +100,7 @@ class AgricultureSchoolRepository:
         return obj
 
     async def delete(self, school_id: int) -> bool:
+        """Handle delete (school_id)."""
         obj = await self.get_by_id(school_id)
         if not obj:
             return False
@@ -103,6 +109,7 @@ class AgricultureSchoolRepository:
         return True
 
     async def get_stats(self) -> dict:
+        """Handle get_stats."""
         result = await self.session.execute(select(AgricultureSchool))
         schools = result.scalars().all()
         

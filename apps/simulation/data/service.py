@@ -13,6 +13,7 @@ _TTL = 3600  # 1 hour
 
 
 def _cache_get(key: str) -> None:
+    """Handle _cache_get (key)."""
     if key in _CACHE:
         ts, val = _CACHE[key]
         if time.time() - ts < _TTL:
@@ -22,6 +23,7 @@ def _cache_get(key: str) -> None:
 
 
 def _cache_set(key: str, val) -> None:
+    """Handle _cache_set (key, val)."""
     _CACHE[key] = (time.time(), val)
 
 
@@ -67,6 +69,7 @@ async def get_climate_series(lat: float, lon: float, start: date, end: date,
 
 
 async def get_elevation(lat: float, lon: float) -> float | None:
+    """Handle get_elevation (lat, lon)."""
     key = f"elev:{lat:.4f}:{lon:.4f}"
     cached = _cache_get(key)
     if cached is not None:

@@ -27,25 +27,31 @@ class ITreeSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "itree"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "i-Tree (Urban Forest Benefits Model)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "biodiversity"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "i-Tree quantifies benefits of urban forests including air quality, carbon storage, and stormwater management."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

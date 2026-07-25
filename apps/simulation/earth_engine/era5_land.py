@@ -38,25 +38,31 @@ class ERA5LandFetcher(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "era5_land"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "ERA5-Land Climate Data Fetcher"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "earth_engine"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Fetches ERA5-Land hourly reanalysis climate data for weather analysis."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(
                 name="bounds", label="Bounding Box [lon_min, lat_min, lon_max, lat_max]", type="string",
@@ -79,6 +85,7 @@ class ERA5LandFetcher(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         import time
         start = time.time()
         errors = self.validate(parameters)
@@ -101,6 +108,7 @@ class ERA5LandFetcher(BaseSimulator):
                 error=str(e), execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         variables = [v.strip() for v in params["variables"].split(",")]
         start = datetime.strptime(params["start_date"], "%Y-%m-%d")
         end = datetime.strptime(params["end_date"], "%Y-%m-%d")
@@ -127,6 +135,7 @@ class ERA5LandFetcher(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         data = outputs.get("hourly_data", {})
         metrics = {}
         for var, values in data.items():
@@ -135,4 +144,5 @@ class ERA5LandFetcher(BaseSimulator):
         return metrics
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {"climate_timeseries": outputs.get("hourly_data", {})}

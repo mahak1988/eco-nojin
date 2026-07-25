@@ -1,3 +1,5 @@
+"""service module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,15 +15,18 @@ from apps.users.models import User
 class AdminService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        """Handle __init__ (session)."""
         self.settings_repo = AdminSettingRepository(session)
         self.audit_repo = AuditLogRepository(session)
         self.report_repo = SystemReportRepository(session)
 
     async def get_system_settings(self, limit: int = 100, offset: int = 0) -> list[AdminSetting]:
         return await self.settings_repo.get_multi(limit=limit, offset=offset)
+        """Handle get_system_settings (limit, offset)."""
 
     async def get_setting_by_key(self, key: str) -> Optional[AdminSetting]:
         return await self.settings_repo.get_by_key(key)
+        """Handle get_setting_by_key (key)."""
 
     async def upsert_system_setting(
         self,
@@ -31,6 +36,7 @@ class AdminService:
         is_active: Optional[bool] = None
     ) -> AdminSetting:
         existing = await self.get_setting_by_key(key)
+        """Handle upsert_system_setting (key, value, description, is_active)."""
         payload: Dict[str, Any] = {}
         if value is not None:
             payload["value"] = value
@@ -57,6 +63,7 @@ class AdminService:
         offset: int = 0
     ) -> list[AuditLog]:
         return await self.audit_repo.filter_by_event_type(event_type, limit=limit, offset=offset)
+        """Handle list_audit_logs (event_type, limit, offset)."""
 
     async def record_audit_event(
         self,
@@ -65,6 +72,7 @@ class AdminService:
         actor: Optional[User] = None
     ) -> AuditLog:
         payload = {
+        """Handle record_audit_event (event_type, event_data, actor)."""
             "event_type": event_type,
             "event_data": event_data,
             "actor_id": actor.id if actor else None,
@@ -74,9 +82,11 @@ class AdminService:
 
     async def list_system_reports(self, limit: int = 100, offset: int = 0) -> list[SystemReport]:
         return await self.report_repo.get_multi(limit=limit, offset=offset)
+        """Handle list_system_reports (limit, offset)."""
 
     async def get_dashboard_summary(self) -> dict:
         user_count = await self._count_users()
+        """Handle get_dashboard_summary."""
         active_user_count = await self._count_users(filter_by={"is_active": True})
         superuser_count = await self._count_users(filter_by={"is_superuser": True})
         total_settings = await self.settings_repo.count()
@@ -94,6 +104,7 @@ class AdminService:
 
     async def _count_users(self, filter_by: Optional[dict] = None) -> int:
         stmt = select(func.count()).select_from(User)
+        """Handle _count_users (filter_by)."""
         if filter_by:
             for key, value in filter_by.items():
                 stmt = stmt.where(getattr(User, key) == value)

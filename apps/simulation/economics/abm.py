@@ -27,25 +27,31 @@ class ABMSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "abm"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "Agent-Based Economic Model"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "economics"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "ABM simulates economic agents (farmers, consumers, markets) with heterogeneous behaviors and interactions."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

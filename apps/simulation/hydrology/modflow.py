@@ -27,25 +27,31 @@ class MODFLOWSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "modflow"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "MODFLOW (USGS Groundwater Model)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "hydrology"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "MODFLOW simulates groundwater flow in aquifers. Used for water resource management and contamination studies."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

@@ -43,6 +43,7 @@ class SharedSim(Base):
     )
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<SharedSim(id={self.id}, name={self.name!r})>"
 
     def to_dict(self) -> dict:

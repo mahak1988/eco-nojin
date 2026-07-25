@@ -1,3 +1,5 @@
+"""service module."""
+
 from typing import Optional, Dict, Any, AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
@@ -44,6 +46,7 @@ class AIAgentService:
     
     def __init__(self, session: AsyncSession, llm: Any) -> None:
         self.session = session
+        """Handle __init__ (session, llm)."""
         self.llm = llm
         self.conversation_repo = ConversationRepository(session)
         self.message_repo = MessageRepository(session)

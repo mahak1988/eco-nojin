@@ -25,6 +25,7 @@ async def get_indicators(country_code: str, year_from: int = 2010, year_to: int 
         url = f"{BASE}/country/{country_code}/indicator/{code}?format=json&date={year_from}:{year_to}&per_page=50"
 
         def _fetch(u=url) -> None:
+            """Handle _fetch (u)."""
             req = urllib.request.Request(u, headers={"User-Agent": "EcoNojin/2.0"})
             with urllib.request.urlopen(req, timeout=20) as r:
                 return json.loads(r.read().decode())

@@ -27,25 +27,31 @@ class LEAPSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "leap"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "LEAP (Low Emissions Analysis Platform)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "energy"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "LEAP is an energy planning tool for climate change mitigation. Models energy demand, supply, and emissions."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

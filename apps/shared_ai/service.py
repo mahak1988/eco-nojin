@@ -21,6 +21,7 @@ class SharedAiService:
     """Service for shared_ai operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = SharedAiRepository(session)
 
     async def get(self, id: int) -> Optional[SharedAi]:

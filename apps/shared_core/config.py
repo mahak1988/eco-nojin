@@ -82,6 +82,7 @@ class Settings(BaseSettings):
     # =========================================================================
     @model_validator(mode='after')
     def validate_production_settings(self) -> 'Settings':
+        """Handle validate_production_settings."""
         if self.ENVIRONMENT == "production":
             if self.SECRET_KEY == "super-secret-key-change-in-production-please":
                 raise ValueError("لطفاً مقدار SECRET_KEY را در محیط production تغییر دهید.")
@@ -90,6 +91,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
+    """Handle get_settings."""
     return Settings()
 
 settings = get_settings()

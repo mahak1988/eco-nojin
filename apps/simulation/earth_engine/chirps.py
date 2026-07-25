@@ -26,25 +26,31 @@ class CHIRPSFetcher(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "chirps"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "CHIRPS Precipitation Fetcher"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "earth_engine"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Fetches CHIRPS satellite-gauge combined precipitation data."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(
                 name="bounds", label="Bounding Box [lon_min, lat_min, lon_max, lat_max]", type="string",
@@ -67,6 +73,7 @@ class CHIRPSFetcher(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         import time
         start = time.time()
         errors = self.validate(parameters)
@@ -89,6 +96,7 @@ class CHIRPSFetcher(BaseSimulator):
                 error=str(e), execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         start = datetime.strptime(params["start_date"], "%Y-%m-%d")
         end = datetime.strptime(params["end_date"], "%Y-%m-%d")
         aggregation = params["aggregation"]
@@ -114,6 +122,7 @@ class CHIRPSFetcher(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         precip = outputs.get("precipitation_mm", [])
         return {
             "total_precipitation_mm": outputs.get("total_precipitation_mm", 0),
@@ -121,6 +130,7 @@ class CHIRPSFetcher(BaseSimulator):
         }
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {
             "precipitation_timeseries": [
                 {"period": i + 1, "precipitation": p}

@@ -48,6 +48,7 @@ _FAILED: list[dict] = []
 
 
 def _load_all() -> tuple[int, int]:
+    """Handle _load_all."""
     loaded = skipped = 0
     for mod_path, cls_name in SIMULATOR_MODULES:
         try:
@@ -74,6 +75,7 @@ logger.info(f"🔬 شبیه‌سازها: {_LOADED} بارگذاری، {_SKIPPED
 
 
 def register_all_simulators() -> list[dict]:
+    """Handle register_all_simulators."""
     return SimulationRegistry.list_all()
 
 

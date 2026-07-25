@@ -27,25 +27,31 @@ class EPICSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "epic"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "EPIC (Environmental Policy Integrated Climate)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "soil"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "EPIC simulates soil erosion, nutrient cycling, and crop growth. Used for assessing environmental policy impacts."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

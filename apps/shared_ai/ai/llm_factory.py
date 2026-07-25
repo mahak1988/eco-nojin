@@ -1,3 +1,5 @@
+"""llm_factory module."""
+
 import os
 import logging
 from typing import Optional, Any, Literal
@@ -180,6 +182,7 @@ class LLMFactory:
         class FakeToolCallingModel(FakeMessagesListChatModel):
             def bind_tools(self, tools, **kwargs) -> None:
                 return self
+                """Handle bind_tools (tools)."""
         
         return FakeToolCallingModel(
             responses=[

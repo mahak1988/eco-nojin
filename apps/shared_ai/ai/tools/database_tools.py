@@ -1,3 +1,5 @@
+"""database_tools module."""
+
 from langchain_core.tools import tool
 from sqlalchemy import text
 from apps.shared_core.database.session import async_session_maker

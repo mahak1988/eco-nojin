@@ -1,4 +1,6 @@
 # apps/api/routes/ecocoin.py
+"""ecocoin module."""
+
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,3 +1,5 @@
+"""repository module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,6 +15,7 @@ class ConversationRepository(BaseRepository[Conversation]):
     
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Conversation)
+        """Handle __init__ (session)."""
     
     async def get_user_conversations(
         self,
@@ -65,6 +68,7 @@ class MessageRepository(BaseRepository[Message]):
     
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Message)
+        """Handle __init__ (session)."""
     
     async def get_conversation_messages(
         self,

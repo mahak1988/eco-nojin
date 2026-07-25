@@ -1,3 +1,5 @@
+"""rules_engine module."""
+
 from typing import List, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
@@ -13,6 +15,7 @@ class RulesEngine:
     
     def __init__(self, session: AsyncSession) -> None:
         self.repo = KnowledgeRepository(session)
+        """Handle __init__ (session)."""
     
     async def evaluate(
         self,

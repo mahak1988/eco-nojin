@@ -1,3 +1,5 @@
+"""repository module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,6 +17,7 @@ class UserRepository(BaseRepository[User]):
     
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
+        """Handle __init__ (session)."""
     
     async def get_by_email(self, email: str) -> Optional[User]:
         """

@@ -27,25 +27,31 @@ class MaxEntSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "maxent"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "MaxEnt (Maximum Entropy Species Distribution)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "biodiversity"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "MaxEnt models species distribution from presence-only data. Predicts habitat suitability under climate scenarios."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

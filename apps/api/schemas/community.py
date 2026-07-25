@@ -69,6 +69,7 @@ class PostResponse(PostBase):
 
     @classmethod
     def model_validate(cls, obj: "Post") -> "PostResponse":
+        """Handle model_validate (cls, obj)."""
         data = super().model_validate(obj).model_dump()
         if hasattr(obj, "tags") and obj.tags:
             data["tags"] = [t.strip() for t in obj.tags.split(",") if t.strip()]

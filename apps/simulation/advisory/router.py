@@ -21,4 +21,5 @@ class AdvisoryRequest(BaseModel):
 
 @router.post("/advisory", summary="Generate analysis, recommendations & scenarios")
 async def advisory(req: AdvisoryRequest) -> None:
+    """Handle advisory (req)."""
     return generate_advisory(req.simulator_id, req.metrics, req.parameters)

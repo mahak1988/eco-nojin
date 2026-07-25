@@ -1,3 +1,5 @@
+"""repository module."""
+
 from typing import TypeVar, Generic, Type, Any, Dict, List, Optional, Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func
@@ -20,6 +22,7 @@ class BaseRepository(Generic[T]):
     
     def __init__(self, session: AsyncSession, model: Type[T]) -> None:
         self.session = session
+        """Handle __init__ (session, model)."""
         self.model = model
 
     async def get_by_id(self, id: Any, options: Optional[Sequence[Any]] = None) -> Optional[T]:

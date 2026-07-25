@@ -32,6 +32,7 @@ class VocabularyWord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<VocabularyWord(id={self.id}, word={self.word!r})>"
 
 
@@ -53,6 +54,7 @@ class Quiz(Base):
     questions: Mapped[List["QuizQuestion"]] = relationship("QuizQuestion", back_populates="quiz", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<Quiz(id={self.id}, title={self.title!r})>"
 
 
@@ -76,6 +78,7 @@ class QuizQuestion(Base):
     quiz: Mapped["Quiz"] = relationship("Quiz", back_populates="questions")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<QuizQuestion(id={self.id}, quiz_id={self.quiz_id})>"
 
 
@@ -97,6 +100,7 @@ class QuizAttempt(Base):
     quiz: Mapped["Quiz"] = relationship("Quiz")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<QuizAttempt(quiz_id={self.quiz_id}, user_id={self.user_id}, score={self.percentage}%)>"
 
 
