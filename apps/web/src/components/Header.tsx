@@ -1,12 +1,24 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, FlaskConical, Satellite, Coins, Receipt, 
-  Users, Settings, Globe, Menu, X, ChevronDown, Leaf 
+import {
+  LayoutDashboard,
+  FlaskConical,
+  Satellite,
+  Coins,
+  Receipt,
+  Users,
+  Settings,
+  Globe,
+  Menu,
+  X,
+  ChevronDown,
+  Leaf,
+  Bell,
 } from "lucide-react";
-import { useLang } from "../eco/i18n";
+// ✅ اصلاح مسیر: استفاده از ./ به جای ../ برای دسترسی به پوشه هم‌سطح
+import { useLang } from "./eco/i18n";
 
-// تعریف ساختار منو برای دسته‌بندی زیبا
+// تعریف ساختار منو برای دسته‌بندی زیبا و منظم
 const navCategories = [
   {
     title: "داشبورد",
@@ -14,12 +26,13 @@ const navCategories = [
     icon: LayoutDashboard,
   },
   {
-    title: "اکوسیستم و پایش",
+    title: "پایش و شبیه‌سازی",
     icon: Globe,
     items: [
       { name: "شبیه‌سازهای اکولوژیک", href: "/simulators", icon: FlaskConical },
       { name: "پایش ماهواره‌ای (MRV)", href: "/mrv", icon: Satellite },
       { name: "تصاویر ماهواره‌ای", href: "/satellite", icon: Globe },
+      { name: "مقایسه سناریوها", href: "/comparison", icon: LayoutDashboard },
     ],
   },
   {
@@ -36,6 +49,7 @@ const navCategories = [
     items: [
       { name: "انجمن کاربران", href: "/community", icon: Users },
       { name: "آکادمی و آموزش", href: "/education", icon: Leaf },
+      { name: "کتابخانه", href: "/library", icon: Leaf },
     ],
   },
   {
@@ -45,7 +59,7 @@ const navCategories = [
   },
 ];
 
-export function Header() {
+export default function Header() {
   const { lang } = useLang();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -54,12 +68,15 @@ export function Header() {
   const isActive = (href: string) => location.pathname === href;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/20 bg-white/70 backdrop-blur-xl dark:bg-slate-900/70 dark:border-slate-800/50 shadow-sm transition-all duration-300">
+    <header 
+      className="fixed top-0 left-0 right-0 z-50 border-b border-white/20 bg-white/70 backdrop-blur-xl dark:bg-slate-900/70 dark:border-slate-800/50 shadow-sm transition-all duration-300"
+      dir="rtl"
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
         
-        {/* لوگو و برند */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
+        {/* ۱. لوگو و برند */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 transition-transform group-hover:scale-105">
             <Leaf className="h-5 w-5" />
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">
@@ -67,7 +84,7 @@ export function Header() {
           </span>
         </Link>
 
-        {/* منوی دسکتاپ (دسته‌بندی شده) */}
+        {/* ۲. منوی دسکتاپ (دسته‌بندی شده با افکت شیشه‌ای) */}
         <nav className="hidden items-center gap-1 md:flex">
           {navCategories.map((category) => (
             <div 
@@ -85,7 +102,7 @@ export function Header() {
                   </button>
                   
                   {activeDropdown === category.title && (
-                    <div className="absolute top-full right-0 mt-2 w-56 rounded-xl border border-white/30 bg-white/90 p-2 shadow-xl backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-900/90 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full start-0 mt-2 w-56 rounded-xl border border-white/30 bg-white/90 p-2 shadow-xl backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-900/90 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                       {category.items.map((item) => (
                         <Link
                           key={item.name}
@@ -121,28 +138,32 @@ export function Header() {
           ))}
         </nav>
 
-        {/* اکشن‌های کاربری و منوی موبایل */}
+        {/* ۳. اکشن‌های کاربری و منوی موبایل */}
         <div className="flex items-center gap-3">
-          {/* دکمه تغییر تم یا زبان می‌تواند اینجا باشد */}
-          
+          {/* دکمه اعلان‌ها */}
+          <button className="hidden rounded-lg p-2 text-slate-600 hover:bg-white/50 dark:text-slate-300 dark:hover:bg-slate-800/50 md:flex">
+            <Bell className="h-5 w-5" />
+          </button>
+
           {/* دکمه منوی موبایل */}
           <button
             className="rounded-lg p-2 text-slate-600 hover:bg-white/50 dark:text-slate-300 dark:hover:bg-slate-800/50 md:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
 
           {/* آواتار کاربر */}
-          <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-slate-200 to-slate-300 text-sm font-bold text-slate-700 md:flex">
+          <div className="hidden h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-slate-200 to-slate-300 text-sm font-bold text-slate-700 md:flex dark:from-slate-700 dark:to-slate-600 dark:text-slate-200">
             U
           </div>
         </div>
       </div>
 
-      {/* منوی موبایل (بازشو) */}
+      {/* ۴. منوی موبایل (بازشو با افکت شیشه‌ای) */}
       {isMobileMenuOpen && (
-        <div className="border-t border-white/20 bg-white/95 px-4 py-4 backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/95 md:hidden">
+        <div className="border-t border-white/20 bg-white/95 px-4 py-4 backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-900/95 md:hidden max-h-[80vh] overflow-y-auto">
           <nav className="flex flex-col gap-2">
             {navCategories.map((category) => (
               <div key={category.title}>
@@ -156,7 +177,7 @@ export function Header() {
                         key={item.name}
                         to={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+                        className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm ${
                           isActive(item.href)
                             ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                             : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
@@ -171,7 +192,7 @@ export function Header() {
                   <Link
                     to={category.href!}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm ${
                       isActive(category.href!)
                         ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                         : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
