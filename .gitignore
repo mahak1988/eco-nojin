@@ -269,3 +269,5 @@ contracts/artifacts/
 # i18n audit reports (temporary)
 i18n_report/
 i18n_audit.py
+
+advanced_i18n_analyzer.py
