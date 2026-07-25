@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 """
 ai_agents module | ماژول ai_agents
 ====================================
