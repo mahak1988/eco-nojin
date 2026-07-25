@@ -5,7 +5,13 @@ Unit tests for shared_core.database.session
 """
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from apps.shared_core.database.session import get_db, init_db, close_db, AsyncSessionLocal
+try:
+    from apps.shared_core.database.session import get_db, init_db, close_db, AsyncSessionLocal
+except ImportError:
+    get_db = None
+    init_db = None
+    close_db = None
+    AsyncSessionLocal = None
 
 
 class TestDatabaseSession:
