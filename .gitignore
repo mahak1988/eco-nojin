@@ -235,3 +235,9 @@ current_snapshot.json
 previous_snapshot.json
 sync_report_*.json
 contracts/artifacts/
+
+# Token files (هرگز commit نشوند)
+.gh_token
+*.token
+.gh_*
+.github_token
