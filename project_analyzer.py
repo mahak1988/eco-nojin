@@ -77,8 +77,7 @@ SKIP_DIRS = {
 SKIP_FILE_NAMES = {
     "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "poetry.lock",
     "pipfile.lock", "composer.lock", "cargo.lock", "go.sum",
-    "gemfile.lock", "tsconfig.tsbuildinfo",
-}
+    "gemfile.lock", "tsconfig.tsbuildinfo", ".env", ".env.bak", ".env.local", ".env.production", ".gh_token"}
 SKIP_FILE_SUFFIXES = (
     ".min.js", ".min.css", ".js.map", ".css.map", ".bundle.js",
     ".chunk.js", ".woff", ".woff2", ".ttf", ".eot", ".otf",
