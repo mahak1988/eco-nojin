@@ -2,7 +2,7 @@
 import { lazy, Suspense, Component, useEffect, type ReactNode } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
-import Layout from "./layouts/Layout";
+import Layout from "./components/Layout/Layout";
 
 // ── Lazy Pages (با fallback برای خطاهای شبکه یا version-skew در Vite) ──
 const HomePage = lazy(() => import("./pages/HomePage"));
