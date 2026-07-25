@@ -247,3 +247,9 @@ contracts/artifacts/
 *.token
 .gh_*
 .github_token
+
+# Token files (هرگز commit نشوند)
+.gh_token
+*.token
+.gh_*
+.github_token
