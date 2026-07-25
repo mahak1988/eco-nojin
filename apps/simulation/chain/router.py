@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -9,14 +12,14 @@ class ChainRequest(BaseModel):
     chain_id: str = Field(..., description="e.g., 'climate_to_economy'")
     base_parameters: dict[str, Any] = Field(default_factory=dict)
 
-def _get_sim_instance(sim_id: str):
+def _get_sim_instance(sim_id: str) -> None:
     sim = SimulationRegistry.get(sim_id)
     if not sim:
         raise HTTPException(404, f"Simulator '{sim_id}' not found")
     return sim() if isinstance(sim, type) else sim
 
 @router.post("/chain", summary="Execute a chained simulation workflow")
-async def run_chain(req: ChainRequest):
+async def run_chain(req: ChainRequest) -> None:
     results = {}
     base = req.base_parameters
     

@@ -1,6 +1,9 @@
 """
 API سناریو، مقایسه و زنجیره‌سازی مدل‌ها
 """
+import logging
+
+logger = logging.getLogger(__name__)
 from __future__ import annotations
 import uuid
 from datetime import datetime
@@ -95,7 +98,7 @@ class PresetScenarioResponse(BaseModel):
 # ─── Endpoints: سناریوهای پیش‌فرض ──────────────────────────
 
 @router.get("/presets/{simulator_id}", response_model=PresetScenarioResponse)
-async def get_preset_scenarios(simulator_id: str):
+async def get_preset_scenarios(simulator_id: str) -> None:
     """دریافت سناریوهای پیش‌فرض برای یک شبیه‌ساز"""
     presets = PRESET_SCENARIOS.get(simulator_id, [])
     if not presets:
@@ -105,7 +108,7 @@ async def get_preset_scenarios(simulator_id: str):
 
 
 @router.get("/presets", response_model=list[PresetScenarioResponse])
-async def get_all_presets():
+async def get_all_presets() -> None:
     """دریافت تمام سناریوهای پیش‌فرض"""
     result = []
     for sim_id, presets in PRESET_SCENARIOS.items():
@@ -188,7 +191,7 @@ async def list_scenarios(
 
 
 @router.get("/scenarios/{scenario_id}", response_model=ScenarioResponse)
-async def get_scenario(scenario_id: str, db: AsyncSession = Depends(get_db_session)):
+async def get_scenario(scenario_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
     """دریافت جزئیات یک سناریو"""
     result = await db.execute(
         select(Scenario).where(Scenario.id == uuid.UUID(scenario_id))
@@ -211,7 +214,7 @@ async def get_scenario(scenario_id: str, db: AsyncSession = Depends(get_db_sessi
 
 
 @router.delete("/scenarios/{scenario_id}", status_code=204)
-async def delete_scenario(scenario_id: str, db: AsyncSession = Depends(get_db_session)):
+async def delete_scenario(scenario_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
     """حذف سناریو"""
     result = await db.execute(
         select(Scenario).where(Scenario.id == uuid.UUID(scenario_id))
@@ -375,7 +378,7 @@ async def create_comparison(
 
 
 @router.get("/comparisons", response_model=list[dict])
-async def list_comparisons(db: AsyncSession = Depends(get_db_session)):
+async def list_comparisons(db: AsyncSession = Depends(get_db_session)) -> None:
     """لیست جلسات مقایسه"""
     result = await db.execute(
         select(ComparisonSession).order_by(ComparisonSession.created_at.desc())
@@ -397,7 +400,7 @@ async def list_comparisons(db: AsyncSession = Depends(get_db_session)):
 # ─── Endpoints: زنجیره‌سازی مدل‌ها ─────────────────────────
 
 @router.post("/chains", response_model=dict, status_code=201)
-async def create_chain(data: ChainConfig, db: AsyncSession = Depends(get_db_session)):
+async def create_chain(data: ChainConfig, db: AsyncSession = Depends(get_db_session)) -> None:
     """ایجاد زنجیرهٔ مدل‌ها"""
     chain = ModelChain(
         id=uuid.uuid4(),
@@ -411,7 +414,7 @@ async def create_chain(data: ChainConfig, db: AsyncSession = Depends(get_db_sess
 
 
 @router.post("/chains/{chain_id}/run", response_model=ChainRunResponse)
-async def run_chain(chain_id: str, db: AsyncSession = Depends(get_db_session)):
+async def run_chain(chain_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
     """اجرای زنجیرهٔ مدل‌ها"""
     result = await db.execute(
         select(ModelChain).where(ModelChain.id == uuid.UUID(chain_id))
@@ -480,7 +483,7 @@ async def run_chain(chain_id: str, db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get("/chains", response_model=list[dict])
-async def list_chains(db: AsyncSession = Depends(get_db_session)):
+async def list_chains(db: AsyncSession = Depends(get_db_session)) -> None:
     """لیست زنجیره‌های مدل"""
     result = await db.execute(
         select(ModelChain).order_by(ModelChain.created_at.desc())

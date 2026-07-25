@@ -1,6 +1,9 @@
 """
 مدل‌های دیتابیس سناریو و مقایسه
 """
+import logging
+
+logger = logging.getLogger(__name__)
 from __future__ import annotations
 import uuid
 from datetime import datetime
@@ -32,7 +35,7 @@ class Scenario(Base):
     # روابط
     results = relationship("ScenarioResult", back_populates="scenario", cascade="all, delete-orphan")
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<Scenario {self.name} ({self.simulator_id})>"
 
 
@@ -63,7 +66,7 @@ class ComparisonSession(Base):
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<ComparisonSession {self.name} ({len(self.scenario_ids)} scenarios)>"
 
 

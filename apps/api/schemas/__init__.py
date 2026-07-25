@@ -4,6 +4,9 @@ API Schemas Package
 Pydantic models for request/response validation.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from apps.api.schemas.accounting import (
     AccountType, EntryType, InvoiceStatus, PaymentMethod, TaxType,
     AccountBase, AccountCreate, AccountUpdate, AccountResponse, AccountListResponse,

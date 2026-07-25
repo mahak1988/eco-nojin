@@ -4,6 +4,9 @@ QUAL2K (River Water Quality Model) Simulator
 QUAL2K simulates water quality in streams and rivers. Models dissolved oxygen, nutrients, algae, and pathogens.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

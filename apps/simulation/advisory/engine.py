@@ -2,6 +2,9 @@
 EcoNojin Advisory Engine — Scientifically grounded, rule-based recommendations.
 Generates analysis, recommendations, and actionable scenarios based on simulation metrics.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Any, Dict, List
 
 def generate_advisory(simulator_id: str, metrics: Dict[str, Any], parameters: Dict[str, Any]) -> Dict[str, Any]:

@@ -4,6 +4,9 @@ Education Service
 Business logic layer — orchestrates repositories and enforces rules.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +23,7 @@ from apps.api.models.education import Course, Lesson, Enrollment
 class EducationService:
     """Service for education operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = EducationRepository(session)
 
     # ==================== Course Operations ====================

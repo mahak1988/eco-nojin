@@ -4,6 +4,9 @@ i-Tree (Urban Forest Benefits Model) Simulator
 i-Tree quantifies benefits of urban forests including air quality, carbon storage, and stormwater management.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

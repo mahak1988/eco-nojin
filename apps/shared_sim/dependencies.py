@@ -6,6 +6,9 @@ FastAPI dependency injections for the shared_sim module.
 NOTE: Adjust to match your project's auth/permission system.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -22,7 +25,7 @@ async def get_current_user() -> dict:
 CurrentUser = Annotated[dict, Depends(get_current_user)]
 
 
-def require_role(*roles: str):
+def require_role(*roles: str) -> None:
     """Dependency factory: require the user to have one of the given roles."""
     async def _check(user: CurrentUser) -> dict:
         if user.get("role") not in roles:

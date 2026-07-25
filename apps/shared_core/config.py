@@ -3,6 +3,9 @@
 مدیریت متغیرهای محیطی با استفاده از Pydantic v2 Settings
 سازگار شده با apps/main.py
 """
+import logging
+
+logger = logging.getLogger(__name__)
 from functools import lru_cache
 from typing import List, Optional, Literal
 from pydantic import Field, model_validator

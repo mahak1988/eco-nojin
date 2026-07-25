@@ -5,6 +5,9 @@ Prevents brute force attacks on authentication endpoints.
 Uses in-memory store by default, Redis for production.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from time import time
 from collections import defaultdict
 from typing import Callable

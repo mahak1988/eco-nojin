@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class RulesEngine:
     """موتور ارزیابی و اجرای قوانین کسب‌وکار."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = KnowledgeRepository(session)
     
     async def evaluate(

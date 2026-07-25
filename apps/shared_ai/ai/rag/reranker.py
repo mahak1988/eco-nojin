@@ -12,12 +12,12 @@ logger = logging.getLogger(__name__)
 class CrossEncoderReranker:
     """Reranker با استفاده از Cross-Encoder."""
     
-    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
+    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2") -> None:
         self.model_name = model_name
         self._model = None
     
     @property
-    def model(self):
+    def model(self) -> None:
         """Lazy loading مدل."""
         if self._model is None:
             try:

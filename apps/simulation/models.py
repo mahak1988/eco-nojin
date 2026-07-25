@@ -7,6 +7,9 @@ NOTE: This is a starter template. Adjust fields and relationships
       to match your actual domain model.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional
 

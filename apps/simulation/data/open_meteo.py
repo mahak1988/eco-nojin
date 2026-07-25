@@ -3,6 +3,9 @@ Open-Meteo API client (no API key for non-commercial use).
 Provides FAO ET0 directly + historical/forecast weather.
 Docs: https://open-meteo.com/en/docs
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import asyncio
 import json
 import urllib.request
@@ -22,7 +25,7 @@ async def get_historical(lat: float, lon: float, start: date, end: date) -> dict
         "&timezone=auto"
     )
 
-    def _fetch():
+    def _fetch() -> None:
         if not url.startswith("https://"):
             raise ValueError("Only HTTPS URLs are allowed")
         req = urllib.request.Request(url, headers={"User-Agent": "EcoNojin/2.0"})

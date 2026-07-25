@@ -6,6 +6,9 @@ Journal Entries, Invoices, Payments, Budgets, and Tax management.
 Adapted from best practices in open-source accounting systems.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import (
     String, Numeric, DateTime, Text, Boolean, Integer,
     ForeignKey, Enum as SQLEnum, CheckConstraint, Index
@@ -81,7 +84,7 @@ class Account(Base):
         Index("idx_accounts_parent", "parent_id"),
     )
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<Account({self.code} {self.name})>"
 
     @property
@@ -107,7 +110,7 @@ class JournalEntry(Base):
     # Relationships
     items: Mapped[List["JournalItem"]] = relationship("JournalItem", back_populates="entry", cascade="all, delete-orphan")
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<JournalEntry({self.id} {self.date.date()})>"
 
     @property
@@ -138,7 +141,7 @@ class JournalItem(Base):
     entry: Mapped["JournalEntry"] = relationship("JournalEntry", back_populates="items")
     account: Mapped["Account"] = relationship("Account", back_populates="journal_items")
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<JournalItem({self.entry_id} {self.account_id} {self.entry_type} {self.amount})>"
 
 
@@ -165,7 +168,7 @@ class Invoice(Base):
     items: Mapped[List["InvoiceItem"]] = relationship("InvoiceItem", back_populates="invoice", cascade="all, delete-orphan")
     payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="invoice")
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<Invoice({self.number} {self.client_name})>"
 
 
@@ -183,7 +186,7 @@ class InvoiceItem(Base):
     # Relationships
     invoice: Mapped["Invoice"] = relationship("Invoice", back_populates="items")
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<InvoiceItem({self.description} {self.quantity}x{self.unit_price})>"
 
 
@@ -205,7 +208,7 @@ class Payment(Base):
     # Relationships
     invoice: Mapped[Optional["Invoice"]] = relationship("Invoice", back_populates="payments")
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<Payment({self.id} {self.amount} {self.payment_method})>"
 
 
@@ -225,7 +228,7 @@ class Budget(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<Budget({self.name} {self.planned_amount})>"
 
 
@@ -254,7 +257,7 @@ class TaxRate(Base):
     effective_to: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<TaxRate({self.name} {self.rate}%)>"
 
 
@@ -277,5 +280,5 @@ class FixedAsset(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self) -> None:
         return f"<FixedAsset({self.name} cost={self.purchase_cost})>"

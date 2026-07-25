@@ -4,6 +4,9 @@ Games Router - Database backed
 RESTful endpoints for vocabulary and quiz games.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status

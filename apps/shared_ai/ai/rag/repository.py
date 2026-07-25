@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class RAGRepository:
     """Repository برای مدیریت اسناد RAG."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
     
     async def create_document(self, data: Dict[str, Any]) -> Document:

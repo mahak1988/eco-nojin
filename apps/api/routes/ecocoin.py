@@ -1,4 +1,7 @@
 # apps/api/routes/ecocoin.py
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional

@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 """
 Scientific Knowledge Base for all 14 simulators.
 Each entry: formula, assumptions, limitations, references, domain (job roles), why.

@@ -4,6 +4,9 @@ Community Router - Database backed
 RESTful endpoints for community posts, comments, and likes.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status

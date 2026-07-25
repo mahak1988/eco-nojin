@@ -4,6 +4,9 @@ ERA5-Land Data Fetcher
 Fetches ERA5-Land reanalysis climate data for meteorological inputs.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime, UTC
 from typing import Any
 

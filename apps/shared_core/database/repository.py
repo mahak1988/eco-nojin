@@ -18,7 +18,7 @@ class BaseRepository(Generic[T]):
                 super().__init__(session, User)
     """
     
-    def __init__(self, session: AsyncSession, model: Type[T]):
+    def __init__(self, session: AsyncSession, model: Type[T]) -> None:
         self.session = session
         self.model = model
 

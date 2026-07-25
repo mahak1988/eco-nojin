@@ -4,6 +4,9 @@ HEC-RAS (River Analysis System) Simulator
 HEC-RAS models river hydraulics, floodplain inundation, sediment transport, and water temperature.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

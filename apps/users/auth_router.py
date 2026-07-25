@@ -2,6 +2,9 @@
 Eco Nojin - Authentication Router (Final Version with RBAC)
 ===========================================================
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import os
 from datetime import datetime, timedelta
 from typing import Optional, Any
@@ -125,7 +128,7 @@ async def get_current_user(
 # Endpoints
 # ---------------------------------------------------------------------------
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)):
+async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)) -> None:
     result = await db.execute(select(User).where(User.email == request.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -164,7 +167,7 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
     }
 
 @router.post("/login", response_model=AuthResponse)
-async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
+async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> None:
     identifier = request.email or request.username
     
     if not identifier:
@@ -204,7 +207,7 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)):
     }
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(get_current_user)) -> None:
     return UserResponse(
         id=current_user.id,
         email=current_user.email,
@@ -217,11 +220,11 @@ async def get_me(current_user: User = Depends(get_current_user)):
     )
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)):
+async def logout(current_user: User = Depends(get_current_user)) -> None:
     return {"message": "Successfully logged out"}
 
 @router.post("/refresh", response_model=AuthResponse)
-async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)):
+async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)) -> None:
     try:
         payload = jwt.decode(request.refreshToken, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")

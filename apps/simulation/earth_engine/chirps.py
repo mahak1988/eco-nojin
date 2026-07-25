@@ -5,6 +5,9 @@ Fetches CHIRPS (Climate Hazards Group InfraRed Precipitation with Station data)
 for high-resolution precipitation analysis.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime, UTC
 from typing import Any
 

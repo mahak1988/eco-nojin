@@ -5,6 +5,9 @@ Central module providing configuration, security, database, CRUD, and DI utiliti
 adapted from fastapi/full-stack-fastapi-template and fastapi-best-practices.
 
 Usage:
+import logging
+
+logger = logging.getLogger(__name__)
     from apps.shared_core.config import settings
     from apps.shared_core.security import create_access_token, verify_password
     from apps.shared_core.deps import SessionDep, CurrentUser, get_current_user

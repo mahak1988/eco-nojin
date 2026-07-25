@@ -11,6 +11,9 @@ Endpoints:
     DELETE /shared_sim/{id}    Delete
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status

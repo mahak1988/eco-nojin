@@ -4,6 +4,9 @@ EPIC (Environmental Policy Integrated Climate) Simulator
 EPIC simulates soil erosion, nutrient cycling, and crop growth. Used for assessing environmental policy impacts.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

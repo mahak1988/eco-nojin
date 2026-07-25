@@ -4,6 +4,9 @@ Agronomy Agent
 Smart farming and crop advisory agent.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import List, Any
 from langchain_core.tools import BaseTool
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
@@ -52,7 +55,7 @@ AGRONOMY_PROMPT = """شما یک مشاور کشاورزی هوشمند در پ�
 class AgronomyAgent:
     """ایجنت مشاور کشاورزی با ابزارهای هوشمند."""
 
-    def __init__(self, llm: Any):
+    def __init__(self, llm: Any) -> None:
         self.llm = llm
         self.tools: List[BaseTool] = [
             get_weather_data,

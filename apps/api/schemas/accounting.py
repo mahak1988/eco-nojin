@@ -4,6 +4,9 @@ Accounting Schemas | پ schemaهای حسابداری
 Pydantic models for request/response validation.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, List

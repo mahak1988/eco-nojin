@@ -21,7 +21,7 @@ class FallbackBrain:
     4. پاسخ نهایی را تولید می‌کند
     """
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.knowledge_engine = KnowledgeBaseEngine(session)
         self.rules_engine = RulesEngine(session)
@@ -143,7 +143,7 @@ class FallbackBrain:
         except Exception as e:
             logger.warning(f"⚠️ Failed to save memory: {e}")
     
-    async def seed_knowledge_if_needed(self):
+    async def seed_knowledge_if_needed(self) -> None:
         """بارگذاری دانش‌نامه در صورت نیاز."""
         from apps.shared_knowledge.knowledge.seed_data import seed_knowledge_base
         await seed_knowledge_base(self.session)

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class BM25:
     """پیاده‌سازی BM25 برای جستجوی keyword-based."""
     
-    def __init__(self, k1: float = 1.5, b: float = 0.75):
+    def __init__(self, k1: float = 1.5, b: float = 0.75) -> None:
         self.k1 = k1
         self.b = b
         self.corpus = []
@@ -32,7 +32,7 @@ class BM25:
         tokens = text.split()
         return [token for token in tokens if len(token) > 1]
     
-    def fit(self, documents: List[str]):
+    def fit(self, documents: List[str]) -> None:
         """آموزش BM25 روی corpus."""
         self.corpus = [self._tokenize(doc) for doc in documents]
         self.doc_lengths = [len(doc) for doc in self.corpus]
@@ -94,14 +94,14 @@ class BM25:
 class HybridSearchEngine:
     """موتور جستجوی ترکیبی BM25 + Vector."""
     
-    def __init__(self, vector_store, rrf_k: int = 60):
+    def __init__(self, vector_store, rrf_k: int = 60) -> None:
         self.vector_store = vector_store
         self.bm25 = BM25()
         self.rrf_k = rrf_k
         self.documents = []  # ذخیره متن‌ها برای BM25
         self.metadata_list = []  # ذخیره metadata
     
-    def add_documents(self, texts: List[str], metadata_list: List[Dict[str, Any]]):
+    def add_documents(self, texts: List[str], metadata_list: List[Dict[str, Any]]) -> None:
         """افزودن اسناد به هر دو سیستم."""
         # افزودن به vector store
         doc_ids = self.vector_store.add_documents(texts, metadata_list)

@@ -5,6 +5,9 @@ JWT and authentication settings with proper secret management.
 All secrets are loaded from .env via shared_core.config.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import model_validator
 from typing import Literal
@@ -28,7 +31,7 @@ class UserModuleSettings(BaseSettings):
     PASSWORD_MIN_LENGTH: int = 8
     
     @model_validator(mode="after")
-    def _validate_production_secrets(self):
+    def _validate_production_secrets(self) -> None:
         """Warn about weak algorithms in production."""
         if self.JWT_ALGORITHM == "HS256":
             warnings.warn(

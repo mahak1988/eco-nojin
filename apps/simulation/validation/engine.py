@@ -138,7 +138,7 @@ async def morris_sensitivity(
     delta: float = 0.10,
 ) -> dict:
     """Morris elementary effects: mean absolute change per parameter (higher = more influential)."""
-    async def get_metric(p):
+    async def get_metric(p) -> None:
         try:
             r = await run_fn(p)
             return _find_metric(r, metric_key)

@@ -5,6 +5,9 @@ SQLAlchemy ORM models for the API module.
 """
 
 # Keep backwards compatibility by importing from the models directory
+import logging
+
+logger = logging.getLogger(__name__)
 from apps.api.models.accounting import (
     AccountType,
     EntryType,

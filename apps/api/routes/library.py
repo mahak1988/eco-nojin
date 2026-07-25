@@ -4,6 +4,9 @@ Library Router - Database backed
 RESTful endpoints for digital library and resource management.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional
 import os
 import uuid

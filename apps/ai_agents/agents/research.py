@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import List, Any
 from langchain_core.tools import BaseTool
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
@@ -52,7 +55,7 @@ RESEARCH_AGENT_PROMPT = """شما یک محقق حرفه‌ای و دقیق هس
 class ResearchAgent:
     """ایجنت محقق با RAG."""
     
-    def __init__(self, llm: Any):
+    def __init__(self, llm: Any) -> None:
         self.llm = llm
         self.tools: List[BaseTool] = [
             web_search,

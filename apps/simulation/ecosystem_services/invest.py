@@ -4,6 +4,9 @@ InVEST (Ecosystem Services)
 Three ecosystem services (carbon storage, water yield, habitat quality) across a land-conversion gradient.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

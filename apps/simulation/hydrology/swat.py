@@ -4,6 +4,9 @@ SWAT (Soil & Water Assessment Tool)
 Watershed water balance: surface runoff, baseflow and evapotranspiration (monthly).
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

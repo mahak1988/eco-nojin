@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class DocumentLoader:
     """بارگذاری و chunking اسناد."""
     
-    def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50):
+    def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50) -> None:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
     

@@ -4,6 +4,9 @@ CO2FIX (Carbon Sequestration Model) Simulator
 CO2FIX simulates carbon sequestration in forest ecosystems. Includes biomass, soil, and product pools.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

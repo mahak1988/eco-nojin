@@ -11,7 +11,7 @@ import urllib.request
 async def get_elevation(lat: float, lon: float) -> float | None:
     url = f"https://api.open-elevation.com/api/v1/lookup?locations={lat},{lon}"
 
-    def _fetch():
+    def _fetch() -> None:
         if not url.startswith("https://"):
             raise ValueError("Only HTTPS URLs are allowed")
         req = urllib.request.Request(url, headers={"User-Agent": "EcoNojin/2.0"})

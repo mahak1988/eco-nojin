@@ -4,6 +4,9 @@ RUSLE2 (Revised Universal Soil Loss Equation)
 Annual soil erosion A = R*K*LS*C*P with monthly distribution and tolerance check.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

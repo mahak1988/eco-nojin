@@ -5,6 +5,9 @@ Business logic layer — orchestrates repositories and enforces rules.
 Controllers (routers) call services; services call repositories.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +20,7 @@ from apps.shared_core.schemas import SharedCoreCreate, SharedCoreUpdate
 class SharedCoreService:
     """Service for shared_core operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = SharedCoreRepository(session)
 
     async def get(self, id: int) -> Optional[SharedCore]:

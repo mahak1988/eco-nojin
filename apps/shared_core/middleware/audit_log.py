@@ -29,7 +29,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
     - Timestamp
     """
     
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next) -> None:
         # Skip health checks
         if request.url.path == "/health":
             return await call_next(request)

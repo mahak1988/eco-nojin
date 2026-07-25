@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import String, Boolean, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime

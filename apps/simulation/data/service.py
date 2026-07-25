@@ -12,7 +12,7 @@ _CACHE: dict[str, tuple[float, dict]] = {}
 _TTL = 3600  # 1 hour
 
 
-def _cache_get(key: str):
+def _cache_get(key: str) -> None:
     if key in _CACHE:
         ts, val = _CACHE[key]
         if time.time() - ts < _TTL:
@@ -21,7 +21,7 @@ def _cache_get(key: str):
     return None
 
 
-def _cache_set(key: str, val):
+def _cache_set(key: str, val) -> None:
     _CACHE[key] = (time.time(), val)
 
 

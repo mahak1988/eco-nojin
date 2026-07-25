@@ -20,7 +20,7 @@ from apps.shared_ai.schemas import SharedAiCreate, SharedAiUpdate
 class SharedAiRepository:
     """Repository for SharedAi entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, id: int) -> Optional[SharedAi]:

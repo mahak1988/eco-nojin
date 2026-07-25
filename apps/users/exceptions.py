@@ -5,6 +5,9 @@ Standard authentication exceptions for consistent error handling.
 Based on patterns from fastapi-best-practices.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi import HTTPException, status
 
 
@@ -43,16 +46,16 @@ class AuthExceptions:
 
 
 # Convenience exports
-def raise_invalid_credentials():
+def raise_invalid_credentials() -> None:
     """Raise invalid credentials exception."""
     raise AuthExceptions.InvalidCredentials
 
 
-def raise_token_expired():
+def raise_token_expired() -> None:
     """Raise token expired exception."""
     raise AuthExceptions.TokenExpired
 
 
-def raise_account_locked():
+def raise_account_locked() -> None:
     """Raise account locked exception."""
     raise AuthExceptions.AccountLocked

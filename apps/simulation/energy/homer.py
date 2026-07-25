@@ -4,6 +4,9 @@ HOMER (Hybrid Renewable Energy)
 Solar PV + wind generation against demand; renewable fraction and unmet load.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

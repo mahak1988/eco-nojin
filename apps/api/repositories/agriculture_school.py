@@ -4,6 +4,9 @@ Agriculture Schools Repository
 Data access layer — all database queries live here.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 
 from sqlalchemy import select, func
@@ -18,7 +21,7 @@ from apps.api.schemas.agriculture_school import (
 class AgricultureSchoolRepository:
     """Repository for AgricultureSchool entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, school_id: int) -> Optional[AgricultureSchool]:

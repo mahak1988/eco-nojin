@@ -5,6 +5,9 @@ Adapted from fastapi/full-stack-fastapi-template with async SQLAlchemy support.
 Provides reusable CRUD operations for all domain models.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Any, Generic, TypeVar
 from pydantic import BaseModel
 
@@ -33,7 +36,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         crud_user = CRUDUser(User)
     """
 
-    def __init__(self, model: type[ModelType]):
+    def __init__(self, model: type[ModelType]) -> None:
         """
         Initialize CRUD with the SQLAlchemy model class.
         

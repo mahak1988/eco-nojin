@@ -4,6 +4,9 @@ shared_core models | مدل‌های shared_core
 SQLAlchemy ORM models for the shared_core module.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional
 
