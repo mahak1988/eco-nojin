@@ -273,3 +273,12 @@ i18n_audit.py
 advanced_i18n_analyzer.py
 
 check_env.py
+
+# Temp analysis outputs
+apps-analysis.json
+clean_i18n_output/
+i18n_clean_output/
+orphaned_keys_*.txt
+master_*.json
+master_*.txt
+*_snapshot.json
