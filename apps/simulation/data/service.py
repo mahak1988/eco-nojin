@@ -45,8 +45,8 @@ async def get_climate_series(lat: float, lon: float, start: date, end: date,
                 open_meteo.get_historical(lat, lon, start, end), timeout=35)
             if om:
                 result = om
-        except Exception:
-            pass
+        except Exception as e:
+            import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
 
     if not result and source in ("nasa", "auto"):
         try:
@@ -59,8 +59,8 @@ async def get_climate_series(lat: float, lon: float, start: date, end: date,
                     row["et0_mm"] = nasa_power.hargreaves_et0(
                         row["temp_max_c"], row["temp_min_c"], row["temp_mean_c"], doy, lat)
             result = np_data
-        except Exception:
-            pass
+        except Exception as e:
+            import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
 
     _cache_set(key, result)
     return result
