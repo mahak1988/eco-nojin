@@ -117,7 +117,7 @@ class User(Base):
 
 **استفاده از توکن:**
 ```http
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### مسیرهای ادمین (فقط superuser)
