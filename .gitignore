@@ -259,3 +259,9 @@ contracts/artifacts/
 *.token
 .gh_*
 .github_token
+
+# Security-sensitive (هرگز commit نشوند)
+.gh_token
+.env
+.env.*
+!.env.example
