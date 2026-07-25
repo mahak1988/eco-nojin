@@ -6,6 +6,7 @@ Econojin - نقطه ورود اصلی بک‌اند
 Adapted from fastapi/full-stack-fastapi-template with centralized config.
 """
 
+from security.middleware.security_middleware import SecurityMiddleware
 import sys
 from pathlib import Path
 
@@ -99,6 +100,9 @@ app = FastAPI(
     redoc_url="/redoc",
     lifespan=lifespan,
 )
+
+# ── Spider Web Security Middleware ──
+app.add_middleware(SecurityMiddleware)
 
 # ============================================================
 # Middlewareها
