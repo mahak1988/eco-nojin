@@ -83,8 +83,8 @@ class FallbackBrain:
             logger.error(f"❌ FallbackBrain error: {e}")
             return await self.template_engine.get_response(agent_type, "fallback", {})
     
-    def __detect_intent_extracted():
-        """Extracted from _detect_intent() — If block (31 lines)."""
+    def ___detect_intent_extracted_agent_type_____financial():
+        """Extracted: if agent_type == 'financial'"""
         if agent_type == "financial":
             if any(w in message_lower for w in ["تحلیل", "نسبت", "سود", "زیان"]):
                 return "analysis_request"
@@ -116,6 +116,11 @@ class FallbackBrain:
                 return "bug_report"
             if any(w in message_lower for w in ["تست", "unit test"]):
                 return "test_generation"
+
+
+    def __detect_intent_extracted():
+        """Extracted from _detect_intent() — If block (31 lines)."""
+        ___detect_intent_extracted_agent_type_____financial()  # was: if agent_type == 'financial'
 
     def _detect_intent(self, message: str, agent_type: str) -> str:
         """شناسایی intent پیام کاربر."""
