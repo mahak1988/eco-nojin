@@ -1,0 +1,402 @@
+{
+  "Commands:": "Comandos:",
+  "Options:": "Opções:",
+  "Examples:": "Exemplos:",
+  "boolean": "booleano",
+  "count": "contagem",
+  "string": "string",
+  "number": "número",
+  "array": "array",
+  "required": "obrigatório",
+  "default:": "padrão:",
+  "choices:": "opções:",
+  "aliases:": "sinônimos:",
+  "generated-value": "valor-gerado",
+  "Not enough non-option arguments: got %s, need at least %s": {
+    "one": "Argumentos insuficientes: Argumento %s, necessário pelo menos %s",
+    "other": "Argumentos insuficientes: Argumento %s, necessário pelo menos %s"
+  },
+  "Too many non-option arguments: got %s, maximum of %s": {
+    "one": "Excesso de argumentos: recebido %s, máximo de %s",
+    "other": "Excesso de argumentos: recebido %s, máximo de %s"
+  },
+  "Missing argument value: %s": {
+    "one": "Falta valor de argumento: %s",
+    "other": "Falta valores de argumento: %s"
+  },
+  "Missing required argument: %s": {
+    "one": "Falta argumento obrigatório: %s",
+    "other": "Faltando argumentos obrigatórios: %s"
+  },
+  "Unknown argument: %s": {
+    "one": "Argumento desconhecido: %s",
+    "other": "Argumentos desconhecidos: %s"
+  },
+  "Invalid values:": "Valores inválidos:",
+  "Argument: %s, Given: %s, Choices: %s": "Argumento: %s, Dado: %s, Opções: %s",
+  "Argument check failed: %s": "Verificação de argumento falhou: %s",
+  "Implications failed:": "Implicações falharam:",
+  "Not enough arguments following: %s": "Argumentos insuficientes a seguir: %s",
+  "Invalid JSON config file: %s": "Arquivo JSON de configuração inválido: %s",
+  "Path to JSON config file": "Caminho para o arquivo JSON de configuração",
+  "Show help": "Exibe ajuda",
+  "Show version number": "Exibe a versão",
+  "Did you mean %s?": "Você quis dizer %s?",
+  "Arguments %s and %s are mutually exclusive": "Argumentos %s e %s são mutualmente exclusivos",
+  "Positionals:": "Posicionais:",
+  "command": "comando",
+  "Unknown command: %s": {
+    "one": "",
+    "other": ""
+  },
+  "app": {
+    "description": "",
+    "name": "",
+    "tagline": ""
+  },
+  "auth": {
+    "confirmPassword": "",
+    "continueWithGithub": "",
+    "continueWithGoogle": "",
+    "email": "",
+    "forgotPassword": "",
+    "haveAccount": "",
+    "login": {
+      "subtitle": "",
+      "title": ""
+    },
+    "noAccount": "",
+    "or": "",
+    "password": "",
+    "register": {
+      "title": ""
+    },
+    "rememberMe": "",
+    "signIn": "",
+    "signUp": "",
+    "welcome": ""
+  },
+  "author": {
+    "email": "",
+    "name": "",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "common": {
+    "back": "",
+    "cancel": "",
+    "close": "",
+    "confirm": "",
+    "create": "",
+    "delete": "",
+    "deselectAll": "",
+    "download": "",
+    "edit": "",
+    "error": "",
+    "export": "",
+    "filter": "",
+    "import": "",
+    "itemsPerPage": "",
+    "loading": "",
+    "next": "",
+    "no": "",
+    "noData": "",
+    "noResults": "",
+    "of": "",
+    "open": "",
+    "page": "",
+    "previous": "",
+    "print": "",
+    "reset": "",
+    "save": "",
+    "search": "",
+    "selectAll": "",
+    "sort": "",
+    "submit": "",
+    "success": "",
+    "total": "",
+    "update": "",
+    "upload": "",
+    "yes": ""
+  },
+  "dashboard": {
+    "activeUsers": "",
+    "growth": "",
+    "overview": "",
+    "performance": "",
+    "recentActivity": "",
+    "revenue": "",
+    "title": "",
+    "totalProjects": "",
+    "totalUsers": "",
+    "viewAll": "",
+    "welcome": ""
+  },
+  "default": "",
+  "dependencies": {
+    "@reduxjs/toolkit": "",
+    "@strapi/design-system": "",
+    "@strapi/icons": "",
+    "@strapi/utils": "",
+    "lodash": "",
+    "qs": "",
+    "react-intl": "",
+    "react-redux": "",
+    "yup": "",
+    "zod": ""
+  },
+  "deprecated": "",
+  "deprecated: %s": "",
+  "description": "",
+  "devDependencies": {
+    "@strapi/admin": "",
+    "@strapi/admin-test-utils": "",
+    "@strapi/content-manager": "",
+    "@strapi/database": "",
+    "@strapi/types": "",
+    "@testing-library/react": "",
+    "@testing-library/user-event": "",
+    "koa": "",
+    "msw": "",
+    "react": "",
+    "react-dom": "",
+    "react-query": "",
+    "react-router-dom": "",
+    "styled-components": ""
+  },
+  "engines": {
+    "node": "",
+    "npm": ""
+  },
+  "error": {
+    "404": {
+      "description": "",
+      "title": ""
+    },
+    "500": {
+      "description": "",
+      "title": ""
+    },
+    "goHome": "",
+    "tryAgain": ""
+  },
+  "exports": {
+    "": {
+      "/package": {
+        "json": ""
+      },
+      "/strapi-admin": {
+        "default": "",
+        "import": "",
+        "require": "",
+        "source": "",
+        "types": ""
+      },
+      "/strapi-server": {
+        "default": "",
+        "import": "",
+        "require": "",
+        "source": "",
+        "types": ""
+      }
+    }
+  },
+  "files": "",
+  "footer": {
+    "about": "",
+    "contact": "",
+    "copyright": "",
+    "privacy": "",
+    "terms": ""
+  },
+  "homepage": "",
+  "license": "",
+  "maintainers": "",
+  "map": {
+    "fullscreen": "",
+    "layers": "",
+    "satellite": "",
+    "street": "",
+    "terrain": "",
+    "title": "",
+    "zoomIn": "",
+    "zoomOut": ""
+  },
+  "name": "",
+  "nav": {
+    "analytics": "",
+    "dashboard": "",
+    "help": "",
+    "home": "",
+    "language": "",
+    "login": "",
+    "logout": "",
+    "map": "",
+    "notifications": "",
+    "profile": "",
+    "projects": "",
+    "register": "",
+    "reports": "",
+    "settings": "",
+    "tasks": "",
+    "users": ""
+  },
+  "pages": {
+    "account": {
+      "desc": "",
+      "title": ""
+    },
+    "accounting": {
+      "desc": "",
+      "title": ""
+    },
+    "alerts": {
+      "desc": "",
+      "title": ""
+    },
+    "analytics": {
+      "desc": "",
+      "title": ""
+    },
+    "community": {
+      "desc": "",
+      "title": ""
+    },
+    "ecocoin": {
+      "desc": "",
+      "title": ""
+    },
+    "education": {
+      "desc": "",
+      "title": ""
+    },
+    "games": {
+      "desc": "",
+      "title": ""
+    },
+    "invoices": {
+      "desc": "",
+      "title": ""
+    },
+    "journal": {
+      "desc": "",
+      "title": ""
+    },
+    "library": {
+      "desc": "",
+      "title": ""
+    },
+    "mrv": {
+      "desc": "",
+      "title": ""
+    },
+    "news": {
+      "desc": "",
+      "title": ""
+    },
+    "payments": {
+      "desc": "",
+      "title": ""
+    },
+    "pilots": {
+      "desc": "",
+      "title": ""
+    },
+    "policies": {
+      "desc": "",
+      "title": ""
+    },
+    "regional": {
+      "desc": "",
+      "title": ""
+    },
+    "reports": {
+      "desc": "",
+      "title": ""
+    },
+    "risks": {
+      "desc": "",
+      "title": ""
+    },
+    "satellite": {
+      "desc": "",
+      "title": ""
+    },
+    "simulators": {
+      "desc": "",
+      "title": ""
+    },
+    "tourism": {
+      "desc": "",
+      "title": ""
+    },
+    "users": {
+      "desc": "",
+      "title": ""
+    }
+  },
+  "peerDependencies": {
+    "@strapi/admin": "",
+    "@strapi/content-manager": "",
+    "react": "",
+    "react-dom": "",
+    "react-router-dom": "",
+    "styled-components": ""
+  },
+  "repository": {
+    "directory": "",
+    "type": "",
+    "url": ""
+  },
+  "scripts": {
+    "build": "",
+    "build:code": "",
+    "build:types": "",
+    "build:types:admin": "",
+    "build:types:server": "",
+    "clean": "",
+    "lint": "",
+    "test:front": "",
+    "test:ts:front": "",
+    "test:unit": "",
+    "test:unit:watch": "",
+    "watch": ""
+  },
+  "settings": {
+    "darkMode": "",
+    "language": "",
+    "lightMode": "",
+    "notifications": "",
+    "profile": "",
+    "security": "",
+    "system": "",
+    "theme": "",
+    "title": ""
+  },
+  "strapi": {
+    "description": "",
+    "displayName": "",
+    "kind": "",
+    "name": "",
+    "required": ""
+  },
+  "theme": {
+    "blue": "",
+    "dark": "",
+    "green": "",
+    "light": "",
+    "orange": "",
+    "purple": "",
+    "system": ""
+  },
+  "validation": {
+    "email": "",
+    "maxLength": "",
+    "minLength": "",
+    "passwordMatch": "",
+    "required": ""
+  },
+  "version": ""
+}
