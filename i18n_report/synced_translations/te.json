@@ -1,0 +1,402 @@
+{
+  "Commands:": "Choose yer command:",
+  "Options:": "Options for me hearties!",
+  "Examples:": "Ex. marks the spot:",
+  "required": "requi-yar-ed",
+  "Missing required argument: %s": {
+    "one": "Ye be havin' to set the followin' argument land lubber: %s",
+    "other": "Ye be havin' to set the followin' arguments land lubber: %s"
+  },
+  "Show help": "Parlay this here code of conduct",
+  "Show version number": "'Tis the version ye be askin' fer",
+  "Arguments %s and %s are mutually exclusive": "Yon scurvy dogs %s and %s be as bad as rum and a prudish wench",
+  "Argument check failed: %s": "",
+  "Argument: %s, Given: %s, Choices: %s": "",
+  "Did you mean %s?": "",
+  "Implications failed:": "",
+  "Invalid JSON config file: %s": "",
+  "Invalid values:": "",
+  "Missing argument value: %s": {
+    "one": "",
+    "other": ""
+  },
+  "Not enough arguments following: %s": "",
+  "Not enough non-option arguments: got %s, need at least %s": {
+    "one": "",
+    "other": ""
+  },
+  "Path to JSON config file": "",
+  "Positionals:": "",
+  "Too many non-option arguments: got %s, maximum of %s": {
+    "one": "",
+    "other": ""
+  },
+  "Unknown argument: %s": {
+    "one": "",
+    "other": ""
+  },
+  "Unknown command: %s": {
+    "one": "",
+    "other": ""
+  },
+  "aliases:": "",
+  "app": {
+    "description": "",
+    "name": "",
+    "tagline": ""
+  },
+  "array": "",
+  "auth": {
+    "confirmPassword": "",
+    "continueWithGithub": "",
+    "continueWithGoogle": "",
+    "email": "",
+    "forgotPassword": "",
+    "haveAccount": "",
+    "login": {
+      "subtitle": "",
+      "title": ""
+    },
+    "noAccount": "",
+    "or": "",
+    "password": "",
+    "register": {
+      "title": ""
+    },
+    "rememberMe": "",
+    "signIn": "",
+    "signUp": "",
+    "welcome": ""
+  },
+  "author": {
+    "email": "",
+    "name": "",
+    "url": ""
+  },
+  "boolean": "",
+  "bugs": {
+    "url": ""
+  },
+  "choices:": "",
+  "command": "",
+  "common": {
+    "back": "",
+    "cancel": "",
+    "close": "",
+    "confirm": "",
+    "create": "",
+    "delete": "",
+    "deselectAll": "",
+    "download": "",
+    "edit": "",
+    "error": "",
+    "export": "",
+    "filter": "",
+    "import": "",
+    "itemsPerPage": "",
+    "loading": "",
+    "next": "",
+    "no": "",
+    "noData": "",
+    "noResults": "",
+    "of": "",
+    "open": "",
+    "page": "",
+    "previous": "",
+    "print": "",
+    "reset": "",
+    "save": "",
+    "search": "",
+    "selectAll": "",
+    "sort": "",
+    "submit": "",
+    "success": "",
+    "total": "",
+    "update": "",
+    "upload": "",
+    "yes": ""
+  },
+  "count": "",
+  "dashboard": {
+    "activeUsers": "",
+    "growth": "",
+    "overview": "",
+    "performance": "",
+    "recentActivity": "",
+    "revenue": "",
+    "title": "",
+    "totalProjects": "",
+    "totalUsers": "",
+    "viewAll": "",
+    "welcome": ""
+  },
+  "default": "",
+  "default:": "",
+  "dependencies": {
+    "@reduxjs/toolkit": "",
+    "@strapi/design-system": "",
+    "@strapi/icons": "",
+    "@strapi/utils": "",
+    "lodash": "",
+    "qs": "",
+    "react-intl": "",
+    "react-redux": "",
+    "yup": "",
+    "zod": ""
+  },
+  "deprecated": "",
+  "deprecated: %s": "",
+  "description": "",
+  "devDependencies": {
+    "@strapi/admin": "",
+    "@strapi/admin-test-utils": "",
+    "@strapi/content-manager": "",
+    "@strapi/database": "",
+    "@strapi/types": "",
+    "@testing-library/react": "",
+    "@testing-library/user-event": "",
+    "koa": "",
+    "msw": "",
+    "react": "",
+    "react-dom": "",
+    "react-query": "",
+    "react-router-dom": "",
+    "styled-components": ""
+  },
+  "engines": {
+    "node": "",
+    "npm": ""
+  },
+  "error": {
+    "404": {
+      "description": "",
+      "title": ""
+    },
+    "500": {
+      "description": "",
+      "title": ""
+    },
+    "goHome": "",
+    "tryAgain": ""
+  },
+  "exports": {
+    "": {
+      "/package": {
+        "json": ""
+      },
+      "/strapi-admin": {
+        "default": "",
+        "import": "",
+        "require": "",
+        "source": "",
+        "types": ""
+      },
+      "/strapi-server": {
+        "default": "",
+        "import": "",
+        "require": "",
+        "source": "",
+        "types": ""
+      }
+    }
+  },
+  "files": "",
+  "footer": {
+    "about": "",
+    "contact": "",
+    "copyright": "",
+    "privacy": "",
+    "terms": ""
+  },
+  "generated-value": "",
+  "homepage": "",
+  "license": "",
+  "maintainers": "",
+  "map": {
+    "fullscreen": "",
+    "layers": "",
+    "satellite": "",
+    "street": "",
+    "terrain": "",
+    "title": "",
+    "zoomIn": "",
+    "zoomOut": ""
+  },
+  "name": "",
+  "nav": {
+    "analytics": "",
+    "dashboard": "",
+    "help": "",
+    "home": "",
+    "language": "",
+    "login": "",
+    "logout": "",
+    "map": "",
+    "notifications": "",
+    "profile": "",
+    "projects": "",
+    "register": "",
+    "reports": "",
+    "settings": "",
+    "tasks": "",
+    "users": ""
+  },
+  "number": "",
+  "pages": {
+    "account": {
+      "desc": "",
+      "title": ""
+    },
+    "accounting": {
+      "desc": "",
+      "title": ""
+    },
+    "alerts": {
+      "desc": "",
+      "title": ""
+    },
+    "analytics": {
+      "desc": "",
+      "title": ""
+    },
+    "community": {
+      "desc": "",
+      "title": ""
+    },
+    "ecocoin": {
+      "desc": "",
+      "title": ""
+    },
+    "education": {
+      "desc": "",
+      "title": ""
+    },
+    "games": {
+      "desc": "",
+      "title": ""
+    },
+    "invoices": {
+      "desc": "",
+      "title": ""
+    },
+    "journal": {
+      "desc": "",
+      "title": ""
+    },
+    "library": {
+      "desc": "",
+      "title": ""
+    },
+    "mrv": {
+      "desc": "",
+      "title": ""
+    },
+    "news": {
+      "desc": "",
+      "title": ""
+    },
+    "payments": {
+      "desc": "",
+      "title": ""
+    },
+    "pilots": {
+      "desc": "",
+      "title": ""
+    },
+    "policies": {
+      "desc": "",
+      "title": ""
+    },
+    "regional": {
+      "desc": "",
+      "title": ""
+    },
+    "reports": {
+      "desc": "",
+      "title": ""
+    },
+    "risks": {
+      "desc": "",
+      "title": ""
+    },
+    "satellite": {
+      "desc": "",
+      "title": ""
+    },
+    "simulators": {
+      "desc": "",
+      "title": ""
+    },
+    "tourism": {
+      "desc": "",
+      "title": ""
+    },
+    "users": {
+      "desc": "",
+      "title": ""
+    }
+  },
+  "peerDependencies": {
+    "@strapi/admin": "",
+    "@strapi/content-manager": "",
+    "react": "",
+    "react-dom": "",
+    "react-router-dom": "",
+    "styled-components": ""
+  },
+  "repository": {
+    "directory": "",
+    "type": "",
+    "url": ""
+  },
+  "scripts": {
+    "build": "",
+    "build:code": "",
+    "build:types": "",
+    "build:types:admin": "",
+    "build:types:server": "",
+    "clean": "",
+    "lint": "",
+    "test:front": "",
+    "test:ts:front": "",
+    "test:unit": "",
+    "test:unit:watch": "",
+    "watch": ""
+  },
+  "settings": {
+    "darkMode": "",
+    "language": "",
+    "lightMode": "",
+    "notifications": "",
+    "profile": "",
+    "security": "",
+    "system": "",
+    "theme": "",
+    "title": ""
+  },
+  "strapi": {
+    "description": "",
+    "displayName": "",
+    "kind": "",
+    "name": "",
+    "required": ""
+  },
+  "string": "",
+  "theme": {
+    "blue": "",
+    "dark": "",
+    "green": "",
+    "light": "",
+    "orange": "",
+    "purple": "",
+    "system": ""
+  },
+  "validation": {
+    "email": "",
+    "maxLength": "",
+    "minLength": "",
+    "passwordMatch": "",
+    "required": ""
+  },
+  "version": ""
+}
