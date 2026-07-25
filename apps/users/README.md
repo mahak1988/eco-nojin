@@ -80,7 +80,7 @@ class User(Base):
 // POST /api/v1/users/register
 {
     "email": "user@example.com",
-    "password": "*****",
+    "password": "<password>",
     "full_name": "کاربر نمونه"  // اختیاری
 }
 // Response 201
@@ -99,7 +99,7 @@ class User(Base):
 // POST /api/v1/auth/login
 {
     "email": "user@example.com",
-    "password": "*****"
+    "password": "<password>"
 }
 // Response 200
 {
@@ -117,7 +117,7 @@ class User(Base):
 
 **استفاده از توکن:**
 ```http
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer <jwt-token>
 ```
 
 ### مسیرهای ادمین (فقط superuser)
@@ -206,12 +206,12 @@ async def admin_endpoint(
 # 1. ثبت‌نام
 curl -X POST http://localhost:8000/api/v1/users/register \
   -H "Content-Type: application/json" \
-  -d '{"email": "test@econojin.com", "password": "*****", "full_name": "کاربر تست"}'
+  -d '{"email": "test@econojin.com", "password": "<password>", "full_name": "کاربر تست"}'
 
 # 2. ورود و دریافت توکن
 TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "test@econojin.com", "password": "*****"}' \
+  -d '{"email": "test@econojin.com", "password": "<password>"}' \
   | python -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
 
 # 3. دریافت اطلاعات کاربر
@@ -227,13 +227,13 @@ import httpx
 # ثبت‌نام
 response = httpx.post(
     "http://localhost:8000/api/v1/users/register",
-    json={"email": "user@example.com", "password": "*****"}
+    json={"email": "user@example.com", "password": "<password>"}
 )
 
 # ورود
 response = httpx.post(
     "http://localhost:8000/api/v1/auth/login",
-    json={"email": "user@example.com", "password": "*****"}
+    json={"email": "user@example.com", "password": "<password>"}
 )
 token = response.json()["access_token"]
 
