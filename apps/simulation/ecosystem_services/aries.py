@@ -27,25 +27,31 @@ class ARIESSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "aries"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "ARIES (Artificial Intelligence for Ecosystem Services)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "ecosystem-services"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "ARIES uses AI to model ecosystem services flows. Maps source, sink, and use of natural capital."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

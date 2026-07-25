@@ -45,22 +45,27 @@ class Sentinel2Fetcher(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "sentinel2"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "Sentinel-2 Earth Engine Fetcher"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "earth_engine"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Fetches Sentinel-2 satellite imagery for vegetation indices and crop monitoring."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def _get_parameters(self) -> list[SimulationParameter]:

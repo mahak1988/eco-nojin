@@ -21,6 +21,7 @@ class SharedSimService:
     """Service for shared_sim operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = SharedSimRepository(session)
 
     async def get(self, id: int) -> Optional[SharedSim]:

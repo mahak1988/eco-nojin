@@ -42,6 +42,7 @@ def _find_metric(result: dict, preferred: str = "yield_t_ha") -> float:
 
 # ── Goodness-of-fit metrics ──
 def rmse(observed: list[float], simulated: list[float]) -> float:
+    """Handle rmse (observed, simulated)."""
     if not observed:
         return 0.0
     n = min(len(observed), len(simulated))
@@ -60,6 +61,7 @@ def nse(observed: list[float], simulated: list[float]) -> float:
 
 
 def r_squared(observed: list[float], simulated: list[float]) -> float:
+    """Handle r_squared (observed, simulated)."""
     if len(observed) < 2:
         return 0.0
     n = min(len(observed), len(simulated))
@@ -72,6 +74,7 @@ def r_squared(observed: list[float], simulated: list[float]) -> float:
 
 
 def goodness_of_fit(observed: list[float], simulated: list[float]) -> dict:
+    """Handle goodness_of_fit (observed, simulated)."""
     return {
         "rmse": round(rmse(observed, simulated), 3),
         "nse": nse(observed, simulated),
@@ -82,6 +85,7 @@ def goodness_of_fit(observed: list[float], simulated: list[float]) -> dict:
 
 
 def _rate_nse(v: float) -> str:
+    """Handle _rate_nse (v)."""
     if v >= 0.75:
         return "خیلی خوب (Very Good)"
     if v >= 0.65:
@@ -139,6 +143,7 @@ async def morris_sensitivity(
 ) -> dict:
     """Morris elementary effects: mean absolute change per parameter (higher = more influential)."""
     async def get_metric(p) -> None:
+        """Handle get_metric (p)."""
         try:
             r = await run_fn(p)
             return _find_metric(r, metric_key)

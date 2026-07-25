@@ -37,6 +37,7 @@ class LibraryResource(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<LibraryResource(id={self.id}, title={self.title!r})>"
 
 

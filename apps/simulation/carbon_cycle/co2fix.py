@@ -27,25 +27,31 @@ class CO2FIXSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "co2fix"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "CO2FIX (Carbon Sequestration Model)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "carbon-cycle"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "CO2FIX simulates carbon sequestration in forest ecosystems. Includes biomass, soil, and product pools."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

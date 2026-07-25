@@ -1,3 +1,5 @@
+"""knowledge_base module."""
+
 from typing import List, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
@@ -14,6 +16,7 @@ class KnowledgeBaseEngine:
     
     def __init__(self, session: AsyncSession) -> None:
         self.repo = KnowledgeRepository(session)
+        """Handle __init__ (session)."""
     
     async def search(
         self,

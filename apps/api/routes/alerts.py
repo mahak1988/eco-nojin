@@ -81,6 +81,7 @@ async def list_alerts(
     category: Optional[str] = Query(None),
     limit: int = Query(50, le=200),
 ):
+    """Handle list_alerts (severity, acknowledged, category, limit)."""
     result = _alerts
     if severity:
         result = [a for a in result if a["severity"] == severity]
@@ -93,18 +94,21 @@ async def list_alerts(
 
 @router.get("/active")
 async def get_active_alerts() -> None:
+    """Handle get_active_alerts."""
     active = [a for a in _alerts if not a["acknowledged"]]
     return {"alerts": active, "count": len(active)}
 
 
 @router.get("/critical")
 async def get_critical_alerts() -> None:
+    """Handle get_critical_alerts."""
     critical = [a for a in _alerts if a["severity"] == "critical" and not a["acknowledged"]]
     return {"alerts": critical, "count": len(critical)}
 
 
 @router.post("/{alert_id}/acknowledge")
 async def acknowledge_alert(alert_id: str) -> None:
+    """Handle acknowledge_alert (alert_id)."""
     for a in _alerts:
         if a["id"] == alert_id:
             a["acknowledged"] = True

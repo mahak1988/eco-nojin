@@ -289,6 +289,7 @@ async def optimization_solver(
     try:
         # تابع هدف
         def objective(x) -> None:
+            """Handle objective (x)."""
             result = 0.0
             for i, coeff in enumerate(objective_coefficients):
                 if i < len(x):

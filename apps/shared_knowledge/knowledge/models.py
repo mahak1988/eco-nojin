@@ -1,3 +1,5 @@
+"""models module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,7 @@ class KnowledgeArticle(Base):
     
     def __repr__(self) -> str:
         return f"<KnowledgeArticle(agent={self.agent_type}, title='{self.title}')>"
+        """Handle __repr__."""
 
 
 class BusinessRule(Base):

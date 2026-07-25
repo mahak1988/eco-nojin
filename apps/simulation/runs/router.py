@@ -40,6 +40,7 @@ class RunCreate(BaseModel):
 
 
 def _to_dict(r: SimulationRun) -> dict:
+    """Handle _to_dict (r)."""
     return {
         "id": r.id, "user_id": r.user_id, "simulator_id": r.simulator_id,
         "simulator_name": r.simulator_name, "parameters": r.parameters,
@@ -51,6 +52,7 @@ def _to_dict(r: SimulationRun) -> dict:
 
 @router.post("", summary="Save a simulation run to the dashboard")
 async def save_run(data: RunCreate, db: AsyncSession = Depends(get_db_session)) -> None:
+    """Handle save_run (data, db)."""
     await _ensure_table(db)
     run = SimulationRun(
         id=str(uuid.uuid4()),
@@ -76,6 +78,7 @@ async def list_runs(
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db_session),
 ):
+    """Handle list_runs (simulator_id, user_id, limit, db)."""
     q = select(SimulationRun).order_by(desc(SimulationRun.created_at)).limit(limit)
     if simulator_id:
         q = q.where(SimulationRun.simulator_id == simulator_id)
@@ -88,6 +91,7 @@ async def list_runs(
 
 @router.get("/{run_id}", summary="Get one saved run")
 async def get_run(run_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
+    """Handle get_run (run_id, db)."""
     await _ensure_table(db)
     run = await db.get(SimulationRun, run_id)
     if not run:
@@ -97,6 +101,7 @@ async def get_run(run_id: str, db: AsyncSession = Depends(get_db_session)) -> No
 
 @router.delete("/{run_id}", summary="Delete a saved run")
 async def delete_run(run_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
+    """Handle delete_run (run_id, db)."""
     await _ensure_table(db)
     run = await db.get(SimulationRun, run_id)
     if not run:

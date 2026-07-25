@@ -27,25 +27,31 @@ class WASPSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "wasp"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "WASP (Water Quality Analysis Simulation Program)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "water-quality"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "WASP simulates water quality in water bodies. Models eutrophication, toxic chemicals, and sediment transport."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

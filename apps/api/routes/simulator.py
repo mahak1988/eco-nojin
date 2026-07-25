@@ -36,6 +36,7 @@ BIO_BASELINE = {"rainforest": 0.85, "temperate": 0.65, "wetland": 0.75, "grassla
 
 @router.post("/carbon/run")
 async def run_carbon(sim: CarbonSim) -> None:
+    """Handle run_carbon (sim)."""
     rate = CARBON_RATES.get(sim.forest_type, 10)
     yearly = []
     cumulative = 0
@@ -65,6 +66,7 @@ async def run_carbon(sim: CarbonSim) -> None:
 
 @router.post("/water/run")
 async def run_water(sim: WaterSim) -> None:
+    """Handle run_water (sim)."""
     rate = WATER_RATES.get(sim.region.lower(), 1000)
     yearly = []
     for y in range(1, sim.years + 1):
@@ -86,6 +88,7 @@ async def run_water(sim: WaterSim) -> None:
 
 @router.post("/biodiversity/run")
 async def run_biodiversity(sim: BioSim) -> None:
+    """Handle run_biodiversity (sim)."""
     baseline = BIO_BASELINE.get(sim.ecosystem_type, 0.5)
     target = baseline + (1 - baseline) * sim.restoration_level
     yearly = []
@@ -112,6 +115,7 @@ async def run_biodiversity(sim: BioSim) -> None:
 
 @router.get("/forest-types")
 async def get_forest_types() -> None:
+    """Handle get_forest_types."""
     return [
         {"value": "rainforest", "label": "جنگل بارانی", "rate": 25, "icon": "🌴"},
         {"value": "temperate", "label": "جنگل معتدل", "rate": 12, "icon": "🌳"},
@@ -124,6 +128,7 @@ async def get_forest_types() -> None:
 
 @router.get("/ecosystem-types")
 async def get_ecosystem_types() -> None:
+    """Handle get_ecosystem_types."""
     return [
         {"value": "rainforest", "label": "جنگل بارانی", "baseline": 0.85, "icon": "🌴"},
         {"value": "temperate", "label": "جنگل معتدل", "baseline": 0.65, "icon": "🌳"},

@@ -21,6 +21,7 @@ class SharedCoreService:
     """Service for shared_core operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = SharedCoreRepository(session)
 
     async def get(self, id: int) -> Optional[SharedCore]:

@@ -1,4 +1,7 @@
 """SWAT Model Wrapper for Eco Nozhin"""
+import logging
+
+logger = logging.getLogger(__name__)
 from .wrapper import SWATWrapper, SWATOutput
 
 __all__ = ["SWATWrapper", "SWATOutput"]

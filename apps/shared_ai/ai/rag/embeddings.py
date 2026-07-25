@@ -1,3 +1,5 @@
+"""embeddings module."""
+
 from typing import List
 import logging
 from functools import lru_cache
@@ -10,6 +12,7 @@ class EmbeddingModel:
     
     def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
         self.model_name = model_name
+        """Handle __init__ (model_name)."""
         self._model = None
         self._dimension = 384  # all-MiniLM-L6-v2
     

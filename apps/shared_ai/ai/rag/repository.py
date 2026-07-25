@@ -1,3 +1,5 @@
+"""repository module."""
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from typing import List, Optional, Dict, Any
@@ -13,6 +15,7 @@ class RAGRepository:
     
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        """Handle __init__ (session)."""
     
     async def create_document(self, data: Dict[str, Any]) -> Document:
         """ایجاد سند جدید."""

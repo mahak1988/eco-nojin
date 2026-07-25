@@ -22,6 +22,7 @@ from apps.simulation.base import (
 
 
 def _noise(i: int, seed: int) -> float:
+    """Handle _noise (i, seed)."""
     h = hashlib.sha256(f"{seed}:{i}".encode()).hexdigest()
     return (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
 
@@ -30,28 +31,35 @@ def _noise(i: int, seed: int) -> float:
 class RothCSimulator(BaseSimulator):
     @property
     def id(self) -> str:
+        """Handle id."""
         return "rothc"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "RothC (Soil Organic Carbon Turnover)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "carbon_cycle"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Soil organic carbon dynamics with temperature/moisture/clay-dependent decomposition."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(name="initial_soc", label="Initial SOC (t C/ha)", type="float", default=50.0, min_value=5.0, max_value=300.0, unit="t C/ha", description="Initial soil organic carbon"),
             SimulationParameter(name="carbon_input", label="Annual C Input (t C/ha/yr)", type="float", default=3.0, min_value=0.0, max_value=20.0, unit="t C/ha/yr", description="Annual carbon inputs (residues, manure)"),
@@ -62,6 +70,7 @@ class RothCSimulator(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         start = time.time()
         errors = self.validate(parameters)
         if errors:
@@ -81,6 +90,7 @@ class RothCSimulator(BaseSimulator):
                 execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         soc = params.get("initial_soc", 50.0)
         cin = params.get("carbon_input", 3.0); clay = params.get("clay", 25.0)
         temp = params.get("temperature", 15.0); moist = params.get("moisture", 0.8)
@@ -106,7 +116,9 @@ class RothCSimulator(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         return {k: float(v) for k, v in outputs.get("metrics", {}).items() if isinstance(v, (int, float))}
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {s["key"]: s["values"] for s in outputs.get("series", [])}

@@ -85,6 +85,7 @@ class Account(Base):
     )
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<Account({self.code} {self.name})>"
 
     @property
@@ -111,18 +112,22 @@ class JournalEntry(Base):
     items: Mapped[List["JournalItem"]] = relationship("JournalItem", back_populates="entry", cascade="all, delete-orphan")
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<JournalEntry({self.id} {self.date.date()})>"
 
     @property
     def total_debits(self) -> Decimal:
+        """Handle total_debits."""
         return sum(item.amount for item in self.items if item.entry_type == EntryType.DEBIT)
 
     @property
     def total_credits(self) -> Decimal:
+        """Handle total_credits."""
         return sum(item.amount for item in self.items if item.entry_type == EntryType.CREDIT)
 
     @property
     def is_balanced(self) -> bool:
+        """Handle is_balanced."""
         return self.total_debits == self.total_credits
 
 
@@ -142,6 +147,7 @@ class JournalItem(Base):
     account: Mapped["Account"] = relationship("Account", back_populates="journal_items")
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<JournalItem({self.entry_id} {self.account_id} {self.entry_type} {self.amount})>"
 
 
@@ -169,6 +175,7 @@ class Invoice(Base):
     payments: Mapped[List["Payment"]] = relationship("Payment", back_populates="invoice")
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<Invoice({self.number} {self.client_name})>"
 
 
@@ -187,6 +194,7 @@ class InvoiceItem(Base):
     invoice: Mapped["Invoice"] = relationship("Invoice", back_populates="items")
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<InvoiceItem({self.description} {self.quantity}x{self.unit_price})>"
 
 
@@ -209,6 +217,7 @@ class Payment(Base):
     invoice: Mapped[Optional["Invoice"]] = relationship("Invoice", back_populates="payments")
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<Payment({self.id} {self.amount} {self.payment_method})>"
 
 
@@ -229,6 +238,7 @@ class Budget(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<Budget({self.name} {self.planned_amount})>"
 
 
@@ -258,6 +268,7 @@ class TaxRate(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<TaxRate({self.name} {self.rate}%)>"
 
 
@@ -281,4 +292,5 @@ class FixedAsset(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<FixedAsset({self.name} cost={self.purchase_cost})>"

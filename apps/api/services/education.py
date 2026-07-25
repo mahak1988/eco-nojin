@@ -24,6 +24,7 @@ class EducationService:
     """Service for education operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = EducationRepository(session)
 
     # ==================== Course Operations ====================
@@ -32,75 +33,90 @@ class EducationService:
         self, skip: int = 0, limit: int = 100,
         search: Optional[str] = None, category: Optional[str] = None, level: Optional[str] = None
     ) -> tuple[List[Course], int]:
+        """Handle list_courses (skip, limit, search, category, level)."""
         limit = min(limit, 200)
         return await self.repo.list_courses(skip, limit, search, category, level)
 
     async def create_course(self, data: CourseCreate) -> Course:
+        """Handle create_course (data)."""
         return await self.repo.create_course(data)
 
     async def get_course(self, course_id: int) -> Course:
+        """Handle get_course (course_id)."""
         obj = await self.repo.get_course_by_id(course_id)
         if not obj:
             raise ValueError(f"Course with id={course_id} not found")
         return obj
 
     async def update_course(self, course_id: int, data: CourseUpdate) -> Course:
+        """Handle update_course (course_id, data)."""
         obj = await self.repo.update_course(course_id, data)
         if not obj:
             raise ValueError(f"Course with id={course_id} not found")
         return obj
 
     async def delete_course(self, course_id: int) -> None:
+        """Handle delete_course (course_id)."""
         if not await self.repo.delete_course(course_id):
             raise ValueError(f"Course with id={course_id} not found")
 
     # ==================== Lesson Operations ====================
 
     async def list_lessons(self, course_id: int, skip: int = 0, limit: int = 100) -> tuple[List[Lesson], int]:
+        """Handle list_lessons (course_id, skip, limit)."""
         return await self.repo.list_lessons_by_course(course_id, skip, limit)
 
     async def create_lesson(self, course_id: int, data: LessonCreate) -> Lesson:
         # Verify course exists
+        """Handle create_lesson (course_id, data)."""
         await self.get_course(course_id)
         return await self.repo.create_lesson(course_id, data.model_dump())
 
     async def get_lesson(self, lesson_id: int) -> Lesson:
+        """Handle get_lesson (lesson_id)."""
         obj = await self.repo.get_lesson_by_id(lesson_id)
         if not obj:
             raise ValueError(f"Lesson with id={lesson_id} not found")
         return obj
 
     async def update_lesson(self, lesson_id: int, data: LessonUpdate) -> Lesson:
+        """Handle update_lesson (lesson_id, data)."""
         obj = await self.repo.update_lesson(lesson_id, data.model_dump())
         if not obj:
             raise ValueError(f"Lesson with id={lesson_id} not found")
         return obj
 
     async def delete_lesson(self, lesson_id: int) -> None:
+        """Handle delete_lesson (lesson_id)."""
         if not await self.repo.delete_lesson(lesson_id):
             raise ValueError(f"Lesson with id={lesson_id} not found")
 
     # ==================== Enrollment Operations ====================
 
     async def list_enrollments(self, user_id: int, skip: int = 0, limit: int = 100) -> tuple[List[Enrollment], int]:
+        """Handle list_enrollments (user_id, skip, limit)."""
         return await self.repo.list_enrollments_by_user(user_id, skip, limit)
 
     async def create_enrollment(self, course_id: int, user_id: int) -> Enrollment:
         # Check if already enrolled
+        """Handle create_enrollment (course_id, user_id)."""
         existing = await self.repo.get_user_enrollment(course_id, user_id)
         if existing:
             raise ValueError(f"User already enrolled in this course")
         return await self.repo.create_enrollment(course_id, user_id)
 
     async def update_enrollment(self, enrollment_id: int, data: EnrollmentUpdate) -> Enrollment:
+        """Handle update_enrollment (enrollment_id, data)."""
         obj = await self.repo.update_enrollment(enrollment_id, data.model_dump())
         if not obj:
             raise ValueError(f"Enrollment with id={enrollment_id} not found")
         return obj
 
     async def delete_enrollment(self, enrollment_id: int) -> None:
+        """Handle delete_enrollment (enrollment_id)."""
         if not await self.repo.delete_enrollment(enrollment_id):
             raise ValueError(f"Enrollment with id={enrollment_id} not found")
 
     async def get_stats(self) -> dict:
+        """Handle get_stats."""
         return await self.repo.get_stats()

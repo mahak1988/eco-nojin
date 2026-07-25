@@ -15,6 +15,7 @@ class BM25:
     """پیاده‌سازی BM25 برای جستجوی keyword-based."""
     
     def __init__(self, k1: float = 1.5, b: float = 0.75) -> None:
+        """Handle __init__ (k1, b)."""
         self.k1 = k1
         self.b = b
         self.corpus = []
@@ -95,6 +96,7 @@ class HybridSearchEngine:
     """موتور جستجوی ترکیبی BM25 + Vector."""
     
     def __init__(self, vector_store, rrf_k: int = 60) -> None:
+        """Handle __init__ (vector_store, rrf_k)."""
         self.vector_store = vector_store
         self.bm25 = BM25()
         self.rrf_k = rrf_k

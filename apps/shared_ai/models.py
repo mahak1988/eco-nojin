@@ -43,6 +43,7 @@ class SharedAi(Base):
     )
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<SharedAi(id={self.id}, name={self.name!r})>"
 
     def to_dict(self) -> dict:

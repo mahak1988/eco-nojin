@@ -1,3 +1,5 @@
+"""vector_store module."""
+
 from typing import List, Dict, Any, Optional
 import logging
 import os
@@ -18,6 +20,7 @@ class VectorStore:
     
     def __init__(self, collection_name: str = "econojin_documents") -> None:
         self.collection_name = collection_name
+        """Handle __init__ (collection_name)."""
         self._client = None
         self._backend = None  # "qdrant" or "faiss"
         self._faiss_index = None

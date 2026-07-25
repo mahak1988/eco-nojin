@@ -1,3 +1,5 @@
+"""seed_data module."""
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import logging

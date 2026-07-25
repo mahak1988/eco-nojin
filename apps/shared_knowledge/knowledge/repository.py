@@ -1,3 +1,5 @@
+"""repository module."""
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_, and_, func
 from typing import List, Optional, Dict, Any
@@ -18,6 +20,7 @@ class KnowledgeRepository:
     
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        """Handle __init__ (session)."""
     
     # ==========================================
     # Knowledge Articles

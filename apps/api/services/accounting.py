@@ -34,6 +34,7 @@ class AccountingService:
     """Main service for accounting operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.accounts = AccountRepository(session)
         self.journal_entries = JournalEntryRepository(session)
         self.invoices = InvoiceRepository(session)
@@ -46,9 +47,11 @@ class AccountService:
     """Service for account operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = AccountRepository(session)
 
     async def get(self, account_id: str) -> Account:
+        """Handle get (account_id)."""
         obj = await self.repo.get_by_id(account_id)
         if not obj:
             raise ValueError(f"Account with id={account_id} not found")
@@ -59,6 +62,7 @@ class AccountService:
     async def list(
         self, skip: int = 0, limit: int = 100, account_type: Optional[str] = None
     ) -> tuple[List[Account], int]:
+        """Handle list (skip, limit, account_type)."""
         limit = min(limit, 1000)
         accounts, total = await self.repo.list(skip, limit, account_type)
         # Calculate balances for all accounts
@@ -68,18 +72,21 @@ class AccountService:
 
     async def create(self, data: AccountCreate) -> Account:
         # Check code uniqueness
+        """Handle create (data)."""
         existing = await self.repo.get_by_code(data.code)
         if existing:
             raise ValueError(f"Account with code={data.code} already exists")
         return await self.repo.create(data)
 
     async def update(self, account_id: str, data: AccountUpdate) -> Account:
+        """Handle update (account_id, data)."""
         obj = await self.repo.get_by_id(account_id)
         if not obj:
             raise ValueError(f"Account with id={account_id} not found")
         return await self.repo.update(account_id, data)
 
     async def delete(self, account_id: str) -> None:
+        """Handle delete (account_id)."""
         obj = await self.repo.get_by_id(account_id)
         if not obj:
             raise ValueError(f"Account with id={account_id} not found")
@@ -92,9 +99,11 @@ class JournalEntryService:
     """Service for journal entry operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = JournalEntryRepository(session)
 
     async def get(self, entry_id: str) -> JournalEntry:
+        """Handle get (entry_id)."""
         obj = await self.repo.get_by_id(entry_id)
         if not obj:
             raise ValueError(f"Journal entry with id={entry_id} not found")
@@ -103,11 +112,13 @@ class JournalEntryService:
     async def list(
         self, skip: int = 0, limit: int = 100, is_posted: Optional[bool] = None
     ) -> tuple[List[JournalEntry], int]:
+        """Handle list (skip, limit, is_posted)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit, is_posted)
 
     async def create(self, data: JournalEntryCreate) -> JournalEntry:
         # Validate double-entry balance
+        """Handle create (data)."""
         total_debits = sum(
             item.amount for item in data.items
             if item.entry_type == "debit"
@@ -129,6 +140,7 @@ class JournalEntryService:
         return entry
 
     async def post_entry(self, entry_id: str) -> JournalEntry:
+        """Handle post_entry (entry_id)."""
         obj = await self.repo.post_entry(entry_id)
         if not obj:
             raise ValueError(f"Journal entry with id={entry_id} not found")
@@ -139,9 +151,11 @@ class InvoiceService:
     """Service for invoice operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = InvoiceRepository(session)
 
     async def get(self, invoice_id: str) -> "Invoice":
+        """Handle get (invoice_id)."""
         from apps.api.models.accounting import Invoice as InvoiceModel
         obj = await self.repo.get_by_id(invoice_id)
         if not obj:
@@ -151,13 +165,16 @@ class InvoiceService:
     async def list(
         self, skip: int = 0, limit: int = 100, status: Optional[str] = None
     ) -> tuple[list, int]:
+        """Handle list (skip, limit, status)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit, status)
 
     async def create(self, data: InvoiceCreate) -> "Invoice":
+        """Handle create (data)."""
         return await self.repo.create(data)
 
     async def update(self, invoice_id: str, data: InvoiceUpdate) -> "Invoice":
+        """Handle update (invoice_id, data)."""
         obj = await self.repo.update(invoice_id, data)
         if not obj:
             raise ValueError(f"Invoice with id={invoice_id} not found")
@@ -165,6 +182,7 @@ class InvoiceService:
 
     async def delete(self, invoice_id: str) -> None:
         # Will need to add delete method to repository
+        """Handle delete (invoice_id)."""
         obj = await self.repo.get_by_id(invoice_id)
         if not obj:
             raise ValueError(f"Invoice with id={invoice_id} not found")
@@ -176,13 +194,16 @@ class PaymentService:
     """Service for payment operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = PaymentRepository(session)
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list, int]:
+        """Handle list (skip, limit)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit)
 
     async def create(self, data: PaymentCreate) -> "Payment":
+        """Handle create (data)."""
         from apps.api.models.accounting import Payment as PaymentModel
         return await self.repo.create(data)
 
@@ -191,9 +212,11 @@ class BudgetService:
     """Service for budget operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = BudgetRepository(session)
 
     async def get(self, budget_id: str) -> "Budget":
+        """Handle get (budget_id)."""
         from apps.api.models.accounting import Budget as BudgetModel
         obj = await self.repo.get_by_id(budget_id)
         if not obj:
@@ -201,13 +224,16 @@ class BudgetService:
         return obj
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list, int]:
+        """Handle list (skip, limit)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit)
 
     async def create(self, data: BudgetCreate) -> "Budget":
+        """Handle create (data)."""
         return await self.repo.create(data)
 
     async def update(self, budget_id: str, data: BudgetUpdate) -> "Budget":
+        """Handle update (budget_id, data)."""
         obj = await self.repo.update(budget_id, data)
         if not obj:
             raise ValueError(f"Budget with id={budget_id} not found")

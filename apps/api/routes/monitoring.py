@@ -36,6 +36,7 @@ _sample_data = [
 
 @router.post("/satellite/analyze")
 async def analyze_satellite(req: SatRequest) -> None:
+    """Handle analyze_satellite (req)."""
     ndvi = [d["ndvi"] for d in _sample_data]
     avg = sum(ndvi) / len(ndvi)
     trend = ndvi[-1] - ndvi[0]
@@ -59,11 +60,13 @@ async def analyze_satellite(req: SatRequest) -> None:
 
 @router.post("/satellite/upload")
 async def upload_satellite(file: UploadFile = File(...)) -> None:
+    """Handle upload_satellite (file)."""
     return {"status": "uploaded", "filename": file.filename, "analysis_started": True}
 
 
 @router.post("/ai/analyze")
 async def ai_analyze(req: AIRequest) -> None:
+    """Handle ai_analyze (req)."""
     return {
         "summary": "وضعیت بوم‌شناختی در حال بهبود است. NDVI 3.2٪ افزایش.",
         "insights": [
@@ -83,6 +86,7 @@ async def ai_analyze(req: AIRequest) -> None:
 
 @router.get("/ai/models")
 async def get_ai_models() -> None:
+    """Handle get_ai_models."""
     return [
         {"id": "biomass", "name": "برآورد زیست‌توده", "accuracy": 0.92},
         {"id": "species", "name": "تشخیص گونه", "accuracy": 0.88},
@@ -93,6 +97,7 @@ async def get_ai_models() -> None:
 
 @router.get("/alerts")
 async def get_alerts() -> None:
+    """Handle get_alerts."""
     return {"alerts": [
         {"id": "AL001", "type": "deforestation", "severity": "high",
          "message": "کاهش پوشش در ۵ هکتار", "timestamp": "2026-07-14T08:00:00"},
@@ -103,6 +108,7 @@ async def get_alerts() -> None:
 
 @router.get("/projects/overview")
 async def get_projects_overview() -> None:
+    """Handle get_projects_overview."""
     return {"projects": [
         {"id": "amazon-north", "name": "آمازون شمالی", "hectares": 45200, "ndvi": 0.72, "health": 88},
         {"id": "kenya-grassland", "name": "مراتع کنیا", "hectares": 28900, "ndvi": 0.58, "health": 75},

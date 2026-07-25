@@ -27,25 +27,31 @@ class HECRASSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "hecras"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "HEC-RAS (River Analysis System)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "hydrology"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "HEC-RAS models river hydraulics, floodplain inundation, sediment transport, and water temperature."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

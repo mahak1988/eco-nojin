@@ -38,6 +38,7 @@ class Post(Base):
     comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<Post(id={self.id}, title={self.title!r})>"
 
 
@@ -60,6 +61,7 @@ class Comment(Base):
     post: Mapped["Post"] = relationship("Post", back_populates="comments")
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         return f"<Comment(id={self.id}, post_id={self.post_id})>"
 
 
@@ -75,6 +77,7 @@ class Like(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self) -> str:
+        """Handle __repr__."""
         target = "post" if self.post_id else "comment"
         return f"<Like(user_id={self.user_id}, target={target})>"
 

@@ -1,3 +1,5 @@
+"""document_loader module."""
+
 from typing import List, Dict, Any
 import logging
 import re
@@ -11,6 +13,7 @@ class DocumentLoader:
     
     def __init__(self, chunk_size: int = 500, chunk_overlap: int = 50) -> None:
         self.chunk_size = chunk_size
+        """Handle __init__ (chunk_size, chunk_overlap)."""
         self.chunk_overlap = chunk_overlap
     
     def load_text(self, text: str, metadata: Dict[str, Any] = None) -> List[Dict[str, Any]]:

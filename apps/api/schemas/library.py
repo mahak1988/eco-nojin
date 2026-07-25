@@ -69,6 +69,7 @@ class LibraryResourceResponse(LibraryResourceBase):
 
     @classmethod
     def model_validate(cls, obj: "LibraryResource") -> "LibraryResourceResponse":
+        """Handle model_validate (cls, obj)."""
         data = super().model_validate(obj).model_dump()
         # Convert tags string to list
         if hasattr(obj, "tags") and obj.tags:

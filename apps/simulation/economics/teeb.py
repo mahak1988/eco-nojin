@@ -27,25 +27,31 @@ class TEEBSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "teeb"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "TEEB (The Economics of Ecosystems and Biodiversity)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "economics"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "TEEB framework values ecosystem services and biodiversity. Calculates economic benefits of natural capital."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

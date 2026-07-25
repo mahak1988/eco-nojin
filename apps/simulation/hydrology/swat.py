@@ -22,6 +22,7 @@ from apps.simulation.base import (
 
 
 def _noise(i: int, seed: int) -> float:
+    """Handle _noise (i, seed)."""
     h = hashlib.sha256(f"{seed}:{i}".encode()).hexdigest()
     return (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
 
@@ -30,28 +31,35 @@ def _noise(i: int, seed: int) -> float:
 class SWATSimulator(BaseSimulator):
     @property
     def id(self) -> str:
+        """Handle id."""
         return "swat"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "SWAT (Soil & Water Assessment Tool)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "hydrology"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Watershed water balance: surface runoff, baseflow and evapotranspiration (monthly)."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(name="precipitation", label="Annual Precipitation (mm)", type="float", default=800.0, min_value=100.0, max_value=3000.0, unit="mm", description="Total annual precipitation"),
             SimulationParameter(name="et0", label="Reference ET0 (mm/yr)", type="float", default=600.0, min_value=100.0, max_value=2500.0, unit="mm", description="Annual reference evapotranspiration"),
@@ -62,6 +70,7 @@ class SWATSimulator(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         start = time.time()
         errors = self.validate(parameters)
         if errors:
@@ -81,6 +90,7 @@ class SWATSimulator(BaseSimulator):
                 execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         precip = params.get("precipitation", 800.0)
         et0 = params.get("et0", 600.0)
         rc = params.get("runoff_coef", 0.35)
@@ -111,7 +121,9 @@ class SWATSimulator(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         return {k: float(v) for k, v in outputs.get("metrics", {}).items() if isinstance(v, (int, float))}
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {s["key"]: s["values"] for s in outputs.get("series", [])}

@@ -51,6 +51,7 @@ async def solve_differential_equation(
     try:
         # تعریف تابع ODE
         def ode_system(t, y) -> None:
+            """Handle ode_system (t, y)."""
             dydt = []
             for i in range(len(y)):
                 if i < len(coefficients):
@@ -335,6 +336,7 @@ async def numerical_integration(
     try:
         # تعریف تابع
         def f(x) -> None:
+            """Handle f (x)."""
             result = 0.0
             for i, coeff in enumerate(coefficients):
                 result += coeff * (x ** i)
@@ -406,14 +408,17 @@ async def scientific_optimization(
         # تعریف تابع هدف
         if objective == "rosenbrock":
             def func(x) -> None:
+                """Handle func (x)."""
                 return (1 - x[0]) ** 2 + 100 * (x[1] - x[0] ** 2) ** 2
         elif objective == "rastrigin":
             def func(x) -> None:
+                """Handle func (x)."""
                 A = 10
                 n = len(x)
                 return A * n + sum(xi ** 2 - A * np.cos(2 * np.pi * xi) for xi in x)
         else:  # quadratic
             def func(x) -> None:
+                """Handle func (x)."""
                 return sum(xi ** 2 for xi in x)
         
         # حل بهینه‌سازی

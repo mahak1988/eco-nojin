@@ -1,3 +1,5 @@
+"""router module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,6 +16,7 @@ class ChainRequest(BaseModel):
 
 def _get_sim_instance(sim_id: str) -> None:
     sim = SimulationRegistry.get(sim_id)
+    """Handle _get_sim_instance (sim_id)."""
     if not sim:
         raise HTTPException(404, f"Simulator '{sim_id}' not found")
     return sim() if isinstance(sim, type) else sim
@@ -21,6 +24,7 @@ def _get_sim_instance(sim_id: str) -> None:
 @router.post("/chain", summary="Execute a chained simulation workflow")
 async def run_chain(req: ChainRequest) -> None:
     results = {}
+    """Handle run_chain (req)."""
     base = req.base_parameters
     
     if req.chain_id == "climate_to_economy":

@@ -26,6 +26,7 @@ except ImportError:
     # Fallback stub — replace with real implementation
     from typing import AsyncGenerator
     async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+        """Handle get_db_session."""
         raise NotImplementedError("Wire up get_db_session in apps.shared_core.database.session")
 
 from apps.api.schemas import (

@@ -58,6 +58,7 @@ class AgricultureSchoolResponse(AgricultureSchoolBase):
     # Flatten fields to list of strings
     @classmethod
     def model_validate(cls, obj: "AgricultureSchool") -> "AgricultureSchoolResponse":
+        """Handle model_validate (cls, obj)."""
         data = super().model_validate(obj).model_dump()
         # Extract field names as list
         data["fields"] = [f.field_name for f in obj.fields] if hasattr(obj, "fields") and obj.fields else []

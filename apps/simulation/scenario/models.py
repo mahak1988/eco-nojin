@@ -36,6 +36,7 @@ class Scenario(Base):
     results = relationship("ScenarioResult", back_populates="scenario", cascade="all, delete-orphan")
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<Scenario {self.name} ({self.simulator_id})>"
 
 
@@ -67,6 +68,7 @@ class ComparisonSession(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     def __repr__(self) -> None:
+        """Handle __repr__."""
         return f"<ComparisonSession {self.name} ({len(self.scenario_ids)} scenarios)>"
 
 

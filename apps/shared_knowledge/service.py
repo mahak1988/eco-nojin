@@ -21,6 +21,7 @@ class SharedKnowledgeService:
     """Service for shared_knowledge operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = SharedKnowledgeRepository(session)
 
     async def get(self, id: int) -> Optional[SharedKnowledge]:

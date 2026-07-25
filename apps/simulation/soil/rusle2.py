@@ -22,6 +22,7 @@ from apps.simulation.base import (
 
 
 def _noise(i: int, seed: int) -> float:
+    """Handle _noise (i, seed)."""
     h = hashlib.sha256(f"{seed}:{i}".encode()).hexdigest()
     return (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
 
@@ -30,28 +31,35 @@ def _noise(i: int, seed: int) -> float:
 class RUSLE2Simulator(BaseSimulator):
     @property
     def id(self) -> str:
+        """Handle id."""
         return "rusle2"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "RUSLE2 (Revised Universal Soil Loss Equation)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "soil"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Annual soil erosion A = R*K*LS*C*P with monthly distribution and tolerance check."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(name="R", label="Rainfall Erosivity (R)", type="float", default=150.0, min_value=10.0, max_value=1000.0, unit="MJ.mm/ha.h.yr", description="Rainfall-runoff erosivity factor"),
             SimulationParameter(name="K", label="Soil Erodibility (K)", type="float", default=0.32, min_value=0.0, max_value=0.7, description="Soil erodibility factor"),
@@ -62,6 +70,7 @@ class RUSLE2Simulator(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         start = time.time()
         errors = self.validate(parameters)
         if errors:
@@ -81,6 +90,7 @@ class RUSLE2Simulator(BaseSimulator):
                 execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         R = params.get("R", 150.0); K = params.get("K", 0.32); LS = params.get("LS", 1.5)
         C = params.get("C", 0.2); P = params.get("P", 0.8); T = params.get("tolerance", 11.0)
         seed = int(params.get("seed", 1))
@@ -107,7 +117,9 @@ class RUSLE2Simulator(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         return {k: float(v) for k, v in outputs.get("metrics", {}).items() if isinstance(v, (int, float))}
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {s["key"]: s["values"] for s in outputs.get("series", [])}

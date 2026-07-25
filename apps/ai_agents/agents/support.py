@@ -1,3 +1,5 @@
+"""support module."""
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -46,6 +48,7 @@ class SupportAgent:
     
     def __init__(self, llm: Any) -> None:
         self.llm = llm
+        """Handle __init__ (llm)."""
         self.tools: List[BaseTool] = [
             query_database,
             get_rag_context,

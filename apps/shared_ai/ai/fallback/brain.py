@@ -1,3 +1,5 @@
+"""brain module."""
+
 from typing import Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
@@ -23,6 +25,7 @@ class FallbackBrain:
     
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        """Handle __init__ (session)."""
         self.knowledge_engine = KnowledgeBaseEngine(session)
         self.rules_engine = RulesEngine(session)
         self.template_engine = TemplateEngine(session)

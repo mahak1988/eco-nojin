@@ -22,6 +22,7 @@ from apps.simulation.base import (
 
 
 def _noise(i: int, seed: int) -> float:
+    """Handle _noise (i, seed)."""
     h = hashlib.sha256(f"{seed}:{i}".encode()).hexdigest()
     return (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
 
@@ -30,28 +31,35 @@ def _noise(i: int, seed: int) -> float:
 class HOMERSimulator(BaseSimulator):
     @property
     def id(self) -> str:
+        """Handle id."""
         return "homer"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "HOMER (Hybrid Renewable Energy)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "energy"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "Solar PV + wind generation against demand; renewable fraction and unmet load."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:
+        """Handle _get_parameters."""
         return [
             SimulationParameter(name="solar_kw", label="Solar Capacity (kW)", type="float", default=100.0, min_value=0.0, max_value=10000.0, unit="kW", description="Installed PV capacity"),
             SimulationParameter(name="wind_kw", label="Wind Capacity (kW)", type="float", default=50.0, min_value=0.0, max_value=10000.0, unit="kW", description="Installed wind capacity"),
@@ -62,6 +70,7 @@ class HOMERSimulator(BaseSimulator):
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
+        """Handle run (parameters)."""
         start = time.time()
         errors = self.validate(parameters)
         if errors:
@@ -81,6 +90,7 @@ class HOMERSimulator(BaseSimulator):
                 execution_time_ms=elapsed)
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
+        """Handle _run_simulation (params)."""
         solar_kw = params.get("solar_kw", 100.0)
         wind_kw = params.get("wind_kw", 50.0)
         irr = params.get("irradiance", 5.0)
@@ -117,7 +127,9 @@ class HOMERSimulator(BaseSimulator):
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
+        """Handle _calculate_metrics (outputs)."""
         return {k: float(v) for k, v in outputs.get("metrics", {}).items() if isinstance(v, (int, float))}
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
+        """Handle _generate_charts (outputs)."""
         return {s["key"]: s["values"] for s in outputs.get("series", [])}

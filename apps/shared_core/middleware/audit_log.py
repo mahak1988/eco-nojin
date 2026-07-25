@@ -31,6 +31,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
     
     async def dispatch(self, request: Request, call_next) -> None:
         # Skip health checks
+        """Handle dispatch (request, call_next)."""
         if request.url.path == "/health":
             return await call_next(request)
         

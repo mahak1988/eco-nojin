@@ -34,6 +34,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        """Handle dispatch (request, call_next)."""
         client_ip = request.client.host if request.client else "unknown"
         path = request.url.path
         

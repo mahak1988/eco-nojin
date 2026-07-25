@@ -21,6 +21,7 @@ class ApiService:
     """Service for api operations."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.repo = ApiRepository(session)
 
     async def get(self, id: int) -> Optional[Api]:

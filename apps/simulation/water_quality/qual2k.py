@@ -27,25 +27,31 @@ class QUAL2KSimulator(BaseSimulator):
 
     @property
     def id(self) -> str:
+        """Handle id."""
         return "qual2k"
 
     @property
     def name(self) -> str:
+        """Handle name."""
         return "QUAL2K (River Water Quality Model)"
 
     @property
     def category(self) -> str:
+        """Handle category."""
         return "water-quality"
 
     @property
     def description(self) -> str:
+        """Handle description."""
         return "QUAL2K simulates water quality in streams and rivers. Models dissolved oxygen, nutrients, algae, and pathogens."
 
     @property
     def version(self) -> str:
+        """Handle version."""
         return "1.0.0"
 
     def get_parameters(self) -> list[SimulationParameter]:
+        """Handle get_parameters."""
         return self._get_parameters()
 
     def _get_parameters(self) -> list[SimulationParameter]:

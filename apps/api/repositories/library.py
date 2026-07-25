@@ -20,9 +20,11 @@ class LibraryRepository:
     """Repository for Library entities."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, resource_id: int) -> Optional[LibraryResource]:
+        """Handle get_by_id (resource_id)."""
         result = await self.session.execute(
             select(LibraryResource).where(LibraryResource.id == resource_id)
         )
@@ -36,6 +38,7 @@ class LibraryRepository:
         category: Optional[str] = None,
         author: Optional[str] = None
     ) -> tuple[List[LibraryResource], int]:
+        """Handle list (skip, limit, search, category, author)."""
         query = select(LibraryResource)
 
         if search:
@@ -75,6 +78,7 @@ class LibraryRepository:
 
     async def create(self, data: LibraryResourceCreate) -> LibraryResource:
         # Convert tags list to comma-separated string
+        """Handle create (data)."""
         data_dict = data.model_dump()
         if data_dict.get("tags"):
             data_dict["tags"] = ",".join(data_dict["tags"])
@@ -86,6 +90,7 @@ class LibraryRepository:
         return obj
 
     async def update(self, resource_id: int, data: LibraryResourceUpdate) -> Optional[LibraryResource]:
+        """Handle update (resource_id, data)."""
         obj = await self.get_by_id(resource_id)
         if not obj:
             return None
@@ -105,6 +110,7 @@ class LibraryRepository:
         return obj
 
     async def delete(self, resource_id: int) -> bool:
+        """Handle delete (resource_id)."""
         obj = await self.get_by_id(resource_id)
         if not obj:
             return False
@@ -113,6 +119,7 @@ class LibraryRepository:
         return True
 
     async def increment_download(self, resource_id: int) -> bool:
+        """Handle increment_download (resource_id)."""
         obj = await self.get_by_id(resource_id)
         if not obj:
             return False
@@ -121,6 +128,7 @@ class LibraryRepository:
         return True
 
     async def get_stats(self) -> dict:
+        """Handle get_stats."""
         result = await self.session.execute(select(LibraryResource))
         resources = result.scalars().all()
 

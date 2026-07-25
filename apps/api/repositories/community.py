@@ -20,11 +20,13 @@ class CommunityRepository:
     """Repository for Community entities."""
 
     def __init__(self, session: AsyncSession) -> None:
+        """Handle __init__ (session)."""
         self.session = session
 
     # ==================== Post Operations ====================
 
     async def get_post_by_id(self, post_id: int) -> Optional[Post]:
+        """Handle get_post_by_id (post_id)."""
         result = await self.session.execute(
             select(Post).where(Post.id == post_id)
         )
@@ -38,6 +40,7 @@ class CommunityRepository:
         category: Optional[str] = None,
         author_id: Optional[int] = None
     ) -> tuple[List[Post], int]:
+        """Handle list_posts (skip, limit, search, category, author_id)."""
         query = select(Post)
 
         if search:
@@ -74,6 +77,7 @@ class CommunityRepository:
         return items, total
 
     async def create_post(self, author_id: int, data: PostCreate) -> Post:
+        """Handle create_post (author_id, data)."""
         data_dict = data.model_dump()
         if data_dict.get("tags"):
             data_dict["tags"] = ",".join(data_dict["tags"])
@@ -86,6 +90,7 @@ class CommunityRepository:
         return obj
 
     async def update_post(self, post_id: int, data: PostUpdate) -> Optional[Post]:
+        """Handle update_post (post_id, data)."""
         obj = await self.get_post_by_id(post_id)
         if not obj:
             return None
@@ -102,6 +107,7 @@ class CommunityRepository:
         return obj
 
     async def delete_post(self, post_id: int) -> bool:
+        """Handle delete_post (post_id)."""
         obj = await self.get_post_by_id(post_id)
         if not obj:
             return False
@@ -112,6 +118,7 @@ class CommunityRepository:
     # ==================== Comment Operations ====================
 
     async def get_comment_by_id(self, comment_id: int) -> Optional[Comment]:
+        """Handle get_comment_by_id (comment_id)."""
         result = await self.session.execute(
             select(Comment).where(Comment.id == comment_id)
         )
@@ -120,6 +127,7 @@ class CommunityRepository:
     async def list_comments_by_post(
         self, post_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[Comment], int]:
+        """Handle list_comments_by_post (post_id, skip, limit)."""
         query = select(Comment).where(Comment.post_id == post_id)
         query = query.order_by(Comment.created_at).offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -131,6 +139,7 @@ class CommunityRepository:
         return items, total
 
     async def create_comment(self, post_id: int, author_id: int, data: dict) -> Comment:
+        """Handle create_comment (post_id, author_id, data)."""
         obj = Comment(post_id=post_id, author_id=author_id, **data)
         self.session.add(obj)
         # Update comment count on post
@@ -142,6 +151,7 @@ class CommunityRepository:
         return obj
 
     async def update_comment(self, comment_id: int, data: dict) -> Optional[Comment]:
+        """Handle update_comment (comment_id, data)."""
         from apps.api.schemas.community import CommentUpdate
         obj = await self.get_comment_by_id(comment_id)
         if not obj:
@@ -157,6 +167,7 @@ class CommunityRepository:
         return obj
 
     async def delete_comment(self, comment_id: int) -> bool:
+        """Handle delete_comment (comment_id)."""
         obj = await self.get_comment_by_id(comment_id)
         if not obj:
             return False
@@ -171,24 +182,28 @@ class CommunityRepository:
     # ==================== Like Operations ====================
 
     async def get_like_by_id(self, like_id: int) -> Optional[Like]:
+        """Handle get_like_by_id (like_id)."""
         result = await self.session.execute(
             select(Like).where(Like.id == like_id)
         )
         return result.scalar_one_or_none()
 
     async def get_user_post_like(self, user_id: int, post_id: int) -> Optional[Like]:
+        """Handle get_user_post_like (user_id, post_id)."""
         result = await self.session.execute(
             select(Like).where(Like.user_id == user_id, Like.post_id == post_id)
         )
         return result.scalar_one_or_none()
 
     async def get_user_comment_like(self, user_id: int, comment_id: int) -> Optional[Like]:
+        """Handle get_user_comment_like (user_id, comment_id)."""
         result = await self.session.execute(
             select(Like).where(Like.user_id == user_id, Like.comment_id == comment_id)
         )
         return result.scalar_one_or_none()
 
     async def create_post_like(self, user_id: int, post_id: int) -> Like:
+        """Handle create_post_like (user_id, post_id)."""
         obj = Like(user_id=user_id, post_id=post_id)
         self.session.add(obj)
         # Update like count on post
@@ -200,6 +215,7 @@ class CommunityRepository:
         return obj
 
     async def create_comment_like(self, user_id: int, comment_id: int) -> Like:
+        """Handle create_comment_like (user_id, comment_id)."""
         obj = Like(user_id=user_id, comment_id=comment_id)
         self.session.add(obj)
         # Update like count on comment
@@ -211,6 +227,7 @@ class CommunityRepository:
         return obj
 
     async def delete_like(self, like_id: int) -> bool:
+        """Handle delete_like (like_id)."""
         obj = await self.get_like_by_id(like_id)
         if not obj:
             return False
@@ -227,6 +244,7 @@ class CommunityRepository:
         return True
 
     async def get_stats(self) -> dict:
+        """Handle get_stats."""
         posts_result = await self.session.execute(select(Post))
         posts = posts_result.scalars().all()
 
