@@ -70,7 +70,7 @@ pnpm start
 PUBLIC_URL=http://localhost:1337
 
 # دیتابیس (PostgreSQL برای production)
-DATABASE_URL=postgres://user:password@localhost:5432/econojin_cms
+DATABASE_URL=<see-.env-file>
 
 # امنیت
 ADMIN_JWT_SECRET=your-secret-key-here      # کلید امن پنل ادمین
