@@ -26,6 +26,27 @@ class CalibrationRequest(BaseModel):
 
 
 @router.post("/validation", summary="Calibration + validation + uncertainty + sensitivity")
+def _validation_extracted():
+    """Extracted from validation() — Try block (18 lines)."""
+    try:
+        result = await sim.run(validated_params)
+        metrics = result.metrics or {}
+        # Try multiple metric keys (not just yield_t_ha)
+        sim_yield = None
+        for k in ("yield_t_ha", "yield", "grain_yield", "biomass_t_ha", "total_biomass"):
+            if k in metrics and isinstance(metrics[k], (int, float)):
+                sim_yield = metrics[k]
+                break
+        if sim_yield is None:
+            # Fallback: first numeric metric
+            for v in metrics.values():
+                if isinstance(v, (int, float)):
+                    sim_yield = v
+                    break
+    except Exception as e:
+        sim_yield = None
+        metrics = {"error": str(e)}
+
 async def validation(req: CalibrationRequest) -> None:
     # ۱. دادهٔ واقعی از FAOSTAT
     fao = await fetch_crop_yield(req.crop, req.area_code)
@@ -57,24 +78,7 @@ async def validation(req: CalibrationRequest) -> None:
     except Exception:
         validated_params = sim_params
 
-    try:
-        result = await sim.run(validated_params)
-        metrics = result.metrics or {}
-        # Try multiple metric keys (not just yield_t_ha)
-        sim_yield = None
-        for k in ("yield_t_ha", "yield", "grain_yield", "biomass_t_ha", "total_biomass"):
-            if k in metrics and isinstance(metrics[k], (int, float)):
-                sim_yield = metrics[k]
-                break
-        if sim_yield is None:
-            # Fallback: first numeric metric
-            for v in metrics.values():
-                if isinstance(v, (int, float)):
-                    sim_yield = v
-                    break
-    except Exception as e:
-        sim_yield = None
-        metrics = {"error": str(e)}
+    _validation_extracted()  # refactored: was Try block
 
     # ۳. اعتبارسنجی (مقایسهٔ عملکرد شبیه‌سازی‌شده با میانگین دادهٔ واقعی)
     gof = None

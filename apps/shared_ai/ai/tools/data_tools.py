@@ -92,6 +92,69 @@ def _compute_stats(values, name: str, operations: str) -> str:
 # Correlation Analysis Tool
 # ==========================================
 @tool
+def _correlation_analysis_extracted():
+    """Extracted from correlation_analysis() — Try block (60 lines)."""
+    try:
+        import numpy as np
+
+        data = json.loads(data_json)
+
+        if not isinstance(data, dict) or len(data) < 2:
+            return "❌ نیاز به حداقل 2 ستون عددی برای تحلیل همبستگی است."
+
+        columns = list(data.keys())
+        matrix = []
+
+        for col in columns:
+            if isinstance(data[col], list):
+                matrix.append(data[col])
+
+        if len(matrix) < 2:
+            return "❌ حداقل 2 ستون عددی معتبر نیاز است."
+
+        matrix = np.array(matrix, dtype=float)
+
+        # محاسبه ماتریس همبستگی
+        if method == "pearson":
+            corr_matrix = np.corrcoef(matrix)
+        elif method == "spearman":
+            from scipy.stats import spearmanr
+            corr_matrix = spearmanr(matrix.T).correlation
+        else:
+            return f"❌ روش {method} پشتیبانی نمی‌شود."
+
+        # تولید خروجی
+        output = [f"🔗 ماتریس همبستگی ({method}):\n"]
+        output.append("ستون‌ها: " + ", ".join(columns))
+        output.append("")
+
+        # نمایش ماتریس
+        for i, col1 in enumerate(columns):
+            for j, col2 in enumerate(columns):
+                corr = corr_matrix[i, j]
+                if i <= j:  # فقط مثلث بالا
+                    strength = _correlation_strength(corr)
+                    output.append(f"   {col1} ↔ {col2}: {corr:.4f} ({strength})")
+
+        # شناسایی قوی‌ترین همبستگی‌ها
+        output.append("\n🎯 قوی‌ترین همبستگی‌ها:")
+        pairs = []
+        for i in range(len(columns)):
+            for j in range(i+1, len(columns)):
+                pairs.append((columns[i], columns[j], abs(corr_matrix[i, j])))
+
+        pairs.sort(key=lambda x: x[2], reverse=True)
+        for col1, col2, strength in pairs[:3]:
+            output.append(f"   - {col1} و {col2}: {strength:.4f}")
+
+        return "\n".join(output)
+
+    except ImportError:
+        return "❌ کتابخانه numpy/scipy نصب نیست."
+    except Exception as e:
+        logger.error(f"❌ Correlation error: {e}")
+        return f"❌ خطا در تحلیل همبستگی: {str(e)}"
+
 async def correlation_analysis(data_json: str, method: str = "pearson") -> str:
     """
     تحلیل همبستگی بین متغیرها.
@@ -105,66 +168,7 @@ async def correlation_analysis(data_json: str, method: str = "pearson") -> str:
     """
     logger.info(f"🔗 Computing {method} correlation")
     
-    try:
-        import numpy as np
-        
-        data = json.loads(data_json)
-        
-        if not isinstance(data, dict) or len(data) < 2:
-            return "❌ نیاز به حداقل 2 ستون عددی برای تحلیل همبستگی است."
-        
-        columns = list(data.keys())
-        matrix = []
-        
-        for col in columns:
-            if isinstance(data[col], list):
-                matrix.append(data[col])
-        
-        if len(matrix) < 2:
-            return "❌ حداقل 2 ستون عددی معتبر نیاز است."
-        
-        matrix = np.array(matrix, dtype=float)
-        
-        # محاسبه ماتریس همبستگی
-        if method == "pearson":
-            corr_matrix = np.corrcoef(matrix)
-        elif method == "spearman":
-            from scipy.stats import spearmanr
-            corr_matrix = spearmanr(matrix.T).correlation
-        else:
-            return f"❌ روش {method} پشتیبانی نمی‌شود."
-        
-        # تولید خروجی
-        output = [f"🔗 ماتریس همبستگی ({method}):\n"]
-        output.append("ستون‌ها: " + ", ".join(columns))
-        output.append("")
-        
-        # نمایش ماتریس
-        for i, col1 in enumerate(columns):
-            for j, col2 in enumerate(columns):
-                corr = corr_matrix[i, j]
-                if i <= j:  # فقط مثلث بالا
-                    strength = _correlation_strength(corr)
-                    output.append(f"   {col1} ↔ {col2}: {corr:.4f} ({strength})")
-        
-        # شناسایی قوی‌ترین همبستگی‌ها
-        output.append("\n🎯 قوی‌ترین همبستگی‌ها:")
-        pairs = []
-        for i in range(len(columns)):
-            for j in range(i+1, len(columns)):
-                pairs.append((columns[i], columns[j], abs(corr_matrix[i, j])))
-        
-        pairs.sort(key=lambda x: x[2], reverse=True)
-        for col1, col2, strength in pairs[:3]:
-            output.append(f"   - {col1} و {col2}: {strength:.4f}")
-        
-        return "\n".join(output)
-    
-    except ImportError:
-        return "❌ کتابخانه numpy/scipy نصب نیست."
-    except Exception as e:
-        logger.error(f"❌ Correlation error: {e}")
-        return f"❌ خطا در تحلیل همبستگی: {str(e)}"
+    _correlation_analysis_extracted()  # refactored: was Try block
 
 def _correlation_strength(corr: float) -> str:
     """تعیین قدرت همبستگی."""
@@ -184,6 +188,105 @@ def _correlation_strength(corr: float) -> str:
 # Hypothesis Testing Tool
 # ==========================================
 @tool
+def _hypothesis_test_extracted():
+    """Extracted from hypothesis_test() — Try block (96 lines)."""
+    try:
+        import numpy as np
+        from scipy import stats
+
+        data = json.loads(data_json)
+
+        if test_type == "ttest":
+            # t-test برای مقایسه دو گروه
+            if isinstance(data, dict) and len(data) >= 2:
+                keys = list(data.keys())
+                group1 = np.array(data[keys[0]], dtype=float)
+                group2 = np.array(data[keys[1]], dtype=float)
+
+                t_stat, p_value = stats.ttest_ind(group1, group2)
+
+                output = [
+                    "🧪 آزمون t-test (مقایسه دو گروه):",
+                    f"   گروه 1 ({keys[0]}): میانگین = {np.mean(group1):.4f}, n = {len(group1)}",
+                    f"   گروه 2 ({keys[1]}): میانگین = {np.mean(group2):.4f}, n = {len(group2)}",
+                    f"   آماره t: {t_stat:.4f}",
+                    f"   p-value: {p_value:.6f}",
+                    "",
+                    "📊 نتیجه:",
+                ]
+
+                if p_value < 0.01:
+                    output.append("   ✅ تفاوت بسیار معنادار (p < 0.01)")
+                elif p_value < 0.05:
+                    output.append("   ✅ تفاوت معنادار (p < 0.05)")
+                else:
+                    output.append("   ❌ تفاوت معنادار نیست (p >= 0.05)")
+
+                return "\n".join(output)
+            else:
+                return "❌ برای t-test نیاز به دو گروه داده است."
+
+        elif test_type == "normality":
+            # آزمون نرمال بودن
+            if isinstance(data, dict):
+                key = list(data.keys())[0]
+                values = np.array(data[key], dtype=float)
+            elif isinstance(data, list):
+                values = np.array(data, dtype=float)
+            else:
+                return "❌ فرمت داده نامعتبر."
+
+            stat, p_value = stats.shapiro(values)
+
+            output = [
+                "🧪 آزمون Shapiro-Wilk (نرمال بودن):",
+                f"   تعداد نمونه: {len(values)}",
+                f"   آماره W: {stat:.4f}",
+                f"   p-value: {p_value:.6f}",
+                "",
+                "📊 نتیجه:",
+            ]
+
+            if p_value > 0.05:
+                output.append("   ✅ داده‌ها توزیع نرمال دارند (p > 0.05)")
+            else:
+                output.append("   ❌ داده‌ها توزیع نرمال ندارند (p <= 0.05)")
+
+            return "\n".join(output)
+
+        elif test_type == "anova":
+            # ANOVA برای مقایسه چند گروه
+            if isinstance(data, dict) and len(data) >= 2:
+                groups = [np.array(data[k], dtype=float) for k in data.keys()]
+                f_stat, p_value = stats.f_oneway(*groups)
+
+                output = [
+                    "🧪 آزمون ANOVA (مقایسه چند گروه):",
+                    f"   تعداد گروه‌ها: {len(groups)}",
+                    f"   آماره F: {f_stat:.4f}",
+                    f"   p-value: {p_value:.6f}",
+                    "",
+                    "📊 نتیجه:",
+                ]
+
+                if p_value < 0.05:
+                    output.append("   ✅ تفاوت معنادار بین گروه‌ها وجود دارد")
+                else:
+                    output.append("   ❌ تفاوت معنادار بین گروه‌ها نیست")
+
+                return "\n".join(output)
+            else:
+                return "❌ برای ANOVA نیاز به حداقل 2 گروه است."
+
+        else:
+            return f"❌ نوع آزمون {test_type} پشتیبانی نمی‌شود. گزینه‌ها: ttest, normality, anova"
+
+    except ImportError:
+        return "❌ کتابخانه scipy نصب نیست. دستور: pip install scipy"
+    except Exception as e:
+        logger.error(f"❌ Hypothesis test error: {e}")
+        return f"❌ خطا در آزمون فرضیه: {str(e)}"
+
 async def hypothesis_test(data_json: str, test_type: str = "ttest") -> str:
     """
     انجام آزمون فرضیه‌های آماری.
@@ -197,102 +300,7 @@ async def hypothesis_test(data_json: str, test_type: str = "ttest") -> str:
     """
     logger.info(f"🧪 Performing {test_type} test")
     
-    try:
-        import numpy as np
-        from scipy import stats
-        
-        data = json.loads(data_json)
-        
-        if test_type == "ttest":
-            # t-test برای مقایسه دو گروه
-            if isinstance(data, dict) and len(data) >= 2:
-                keys = list(data.keys())
-                group1 = np.array(data[keys[0]], dtype=float)
-                group2 = np.array(data[keys[1]], dtype=float)
-                
-                t_stat, p_value = stats.ttest_ind(group1, group2)
-                
-                output = [
-                    "🧪 آزمون t-test (مقایسه دو گروه):",
-                    f"   گروه 1 ({keys[0]}): میانگین = {np.mean(group1):.4f}, n = {len(group1)}",
-                    f"   گروه 2 ({keys[1]}): میانگین = {np.mean(group2):.4f}, n = {len(group2)}",
-                    f"   آماره t: {t_stat:.4f}",
-                    f"   p-value: {p_value:.6f}",
-                    "",
-                    "📊 نتیجه:",
-                ]
-                
-                if p_value < 0.01:
-                    output.append("   ✅ تفاوت بسیار معنادار (p < 0.01)")
-                elif p_value < 0.05:
-                    output.append("   ✅ تفاوت معنادار (p < 0.05)")
-                else:
-                    output.append("   ❌ تفاوت معنادار نیست (p >= 0.05)")
-                
-                return "\n".join(output)
-            else:
-                return "❌ برای t-test نیاز به دو گروه داده است."
-        
-        elif test_type == "normality":
-            # آزمون نرمال بودن
-            if isinstance(data, dict):
-                key = list(data.keys())[0]
-                values = np.array(data[key], dtype=float)
-            elif isinstance(data, list):
-                values = np.array(data, dtype=float)
-            else:
-                return "❌ فرمت داده نامعتبر."
-            
-            stat, p_value = stats.shapiro(values)
-            
-            output = [
-                "🧪 آزمون Shapiro-Wilk (نرمال بودن):",
-                f"   تعداد نمونه: {len(values)}",
-                f"   آماره W: {stat:.4f}",
-                f"   p-value: {p_value:.6f}",
-                "",
-                "📊 نتیجه:",
-            ]
-            
-            if p_value > 0.05:
-                output.append("   ✅ داده‌ها توزیع نرمال دارند (p > 0.05)")
-            else:
-                output.append("   ❌ داده‌ها توزیع نرمال ندارند (p <= 0.05)")
-            
-            return "\n".join(output)
-        
-        elif test_type == "anova":
-            # ANOVA برای مقایسه چند گروه
-            if isinstance(data, dict) and len(data) >= 2:
-                groups = [np.array(data[k], dtype=float) for k in data.keys()]
-                f_stat, p_value = stats.f_oneway(*groups)
-                
-                output = [
-                    "🧪 آزمون ANOVA (مقایسه چند گروه):",
-                    f"   تعداد گروه‌ها: {len(groups)}",
-                    f"   آماره F: {f_stat:.4f}",
-                    f"   p-value: {p_value:.6f}",
-                    "",
-                    "📊 نتیجه:",
-                ]
-                
-                if p_value < 0.05:
-                    output.append("   ✅ تفاوت معنادار بین گروه‌ها وجود دارد")
-                else:
-                    output.append("   ❌ تفاوت معنادار بین گروه‌ها نیست")
-                
-                return "\n".join(output)
-            else:
-                return "❌ برای ANOVA نیاز به حداقل 2 گروه است."
-        
-        else:
-            return f"❌ نوع آزمون {test_type} پشتیبانی نمی‌شود. گزینه‌ها: ttest, normality, anova"
-    
-    except ImportError:
-        return "❌ کتابخانه scipy نصب نیست. دستور: pip install scipy"
-    except Exception as e:
-        logger.error(f"❌ Hypothesis test error: {e}")
-        return f"❌ خطا در آزمون فرضیه: {str(e)}"
+    _hypothesis_test_extracted()  # refactored: was Try block
 
 # ==========================================
 # Trend Analysis Tool
@@ -386,6 +394,107 @@ async def trend_analysis(data_json: str) -> str:
 # Chart Generation Tool
 # ==========================================
 @tool
+def _generate_chart_extracted():
+    """Extracted from generate_chart() — Try block (98 lines)."""
+    try:
+        import matplotlib
+        matplotlib.use('Agg')  # Non-interactive backend
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        data = json.loads(data_json)
+
+        # ایجاد figure
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        if chart_type == "line":
+            if isinstance(data, list):
+                ax.plot(data, marker='o', linewidth=2, markersize=4)
+            elif isinstance(data, dict):
+                for key, values in data.items():
+                    if isinstance(values, list):
+                        ax.plot(values, marker='o', linewidth=2, label=key)
+                ax.legend()
+
+        elif chart_type == "bar":
+            if isinstance(data, dict):
+                keys = list(data.keys())
+                values = [np.mean(data[k]) if isinstance(data[k], list) else data[k] for k in keys]
+                ax.bar(keys, values, color='skyblue', edgecolor='black')
+            else:
+                return "❌ نمودار میله‌ای نیاز به دیکشنری دارد."
+
+        elif chart_type == "scatter":
+            if isinstance(data, dict) and len(data) >= 2:
+                keys = list(data.keys())
+                x = np.array(data[keys[0]], dtype=float)
+                y = np.array(data[keys[1]], dtype=float)
+                ax.scatter(x, y, alpha=0.7, s=50)
+                ax.set_xlabel(keys[0])
+                ax.set_ylabel(keys[1])
+            else:
+                return "❌ نمودار scatter نیاز به 2 ستون دارد."
+
+        elif chart_type == "histogram":
+            if isinstance(data, list):
+                values = np.array(data, dtype=float)
+            elif isinstance(data, dict):
+                key = list(data.keys())[0]
+                values = np.array(data[key], dtype=float)
+            else:
+                return "❌ فرمت داده نامعتبر."
+
+            ax.hist(values, bins=20, color='skyblue', edgecolor='black')
+
+        elif chart_type == "pie":
+            if isinstance(data, dict):
+                keys = list(data.keys())
+                values = [np.sum(data[k]) if isinstance(data[k], list) else data[k] for k in keys]
+                ax.pie(values, labels=keys, autopct='%1.1f%%', startangle=90)
+                ax.axis('equal')
+            else:
+                return "❌ نمودار دایره‌ای نیاز به دیکشنری دارد."
+
+        else:
+            return f"❌ نوع نمودار {chart_type} پشتیبانی نمی‌شود."
+
+        ax.set_title(title, fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+
+        # ذخیره به صورت base64
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close()
+
+        # همچنین ذخیره در فایل
+        output_dir = Path("apps/ai_agents/charts")
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        import time
+        filename = f"chart_{int(time.time())}.png"
+        filepath = output_dir / filename
+
+        with open(filepath, 'wb') as f:
+            f.write(base64.b64decode(img_base64))
+
+        output = [
+            f"📊 نمودار {chart_type} تولید شد:",
+            f"   📁 مسیر فایل: {filepath}",
+            f"   📏 اندازه: {os.path.getsize(filepath)} bytes",
+            "",
+            "💡 می‌توانید فایل را در مرورگر باز کنید یا در گزارش استفاده کنید."
+        ]
+
+        return "\n".join(output)
+
+    except ImportError as e:
+        return f"❌ کتابخانه matplotlib نصب نیست. دستور: pip install matplotlib\nخطا: {e}"
+    except Exception as e:
+        logger.error(f"❌ Chart generation error: {e}")
+        return f"❌ خطا در تولید نمودار: {str(e)}"
+
 async def generate_chart(data_json: str, chart_type: str = "line", title: str = "نمودار") -> str:
     """
     تولید نمودار از داده‌ها.
@@ -400,104 +509,7 @@ async def generate_chart(data_json: str, chart_type: str = "line", title: str = 
     """
     logger.info(f"📊 Generating {chart_type} chart")
     
-    try:
-        import matplotlib
-        matplotlib.use('Agg')  # Non-interactive backend
-        import matplotlib.pyplot as plt
-        import numpy as np
-        
-        data = json.loads(data_json)
-        
-        # ایجاد figure
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        if chart_type == "line":
-            if isinstance(data, list):
-                ax.plot(data, marker='o', linewidth=2, markersize=4)
-            elif isinstance(data, dict):
-                for key, values in data.items():
-                    if isinstance(values, list):
-                        ax.plot(values, marker='o', linewidth=2, label=key)
-                ax.legend()
-        
-        elif chart_type == "bar":
-            if isinstance(data, dict):
-                keys = list(data.keys())
-                values = [np.mean(data[k]) if isinstance(data[k], list) else data[k] for k in keys]
-                ax.bar(keys, values, color='skyblue', edgecolor='black')
-            else:
-                return "❌ نمودار میله‌ای نیاز به دیکشنری دارد."
-        
-        elif chart_type == "scatter":
-            if isinstance(data, dict) and len(data) >= 2:
-                keys = list(data.keys())
-                x = np.array(data[keys[0]], dtype=float)
-                y = np.array(data[keys[1]], dtype=float)
-                ax.scatter(x, y, alpha=0.7, s=50)
-                ax.set_xlabel(keys[0])
-                ax.set_ylabel(keys[1])
-            else:
-                return "❌ نمودار scatter نیاز به 2 ستون دارد."
-        
-        elif chart_type == "histogram":
-            if isinstance(data, list):
-                values = np.array(data, dtype=float)
-            elif isinstance(data, dict):
-                key = list(data.keys())[0]
-                values = np.array(data[key], dtype=float)
-            else:
-                return "❌ فرمت داده نامعتبر."
-            
-            ax.hist(values, bins=20, color='skyblue', edgecolor='black')
-        
-        elif chart_type == "pie":
-            if isinstance(data, dict):
-                keys = list(data.keys())
-                values = [np.sum(data[k]) if isinstance(data[k], list) else data[k] for k in keys]
-                ax.pie(values, labels=keys, autopct='%1.1f%%', startangle=90)
-                ax.axis('equal')
-            else:
-                return "❌ نمودار دایره‌ای نیاز به دیکشنری دارد."
-        
-        else:
-            return f"❌ نوع نمودار {chart_type} پشتیبانی نمی‌شود."
-        
-        ax.set_title(title, fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
-        
-        # ذخیره به صورت base64
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png', dpi=100, bbox_inches='tight')
-        buf.seek(0)
-        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
-        plt.close()
-        
-        # همچنین ذخیره در فایل
-        output_dir = Path("apps/ai_agents/charts")
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
-        import time
-        filename = f"chart_{int(time.time())}.png"
-        filepath = output_dir / filename
-        
-        with open(filepath, 'wb') as f:
-            f.write(base64.b64decode(img_base64))
-        
-        output = [
-            f"📊 نمودار {chart_type} تولید شد:",
-            f"   📁 مسیر فایل: {filepath}",
-            f"   📏 اندازه: {os.path.getsize(filepath)} bytes",
-            "",
-            "💡 می‌توانید فایل را در مرورگر باز کنید یا در گزارش استفاده کنید."
-        ]
-        
-        return "\n".join(output)
-    
-    except ImportError as e:
-        return f"❌ کتابخانه matplotlib نصب نیست. دستور: pip install matplotlib\nخطا: {e}"
-    except Exception as e:
-        logger.error(f"❌ Chart generation error: {e}")
-        return f"❌ خطا در تولید نمودار: {str(e)}"
+    _generate_chart_extracted()  # refactored: was Try block
 
 # ==========================================
 # Data Summary Tool

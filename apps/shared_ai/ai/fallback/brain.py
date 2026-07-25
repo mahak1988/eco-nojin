@@ -83,6 +83,40 @@ class FallbackBrain:
             logger.error(f"❌ FallbackBrain error: {e}")
             return await self.template_engine.get_response(agent_type, "fallback", {})
     
+    def __detect_intent_extracted():
+        """Extracted from _detect_intent() — If block (31 lines)."""
+        if agent_type == "financial":
+            if any(w in message_lower for w in ["تحلیل", "نسبت", "سود", "زیان"]):
+                return "analysis_request"
+            if any(w in message_lower for w in ["پیشنهاد", "توصیه"]):
+                return "recommendation"
+
+        elif agent_type == "support":
+            if any(w in message_lower for w in ["مشکل", "خطا", "کار نمی‌کند"]):
+                return "issue_report"
+            if any(w in message_lower for w in ["چگونه", "راهنما"]):
+                return "how_to"
+
+        elif agent_type == "admin":
+            if any(w in message_lower for w in ["گزارش", "وضعیت"]):
+                return "status_report"
+            if any(w in message_lower for w in ["اولویت", "تسک"]):
+                return "task_management"
+
+        elif agent_type == "research":
+            if any(w in message_lower for w in ["تحقیق", "جستجو", "منبع"]):
+                return "research_request"
+
+        elif agent_type == "data_analyst":
+            if any(w in message_lower for w in ["تحلیل", "آمار", "نمودار"]):
+                return "data_analysis"
+
+        elif agent_type == "code_assistant":
+            if any(w in message_lower for w in ["باگ", "خطا", "debug"]):
+                return "bug_report"
+            if any(w in message_lower for w in ["تست", "unit test"]):
+                return "test_generation"
+
     def _detect_intent(self, message: str, agent_type: str) -> str:
         """شناسایی intent پیام کاربر."""
         message_lower = message.lower()
@@ -93,37 +127,7 @@ class FallbackBrain:
             return "greeting"
         
         # agent-specific intents
-        if agent_type == "financial":
-            if any(w in message_lower for w in ["تحلیل", "نسبت", "سود", "زیان"]):
-                return "analysis_request"
-            if any(w in message_lower for w in ["پیشنهاد", "توصیه"]):
-                return "recommendation"
-        
-        elif agent_type == "support":
-            if any(w in message_lower for w in ["مشکل", "خطا", "کار نمی‌کند"]):
-                return "issue_report"
-            if any(w in message_lower for w in ["چگونه", "راهنما"]):
-                return "how_to"
-        
-        elif agent_type == "admin":
-            if any(w in message_lower for w in ["گزارش", "وضعیت"]):
-                return "status_report"
-            if any(w in message_lower for w in ["اولویت", "تسک"]):
-                return "task_management"
-        
-        elif agent_type == "research":
-            if any(w in message_lower for w in ["تحقیق", "جستجو", "منبع"]):
-                return "research_request"
-        
-        elif agent_type == "data_analyst":
-            if any(w in message_lower for w in ["تحلیل", "آمار", "نمودار"]):
-                return "data_analysis"
-        
-        elif agent_type == "code_assistant":
-            if any(w in message_lower for w in ["باگ", "خطا", "debug"]):
-                return "bug_report"
-            if any(w in message_lower for w in ["تست", "unit test"]):
-                return "test_generation"
+        __detect_intent_extracted()  # refactored: was If block
         
         return "general_query"
     

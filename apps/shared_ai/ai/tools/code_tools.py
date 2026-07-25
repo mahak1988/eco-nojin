@@ -13,6 +13,103 @@ logger = logging.getLogger(__name__)
 # Code Analysis Tool (AST-based)
 # ==========================================
 @tool
+def _analyze_code_extracted():
+    """Extracted from analyze_code() — Try block (94 lines)."""
+    try:
+        tree = ast.parse(code)
+
+        # استخراج اطلاعات
+        functions = []
+        classes = []
+        imports = []
+        issues = []
+
+        for node in ast.walk(tree):
+            # توابع
+            if isinstance(node, ast.FunctionDef):
+                args = [arg.arg for arg in node.args.args]
+                functions.append({
+                    "name": node.name,
+                    "args": args,
+                    "line": node.lineno,
+                    "lines_count": node.end_lineno - node.lineno + 1 if node.end_lineno else 0,
+                    "is_async": isinstance(node, ast.AsyncFunctionDef),
+                    "has_docstring": ast.get_docstring(node) is not None
+                })
+
+                # بررسی طول تابع
+                if node.end_lineno and (node.end_lineno - node.lineno) > 50:
+                    issues.append(f"⚠️ تابع '{node.name}' در خط {node.lineno} بیش از 50 خط است (توصیه: تقسیم به توابع کوچکتر)")
+
+                # بررسی docstring
+                if not ast.get_docstring(node):
+                    issues.append(f"⚠️ تابع '{node.name}' در خط {node.lineno} docstring ندارد")
+
+            # کلاس‌ها
+            elif isinstance(node, ast.ClassDef):
+                methods = [n.name for n in node.body if isinstance(n, ast.FunctionDef)]
+                classes.append({
+                    "name": node.name,
+                    "line": node.lineno,
+                    "methods": methods,
+                    "bases": [b.id if isinstance(b, ast.Name) else str(b) for b in node.bases],
+                    "has_docstring": ast.get_docstring(node) is not None
+                })
+
+            # Imports
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    imports.append(alias.name)
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ""
+                for alias in node.names:
+                    imports.append(f"{module}.{alias.name}")
+
+        # ساخت گزارش
+        output = [f"🔍 گزارش تحلیل کد ({language}):\n"]
+        output.append(f"📊 آمار کلی:")
+        output.append(f"   - تعداد توابع: {len(functions)}")
+        output.append(f"   - تعداد کلاس‌ها: {len(classes)}")
+        output.append(f"   - تعداد imports: {len(imports)}")
+        output.append(f"   - تعداد خطوط: {len(code.splitlines())}")
+
+        if functions:
+            output.append(f"\n📝 توابع:")
+            for func in functions:
+                async_mark = "async " if func["is_async"] else ""
+                doc_mark = "✅" if func["has_docstring"] else "❌"
+                output.append(f"   - {async_mark}{func['name']}({', '.join(func['args'])}) [خط {func['line']}, {func['lines_count']} خط] docstring:{doc_mark}")
+
+        if classes:
+            output.append(f"\n🏛️ کلاس‌ها:")
+            for cls in classes:
+                bases = f"({', '.join(cls['bases'])})" if cls['bases'] else ""
+                output.append(f"   - {cls['name']}{bases} [خط {cls['line']}]")
+                for method in cls['methods']:
+                    output.append(f"      └─ {method}()")
+
+        if imports:
+            output.append(f"\n📦 Imports:")
+            for imp in imports[:20]:  # محدود به 20 تا
+                output.append(f"   - {imp}")
+            if len(imports) > 20:
+                output.append(f"   ... و {len(imports) - 20} import دیگر")
+
+        if issues:
+            output.append(f"\n⚠️ مشکلات شناسایی‌شده ({len(issues)} مورد):")
+            for issue in issues[:10]:
+                output.append(f"   {issue}")
+        else:
+            output.append(f"\n✅ هیچ مشکل ساختاری شناسایی نشد")
+
+        return "\n".join(output)
+
+    except SyntaxError as e:
+        return f"❌ خطای syntax در خط {e.lineno}: {e.msg}"
+    except Exception as e:
+        logger.error(f"❌ Code analysis error: {e}")
+        return f"❌ خطا در تحلیل کد: {str(e)}"
+
 async def analyze_code(code: str, language: str = "python") -> str:
     """
     تحلیل ساختاری کد با استفاده از AST.
@@ -29,105 +126,107 @@ async def analyze_code(code: str, language: str = "python") -> str:
     if language.lower() != "python":
         return f"⚠️ تحلیل AST فقط برای Python پیاده‌سازی شده. زبان فعلی: {language}"
     
-    try:
-        tree = ast.parse(code)
-        
-        # استخراج اطلاعات
-        functions = []
-        classes = []
-        imports = []
-        issues = []
-        
-        for node in ast.walk(tree):
-            # توابع
-            if isinstance(node, ast.FunctionDef):
-                args = [arg.arg for arg in node.args.args]
-                functions.append({
-                    "name": node.name,
-                    "args": args,
-                    "line": node.lineno,
-                    "lines_count": node.end_lineno - node.lineno + 1 if node.end_lineno else 0,
-                    "is_async": isinstance(node, ast.AsyncFunctionDef),
-                    "has_docstring": ast.get_docstring(node) is not None
-                })
-                
-                # بررسی طول تابع
-                if node.end_lineno and (node.end_lineno - node.lineno) > 50:
-                    issues.append(f"⚠️ تابع '{node.name}' در خط {node.lineno} بیش از 50 خط است (توصیه: تقسیم به توابع کوچکتر)")
-                
-                # بررسی docstring
-                if not ast.get_docstring(node):
-                    issues.append(f"⚠️ تابع '{node.name}' در خط {node.lineno} docstring ندارد")
-            
-            # کلاس‌ها
-            elif isinstance(node, ast.ClassDef):
-                methods = [n.name for n in node.body if isinstance(n, ast.FunctionDef)]
-                classes.append({
-                    "name": node.name,
-                    "line": node.lineno,
-                    "methods": methods,
-                    "bases": [b.id if isinstance(b, ast.Name) else str(b) for b in node.bases],
-                    "has_docstring": ast.get_docstring(node) is not None
-                })
-            
-            # Imports
-            elif isinstance(node, ast.Import):
-                for alias in node.names:
-                    imports.append(alias.name)
-            elif isinstance(node, ast.ImportFrom):
-                module = node.module or ""
-                for alias in node.names:
-                    imports.append(f"{module}.{alias.name}")
-        
-        # ساخت گزارش
-        output = [f"🔍 گزارش تحلیل کد ({language}):\n"]
-        output.append(f"📊 آمار کلی:")
-        output.append(f"   - تعداد توابع: {len(functions)}")
-        output.append(f"   - تعداد کلاس‌ها: {len(classes)}")
-        output.append(f"   - تعداد imports: {len(imports)}")
-        output.append(f"   - تعداد خطوط: {len(code.splitlines())}")
-        
-        if functions:
-            output.append(f"\n📝 توابع:")
-            for func in functions:
-                async_mark = "async " if func["is_async"] else ""
-                doc_mark = "✅" if func["has_docstring"] else "❌"
-                output.append(f"   - {async_mark}{func['name']}({', '.join(func['args'])}) [خط {func['line']}, {func['lines_count']} خط] docstring:{doc_mark}")
-        
-        if classes:
-            output.append(f"\n🏛️ کلاس‌ها:")
-            for cls in classes:
-                bases = f"({', '.join(cls['bases'])})" if cls['bases'] else ""
-                output.append(f"   - {cls['name']}{bases} [خط {cls['line']}]")
-                for method in cls['methods']:
-                    output.append(f"      └─ {method}()")
-        
-        if imports:
-            output.append(f"\n📦 Imports:")
-            for imp in imports[:20]:  # محدود به 20 تا
-                output.append(f"   - {imp}")
-            if len(imports) > 20:
-                output.append(f"   ... و {len(imports) - 20} import دیگر")
-        
-        if issues:
-            output.append(f"\n⚠️ مشکلات شناسایی‌شده ({len(issues)} مورد):")
-            for issue in issues[:10]:
-                output.append(f"   {issue}")
-        else:
-            output.append(f"\n✅ هیچ مشکل ساختاری شناسایی نشد")
-        
-        return "\n".join(output)
-    
-    except SyntaxError as e:
-        return f"❌ خطای syntax در خط {e.lineno}: {e.msg}"
-    except Exception as e:
-        logger.error(f"❌ Code analysis error: {e}")
-        return f"❌ خطا در تحلیل کد: {str(e)}"
+    _analyze_code_extracted()  # refactored: was Try block
 
 # ==========================================
 # Bug Finder Tool
 # ==========================================
 @tool
+def _find_bugs_extracted():
+    """Extracted from find_bugs() — Try block (92 lines)."""
+    try:
+        bugs = []
+        tree = ast.parse(code)
+
+        for node in ast.walk(tree):
+            # بررسی except خالی
+            if isinstance(node, ast.ExceptHandler) and node.type is None:
+                bugs.append({
+                    "type": "bare_except",
+                    "line": node.lineno,
+                    "severity": "high",
+                    "message": "استفاده از except بدون نوع استثنا (bare except) - ممکن است خطاهای مهم را پنهان کند"
+                })
+
+            # بررسی mutable default arguments
+            if isinstance(node, ast.FunctionDef):
+                for default in node.args.defaults:
+                    if isinstance(default, (ast.List, ast.Dict, ast.Set)):
+                        bugs.append({
+                            "type": "mutable_default",
+                            "line": node.lineno,
+                            "severity": "high",
+                            "message": f"تابع '{node.name}' از mutable default argument استفاده می‌کند"
+                        })
+
+            # بررسی import *
+            if isinstance(node, ast.ImportFrom):
+                for alias in node.names:
+                    if alias.name == "*":
+                        bugs.append({
+                            "type": "wildcard_import",
+                            "line": node.lineno,
+                            "severity": "medium",
+                            "message": f"استفاده از wildcard import در {node.module}"
+                        })
+
+            # بررسی print در production code
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id == "print":
+                    bugs.append({
+                        "type": "print_statement",
+                        "line": node.lineno,
+                        "severity": "low",
+                        "message": "استفاده از print - در production از logging استفاده کنید"
+                    })
+
+            # بررسی TODO/FIXME در کامنت‌ها
+            if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
+                if isinstance(node.value.value, str):
+                    content = node.value.value
+                    if "TODO" in content or "FIXME" in content or "HACK" in content:
+                        bugs.append({
+                            "type": "tech_debt",
+                            "line": node.lineno,
+                            "severity": "low",
+                            "message": f"بدهی فنی شناسایی شد: {content[:50]}..."
+                        })
+
+        # ساخت گزارش
+        if not bugs:
+            return "✅ هیچ باگ رایجی شناسایی نشد"
+
+        output = [f"🐛 گزارش شناسایی باگ‌ها ({len(bugs)} مورد):\n"]
+
+        # مرتب‌سازی بر اساس severity
+        severity_order = {"high": 0, "medium": 1, "low": 2}
+        bugs.sort(key=lambda x: severity_order.get(x["severity"], 3))
+
+        for bug in bugs:
+            severity_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(bug["severity"], "⚪")
+            output.append(f"{severity_icon} [{bug['severity'].upper()}] خط {bug['line']}:")
+            output.append(f"   {bug['message']}")
+            output.append(f"   نوع: {bug['type']}")
+            output.append("")
+
+        # خلاصه
+        high = sum(1 for b in bugs if b["severity"] == "high")
+        medium = sum(1 for b in bugs if b["severity"] == "medium")
+        low = sum(1 for b in bugs if b["severity"] == "low")
+
+        output.append(f"\n📊 خلاصه:")
+        output.append(f"   🔴 بحرانی: {high}")
+        output.append(f"   🟡 متوسط: {medium}")
+        output.append(f"   🟢 کم: {low}")
+
+        return "\n".join(output)
+
+    except SyntaxError as e:
+        return f"❌ خطای syntax در خط {e.lineno}: {e.msg}"
+    except Exception as e:
+        logger.error(f"❌ Bug finder error: {e}")
+        return f"❌ خطا در شناسایی باگ: {str(e)}"
+
 async def find_bugs(code: str, language: str = "python") -> str:
     """
     شناسایی باگ‌های رایج در کد.
@@ -144,98 +243,7 @@ async def find_bugs(code: str, language: str = "python") -> str:
     if language.lower() != "python":
         return f"⚠️ تحلیل باگ فقط برای Python پیاده‌سازی شده"
     
-    try:
-        bugs = []
-        tree = ast.parse(code)
-        
-        for node in ast.walk(tree):
-            # بررسی except خالی
-            if isinstance(node, ast.ExceptHandler) and node.type is None:
-                bugs.append({
-                    "type": "bare_except",
-                    "line": node.lineno,
-                    "severity": "high",
-                    "message": "استفاده از except بدون نوع استثنا (bare except) - ممکن است خطاهای مهم را پنهان کند"
-                })
-            
-            # بررسی mutable default arguments
-            if isinstance(node, ast.FunctionDef):
-                for default in node.args.defaults:
-                    if isinstance(default, (ast.List, ast.Dict, ast.Set)):
-                        bugs.append({
-                            "type": "mutable_default",
-                            "line": node.lineno,
-                            "severity": "high",
-                            "message": f"تابع '{node.name}' از mutable default argument استفاده می‌کند"
-                        })
-            
-            # بررسی import *
-            if isinstance(node, ast.ImportFrom):
-                for alias in node.names:
-                    if alias.name == "*":
-                        bugs.append({
-                            "type": "wildcard_import",
-                            "line": node.lineno,
-                            "severity": "medium",
-                            "message": f"استفاده از wildcard import در {node.module}"
-                        })
-            
-            # بررسی print در production code
-            if isinstance(node, ast.Call):
-                if isinstance(node.func, ast.Name) and node.func.id == "print":
-                    bugs.append({
-                        "type": "print_statement",
-                        "line": node.lineno,
-                        "severity": "low",
-                        "message": "استفاده از print - در production از logging استفاده کنید"
-                    })
-            
-            # بررسی TODO/FIXME در کامنت‌ها
-            if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
-                if isinstance(node.value.value, str):
-                    content = node.value.value
-                    if "TODO" in content or "FIXME" in content or "HACK" in content:
-                        bugs.append({
-                            "type": "tech_debt",
-                            "line": node.lineno,
-                            "severity": "low",
-                            "message": f"بدهی فنی شناسایی شد: {content[:50]}..."
-                        })
-        
-        # ساخت گزارش
-        if not bugs:
-            return "✅ هیچ باگ رایجی شناسایی نشد"
-        
-        output = [f"🐛 گزارش شناسایی باگ‌ها ({len(bugs)} مورد):\n"]
-        
-        # مرتب‌سازی بر اساس severity
-        severity_order = {"high": 0, "medium": 1, "low": 2}
-        bugs.sort(key=lambda x: severity_order.get(x["severity"], 3))
-        
-        for bug in bugs:
-            severity_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(bug["severity"], "⚪")
-            output.append(f"{severity_icon} [{bug['severity'].upper()}] خط {bug['line']}:")
-            output.append(f"   {bug['message']}")
-            output.append(f"   نوع: {bug['type']}")
-            output.append("")
-        
-        # خلاصه
-        high = sum(1 for b in bugs if b["severity"] == "high")
-        medium = sum(1 for b in bugs if b["severity"] == "medium")
-        low = sum(1 for b in bugs if b["severity"] == "low")
-        
-        output.append(f"\n📊 خلاصه:")
-        output.append(f"   🔴 بحرانی: {high}")
-        output.append(f"   🟡 متوسط: {medium}")
-        output.append(f"   🟢 کم: {low}")
-        
-        return "\n".join(output)
-    
-    except SyntaxError as e:
-        return f"❌ خطای syntax در خط {e.lineno}: {e.msg}"
-    except Exception as e:
-        logger.error(f"❌ Bug finder error: {e}")
-        return f"❌ خطا در شناسایی باگ: {str(e)}"
+    _find_bugs_extracted()  # refactored: was Try block
 
 # ==========================================
 # Complexity Calculator
@@ -302,6 +310,27 @@ async def calculate_complexity(code: str, function_name: Optional[str] = None) -
         logger.error(f"❌ Complexity calculation error: {e}")
         return f"❌ خطا در محاسبه پیچیدگی: {str(e)}"
 
+def __analyze_complexity_extracted():
+    """Extracted from _analyze_complexity() — For block (18 lines)."""
+    for node in ast.walk(func_node):
+        # شمارش حلقه‌ها
+        if isinstance(node, (ast.For, ast.While)):
+            loops_count += 1
+
+            # بررسی حلقه‌های تو در تو
+            for child in ast.walk(node):
+                if isinstance(child, (ast.For, ast.While)) and child is not node:
+                    nested_loops += 1
+
+        # بررسی recursion
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name) and node.func.id == func_node.name:
+                has_recursion = True
+
+        # بررسی list comprehension
+        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            details.append("List/Set/Dict comprehension شناسایی شد")
+
 def _analyze_complexity(func_node: ast.FunctionDef) -> Dict[str, Any]:
     """تحلیل پیچیدگی یک تابع."""
     time_complexity = "1"
@@ -312,24 +341,7 @@ def _analyze_complexity(func_node: ast.FunctionDef) -> Dict[str, Any]:
     nested_loops = 0
     has_recursion = False
     
-    for node in ast.walk(func_node):
-        # شمارش حلقه‌ها
-        if isinstance(node, (ast.For, ast.While)):
-            loops_count += 1
-            
-            # بررسی حلقه‌های تو در تو
-            for child in ast.walk(node):
-                if isinstance(child, (ast.For, ast.While)) and child is not node:
-                    nested_loops += 1
-        
-        # بررسی recursion
-        if isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Name) and node.func.id == func_node.name:
-                has_recursion = True
-        
-        # بررسی list comprehension
-        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
-            details.append("List/Set/Dict comprehension شناسایی شد")
+    __analyze_complexity_extracted()  # refactored: was For block
     
     # تعیین پیچیدگی زمانی
     if has_recursion:
