@@ -265,3 +265,7 @@ contracts/artifacts/
 .env
 .env.*
 !.env.example
+
+# i18n audit reports (temporary)
+i18n_report/
+i18n_audit.py
