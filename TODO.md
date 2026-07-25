@@ -1,23 +1,32 @@
-# ✅ DONE: i18n Cleanup & Standardization
+# TODO: Centralized i18n Dictionary Consolidation
 
-## ✅ Phase 1: Cleanup and Verification of fa.json & en.json
-- [x] Read current fa.json and en.json
-- [x] Verify both files have identical key structure (same nested keys)
-- [x] Identify any keys in fa.json not in en.json (and vice versa) — **None found**
-- [x] Ensure no noise keys (dependencies.*, component names, CLI errors, etc.) — **None found**
-- [x] Ensure no empty/null values — **None found**
+## ✅ Step 1: Analyze and Plan [DONE]
+- Scanned all scattered i18n files (18 module files + 1 legacy eco/i18n.tsx)
+- Identified all missing keys across modules
+- Understood current architecture (2 systems: component-level CONTENT + i18next JSON)
 
-## ✅ Phase 2: Alphabetical Sorting
-- [x] Sort fa.json keys alphabetically
-- [x] Sort en.json keys alphabetically
-- [x] Ensure 2-space indentation and UTF-8 encoding
+## ✅ Step 2: Create Comprehensive Centralized Dictionary [IN PROGRESS]
+- [x] Add ALL module sections to FA in `apps/web/src/i18n/i18n.tsx`:
+  - `account`, `analytics`, `community`, `ecocoin`, `education`, `finance`
+  - `games`, `invoices`, `journal`, `library`, `mrv`, `news`, `notFound`
+  - `payments`, `pilots`, `policies`, `regional`
+  - `home` (from eco/i18n.tsx HomePage keys)
+  - `nav` (from eco/i18n.tsx navigation keys)
+  - Expand `dashboard` (add dash_* keys from eco/i18n.tsx)
+- [x] Complete EN mirroring FA exactly
+- [x] Complete AR mirroring FA exactly
+- [x] Add 12 remaining languages (ur, ru, hi, bn, id, zh-CN, fr, de, tr, es, pt, it) as EN copies
+- [x] Ensure `ContentStrings = typeof FA` TypeScript strictness
 
-## ✅ Phase 3: Generate Report
-- [x] Count total valid keys: **167**
-- [x] Files reviewed: `fa.json`, `en.json`
-- [x] Files updated: `fa.json` (sorted), `en.json` (sorted)
-- [x] Confirm fa.json and en.json are 100% synced: **✅ Confirmed**
+## 🔲 Step 3: Update Component-Level i18n Files
+- [ ] Update `components/eco/i18n.tsx` to re-export from centralized dict
+- [ ] Ensure all component imports still work
 
-## ⏳ Phase 4 (Optional): Investigate *I18n.ts files
-- [ ] Check if component-level *I18n.ts files are actively used
-- [ ] If not, recommend removal to avoid confusion
+## 🔲 Step 4: Sync JSON Locale Files
+- [ ] Update `apps/web/src/i18n/locales/*.json` to match centralized dict keys
+- [ ] Verify i18next integration works
+
+## 🔲 Step 5: Verify TypeScript
+- [ ] Run `tsc --noEmit` to check for type errors
+- [ ] Fix any type mismatches
+
