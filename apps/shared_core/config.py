@@ -41,13 +41,13 @@ class Settings(BaseSettings):
     # =========================================================================
     # 2. تنظیمات پایگاه داده (Database)
     # =========================================================================
-    DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./econojin.db", description="رشته اتصال به پایگاه داده")
+    DATABASE_URL: str = Field(..., description="رشته اتصال به پایگاه داده")
     DB_ECHO: bool = Field(default=False, description="نمایش کوئری‌های SQL در لاگ")
 
     # =========================================================================
     # 3. تنظیمات امنیت و احراز هویت (Security & Auth)
     # =========================================================================
-    SECRET_KEY: str = Field(default="super-secret-key-change-in-production-please", description="کلید محرمانه JWT")
+    SECRET_KEY: str = Field(..., description="کلید محرمانه JWT")
     ALGORITHM: str = Field(default="HS256", description="الگوریتم رمزنگاری JWT")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=60 * 24, description="مدت زمان انقضای توکن دسترسی")
 
