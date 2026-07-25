@@ -23,6 +23,8 @@ async def get_historical(lat: float, lon: float, start: date, end: date) -> dict
     )
 
     def _fetch():
+        if not url.startswith("https://"):
+            raise ValueError("Only HTTPS URLs are allowed")
         req = urllib.request.Request(url, headers={"User-Agent": "EcoNojin/2.0"})
         with urllib.request.urlopen(req, timeout=30) as r:
             return json.loads(r.read().decode())

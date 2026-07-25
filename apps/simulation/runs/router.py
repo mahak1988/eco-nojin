@@ -21,8 +21,8 @@ async def _ensure_table(db: AsyncSession):
         bind = db.get_bind()
         async with bind.begin() as conn:
             await conn.run_sync(SimulationRun.metadata.create_all)
-    except Exception:
-        pass
+    except Exception as e:
+        import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
 
 
 router = APIRouter(prefix="/api/v1/simulation/runs", tags=["💾 Saved Runs"])

@@ -112,8 +112,8 @@ async def monte_carlo(
             r = await run_fn(perturbed)
             val = _find_metric(r, metric_key)
             results.append(val)  # _find_metric always returns float
-        except Exception:
-            pass
+        except Exception as e:
+            import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
     if len(results) < 5:
         return {"error": "دادهٔ کافی برای تحلیل عدم قطعیت تولید نشد", "n": len(results)}
     results.sort()

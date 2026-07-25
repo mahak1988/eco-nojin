@@ -37,6 +37,6 @@ async def get_indicators(country_code: str, year_from: int = 2010, year_to: int 
                     for item in data[1] if item.get("value") is not None
                 }
                 out[friendly] = series
-        except Exception:
-            pass
+        except Exception as e:
+            import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
     return out
