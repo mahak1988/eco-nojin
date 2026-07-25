@@ -8,7 +8,11 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.models.community import Post, Comment, Like, PostStatus
+from apps.api.models.community import Post, Comment, Like
+try:
+    from apps.api.models.community import PostStatus
+except ImportError:
+    PostStatus = None
 
 
 @pytest.fixture
