@@ -271,3 +271,5 @@ i18n_report/
 i18n_audit.py
 
 advanced_i18n_analyzer.py
+
+check_env.py
