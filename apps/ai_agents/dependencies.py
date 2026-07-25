@@ -6,6 +6,9 @@ FastAPI dependency injections for the ai_agents module.
 NOTE: Adjust to match your project's auth/permission system.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status

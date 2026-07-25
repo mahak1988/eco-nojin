@@ -1,0 +1,261 @@
+{
+  "generated_at": "2026-07-25T05:09:44.080801+00:00",
+  "project": "econojin.com/apps",
+  "structure": {
+    "total_files": 594,
+    "apps": {
+      "conftest.py": {
+        "files": 1,
+        "lines": 159
+      },
+      "main.py": {
+        "files": 1,
+        "lines": 370
+      },
+      "__init__.py": {
+        "files": 1,
+        "lines": 0
+      },
+      "admin_panel": {
+        "files": 30,
+        "lines": 1536
+      },
+      "ai_agents": {
+        "files": 38,
+        "lines": 3238
+      },
+      "api": {
+        "files": 55,
+        "lines": 7599
+      },
+      "shared_ai": {
+        "files": 47,
+        "lines": 6880
+      },
+      "shared_core": {
+        "files": 25,
+        "lines": 1791
+      },
+      "shared_knowledge": {
+        "files": 14,
+        "lines": 1429
+      },
+      "shared_sim": {
+        "files": 10,
+        "lines": 511
+      },
+      "simulation": {
+        "files": 104,
+        "lines": 6715
+      },
+      "users": {
+        "files": 14,
+        "lines": 1341
+      },
+      "web": {
+        "files": 231,
+        "lines": 26935
+      },
+      "library": {
+        "files": 9,
+        "lines": 342
+      },
+      "cms": {
+        "files": 13,
+        "lines": 523
+      },
+      "TODO_DOCS.md": {
+        "files": 1,
+        "lines": 20
+      }
+    }
+  },
+  "complexity": {
+    "total_functions": 1201,
+    "high_complexity_count": 9,
+    "long_functions_count": 37,
+    "top_10": [
+      {
+        "name": "analyze_code",
+        "line": 14,
+        "lines": 110,
+        "complexity": 33,
+        "args": 2,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\tools\\code_tools.py"
+      },
+      {
+        "name": "validation",
+        "line": 29,
+        "lines": 93,
+        "complexity": 30,
+        "args": 1,
+        "has_docstring": false,
+        "has_return_type": false,
+        "has_type_hints": true,
+        "file": "apps\\simulation\\validation\\router.py"
+      },
+      {
+        "name": "_detect_intent",
+        "line": 83,
+        "lines": 43,
+        "complexity": 29,
+        "args": 3,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\fallback\\brain.py"
+      },
+      {
+        "name": "find_bugs",
+        "line": 129,
+        "lines": 108,
+        "complexity": 27,
+        "args": 2,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\tools\\code_tools.py"
+      },
+      {
+        "name": "generate_chart",
+        "line": 387,
+        "lines": 112,
+        "complexity": 23,
+        "args": 3,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\tools\\data_tools.py"
+      },
+      {
+        "name": "hypothesis_test",
+        "line": 185,
+        "lines": 109,
+        "complexity": 17,
+        "args": 2,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\tools\\data_tools.py"
+      },
+      {
+        "name": "run_scenario",
+        "line": 229,
+        "lines": 64,
+        "complexity": 16,
+        "args": 3,
+        "has_docstring": true,
+        "has_return_type": false,
+        "has_type_hints": true,
+        "file": "apps\\simulation\\scenario\\router.py"
+      },
+      {
+        "name": "_analyze_complexity",
+        "line": 303,
+        "lines": 58,
+        "complexity": 16,
+        "args": 1,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\tools\\code_tools.py"
+      },
+      {
+        "name": "correlation_analysis",
+        "line": 93,
+        "lines": 73,
+        "complexity": 16,
+        "args": 2,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\shared_ai\\ai\\tools\\data_tools.py"
+      },
+      {
+        "name": "validate",
+        "line": 145,
+        "lines": 22,
+        "complexity": 15,
+        "args": 2,
+        "has_docstring": true,
+        "has_return_type": true,
+        "has_type_hints": true,
+        "file": "apps\\simulation\\base.py"
+      }
+    ]
+  },
+  "quality": {
+    "docstring_ratio": 0.759,
+    "type_hint_ratio": 0.486,
+    "logging_ratio": 0.153,
+    "bare_except_count": 0,
+    "print_count": 0,
+    "todo_count": 20
+  },
+  "security": {
+    "total_issues": 1,
+    "by_severity": {
+      "low": 1,
+      "high": 0,
+      "medium": 0
+    }
+  },
+  "tests": {
+    "test_files": 36,
+    "source_files": 257,
+    "ratio": 0.14
+  },
+  "dependencies": {
+    "npm_count": 29,
+    "pypi_count": 0
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "معماری",
+      "title": "کاهش پیچیدگی 9 تابع",
+      "detail": "توابع با پیچیدگی >۱۵ باید به توابع کوچک‌تر تقسیم شوند. از الگوهای Strategy، Command یا Pipeline استفاده کنید.",
+      "files": [
+        "apps\\shared_ai\\ai\\tools\\code_tools.py",
+        "apps\\simulation\\validation\\router.py",
+        "apps\\shared_ai\\ai\\fallback\\brain.py",
+        "apps\\shared_ai\\ai\\tools\\code_tools.py",
+        "apps\\shared_ai\\ai\\tools\\data_tools.py"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "معماری",
+      "title": "کوتاه‌کردن 37 تابع بلند",
+      "detail": "توابع با بیش از 50 خط باید شکسته شوند. هر تابع باید یک مسئولیت داشته باشد (SRP)."
+    },
+    {
+      "priority": "medium",
+      "category": "کیفیت کد",
+      "title": "افزایش type hints (فعلاً 49%)",
+      "detail": "Type hints باعث کشف زودتر باگ‌ها و بهبود IDE support می‌شود. از mypy برای بررسی خودکار استفاده کنید."
+    },
+    {
+      "priority": "medium",
+      "category": "معماری",
+      "title": "شکستن 7 فایل بزرگ (>400 خط)",
+      "detail": "فایل‌های بزرگ را به ماژول‌های کوچک‌تر تقسیم کنید.",
+      "files": [
+        "apps\\simulation\\scenario\\router.py",
+        "apps\\shared_knowledge\\knowledge\\seed_data.py",
+        "apps\\shared_ai\\ai\\tools\\code_tools.py",
+        "apps\\shared_ai\\ai\\tools\\data_tools.py",
+        "apps\\shared_ai\\ai\\tools\\scientific_compute.py"
+      ]
+    },
+    {
+      "priority": "low",
+      "category": "بدهی فنی",
+      "title": "بررسی 20 TODO/FIXME",
+      "detail": "هر TODO باید یک issue متناظر در GitHub داشته باشد."
+    }
+  ]
+}

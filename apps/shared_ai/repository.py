@@ -5,6 +5,9 @@ Data access layer — all database queries live here.
 Services call repositories; repositories never call services.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional
 
 from sqlalchemy import select, func
