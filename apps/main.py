@@ -51,7 +51,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     start_time = time.time()
 
-    # مقداردهی اولیه دیتابیس
     try:
         from apps.shared_core.database.session import init_db
         await init_db()
@@ -59,14 +58,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as e:
         logger.warning(f"⚠️  init_db خطا: {e}")
 
-    # بارگذاری ماژول AI
     try:
         from apps.shared_ai.ai.llm_factory import LLMFactory
         logger.info(f"✅ ماژول AI بارگذاری شد (provider: {settings.LLM_PROVIDER})")
     except Exception as e:
         logger.warning(f"⚠️  ماژول AI در دسترس نیست: {e}")
 
-    # راه‌اندازی Sentry
     try:
         from apps.shared_core.monitoring.sentry import init_sentry
         init_sentry(app)
@@ -77,7 +74,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info(f"✅ راه‌اندازی در {time.time() - start_time:.2f} ثانیه کامل شد")
     logger.info("=" * 60)
 
-    yield  # اپلیکیشن در حال اجرا است
+    yield
 
     logger.info("=" * 60)
     logger.info("🛑 Econojin API - در حال خاموش شدن")
@@ -89,9 +86,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("✅ اتصال دیتابیس بسته شد")
     except Exception as e:
         logger.warning(f"⚠️  close_db خطا: {e}")
-
-    logger.info("✅ خاموش شدن کامل شد")
-    logger.info("=" * 60)
 
 
 # ============================================================
@@ -109,7 +103,6 @@ app = FastAPI(
 # ============================================================
 # Middlewareها
 # ============================================================
-# Rate Limiting (Brute Force Protection)
 if settings.ENVIRONMENT != "local":
     try:
         from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
@@ -130,7 +123,6 @@ app.add_middleware(
     max_age=600,
 )
 
-
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     start_time = time.time()
@@ -138,7 +130,6 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = f"{process_time:.4f}"
     return response
-
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -148,14 +139,12 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"error": "Internal Server Error", "message": "یک خطای داخلی رخ داد."},
     )
 
-
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={"error": "Not Found", "message": f"مسیر {request.url.path} یافت نشد"},
     )
-
 
 # ============================================================
 # ثبت Routerهای ماژول‌ها
@@ -230,10 +219,10 @@ try:
     from apps.simulation.router import router as simulation_router
     app.include_router(simulation_router, prefix=f"{settings.API_V1_STR}/simulation", tags=["🔬 Simulation"])
     logger.info("✅ simulation: روتر بارگذاری شد")
-except Exception:
-    logger.info("ℹ️  simulation: روتر یافت نشد (اختیاری)")
+except Exception as e:
+    logger.warning(f"⚠️  simulation: {e}")
 
-# ماژول Real-World Data (NASA POWER / Open-Meteo / Open-Elevation / World Bank)
+# ماژول Real-World Data
 try:
     from apps.simulation.data.router import router as data_router
     app.include_router(data_router)
@@ -241,23 +230,21 @@ try:
 except Exception as e:
     logger.warning(f"⚠️  data: {e}")
 
-# ماژول Advisory (تحلیل + توصیه + سناریو)
+# ماژول Advisory
 try:
     from apps.simulation.advisory.router import router as advisory_router
     app.include_router(advisory_router)
     logger.info("✅ advisory: روتر بارگذاری شد")
-
 except Exception as e:
-    pass
+    logger.warning(f"⚠️  advisory: {e}")
 
-# ماژول Saved Runs (داشبورد کاربر)
+# ماژول Saved Runs
 try:
     from apps.simulation.runs.router import router as runs_router
     app.include_router(runs_router)
     logger.info("✅ runs: روتر بارگذاری شد")
 except Exception as e:
-    pass
-
+    logger.warning(f"⚠️  runs: {e}")
 
 # ماژول Scenario & Comparison
 try:
@@ -267,15 +254,14 @@ try:
 except Exception as e:
     logger.warning(f"⚠️  scenario: {e}")
 
-# ماژول Validation (کالیبراسیون + عدم قطعیت + حساسیت)
+# ماژول Validation
 try:
     from apps.simulation.validation.router import router as validation_router
     app.include_router(validation_router)
     logger.info("✅ validation: روتر بارگذاری شد")
 except Exception as e:
     logger.warning(f"⚠️  validation: {e}")
-    logger.warning(f"⚠️  runs: {e}")
-    logger.warning(f"⚠️  router block: {e}")
+
 # ۱۰. ماژول Agriculture Schools
 try:
     from apps.api.routes.agriculture_schools import router as ag_schools_router
@@ -308,7 +294,7 @@ try:
 except Exception as e:
     logger.warning(f"⚠️  games: {e}")
 
-# ۱۴. ماژول Model Chaining (زنجیرهٔ شبیه‌سازی)
+# ۱۴. ماژول Model Chaining
 try:
     from apps.simulation.chain.router import router as chain_router
     app.include_router(chain_router)
@@ -316,7 +302,7 @@ try:
 except Exception as e:
     logger.warning(f"⚠️  chain: {e}")
 
-# ۱۵. ماژول Reports (گزارش‌گیری CSV/JSON)
+# ۱۵. ماژول Reports
 try:
     from apps.simulation.reports.router import router as reports_router
     app.include_router(reports_router)
@@ -338,7 +324,6 @@ async def root():
         "docs": "/docs",
     }
 
-
 @app.get("/health", tags=["🏥 Health"])
 async def health():
     return {
@@ -347,31 +332,16 @@ async def health():
         "environment": settings.ENVIRONMENT,
     }
 
-
 @app.get("/modules", tags=["📦 Modules"])
 async def list_modules():
-    """لیست ماژول‌های فعال API."""
     return {
         "modules": [
-            "users",
-            "auth",
-            "ai_agents",
-            "accounting",
-            "ecocoin",
-            "monitoring",
-            "simulator",
-            "admin_panel",
-            "simulation",
-            "agriculture_schools",
-            "alerts",
-            "education",
-            "library",
-            "community",
-            "games",
+            "users", "auth", "ai_agents", "accounting", "ecocoin",
+            "monitoring", "simulator", "admin_panel", "simulation",
+            "agriculture_schools", "education", "community", "games", "chain", "reports"
         ],
         "total": 15,
     }
-
 
 # ============================================================
 # اجرای مستقیم
@@ -380,7 +350,7 @@ if __name__ == "__main__":
     import uvicorn
 
     host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", str(settings.API_V1_STR and "8000")))
+    port = int(os.getenv("PORT", "8000")) # اصلاح خط محاسبه پورت
     reload = settings.ENVIRONMENT == "local"
 
     logger.info(f"🚀 شروع سرور توسعه روی {host}:{port}")
