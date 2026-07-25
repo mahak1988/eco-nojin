@@ -433,6 +433,14 @@ class ProjectAnalyzer:
     # ── ثبت یافته (thread-safe با حذف تکراری) ──
     def _add_finding(self, severity: str, category: str, title: str,
                      file: str, line: int, snippet: str, cwe: str = "") -> None:
+        # test-files-downgrade
+        # کاهش severity فایل‌های تست (رمزهای ساختگی)
+        if hasattr(self, "_current_file") and self._current_file:
+            _cf = self._current_file.replace("\\", "/")
+            if "/tests/" in _cf or "/test_" in _cf or _cf.split("/")[-1].startswith("test_"):
+                if severity in ("high", "medium"):
+                    severity = "info"
+
         key = (file, line, title if category == "secrets" else category)
         with self._findings_lock:
             if key in self._seen:
