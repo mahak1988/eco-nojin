@@ -1,123 +1,247 @@
 {
-  "app.name": "EkoNojin",
-  "app.tagline": "Sürdürülebilir Doğal Kaynak ve Çevre Yönetimi için Akıllı Platform",
-  "app.description": "EcoNojin is a comprehensive platform for monitoring, analyzing and sustainably managing natural resources, smart agriculture and the environment",
-  "nav.home": "Ana Sayfa",
-  "nav.dashboard": "Panel",
-  "nav.analytics": "Analitik",
-  "nav.map": "Harita",
-  "nav.reports": "Raporlar",
-  "nav.settings": "Ayarlar",
-  "nav.profile": "Profil",
-  "nav.users": "Kullanıcılar",
-  "nav.projects": "Projeler",
-  "nav.tasks": "Görevler",
-  "nav.notifications": "Bildirimler",
-  "nav.help": "Yardım",
-  "nav.logout": "Çıkış",
-  "nav.login": "Giriş",
-  "nav.register": "Kayıt Ol",
-  "nav.language": "Dil",
-  "auth.welcome": "Hoş Geldiniz",
-  "auth.login.title": "Giriş Yap",
-  "auth.login.subtitle": "Sign in to your account",
-  "auth.register.title": "Create Account",
-  "auth.forgotPassword": "Forgot password?",
-  "auth.email": "E-posta",
-  "auth.password": "Şifre",
-  "auth.confirmPassword": "Confirm Password",
-  "auth.rememberMe": "Remember me",
-  "auth.noAccount": "Don't have an account?",
-  "auth.haveAccount": "Already have an account?",
-  "auth.signUp": "Kayıt Ol",
-  "auth.signIn": "Giriş Yap",
-  "auth.or": "or",
-  "auth.continueWithGoogle": "Continue with Google",
-  "auth.continueWithGithub": "Continue with GitHub",
-  "dashboard.title": "Panel",
-  "dashboard.overview": "Genel Bakış",
-  "dashboard.welcome": "Welcome to EcoNojin Dashboard",
-  "dashboard.totalUsers": "Toplam Kullanıcı",
-  "dashboard.activeUsers": "Aktif Kullanıcı",
-  "dashboard.totalProjects": "Toplam Proje",
-  "dashboard.revenue": "Revenue",
-  "dashboard.growth": "Growth",
-  "dashboard.performance": "Performance",
-  "dashboard.recentActivity": "Recent Activity",
-  "dashboard.viewAll": "View All",
-  "common.loading": "Yükleniyor...",
-  "common.error": "Hata!",
-  "common.success": "Başarılı",
-  "common.save": "Kaydet",
-  "common.cancel": "İptal",
-  "common.delete": "Sil",
-  "common.edit": "Düzenle",
-  "common.create": "Create",
-  "common.update": "Update",
-  "common.search": "Ara",
-  "common.filter": "Filtrele",
-  "common.sort": "Sort",
-  "common.export": "Export",
-  "common.import": "Import",
-  "common.print": "Print",
-  "common.back": "Back",
-  "common.next": "Next",
-  "common.previous": "Previous",
-  "common.close": "Kapat",
-  "common.open": "Open",
-  "common.yes": "Evet",
-  "common.no": "Hayır",
-  "common.confirm": "Confirm",
-  "common.submit": "Submit",
-  "common.reset": "Reset",
-  "common.download": "Download",
-  "common.upload": "Upload",
-  "common.selectAll": "Select All",
-  "common.deselectAll": "Deselect All",
-  "common.noData": "Veri yok",
-  "common.noResults": "No results found",
-  "common.page": "Page",
-  "common.of": "of",
-  "common.itemsPerPage": "Items per page",
-  "common.total": "Total",
-  "validation.required": "This field is required",
-  "validation.email": "Please enter a valid email",
-  "validation.minLength": "Minimum {{count}} characters required",
-  "validation.maxLength": "Maximum {{count}} characters allowed",
-  "validation.passwordMatch": "Passwords do not match",
-  "settings.title": "Ayarlar",
-  "settings.profile": "Profile Settings",
-  "settings.security": "Security",
-  "settings.notifications": "Notifications",
-  "settings.theme": "Theme",
-  "settings.language": "Dil",
-  "settings.darkMode": "Dark Mode",
-  "settings.lightMode": "Light Mode",
-  "settings.system": "System",
-  "theme.light": "Açık",
-  "theme.dark": "Koyu",
-  "theme.system": "Sistem",
-  "theme.green": "Green (Default)",
-  "theme.blue": "Blue",
-  "theme.purple": "Purple",
-  "theme.orange": "Orange",
-  "map.title": "GIS Map",
-  "map.satellite": "Satellite",
-  "map.terrain": "Terrain",
-  "map.street": "Street",
-  "map.layers": "Layers",
-  "map.zoomIn": "Zoom In",
-  "map.zoomOut": "Zoom Out",
-  "map.fullscreen": "Fullscreen",
-  "error.404.title": "Page Not Found",
-  "error.404.description": "The page you are looking for does not exist or has been removed.",
-  "error.500.title": "Server Error",
-  "error.500.description": "Sorry, something went wrong on our end. Please try again later.",
-  "error.goHome": "Go Home",
-  "error.tryAgain": "Try Again",
-  "footer.copyright": "© 2026 EkoNojin. Tüm hakları saklıdır.",
-  "footer.privacy": "Privacy Policy",
-  "footer.terms": "Terms of Service",
-  "footer.contact": "Contact Us",
-  "footer.about": "About Us"
+  "app": {
+    "name": "EkoNojin",
+    "tagline": "Sürdürülebilir Doğal Kaynak ve Çevre Yönetimi için Akıllı Platform",
+    "description": "EcoNojin is a comprehensive platform for monitoring, analyzing and sustainably managing natural resources, smart agriculture and the environment"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "dashboard": "Panel",
+    "analytics": "Analitik",
+    "map": "Harita",
+    "reports": "Raporlar",
+    "settings": "Ayarlar",
+    "profile": "Profil",
+    "users": "Kullanıcılar",
+    "projects": "Projeler",
+    "tasks": "Görevler",
+    "notifications": "Bildirimler",
+    "help": "Yardım",
+    "logout": "Çıkış",
+    "login": "Giriş",
+    "register": "Kayıt Ol",
+    "language": "Dil"
+  },
+  "auth": {
+    "welcome": "Hoş Geldiniz",
+    "login": {
+      "title": "Giriş Yap",
+      "subtitle": "Sign in to your account"
+    },
+    "register": {
+      "title": "Create Account"
+    },
+    "forgotPassword": "Forgot password?",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember me",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signUp": "Kayıt Ol",
+    "signIn": "Giriş Yap",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "overview": "Genel Bakış",
+    "welcome": "Welcome to EcoNojin Dashboard",
+    "totalUsers": "Toplam Kullanıcı",
+    "activeUsers": "Aktif Kullanıcı",
+    "totalProjects": "Toplam Proje",
+    "revenue": "Revenue",
+    "growth": "Growth",
+    "performance": "Performance",
+    "recentActivity": "Recent Activity",
+    "viewAll": "View All"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Hata!",
+    "success": "Başarılı",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "create": "Create",
+    "update": "Update",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "print": "Print",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Kapat",
+    "open": "Open",
+    "yes": "Evet",
+    "no": "Hayır",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "reset": "Reset",
+    "download": "Download",
+    "upload": "Upload",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "noData": "Veri yok",
+    "noResults": "No results found",
+    "page": "Page",
+    "of": "of",
+    "itemsPerPage": "Items per page",
+    "total": "Total"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "minLength": "Minimum {{count}} characters required",
+    "maxLength": "Maximum {{count}} characters allowed",
+    "passwordMatch": "Passwords do not match"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "profile": "Profile Settings",
+    "security": "Security",
+    "notifications": "Notifications",
+    "theme": "Theme",
+    "language": "Dil",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "system": "System"
+  },
+  "theme": {
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem",
+    "green": "Green (Default)",
+    "blue": "Blue",
+    "purple": "Purple",
+    "orange": "Orange"
+  },
+  "map": {
+    "title": "GIS Map",
+    "satellite": "Satellite",
+    "terrain": "Terrain",
+    "street": "Street",
+    "layers": "Layers",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fullscreen": "Fullscreen"
+  },
+  "error": {
+    "404": {
+      "title": "Page Not Found",
+      "description": "The page you are looking for does not exist or has been removed."
+    },
+    "500": {
+      "title": "Server Error",
+      "description": "Sorry, something went wrong on our end. Please try again later."
+    },
+    "goHome": "Go Home",
+    "tryAgain": "Try Again"
+  },
+  "footer": {
+    "copyright": "© 2026 EkoNojin. Tüm hakları saklıdır.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "about": "About Us"
+  },
+  "pages": {
+    "analytics": {
+      "title": "داشبورد تحلیلی",
+      "desc": "بینش و معیارهای جامع داده"
+    },
+    "policies": {
+      "title": "سیاست‌ها و قانونی",
+      "desc": "بازنگری و مدیریت سیاست‌های پروژه"
+    },
+    "reports": {
+      "title": "گزارش‌ها",
+      "desc": "تولید و دانلود گزارش‌های پروژه"
+    },
+    "invoices": {
+      "title": "فاکتورها",
+      "desc": "مدیریت و پیگیری تمام فاکتورها"
+    },
+    "community": {
+      "title": "جامعه",
+      "desc": "انجمن‌ها، بحث‌ها و همکاری"
+    },
+    "simulators": {
+      "desc": "شبیه‌سازهای آب‌وهوا، آب و کشاورزی",
+      "title": "شبیه‌سازها"
+    },
+    "users": {
+      "title": "مدیریت کاربران",
+      "desc": "نقش‌ها، دسترسی‌ها و تعامل اجتماعی"
+    },
+    "mrv": {
+      "desc": "پایش، گزارش‌دهی و تأیید",
+      "title": "MRV و حمایت‌ها"
+    },
+    "games": {
+      "desc": "چالش‌های اکولوگی، تابلوهای برتری و جایزه‌ها",
+      "title": "بازی‌سازی"
+    },
+    "account": {
+      "title": "تنظیمات حساب",
+      "desc": "مدیریت پروفایل و ترجیحات"
+    },
+    "tourism": {
+      "title": "گردشگری اکولوژیک",
+      "desc": "گردشگری پایدار و نقشه‌برداری"
+    },
+    "accounting": {
+      "desc": "حسابداری، فاکتورها، سندها، پرداخت‌ها",
+      "title": "داشبورد مالی"
+    },
+    "education": {
+      "desc": "یادگیری درباره پایداری و دریافت گواهینامه",
+      "title": "آموزش و آموزش"
+    },
+    "pilots": {
+      "desc": "پروژه‌های فعال و ابتکارات",
+      "title": "پروژه‌های آزمایشی"
+    },
+    "library": {
+      "desc": "مواد آموزشی، مستندات و کتابخانه",
+      "title": "مرکز دانش"
+    },
+    "satellite": {
+      "desc": "داده‌های زنده ماهواره و تحلیل NDVI",
+      "title": "تصاویر ماهواره‌ای"
+    },
+    "journal": {
+      "desc": "مشاهده و مدیریت سندهای حسابرسی",
+      "title": "سندهای حسابرسی"
+    },
+    "ecocoin": {
+      "title": "اکولکوین",
+      "desc": "پاداش‌های رمزارز و تراکنش‌ها"
+    },
+    "news": {
+      "title": "اخبار و به‌روزرسانی‌ها",
+      "desc": "آخرین اخبار، هشدارها و اعلانیه‌ها"
+    },
+    "risks": {
+      "desc": "شناسایی و کاهش ریسک‌های پروژه",
+      "title": "مدیریت ریسک"
+    },
+    "regional": {
+      "title": "پیاده‌سازی منطقه‌ای",
+      "desc": "افغانستان، عراق، اردن، شبکه مENA ILM"
+    },
+    "payments": {
+      "desc": "مدیریت تمام تراکنش‌های پرداخت",
+      "title": "پرداخت‌ها"
+    },
+    "alerts": {
+      "title": "هشدارها و اعلان‌ها",
+      "desc": "هشدارهای زنده و هشدارهای پیش‌بینی"
+    }
+  }
 }
