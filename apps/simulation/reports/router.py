@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 import csv
 import io
 from uuid import UUID
@@ -12,7 +15,7 @@ from apps.simulation.runs.models import SimulationRun
 router = APIRouter(prefix="/api/v1/simulation", tags=["📊 Reports"])
 
 @router.get("/reports/{run_id}/csv", summary="Export run as CSV")
-async def export_run_csv(run_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def export_run_csv(run_id: UUID, db: AsyncSession = Depends(get_db_session)) -> None:
     result = await db.execute(select(SimulationRun).where(SimulationRun.id == str(run_id)))
     run = result.scalar_one_or_none()
     if not run:
@@ -37,7 +40,7 @@ async def export_run_csv(run_id: UUID, db: AsyncSession = Depends(get_db_session
     )
 
 @router.get("/reports/{run_id}/html", summary="Get structured HTML report for PDF printing")
-async def export_run_html(run_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def export_run_html(run_id: UUID, db: AsyncSession = Depends(get_db_session)) -> None:
     result = await db.execute(select(SimulationRun).where(SimulationRun.id == str(run_id)))
     run = result.scalar_one_or_none()
     if not run:

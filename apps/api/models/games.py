@@ -4,6 +4,9 @@ Games Models
 Database models for vocabulary and quiz games.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional, List
 

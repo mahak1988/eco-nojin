@@ -4,6 +4,9 @@ APSIM (Agricultural Production Systems Simulator) Simulator
 APSIM is a modular modelling framework for agricultural systems. Simulates crop growth, soil water, nitrogen, and management practices.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

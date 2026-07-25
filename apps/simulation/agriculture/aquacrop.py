@@ -1,6 +1,9 @@
 """
 AquaCrop (FAO Crop Water Productivity Model) — Full daily simulation.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import time
 from typing import Any

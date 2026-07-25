@@ -5,6 +5,9 @@ Adapted from fastapi/full-stack-fastapi-template with Argon2 + Bcrypt password h
 and JWT token management. Extended with OTP support for EcoNojin.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import UTC, datetime, timedelta
 from typing import Any
 

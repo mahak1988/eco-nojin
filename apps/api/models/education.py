@@ -4,6 +4,9 @@ Education Models
 Database models for educational content and courses.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional, List
 

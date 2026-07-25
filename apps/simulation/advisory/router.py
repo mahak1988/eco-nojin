@@ -1,6 +1,9 @@
 """
 Advisory API Router — analysis + recommendations + scenarios for a simulator run.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -17,5 +20,5 @@ class AdvisoryRequest(BaseModel):
 
 
 @router.post("/advisory", summary="Generate analysis, recommendations & scenarios")
-async def advisory(req: AdvisoryRequest):
+async def advisory(req: AdvisoryRequest) -> None:
     return generate_advisory(req.simulator_id, req.metrics, req.parameters)

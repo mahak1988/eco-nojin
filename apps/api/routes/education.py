@@ -4,6 +4,9 @@ Education Router - Database backed
 RESTful endpoints for educational content and courses.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status

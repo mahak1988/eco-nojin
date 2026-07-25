@@ -40,7 +40,7 @@ class UserService:
     این کلاس مسئول تمام عملیات مرتبط با کاربران است.
     """
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = UserRepository(session)
     
     async def register_user(self, user_in: UserCreate) -> User:

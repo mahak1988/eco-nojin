@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-25T05:09:44.080801+00:00",
+  "generated_at": "2026-07-25T05:14:02.832422+00:00",
   "project": "econojin.com/apps",
   "structure": {
     "total_files": 594,
@@ -14,23 +14,23 @@
       },
       "__init__.py": {
         "files": 1,
-        "lines": 0
+        "lines": 3
       },
       "admin_panel": {
         "files": 30,
-        "lines": 1536
+        "lines": 1551
       },
       "ai_agents": {
         "files": 38,
-        "lines": 3238
+        "lines": 3253
       },
       "api": {
         "files": 55,
-        "lines": 7599
+        "lines": 7617
       },
       "shared_ai": {
         "files": 47,
-        "lines": 6880
+        "lines": 6889
       },
       "shared_core": {
         "files": 25,
@@ -188,9 +188,9 @@
     ]
   },
   "quality": {
-    "docstring_ratio": 0.759,
+    "docstring_ratio": 0.747,
     "type_hint_ratio": 0.486,
-    "logging_ratio": 0.153,
+    "logging_ratio": 0.233,
     "bare_except_count": 0,
     "print_count": 0,
     "todo_count": 20

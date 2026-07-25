@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class TemplateEngine:
     """موتور مدیریت و رندر قالب‌های پاسخ."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = KnowledgeRepository(session)
     
     async def get_response(

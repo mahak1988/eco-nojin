@@ -3,6 +3,9 @@ SimulationRun model — persists a simulation execution with its metrics,
 advisory (analysis/recommendations/scenarios) and an optional user note.
 Uses the project's shared Base so init_db's create_all builds it automatically.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import uuid
 from datetime import datetime
 from typing import Optional

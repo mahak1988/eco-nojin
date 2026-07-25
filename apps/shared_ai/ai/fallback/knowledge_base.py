@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class KnowledgeBaseEngine:
     """موتور جستجو و بازیابی دانش."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = KnowledgeRepository(session)
     
     async def search(

@@ -5,6 +5,9 @@ Data access layer — all database queries live here.
 Services call repositories; repositories never call services.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
@@ -31,7 +34,7 @@ from apps.api.schemas.accounting import (
 class AccountRepository:
     """Repository for Account entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, account_id: str) -> Optional[Account]:
@@ -118,7 +121,7 @@ class AccountRepository:
 class JournalEntryRepository:
     """Repository for JournalEntry entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, entry_id: str) -> Optional[JournalEntry]:
@@ -177,7 +180,7 @@ class JournalEntryRepository:
 class InvoiceRepository:
     """Repository for Invoice entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, invoice_id: str) -> Optional[Invoice]:
@@ -258,7 +261,7 @@ class InvoiceRepository:
 class PaymentRepository:
     """Repository for Payment entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, payment_id: str) -> Optional[Payment]:
@@ -294,7 +297,7 @@ class PaymentRepository:
 class BudgetRepository:
     """Repository for Budget entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, budget_id: str) -> Optional[Budget]:
@@ -341,7 +344,7 @@ class BudgetRepository:
 class TaxRateRepository:
     """Repository for TaxRate entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, tax_id: str) -> Optional[TaxRate]:
@@ -360,7 +363,7 @@ class TaxRateRepository:
 class FixedAssetRepository:
     """Repository for FixedAsset entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, asset_id: str) -> Optional[FixedAsset]:

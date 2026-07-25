@@ -2,6 +2,9 @@
 Generic Crop Growth Model — standardized model (Phase 4 upgrade).
 Deterministic, returns standard outputs.series + metrics for the frontend.
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

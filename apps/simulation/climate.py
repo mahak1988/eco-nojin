@@ -11,6 +11,9 @@ Physics (simplified, educational, NOT a GCM):
     precipitation reacts to warming; extremes scale with anomaly.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

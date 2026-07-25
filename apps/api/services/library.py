@@ -4,6 +4,9 @@ Library Service
 Business logic layer — orchestrates repositories and enforces rules.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +19,7 @@ from apps.api.models.library import LibraryResource
 class LibraryService:
     """Service for library operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = LibraryRepository(session)
 
     async def list(

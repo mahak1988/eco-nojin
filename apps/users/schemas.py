@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime
 from typing import Optional

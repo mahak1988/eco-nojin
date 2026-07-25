@@ -5,6 +5,9 @@ Business logic layer — orchestrates repositories and enforces rules.
 Controllers (routers) call services; services call repositories.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 from datetime import datetime, date
 from decimal import Decimal
@@ -30,7 +33,7 @@ from apps.api.models.accounting import Account, AccountType, JournalEntry, Journ
 class AccountingService:
     """Main service for accounting operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.accounts = AccountRepository(session)
         self.journal_entries = JournalEntryRepository(session)
         self.invoices = InvoiceRepository(session)
@@ -42,7 +45,7 @@ class AccountingService:
 class AccountService:
     """Service for account operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = AccountRepository(session)
 
     async def get(self, account_id: str) -> Account:
@@ -88,7 +91,7 @@ class AccountService:
 class JournalEntryService:
     """Service for journal entry operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = JournalEntryRepository(session)
 
     async def get(self, entry_id: str) -> JournalEntry:
@@ -135,7 +138,7 @@ class JournalEntryService:
 class InvoiceService:
     """Service for invoice operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = InvoiceRepository(session)
 
     async def get(self, invoice_id: str) -> "Invoice":
@@ -172,7 +175,7 @@ class InvoiceService:
 class PaymentService:
     """Service for payment operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = PaymentRepository(session)
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list, int]:
@@ -187,7 +190,7 @@ class PaymentService:
 class BudgetService:
     """Service for budget operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = BudgetRepository(session)
 
     async def get(self, budget_id: str) -> "Budget":

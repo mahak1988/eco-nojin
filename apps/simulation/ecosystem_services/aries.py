@@ -4,6 +4,9 @@ ARIES (Artificial Intelligence for Ecosystem Services) Simulator
 ARIES uses AI to model ecosystem services flows. Maps source, sink, and use of natural capital.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

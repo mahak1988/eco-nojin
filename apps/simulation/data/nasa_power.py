@@ -2,6 +2,9 @@
 NASA POWER API Client — Fetches real-world historical weather data.
 Docs: https://power.larc.nasa.gov/docs/
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import httpx
 from typing import Optional
 

@@ -24,7 +24,7 @@ router = APIRouter(prefix="/ai-agents", tags=["AI Agents"])
 # ==========================================
 # LLM Dependency
 # ==========================================
-def get_llm():
+def get_llm() -> None:
     """دریافت نمونه LLM از Factory."""
     return LLMFactory.create()
 
@@ -54,7 +54,7 @@ async def chat_stream(
     - data: {"content": "more text"}
     - data: {"done": true, "used_fallback": false}
     """
-    async def event_generator():
+    async def event_generator() -> None:
         try:
             async for chunk in agent_service.chat_stream(
                 user_id=current_user.id,
@@ -187,7 +187,7 @@ async def create_conversation(
     )
 
 @router.get("/types")
-async def list_agent_types():
+async def list_agent_types() -> None:
     """دریافت لیست انواع ایجنت‌های موجود."""
     return {
         "agents": [
@@ -266,12 +266,12 @@ async def list_agent_types():
     }
 
 @router.get("/llm/providers")
-async def list_llm_providers():
+async def list_llm_providers() -> None:
     """دریافت لیست ارائه‌دهندگان LLM."""
     return LLMFactory.list_providers()
 
 @router.get("/llm/current")
-async def get_current_llm():
+async def get_current_llm() -> None:
     """دریافت اطلاعات LLM فعلی."""
     import os
     

@@ -20,7 +20,7 @@ class AgentState(TypedDict):
 class ModularAgentBuilder:
     """سازنده ماژولار ایجنت‌های LangGraph."""
     
-    def __init__(self, llm: Any, tools: List[Any], system_prompt: str = ""):
+    def __init__(self, llm: Any, tools: List[Any], system_prompt: str = "") -> None:
         self.llm = llm.bind_tools(tools) if tools else llm
         self.tools = {t.name: t for t in tools}
         self.system_prompt = system_prompt

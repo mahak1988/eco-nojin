@@ -1,4 +1,7 @@
 """شبیه‌سازهای بوم‌شناختی Econojin"""
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
@@ -32,7 +35,7 @@ BIO_BASELINE = {"rainforest": 0.85, "temperate": 0.65, "wetland": 0.75, "grassla
 
 
 @router.post("/carbon/run")
-async def run_carbon(sim: CarbonSim):
+async def run_carbon(sim: CarbonSim) -> None:
     rate = CARBON_RATES.get(sim.forest_type, 10)
     yearly = []
     cumulative = 0
@@ -61,7 +64,7 @@ async def run_carbon(sim: CarbonSim):
 
 
 @router.post("/water/run")
-async def run_water(sim: WaterSim):
+async def run_water(sim: WaterSim) -> None:
     rate = WATER_RATES.get(sim.region.lower(), 1000)
     yearly = []
     for y in range(1, sim.years + 1):
@@ -82,7 +85,7 @@ async def run_water(sim: WaterSim):
 
 
 @router.post("/biodiversity/run")
-async def run_biodiversity(sim: BioSim):
+async def run_biodiversity(sim: BioSim) -> None:
     baseline = BIO_BASELINE.get(sim.ecosystem_type, 0.5)
     target = baseline + (1 - baseline) * sim.restoration_level
     yearly = []
@@ -108,7 +111,7 @@ async def run_biodiversity(sim: BioSim):
 
 
 @router.get("/forest-types")
-async def get_forest_types():
+async def get_forest_types() -> None:
     return [
         {"value": "rainforest", "label": "جنگل بارانی", "rate": 25, "icon": "🌴"},
         {"value": "temperate", "label": "جنگل معتدل", "rate": 12, "icon": "🌳"},
@@ -120,7 +123,7 @@ async def get_forest_types():
 
 
 @router.get("/ecosystem-types")
-async def get_ecosystem_types():
+async def get_ecosystem_types() -> None:
     return [
         {"value": "rainforest", "label": "جنگل بارانی", "baseline": 0.85, "icon": "🌴"},
         {"value": "temperate", "label": "جنگل معتدل", "baseline": 0.65, "icon": "🌳"},

@@ -5,6 +5,9 @@ Business logic layer — orchestrates repositories and enforces rules.
 Controllers (routers) call services; services call repositories.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +20,7 @@ from apps.simulation.schemas import SimulationCreate, SimulationUpdate
 class SimulationService:
     """Service for simulation operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = SimulationRepository(session)
 
     async def get(self, id: int) -> Optional[Simulation]:

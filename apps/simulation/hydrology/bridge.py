@@ -4,6 +4,9 @@ Hydrological Bridge Model Simulator
 A conceptual hydrological model bridging rainfall-runoff processes with water quality indicators.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

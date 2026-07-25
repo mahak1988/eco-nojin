@@ -4,6 +4,9 @@ TEEB (The Economics of Ecosystems and Biodiversity) Simulator
 TEEB framework values ecosystem services and biodiversity. Calculates economic benefits of natural capital.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

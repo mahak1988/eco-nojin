@@ -11,7 +11,7 @@ from apps.ai_agents.models import Conversation, Message
 class ConversationRepository(BaseRepository[Conversation]):
     """Repository برای مدیریت مکالمات."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Conversation)
     
     async def get_user_conversations(
@@ -63,7 +63,7 @@ class ConversationRepository(BaseRepository[Conversation]):
 class MessageRepository(BaseRepository[Message]):
     """Repository برای مدیریت پیام‌ها."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Message)
     
     async def get_conversation_messages(

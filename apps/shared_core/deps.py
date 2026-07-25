@@ -6,6 +6,9 @@ Provides reusable FastAPI dependencies for authentication, database sessions,
 and authorization.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from collections.abc import AsyncGenerator
 from typing import Annotated
 

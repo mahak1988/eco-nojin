@@ -4,6 +4,9 @@ MaxEnt (Maximum Entropy Species Distribution) Simulator
 MaxEnt models species distribution from presence-only data. Predicts habitat suitability under climate scenarios.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

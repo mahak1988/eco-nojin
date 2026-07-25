@@ -4,6 +4,9 @@ Library Models
 Database models for digital library and resource management.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional, List
 

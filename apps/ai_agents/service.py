@@ -21,7 +21,7 @@ class AgentFactory:
     """کارخانه ساخت ایجنت‌ها."""
     
     @staticmethod
-    def create_agent(agent_type: str, llm: Any):
+    def create_agent(agent_type: str, llm: Any) -> None:
         """ساخت ایجنت بر اساس نوع."""
         if agent_type == "financial":
             return FinancialAnalystAgent(llm)
@@ -42,7 +42,7 @@ class AgentFactory:
 class AIAgentService:
     """سرویس اصلی مدیریت ایجنت‌ها و مکالمات."""
     
-    def __init__(self, session: AsyncSession, llm: Any):
+    def __init__(self, session: AsyncSession, llm: Any) -> None:
         self.session = session
         self.llm = llm
         self.conversation_repo = ConversationRepository(session)

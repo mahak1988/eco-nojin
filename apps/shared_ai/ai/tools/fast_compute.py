@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # ==========================================
 
 @jit(nopython=True, parallel=True, cache=True)
-def _fast_mean_std(data: np.ndarray):
+def _fast_mean_std(data: np.ndarray) -> None:
     """محاسبه سریع میانگین و انحراف معیار با Numba."""
     n = len(data)
     sum_val = 0.0
@@ -36,7 +36,7 @@ def _fast_mean_std(data: np.ndarray):
     return mean, std
 
 @jit(nopython=True, cache=True)
-def _fast_percentile(sorted_data: np.ndarray, p: float):
+def _fast_percentile(sorted_data: np.ndarray, p: float) -> None:
     """محاسبه سریع percentile."""
     n = len(sorted_data)
     index = p / 100.0 * (n - 1)
@@ -50,7 +50,7 @@ def _fast_percentile(sorted_data: np.ndarray, p: float):
     return sorted_data[lower] * (1 - weight) + sorted_data[upper] * weight
 
 @jit(nopython=True, cache=True)
-def _fast_skewness_kurtosis(data: np.ndarray, mean: float, std: float):
+def _fast_skewness_kurtosis(data: np.ndarray, mean: float, std: float) -> None:
     """محاسبه چولگی و کشیدگی."""
     n = len(data)
     if std == 0:
@@ -160,7 +160,7 @@ async def fast_statistics(data: List[float], operations: Optional[List[str]] = N
 # ==========================================
 
 @jit(nopython=True, parallel=True, cache=True)
-def _monte_carlo_random_walk(iterations: int, steps: int, up_factor: float, down_factor: float, seed: int):
+def _monte_carlo_random_walk(iterations: int, steps: int, up_factor: float, down_factor: float, seed: int) -> None:
     """شبیه‌سازی Random Walk با Numba."""
     np.random.seed(seed)
     results = np.zeros(iterations)
@@ -177,7 +177,7 @@ def _monte_carlo_random_walk(iterations: int, steps: int, up_factor: float, down
     return results
 
 @jit(nopython=True, cache=True)
-def _calculate_confidence_interval(data: np.ndarray, mean: float, std: float, confidence: float = 0.95):
+def _calculate_confidence_interval(data: np.ndarray, mean: float, std: float, confidence: float = 0.95) -> None:
     """محاسبه بازه اطمینان."""
     n = len(data)
     z_score = 1.96 if confidence == 0.95 else 2.576  # 99%
@@ -288,7 +288,7 @@ async def optimization_solver(
     
     try:
         # تابع هدف
-        def objective(x):
+        def objective(x) -> None:
             result = 0.0
             for i, coeff in enumerate(objective_coefficients):
                 if i < len(x):

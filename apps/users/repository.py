@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from apps.shared_core.database.repository import BaseRepository
@@ -10,7 +13,7 @@ class UserRepository(BaseRepository[User]):
     متدهای اختصاصی برای عملیات مرتبط با کاربران.
     """
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
     
     async def get_by_email(self, email: str) -> Optional[User]:
@@ -27,7 +30,7 @@ class UserRepository(BaseRepository[User]):
         result = await self.session.execute(stmt)
         return result.scalars().first()
     
-    async def get_active_users(self, limit: int = 100, offset: int = 0):
+    async def get_active_users(self, limit: int = 100, offset: int = 0) -> None:
         """دریافت کاربران فعال."""
         return await self.get_multi(
             filter_by={"is_active": True},

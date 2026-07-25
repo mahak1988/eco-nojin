@@ -178,7 +178,7 @@ class LLMFactory:
         from langchain_core.messages import AIMessage
         
         class FakeToolCallingModel(FakeMessagesListChatModel):
-            def bind_tools(self, tools, **kwargs):
+            def bind_tools(self, tools, **kwargs) -> None:
                 return self
         
         return FakeToolCallingModel(

@@ -4,6 +4,9 @@ Simulation API Router
 Exposes all 28 simulators via REST API endpoints.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Any, Optional
@@ -34,7 +37,7 @@ class SimulationRunResponse(BaseModel):
 
 
 @router.get("/simulators", summary="List all available simulators")
-async def list_simulators():
+async def list_simulators() -> None:
     """Get metadata for all 28 registered simulators."""
     simulators = register_all_simulators()
     return {
@@ -44,7 +47,7 @@ async def list_simulators():
 
 
 @router.get("/simulators/{simulator_id}", summary="Get simulator details")
-async def get_simulator(simulator_id: str):
+async def get_simulator(simulator_id: str) -> None:
     """Get detailed information about a specific simulator."""
     params = SimulationRegistry.get_parameters(simulator_id)
     if not params:
@@ -86,7 +89,7 @@ async def run_simulation(request: SimulationRunRequest) -> SimulationRunResponse
 
 
 @router.get("/categories", summary="List simulator categories")
-async def list_categories():
+async def list_categories() -> None:
     """Get all simulator categories with counts."""
     simulators = register_all_simulators()
     categories: dict[str, list] = {}

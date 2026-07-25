@@ -4,6 +4,9 @@ Agriculture Schools Models
 Database models for agricultural education institutions.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional, List
 

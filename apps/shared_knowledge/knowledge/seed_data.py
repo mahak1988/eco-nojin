@@ -556,7 +556,7 @@ RESPONSE_TEMPLATES = [
 ]
 
 
-async def seed_knowledge_base(session: AsyncSession):
+async def seed_knowledge_base(session: AsyncSession) -> None:
     """بارگذاری داده‌های اولیه به دانش‌نامه."""
     logger.info("🌱 Seeding knowledge base...")
     

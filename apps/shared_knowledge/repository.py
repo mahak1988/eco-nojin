@@ -5,6 +5,9 @@ Data access layer — all database queries live here.
 Services call repositories; repositories never call services.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional
 
 from sqlalchemy import select, func
@@ -17,7 +20,7 @@ from apps.shared_knowledge.schemas import SharedKnowledgeCreate, SharedKnowledge
 class SharedKnowledgeRepository:
     """Repository for SharedKnowledge entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, id: int) -> Optional[SharedKnowledge]:

@@ -1,4 +1,7 @@
 """پایش ماهواره‌ای و AI Econojin"""
+import logging
+
+logger = logging.getLogger(__name__)
 from fastapi import APIRouter, UploadFile, File
 from pydantic import BaseModel
 from typing import Optional
@@ -32,7 +35,7 @@ _sample_data = [
 
 
 @router.post("/satellite/analyze")
-async def analyze_satellite(req: SatRequest):
+async def analyze_satellite(req: SatRequest) -> None:
     ndvi = [d["ndvi"] for d in _sample_data]
     avg = sum(ndvi) / len(ndvi)
     trend = ndvi[-1] - ndvi[0]
@@ -55,12 +58,12 @@ async def analyze_satellite(req: SatRequest):
 
 
 @router.post("/satellite/upload")
-async def upload_satellite(file: UploadFile = File(...)):
+async def upload_satellite(file: UploadFile = File(...)) -> None:
     return {"status": "uploaded", "filename": file.filename, "analysis_started": True}
 
 
 @router.post("/ai/analyze")
-async def ai_analyze(req: AIRequest):
+async def ai_analyze(req: AIRequest) -> None:
     return {
         "summary": "وضعیت بوم‌شناختی در حال بهبود است. NDVI 3.2٪ افزایش.",
         "insights": [
@@ -79,7 +82,7 @@ async def ai_analyze(req: AIRequest):
 
 
 @router.get("/ai/models")
-async def get_ai_models():
+async def get_ai_models() -> None:
     return [
         {"id": "biomass", "name": "برآورد زیست‌توده", "accuracy": 0.92},
         {"id": "species", "name": "تشخیص گونه", "accuracy": 0.88},
@@ -89,7 +92,7 @@ async def get_ai_models():
 
 
 @router.get("/alerts")
-async def get_alerts():
+async def get_alerts() -> None:
     return {"alerts": [
         {"id": "AL001", "type": "deforestation", "severity": "high",
          "message": "کاهش پوشش در ۵ هکتار", "timestamp": "2026-07-14T08:00:00"},
@@ -99,7 +102,7 @@ async def get_alerts():
 
 
 @router.get("/projects/overview")
-async def get_projects_overview():
+async def get_projects_overview() -> None:
     return {"projects": [
         {"id": "amazon-north", "name": "آمازون شمالی", "hectares": 45200, "ndvi": 0.72, "health": 88},
         {"id": "kenya-grassland", "name": "مراتع کنیا", "hectares": 28900, "ndvi": 0.58, "health": 75},

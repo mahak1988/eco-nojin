@@ -2,6 +2,9 @@
 FAOSTAT data client — fetches real crop yield data (no API key required).
 Source: FAO FAOSTAT bulk download API (fenixservices.fao.org).
 """
+import logging
+
+logger = logging.getLogger(__name__)
 import httpx
 from typing import Optional
 

@@ -4,6 +4,9 @@ WEAP (Water Evaluation And Planning)
 Monthly water supply-demand balance with priority allocation (domestic > industrial > agricultural).
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

@@ -8,13 +8,13 @@ logger = logging.getLogger(__name__)
 class EmbeddingModel:
     """مدل embedding برای تبدیل متن به بردار."""
     
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
         self.model_name = model_name
         self._model = None
         self._dimension = 384  # all-MiniLM-L6-v2
     
     @property
-    def model(self):
+    def model(self) -> None:
         """Lazy loading مدل."""
         if self._model is None:
             try:

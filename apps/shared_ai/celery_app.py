@@ -71,27 +71,27 @@ celery_app.conf.update(
 # Task Signal Handlers
 # ==========================================
 @task_prerun.connect
-def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs):
+def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """Increment running count before task starts."""
     TaskMonitor._tasks_running += 1
     logger.info(f"Task started: {task.name} (id={task_id})")
 
 
 @task_postrun.connect
-def task_postrun_handler(sender=None, task_id=None, task=None, **kwargs):
+def task_postrun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
     """Decrement running count after task completes."""
     TaskMonitor._tasks_running -= 1
 
 
 @task_success.connect
-def task_success_handler(sender=None, result=None, **kwargs):
+def task_success_handler(sender=None, result=None, **kwargs) -> None:
     """Increment completed count on success."""
     TaskMonitor._tasks_completed += 1
     logger.info(f"Task completed successfully: {sender.name}")
 
 
 @task_failure.connect
-def task_failure_handler(sender=None, exception=None, **kwargs):
+def task_failure_handler(sender=None, exception=None, **kwargs) -> None:
     """Increment failed count on failure."""
     TaskMonitor._tasks_failed += 1
     logger.error(f"Task failed: {sender.name}, error: {str(exception)}")

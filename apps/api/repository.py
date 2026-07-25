@@ -20,7 +20,7 @@ from apps.api.schemas import ApiCreate, ApiUpdate
 class ApiRepository:
     """Repository for Api entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, id: int) -> Optional[Api]:

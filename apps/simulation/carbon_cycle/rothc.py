@@ -4,6 +4,9 @@ RothC (Soil Organic Carbon Turnover)
 Soil organic carbon dynamics with temperature/moisture/clay-dependent decomposition.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

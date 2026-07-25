@@ -1,4 +1,7 @@
 """InVEST Wrapper for Eco Nozhin"""
+import logging
+
+logger = logging.getLogger(__name__)
 from .wrapper import InVESTWrapper, InVESTOutput
 from .carbon_model import CarbonModel
 from .water_yield_model import WaterYieldModel

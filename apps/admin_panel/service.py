@@ -11,7 +11,7 @@ from apps.users.models import User
 
 
 class AdminService:
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.settings_repo = AdminSettingRepository(session)
         self.audit_repo = AuditLogRepository(session)

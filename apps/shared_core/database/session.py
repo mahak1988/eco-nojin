@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from typing import AsyncGenerator
@@ -50,12 +53,12 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
 # ==========================================
 # Database Initialization
 # ==========================================
-async def init_db():
+async def init_db() -> None:
     """ایجاد تمام جداول دیتابیس (فقط برای توسعه اولیه)."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-async def close_db():
+async def close_db() -> None:
     """بستن اتصال دیتابیس (در زمان shutdown)."""
     await engine.dispose()
 

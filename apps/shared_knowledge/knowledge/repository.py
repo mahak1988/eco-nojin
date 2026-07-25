@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class KnowledgeRepository:
     """Repository برای مدیریت دانش‌نامه."""
     
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
     
     # ==========================================
@@ -180,7 +180,7 @@ class KnowledgeRepository:
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
     
-    async def update_memory_access(self, memory_id: int):
+    async def update_memory_access(self, memory_id: int) -> None:
         """بروزرسانی زمان دسترسی به حافظه."""
         stmt = select(AgentMemory).where(AgentMemory.id == memory_id)
         result = await self.session.execute(stmt)

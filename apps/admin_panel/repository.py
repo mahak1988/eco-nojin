@@ -10,7 +10,7 @@ from apps.shared_core.models import AdminSetting, AuditLog, SystemReport
 
 
 class AdminSettingRepository(BaseRepository[AdminSetting]):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, AdminSetting)
 
     async def get_by_key(self, key: str) -> Optional[AdminSetting]:
@@ -20,7 +20,7 @@ class AdminSettingRepository(BaseRepository[AdminSetting]):
 
 
 class AuditLogRepository(BaseRepository[AuditLog]):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, AuditLog)
 
     async def filter_by_event_type(
@@ -38,5 +38,5 @@ class AuditLogRepository(BaseRepository[AuditLog]):
 
 
 class SystemReportRepository(BaseRepository[SystemReport]):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, SystemReport)

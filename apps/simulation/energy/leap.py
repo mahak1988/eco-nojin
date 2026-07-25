@@ -4,6 +4,9 @@ LEAP (Low Emissions Analysis Platform) Simulator
 LEAP is an energy planning tool for climate change mitigation. Models energy demand, supply, and emissions.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

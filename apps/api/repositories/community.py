@@ -4,6 +4,9 @@ Community Repository
 Data access layer — all database queries live here.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import Optional, List
 
 from sqlalchemy import select, func
@@ -16,7 +19,7 @@ from apps.api.schemas.community import PostCreate, PostUpdate
 class CommunityRepository:
     """Repository for Community entities."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     # ==================== Post Operations ====================

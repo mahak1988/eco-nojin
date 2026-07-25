@@ -14,7 +14,7 @@ from apps.shared_core.database.session import get_db_session
 from apps.simulation.runs.models import SimulationRun
 
 
-async def _ensure_table(db: AsyncSession):
+async def _ensure_table(db: AsyncSession) -> None:
     """Idempotently create the simulation_runs table on first use."""
     try:
         from apps.simulation.runs.models import SimulationRun
@@ -50,7 +50,7 @@ def _to_dict(r: SimulationRun) -> dict:
 
 
 @router.post("", summary="Save a simulation run to the dashboard")
-async def save_run(data: RunCreate, db: AsyncSession = Depends(get_db_session)):
+async def save_run(data: RunCreate, db: AsyncSession = Depends(get_db_session)) -> None:
     await _ensure_table(db)
     run = SimulationRun(
         id=str(uuid.uuid4()),
@@ -87,7 +87,7 @@ async def list_runs(
 
 
 @router.get("/{run_id}", summary="Get one saved run")
-async def get_run(run_id: str, db: AsyncSession = Depends(get_db_session)):
+async def get_run(run_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
     await _ensure_table(db)
     run = await db.get(SimulationRun, run_id)
     if not run:
@@ -96,7 +96,7 @@ async def get_run(run_id: str, db: AsyncSession = Depends(get_db_session)):
 
 
 @router.delete("/{run_id}", summary="Delete a saved run")
-async def delete_run(run_id: str, db: AsyncSession = Depends(get_db_session)):
+async def delete_run(run_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
     await _ensure_table(db)
     run = await db.get(SimulationRun, run_id)
     if not run:

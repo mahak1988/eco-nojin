@@ -5,6 +5,9 @@ Abstract base class for all simulation models with parameter validation,
 result serialization, and registry pattern.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, UTC

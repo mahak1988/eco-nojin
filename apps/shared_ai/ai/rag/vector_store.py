@@ -16,7 +16,7 @@ class VectorStore:
     3. FAISS (fallback)
     """
     
-    def __init__(self, collection_name: str = "econojin_documents"):
+    def __init__(self, collection_name: str = "econojin_documents") -> None:
         self.collection_name = collection_name
         self._client = None
         self._backend = None  # "qdrant" or "faiss"
@@ -31,7 +31,7 @@ class VectorStore:
         # Initialize
         self._initialize()
     
-    def _initialize(self):
+    def _initialize(self) -> None:
         """راه‌اندازی vector store."""
         qdrant_url = os.getenv("QDRANT_URL")
         qdrant_api_key = os.getenv("QDRANT_API_KEY")
@@ -108,7 +108,7 @@ class VectorStore:
         logger.info("🔄 Using FAISS as fallback (in-memory)")
         self._initialize_faiss()
     
-    def _initialize_faiss(self):
+    def _initialize_faiss(self) -> None:
         """راه‌اندازی FAISS."""
         try:
             import faiss
@@ -276,7 +276,7 @@ class VectorStore:
         
         return True
     
-    def _rebuild_faiss(self, exclude_ids: set):
+    def _rebuild_faiss(self, exclude_ids: set) -> None:
         """بازسازی FAISS index بدون اسناد حذف شده."""
         import faiss
         import numpy as np

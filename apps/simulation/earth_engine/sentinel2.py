@@ -5,6 +5,9 @@ Fetches and processes Sentinel-2 satellite imagery for crop monitoring,
 vegetation indices, and land use analysis.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 from datetime import datetime, UTC
 from typing import Any, Optional
 

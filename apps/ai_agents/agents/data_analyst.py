@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from typing import List, Any
 from langchain_core.tools import BaseTool
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
@@ -78,7 +81,7 @@ DATA_ANALYST_PROMPT = """شما یک تحلیلگر داده حرفه‌ای ه�
 class DataAnalystAgent:
     """ایجنت تحلیلگر داده با RAG."""
     
-    def __init__(self, llm: Any):
+    def __init__(self, llm: Any) -> None:
         self.llm = llm
         self.tools: List[BaseTool] = [
             # ابزارهای سریع (Numba)

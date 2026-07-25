@@ -4,6 +4,9 @@ MODFLOW (USGS Groundwater Model) Simulator
 MODFLOW simulates groundwater flow in aquifers. Used for water resource management and contamination studies.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

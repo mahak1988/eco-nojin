@@ -26,7 +26,7 @@ class CalibrationRequest(BaseModel):
 
 
 @router.post("/validation", summary="Calibration + validation + uncertainty + sensitivity")
-async def validation(req: CalibrationRequest):
+async def validation(req: CalibrationRequest) -> None:
     # ۱. دادهٔ واقعی از FAOSTAT
     fao = await fetch_crop_yield(req.crop, req.area_code)
     observed = list(fao.get("data", {}).values())
@@ -90,7 +90,7 @@ async def validation(req: CalibrationRequest):
     # ۴. عدم قطعیت (Monte Carlo)
     uncertainty = None
     if req.run_uncertainty:
-        async def run_fn(p):
+        async def run_fn(p) -> None:
             try:
                 r = await sim.run(p)
                 return {"metrics": r.metrics or {}, "outputs": r.outputs or {}}
@@ -102,7 +102,7 @@ async def validation(req: CalibrationRequest):
     # ۵. حساسیت (Morris)
     sensitivity = None
     if req.run_sensitivity:
-        async def run_fn2(p):
+        async def run_fn2(p) -> None:
             try:
                 r = await sim.run(p)
                 return {"metrics": r.metrics or {}, "outputs": r.outputs or {}}

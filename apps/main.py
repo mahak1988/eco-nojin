@@ -128,7 +128,7 @@ app.add_middleware(
 )
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
+async def add_process_time_header(request: Request, call_next) -> None:
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
@@ -136,7 +136,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
+async def global_exception_handler(request: Request, exc: Exception) -> None:
     logger.error(f"❌ خطای پیش‌بینی‌نشده: {exc}", exc_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -144,7 +144,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 @app.exception_handler(404)
-async def not_found_handler(request: Request, exc: Exception):
+async def not_found_handler(request: Request, exc: Exception) -> None:
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={"error": "Not Found", "message": f"مسیر {request.url.path} یافت نشد"},
@@ -319,7 +319,7 @@ except Exception as e:
 # مسیرهای عمومی
 # ============================================================
 @app.get("/", tags=["🏠 Root"])
-async def root():
+async def root() -> None:
     return {
         "name": settings.PROJECT_NAME,
         "status": "running",
@@ -329,7 +329,7 @@ async def root():
     }
 
 @app.get("/health", tags=["🏥 Health"])
-async def health():
+async def health() -> None:
     return {
         "status": "healthy",
         "version": settings.VERSION,
@@ -337,7 +337,7 @@ async def health():
     }
 
 @app.get("/modules", tags=["📦 Modules"])
-async def list_modules():
+async def list_modules() -> None:
     return {
         "modules": [
             "users", "auth", "ai_agents", "accounting", "ecocoin",

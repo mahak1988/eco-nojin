@@ -20,7 +20,7 @@ from apps.api.schemas import ApiCreate, ApiUpdate
 class ApiService:
     """Service for api operations."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.repo = ApiRepository(session)
 
     async def get(self, id: int) -> Optional[Api]:

@@ -4,6 +4,9 @@ DSSAT (Crop Growth & Yield)
 Thermal-time (GDD) crop growth with water and nitrogen limitation; logistic biomass.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import math
 import hashlib
 import time

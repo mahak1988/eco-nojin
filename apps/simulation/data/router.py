@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from apps.simulation.data.satellite import fetch_satellite_agro_data
 from apps.simulation.data.nasa_power import fetch_nasa_power_data
 """
@@ -61,7 +64,7 @@ async def indicators(
     return {"country": country.upper(), "indicators": data}
 
 @router.get("/weather/real", summary="دریافت دادهٔ واقعی آب‌وهوا از NASA POWER")
-async def get_real_weather(lat: float, lon: float, days: int = 30):
+async def get_real_weather(lat: float, lon: float, days: int = 30) -> None:
     from datetime import datetime, timedelta
     end_date = datetime.now().strftime("%Y%m%d")
     start_date = (datetime.now() - timedelta(days=days)).strftime("%Y%m%d")
@@ -86,7 +89,7 @@ async def get_real_weather(lat: float, lon: float, days: int = 30):
     }
 
 @router.get("/satellite", summary="دریافت داده‌های ماهواره‌ای کشاورزی (رطوبت خاک و تبخیر-تعرق)")
-async def get_satellite_data(lat: float, lon: float, days: int = 7):
+async def get_satellite_data(lat: float, lon: float, days: int = 7) -> None:
     data = await fetch_satellite_agro_data(lat, lon, days)
     if data.get("status") == "error":
         return {"status": "error", "message": data.get("message")}

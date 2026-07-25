@@ -4,6 +4,9 @@ WASP (Water Quality Analysis Simulation Program) Simulator
 WASP simulates water quality in water bodies. Models eutrophication, toxic chemicals, and sediment transport.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

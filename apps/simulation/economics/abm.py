@@ -4,6 +4,9 @@ Agent-Based Economic Model Simulator
 ABM simulates economic agents (farmers, consumers, markets) with heterogeneous behaviors and interactions.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 import math
 from datetime import datetime, UTC

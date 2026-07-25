@@ -4,6 +4,9 @@ Sentry Monitoring Integration
 Error tracking and performance monitoring for Econojin backend.
 """
 
+import logging
+
+logger = logging.getLogger(__name__)
 import os
 from typing import Optional
 
