@@ -1,4 +1,6 @@
-// Unified API layer: same-origin by default (Vite proxies /api and /health).
+// Domain API helpers. R1: mock only if VITE_USE_MOCK=true.
+
+import { USE_MOCK } from "../api/http";
 
 const TIMEOUT = 8000;
 
@@ -10,7 +12,6 @@ function readEnv(key: string): string | undefined {
   }
 }
 
-/** Prefer relative URLs so Vite proxy works; override with VITE_API_BASE_URL if needed. */
 const API_BASE =
   readEnv("VITE_API_BASE_URL") ||
   readEnv("VITE_API_BASE") ||
@@ -24,12 +25,21 @@ function url(path: string): string {
   return `${API_BASE.replace(/\/$/, "")}${p}`;
 }
 
-async function fetchSafe<T>(path: string, fallback: T): Promise<{ data: T; source: "api" | "mock" }> {
+export type DataSource = "api" | "mock" | "error";
+
+async function fetchSafe<T>(
+  path: string,
+  fallback: T,
+): Promise<{ data: T; source: DataSource }> {
+  if (USE_MOCK) {
+    return { data: fallback, source: "mock" };
+  }
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), TIMEOUT);
     const res = await fetch(url(path), {
       signal: ctrl.signal,
+      credentials: "include",
       headers: { Accept: "application/json" },
     });
     clearTimeout(timer);
@@ -37,7 +47,8 @@ async function fetchSafe<T>(path: string, fallback: T): Promise<{ data: T; sourc
     const data = (await res.json()) as T;
     return { data, source: "api" };
   } catch {
-    return { data: fallback, source: "mock" };
+    // Without VITE_USE_MOCK we still return fallback for resilience but mark source
+    return { data: fallback, source: "error" };
   }
 }
 
@@ -87,14 +98,29 @@ export async function getSimulatorList() {
 }
 
 export async function runSimulation(id: string, params: Record<string, number>) {
-  return fetchSafe("/api/v1/simulation/run", { id, status: "idle", metrics: {}, parameters: params });
+  return fetchSafe("/api/v1/simulation/run", {
+    id,
+    status: "idle",
+    metrics: {},
+    parameters: params,
+  });
 }
 
 export async function getApiHealth() {
   return fetchSafe("/health", { status: "unreachable" });
 }
 
-/** Local-only helper: seed demo education courses if empty. */
 export async function seedEducationDemo() {
-  return fetchSafe("/api/v1/education/seed-demo", { seeded: 0, message: "skipped" });
+  if (USE_MOCK) return { data: { seeded: 0, message: "mock" }, source: "mock" as const };
+  try {
+    const res = await fetch(url("/api/v1/education/seed-demo"), {
+      method: "POST",
+      credentials: "include",
+      headers: { Accept: "application/json", "User-Agent": "EcoNojin-Web" },
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    return { data: await res.json(), source: "api" as const };
+  } catch {
+    return { data: { seeded: 0, message: "failed" }, source: "error" as const };
+  }
 }

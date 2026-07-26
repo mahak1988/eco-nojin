@@ -1,7 +1,6 @@
 /**
- * Shared fetch helper.
- * Default API_BASE is empty → same-origin requests (Vite proxy in dev).
- * Set VITE_API_BASE_URL only when FE and BE are on different hosts.
+ * Shared fetch helper (R19: no axios).
+ * R1: mock only when VITE_USE_MOCK=true.
  */
 
 function readEnv(key: string): string | undefined {
@@ -12,7 +11,7 @@ function readEnv(key: string): string | undefined {
   }
 }
 
-/** Empty string = relative URL (recommended for Vite proxy). */
+/** Empty = same-origin (Vite proxy). */
 export const API_BASE =
   readEnv("VITE_API_BASE_URL") ||
   readEnv("VITE_API_BASE") ||
@@ -21,21 +20,33 @@ export const API_BASE =
 
 export const API_V1 = readEnv("VITE_API_V1") || "/api/v1";
 
+/** R1: explicit mock mode — never silent fake success without this flag. */
+export const USE_MOCK = (readEnv("VITE_USE_MOCK") || "").toLowerCase() === "true";
+
 export class ApiError extends Error {
   status: number;
   requestId?: string;
+  code?: string;
   data?: unknown;
 
-  constructor(message: string, status: number, requestId?: string, data?: unknown) {
+  constructor(
+    message: string,
+    status: number,
+    requestId?: string,
+    data?: unknown,
+    code?: string,
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.requestId = requestId;
     this.data = data;
+    this.code = code;
   }
 }
 
 function authHeader(): Record<string, string> {
+  // Temporary until R5 HttpOnly cookies fully replace bearer storage
   try {
     const token =
       localStorage.getItem("access_token") || localStorage.getItem("token") || "";
@@ -64,6 +75,7 @@ export async function apiFetch<T>(
     const res = await fetch(url, {
       ...init,
       signal: ctrl.signal,
+      credentials: "include", // prepare for R5 HttpOnly cookies
       headers: {
         Accept: "application/json",
         ...(init.body ? { "Content-Type": "application/json" } : {}),
@@ -82,13 +94,18 @@ export async function apiFetch<T>(
       }
     }
     if (!res.ok) {
+      const errObj = data as {
+        error?: { message?: string; code?: string };
+        message?: string;
+        detail?: string;
+      };
       const msg =
-        (data as { message?: string; detail?: string; error?: string })?.message ||
-        (data as { detail?: string })?.detail ||
-        (data as { error?: string })?.error ||
+        errObj?.error?.message ||
+        errObj?.message ||
+        errObj?.detail ||
         res.statusText ||
         "Request failed";
-      throw new ApiError(String(msg), res.status, requestId, data);
+      throw new ApiError(String(msg), res.status, requestId, data, errObj?.error?.code);
     }
     return data as T;
   } finally {
