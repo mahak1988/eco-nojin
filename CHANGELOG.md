@@ -2,17 +2,15 @@
 
 ## [Unreleased]
 
-### 2026-07-27 — Constitution & Wave A
-- Added `docs/CONSTITUTION.md` (hard rules R1–R23)
-- Added `docs/RULES_GAP.md` (honest compliance matrix)
-- **R10:** CORS no longer uses `*`; explicit localhost origins only
-- **R20:** `DATABASE_URL` from Pydantic settings in `session.py`
-- **R11 path:** `create_all` only when `ENVIRONMENT=local`; staging+ must use Alembic
-- Central `model_registry.py` (education, accounting, community, users, …)
-- Error handlers move toward **R17** nested `{ error: { code, message, details, request_id } }`
-- Alembic `env.py` uses model registry + settings URL
+### 2026-07-27 — Protocol + R1 mock flag
+- `docs/INTERACTION_PROTOCOL.md` — coding order & phase acceptance checklist
+- **R1:** `VITE_USE_MOCK` in `http.ts` / `apiServices.ts` (mock only when explicitly true)
+- **R5 prep:** `credentials: "include"` on fetch
+- **R14:** `apps/web/src/types/list.ts` list envelope + legacy adapter
+- Constitution + gap matrix maintained
+
+### Earlier 2026-07-27
+- R10 CORS explicit, R20 settings DATABASE_URL, model registry, R11 local-only create_all
 
 ### 2026-07-26
-- Security middleware MutableHeaders fix
-- Health get_engine, education MissingGreenlet, seed-demo, FE proxy
-- Restored `requirements.txt`, README rewrite
+- Middleware, health, education MissingGreenlet, seed, requirements, README
