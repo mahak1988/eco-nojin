@@ -102,7 +102,6 @@ if settings.ENVIRONMENT != "local":
     except Exception as e:
         logger.warning("Security middleware failed: %s", e)
 
-# Broad local CORS so Vite (any port) works
 _cors = list(settings.all_cors_origins)
 for extra in ("http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"):
     if extra not in _cors:
@@ -110,7 +109,7 @@ for extra in ("http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_cors if settings.ENVIRONMENT == "production" else ["*"] if settings.ENVIRONMENT == "local" else _cors,
+    allow_origins=["*"] if settings.ENVIRONMENT == "local" else _cors,
     allow_credentials=settings.ENVIRONMENT != "local",
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
@@ -181,6 +180,7 @@ _include("scenario", lambda: __import__("apps.simulation.scenario.router", froml
 _include("validation", lambda: __import__("apps.simulation.validation.router", fromlist=["router"]).router)
 _include("agriculture_schools", lambda: __import__("apps.api.routes.agriculture_schools", fromlist=["router"]).router)
 _include("education", lambda: __import__("apps.api.routes.education", fromlist=["router"]).router)
+_include("education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router)
 _include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
 _include("chain", lambda: __import__("apps.simulation.chain.router", fromlist=["router"]).router)
