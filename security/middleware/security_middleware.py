@@ -70,5 +70,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         for h, v in self.cfg["security_headers"].items():
             response.headers[h] = v
-        response.headers.pop("server", None)
+        # Starlette MutableHeaders has no .pop(); use del
+        if "server" in response.headers:
+            del response.headers["server"]
         return response
