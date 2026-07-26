@@ -1,17 +1,27 @@
-// Unified API service layer with timeout + graceful mock fallback.
+// Unified API layer: same-origin by default (Vite proxies /api and /health).
 
 const TIMEOUT = 8000;
 
+function readEnv(key: string): string | undefined {
+  try {
+    return (import.meta as ImportMeta & { env?: Record<string, string> }).env?.[key];
+  } catch {
+    return undefined;
+  }
+}
+
+/** Prefer relative URLs so Vite proxy works; override with VITE_API_BASE_URL if needed. */
 const API_BASE =
-  (typeof import.meta !== "undefined" &&
-    (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_BASE_URL) ||
-  (typeof import.meta !== "undefined" &&
-    (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_BASE) ||
-  "http://localhost:8000";
+  readEnv("VITE_API_BASE_URL") ||
+  readEnv("VITE_API_BASE") ||
+  readEnv("VITE_API_URL") ||
+  "";
 
 function url(path: string): string {
   if (path.startsWith("http")) return path;
-  return `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const p = path.startsWith("/") ? path : `/${path}`;
+  if (!API_BASE) return p;
+  return `${API_BASE.replace(/\/$/, "")}${p}`;
 }
 
 async function fetchSafe<T>(path: string, fallback: T): Promise<{ data: T; source: "api" | "mock" }> {
@@ -50,7 +60,6 @@ export async function getEducationCourses() {
 }
 
 export async function getEducationStats() {
-  // Backend path is /courses/stats
   return fetchSafe("/api/v1/education/courses/stats", {
     total_courses: 0,
     total_lessons: 0,
@@ -83,4 +92,9 @@ export async function runSimulation(id: string, params: Record<string, number>) 
 
 export async function getApiHealth() {
   return fetchSafe("/health", { status: "unreachable" });
+}
+
+/** Local-only helper: seed demo education courses if empty. */
+export async function seedEducationDemo() {
+  return fetchSafe("/api/v1/education/seed-demo", { seeded: 0, message: "skipped" });
 }

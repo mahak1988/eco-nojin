@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Econojin API entrypoint.
-Central config, middleware, module routers, honest health checks.
-"""
+"""Econojin API entrypoint."""
 
 from security.middleware.security_middleware import SecurityMiddleware
 from apps.shared_core.middleware.request_id import RequestIDMiddleware
@@ -23,6 +20,7 @@ from typing import AsyncGenerator, Any
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,15 +31,12 @@ logger = logging.getLogger("econojin")
 
 from apps.shared_core.config import settings
 
-# Track DB init result for /health
 _db_status = {"ok": False, "detail": "not_initialized"}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    logger.info("=" * 60)
     logger.info("Econojin API v%s starting (%s)", settings.VERSION, settings.ENVIRONMENT)
-    logger.info("=" * 60)
     start_time = time.time()
 
     try:
@@ -78,7 +73,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         from apps.shared_core.database.session import close_db
 
         await close_db()
-        logger.info("Database closed")
     except Exception as e:
         logger.warning("close_db failed: %s", e)
 
@@ -105,16 +99,21 @@ if settings.ENVIRONMENT != "local":
 
         app.add_middleware(RateLimitMiddleware)
         app.add_middleware(AuditLogMiddleware)
-        logger.info("Security middlewares added")
     except Exception as e:
         logger.warning("Security middleware failed: %s", e)
 
+# Broad local CORS so Vite (any port) works
+_cors = list(settings.all_cors_origins)
+for extra in ("http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"):
+    if extra not in _cors:
+        _cors.append(extra)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.all_cors_origins,
-    allow_credentials=True,
+    allow_origins=_cors if settings.ENVIRONMENT == "production" else ["*"] if settings.ENVIRONMENT == "local" else _cors,
+    allow_credentials=settings.ENVIRONMENT != "local",
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "X-Request-ID"],
+    allow_headers=["*"],
     expose_headers=["X-Total-Count", "X-Page-Count", "X-Request-ID", "X-Process-Time"],
     max_age=600,
 )
@@ -201,27 +200,22 @@ async def root() -> dict[str, Any]:
 
 @app.get("/health", tags=["Health"])
 async def health() -> dict[str, Any]:
-    """Honest health: reports DB status; overall degraded if DB down."""
     db_live = False
     db_detail = _db_status.get("detail", "unknown")
     try:
         from apps.shared_core.database.session import get_engine
 
-        engine = get_engine()
-        if engine is not None:
-            from sqlalchemy import text
-
-            async with engine.connect() as conn:
-                await conn.execute(text("SELECT 1"))
-            db_live = True
-            db_detail = "ok"
+        eng = get_engine()
+        async with eng.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        db_live = True
+        db_detail = "ok"
     except Exception as e:
         db_live = False
         db_detail = str(e)[:200]
 
-    overall = "healthy" if db_live else "degraded"
     return {
-        "status": overall,
+        "status": "healthy" if db_live else "degraded",
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT,
         "database": "ok" if db_live else "fail",
@@ -232,21 +226,9 @@ async def health() -> dict[str, Any]:
 @app.get("/modules", tags=["Modules"])
 async def list_modules() -> dict[str, Any]:
     modules = [
-        "users",
-        "auth",
-        "ai_agents",
-        "accounting",
-        "ecocoin",
-        "monitoring",
-        "simulator",
-        "admin_panel",
-        "simulation",
-        "agriculture_schools",
-        "education",
-        "community",
-        "games",
-        "chain",
-        "reports",
+        "users", "auth", "ai_agents", "accounting", "ecocoin",
+        "monitoring", "simulator", "admin_panel", "simulation",
+        "agriculture_schools", "education", "community", "games", "chain", "reports",
     ]
     return {"modules": modules, "total": len(modules)}
 
@@ -254,8 +236,7 @@ async def list_modules() -> dict[str, Any]:
 if __name__ == "__main__":
     import uvicorn
 
-    host = os.getenv("HOST", "127.0.0.1" if os.getenv("ENVIRONMENT") == "production" else "0.0.0.0")
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8000"))
     reload = settings.ENVIRONMENT == "local"
-    logger.info("Starting server on %s:%s", host, port)
     uvicorn.run("apps.main:app", host=host, port=port, reload=reload, log_level="info", access_log=True)
