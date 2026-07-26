@@ -1,9 +1,12 @@
-"""Async SQLAlchemy session, engine, and Base."""
+"""Async SQLAlchemy session, engine, and Base.
+
+R20: DATABASE_URL from settings (Pydantic), not os.getenv.
+R11: Prefer Alembic in staging/production; create_all only as local bootstrap.
+"""
 
 from __future__ import annotations
 
 import logging
-import os
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
@@ -11,10 +14,18 @@ from sqlalchemy.orm import DeclarativeBase
 
 logger = logging.getLogger(__name__)
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "sqlite+aiosqlite:///./apps/econojin.db",
-)
+
+def _database_url() -> str:
+    try:
+        from apps.shared_core.config import settings
+
+        return settings.DATABASE_URL
+    except Exception:
+        # Bootstrap only if settings cannot load (e.g. incomplete env during tooling)
+        return "sqlite+aiosqlite:///./apps/econojin.db"
+
+
+DATABASE_URL = _database_url()
 
 engine: AsyncEngine = create_async_engine(
     DATABASE_URL,
@@ -34,7 +45,6 @@ class Base(DeclarativeBase):
 
 
 def get_engine() -> AsyncEngine:
-    """Return the shared async engine (used by /health and jobs)."""
     return engine
 
 
@@ -51,27 +61,23 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 def _import_models() -> None:
-    """Register ORM models on Base.metadata before create_all."""
-    try:
-        import apps.api.models.education  # noqa: F401
-    except Exception as e:
-        logger.debug("education models: %s", e)
-    try:
-        import apps.api.models.accounting  # noqa: F401
-    except Exception as e:
-        logger.debug("accounting models: %s", e)
-    try:
-        import apps.api.models.community  # noqa: F401
-    except Exception as e:
-        logger.debug("community models: %s", e)
-    try:
-        import apps.users.models  # noqa: F401
-    except Exception as e:
-        logger.debug("users models: %s", e)
+    from apps.shared_core.database.model_registry import import_all_models
+
+    loaded = import_all_models()
+    logger.info("ORM models registered: %s", len(loaded))
 
 
 async def init_db() -> None:
+    """Local bootstrap only. Staging/production must use Alembic (R11)."""
     _import_models()
+    try:
+        from apps.shared_core.config import settings
+
+        if settings.ENVIRONMENT != "local":
+            logger.info("Skipping create_all (ENVIRONMENT=%s); use Alembic", settings.ENVIRONMENT)
+            return
+    except Exception:
+        pass
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

@@ -102,17 +102,25 @@ if settings.ENVIRONMENT != "local":
     except Exception as e:
         logger.warning("Security middleware failed: %s", e)
 
-_cors = list(settings.all_cors_origins)
-for extra in ("http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"):
-    if extra not in _cors:
-        _cors.append(extra)
+# R10: explicit origins only — never "*"
+_cors_origins = list(settings.all_cors_origins)
+for extra in (
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+):
+    if extra not in _cors_origins:
+        _cors_origins.append(extra)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.ENVIRONMENT == "local" else _cors,
-    allow_credentials=settings.ENVIRONMENT != "local",
+    allow_origins=_cors_origins,
+    allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["*"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "X-Request-ID"],
     expose_headers=["X-Total-Count", "X-Page-Count", "X-Request-ID", "X-Process-Time"],
     max_age=600,
 )
@@ -133,12 +141,16 @@ def _request_id(request: Request) -> str | None:
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.error("Unhandled error: %s", exc, exc_info=True)
+    # Moving toward R17 nested error shape
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
-            "error": "Internal Server Error",
-            "message": "An internal error occurred.",
-            "request_id": _request_id(request),
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "An internal error occurred.",
+                "details": [],
+                "request_id": _request_id(request),
+            }
         },
     )
 
@@ -148,9 +160,12 @@ async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={
-            "error": "Not Found",
-            "message": f"Path {request.url.path} was not found",
-            "request_id": _request_id(request),
+            "error": {
+                "code": "NOT_FOUND",
+                "message": f"Path {request.url.path} was not found",
+                "details": [],
+                "request_id": _request_id(request),
+            }
         },
     )
 
@@ -236,7 +251,7 @@ async def list_modules() -> dict[str, Any]:
 if __name__ == "__main__":
     import uvicorn
 
-    host = os.getenv("HOST", "0.0.0.0")
+    host = os.getenv("HOST", "0.0.0.0")  # process bind only; app config uses settings
     port = int(os.getenv("PORT", "8000"))
     reload = settings.ENVIRONMENT == "local"
     uvicorn.run("apps.main:app", host=host, port=port, reload=reload, log_level="info", access_log=True)
