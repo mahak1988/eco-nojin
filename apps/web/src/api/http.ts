@@ -1,19 +1,25 @@
 /**
- * Shared fetch helper for Vite frontend.
- * English-only module per engineering standards.
+ * Shared fetch helper.
+ * Default API_BASE is empty → same-origin requests (Vite proxy in dev).
+ * Set VITE_API_BASE_URL only when FE and BE are on different hosts.
  */
 
-export const API_BASE =
-  (typeof import.meta !== "undefined" &&
-    (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_BASE_URL) ||
-  (typeof import.meta !== "undefined" &&
-    (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_BASE) ||
-  "http://localhost:8000";
+function readEnv(key: string): string | undefined {
+  try {
+    return (import.meta as ImportMeta & { env?: Record<string, string> }).env?.[key];
+  } catch {
+    return undefined;
+  }
+}
 
-export const API_V1 =
-  (typeof import.meta !== "undefined" &&
-    (import.meta as ImportMeta & { env?: Record<string, string> }).env?.VITE_API_V1) ||
-  "/api/v1";
+/** Empty string = relative URL (recommended for Vite proxy). */
+export const API_BASE =
+  readEnv("VITE_API_BASE_URL") ||
+  readEnv("VITE_API_BASE") ||
+  readEnv("VITE_API_URL") ||
+  "";
+
+export const API_V1 = readEnv("VITE_API_V1") || "/api/v1";
 
 export class ApiError extends Error {
   status: number;
@@ -39,12 +45,19 @@ function authHeader(): Record<string, string> {
   }
 }
 
+export function buildUrl(path: string): string {
+  if (path.startsWith("http")) return path;
+  const p = path.startsWith("/") ? path : `/${path}`;
+  if (!API_BASE) return p;
+  return `${API_BASE.replace(/\/$/, "")}${p}`;
+}
+
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
   timeoutMs = 12000,
 ): Promise<T> {
-  const url = path.startsWith("http") ? path : `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const url = buildUrl(path);
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -53,7 +66,7 @@ export async function apiFetch<T>(
       signal: ctrl.signal,
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
+        ...(init.body ? { "Content-Type": "application/json" } : {}),
         ...authHeader(),
         ...(init.headers || {}),
       },
