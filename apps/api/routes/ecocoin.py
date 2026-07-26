@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-router = APIRouter(prefix="/api/ecocoin", tags=["ecocoin"])
+router = APIRouter(prefix="/api/v1/ecocoin", tags=["ecocoin"])
 
 
 # ============================================================
@@ -87,7 +87,7 @@ async def get_stats() -> EcoCoinStats:
 
 
 @router.post("/transfer")
-async def transfer(req: TransferRequest) -> TransferResponse:
+async def transfer(req: TransferRequest, require_write_auth: None = Depends(require_write_auth)) -> TransferResponse:
     """انتقال EcoCoin."""
     if req.amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be positive")
@@ -113,7 +113,7 @@ async def get_staking_tiers() -> list[StakingTier]:
 
 
 @router.post("/staking/stake")
-async def stake(req: StakeRequest) -> dict:
+async def stake(req: StakeRequest, require_write_auth: None = Depends(require_write_auth)) -> dict:
     """استیک کردن EcoCoin."""
     tiers = await get_staking_tiers()
     tier = next((t for t in tiers if t.id == req.tier_id), None)
@@ -185,7 +185,8 @@ async def verify_ecological_proof(
     verification_hash: str,
     credit_type: int,
     measured_value: float,
-) -> dict:
+
+    require_write_auth: None = Depends(require_write_auth)) -> dict:
     """تأیید یک پروژه بوم‌شناختی (Oracle only)."""
     return {
         "verified": True,

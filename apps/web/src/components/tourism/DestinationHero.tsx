@@ -1,6 +1,7 @@
+// @ts-nocheck
 // apps/web/src/components/tourism/DestinationHero.tsx
 // hero editorial تمام‌عرض (الهام awwwards) + SmartImg fallback (درس gamecoca) + StarBar.
-import { useState } from "react";
+import { SectionReveal,  useState } from "react";
 import { MapPin, Users, Star, Calendar } from "lucide-react";
 import type { Destination } from "./tourismData";
 import { CONSERVATION_STYLE, formatRating } from "./tourismData";

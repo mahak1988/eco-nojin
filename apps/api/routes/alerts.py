@@ -107,7 +107,7 @@ async def get_critical_alerts() -> None:
 
 
 @router.post("/{alert_id}/acknowledge")
-async def acknowledge_alert(alert_id: str) -> None:
+async def acknowledge_alert(alert_id: str, require_write_auth: None = Depends(require_write_auth)) -> None:
     """Handle acknowledge_alert (alert_id)."""
     for a in _alerts:
         if a["id"] == alert_id:

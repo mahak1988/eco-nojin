@@ -22,6 +22,7 @@ from apps.api.schemas.education import (
     EnrollmentResponse
 )
 from apps.api.services.education import EducationService
+from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/education", tags=["📚 Education"])
 
@@ -54,7 +55,7 @@ async def get_course_stats(session: AsyncSession = Depends(get_db_session)) -> C
 @router.post("/courses", response_model=CourseResponse, status_code=status.HTTP_201_CREATED)
 async def create_course(
     payload: CourseCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> CourseResponse:
     """Create a new course."""
     service = EducationService(session)
@@ -81,7 +82,7 @@ async def get_course(
 async def update_course(
     course_id: int,
     payload: CourseUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> CourseResponse:
     """Update an existing course."""
     service = EducationService(session)
@@ -96,7 +97,7 @@ async def update_course(
 @router.delete("/courses/{course_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_course(
     course_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a course."""
     service = EducationService(session)
@@ -126,7 +127,7 @@ async def list_lessons(
 async def create_lesson(
     course_id: int,
     payload: LessonCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> LessonResponse:
     """Create a new lesson within a course."""
     service = EducationService(session)
@@ -156,7 +157,7 @@ async def get_lesson(
 async def update_lesson(
     lesson_id: int,
     payload: LessonUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> LessonResponse:
     """Update an existing lesson."""
     service = EducationService(session)
@@ -171,7 +172,7 @@ async def update_lesson(
 @router.delete("/lessons/{lesson_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_lesson(
     lesson_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a lesson."""
     service = EducationService(session)
@@ -200,7 +201,7 @@ async def list_enrollments(
 @router.post("/courses/{course_id}/enroll", response_model=EnrollmentResponse, status_code=status.HTTP_201_CREATED)
 async def enroll_in_course(
     course_id: int,
-    user_id: int = Query(..., description="User ID to enroll"),
+    user_id: int = Query(..., description="User ID to enroll", require_write_auth: None = Depends(require_write_auth)),
     session: AsyncSession = Depends(get_db_session)
 ) -> EnrollmentResponse:
     """Enroll a user in a course."""
@@ -217,7 +218,7 @@ async def enroll_in_course(
 async def update_enrollment(
     enrollment_id: int,
     payload: EnrollmentUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> EnrollmentResponse:
     """Update an enrollment (e.g., progress)."""
     service = EducationService(session)
@@ -232,7 +233,7 @@ async def update_enrollment(
 @router.delete("/enrollments/{enrollment_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_enrollment(
     enrollment_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Remove an enrollment."""
     service = EducationService(session)

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Optional
 import math
 
-router = APIRouter(prefix="/api/simulator", tags=["simulator"])
+router = APIRouter(prefix="/api/v1/simulator", tags=["simulator"])
 
 
 class CarbonSim(BaseModel):
@@ -35,7 +35,7 @@ BIO_BASELINE = {"rainforest": 0.85, "temperate": 0.65, "wetland": 0.75, "grassla
 
 
 @router.post("/carbon/run")
-async def run_carbon(sim: CarbonSim) -> None:
+async def run_carbon(sim: CarbonSim, require_write_auth: None = Depends(require_write_auth)) -> None:
     """Handle run_carbon (sim)."""
     rate = CARBON_RATES.get(sim.forest_type, 10)
     yearly = []
@@ -65,7 +65,7 @@ async def run_carbon(sim: CarbonSim) -> None:
 
 
 @router.post("/water/run")
-async def run_water(sim: WaterSim) -> None:
+async def run_water(sim: WaterSim, require_write_auth: None = Depends(require_write_auth)) -> None:
     """Handle run_water (sim)."""
     rate = WATER_RATES.get(sim.region.lower(), 1000)
     yearly = []
@@ -87,7 +87,7 @@ async def run_water(sim: WaterSim) -> None:
 
 
 @router.post("/biodiversity/run")
-async def run_biodiversity(sim: BioSim) -> None:
+async def run_biodiversity(sim: BioSim, require_write_auth: None = Depends(require_write_auth)) -> None:
     """Handle run_biodiversity (sim)."""
     baseline = BIO_BASELINE.get(sim.ecosystem_type, 0.5)
     target = baseline + (1 - baseline) * sim.restoration_level

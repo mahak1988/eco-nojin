@@ -1,6 +1,7 @@
 // apps/web/src/pages/EducationPage.tsx
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { GraduationCap, BookOpen, Route, Award, Search, Users } from "lucide-react";
+import { getEducationCourses, getEducationStats } from "../lib/apiServices";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
@@ -17,6 +18,8 @@ type LevelFilter = "all" | LevelKey;
 const LEVEL_FILTERS: LevelFilter[] = ["all", "level_beginner", "level_intermediate", "level_advanced"];
 
 export default function EducationPage() {
+  const [apiSource, setApiSource] = useState<string | null>(null);
+  useEffect(() => { getEducationStats().then(r => setApiSource(r.source)); }, []);
   const { lang } = useLang();
   const s = EDU_STR[lang as EduLang];
 

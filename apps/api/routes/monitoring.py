@@ -8,7 +8,7 @@ from typing import Optional
 from datetime import datetime
 import math
 
-router = APIRouter(prefix="/api/monitoring", tags=["monitoring"])
+router = APIRouter(prefix="/api/v1/monitoring", tags=["monitoring"])
 
 
 class SatRequest(BaseModel):
@@ -35,7 +35,7 @@ _sample_data = [
 
 
 @router.post("/satellite/analyze")
-async def analyze_satellite(req: SatRequest) -> None:
+async def analyze_satellite(req: SatRequest, require_write_auth: None = Depends(require_write_auth)) -> None:
     """Handle analyze_satellite (req)."""
     ndvi = [d["ndvi"] for d in _sample_data]
     avg = sum(ndvi) / len(ndvi)
@@ -59,13 +59,13 @@ async def analyze_satellite(req: SatRequest) -> None:
 
 
 @router.post("/satellite/upload")
-async def upload_satellite(file: UploadFile = File(...)) -> None:
+async def upload_satellite(file: UploadFile = File(..., require_write_auth: None = Depends(require_write_auth))) -> None:
     """Handle upload_satellite (file)."""
     return {"status": "uploaded", "filename": file.filename, "analysis_started": True}
 
 
 @router.post("/ai/analyze")
-async def ai_analyze(req: AIRequest) -> None:
+async def ai_analyze(req: AIRequest, require_write_auth: None = Depends(require_write_auth)) -> None:
     """Handle ai_analyze (req)."""
     return {
         "summary": "وضعیت بوم‌شناختی در حال بهبود است. NDVI 3.2٪ افزایش.",

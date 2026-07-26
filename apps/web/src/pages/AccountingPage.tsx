@@ -1,9 +1,10 @@
 // apps/web/src/pages/AccountingPage.tsx
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   DollarSign, FileText, CreditCard, TrendingUp, BarChart3,
   Calendar, Plus, Receipt, Download, Wallet,
 } from "lucide-react";
+import { getAccountingSummary } from "../lib/apiServices";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { StatCard, type StatColor } from "../components/finance/StatCard";
@@ -19,6 +20,8 @@ const PERIODS: Period[] = ["7d", "30d", "90d", "1y"];
 const TYPE_FILTERS: ("all" | TxType)[] = ["all", "income", "expense"];
 
 export default function AccountingPage() {
+  const [apiSource, setApiSource] = useState<string | null>(null);
+  useEffect(() => { getAccountingSummary().then(r => setApiSource(r.source)); }, []);
   const { lang } = useLang();
   const s = FIN_STR[lang as FinLang];
 

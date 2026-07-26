@@ -7,6 +7,7 @@ Adapted from fastapi/full-stack-fastapi-template with centralized config.
 """
 
 from security.middleware.security_middleware import SecurityMiddleware
+from apps.shared_core.middleware.request_id import RequestIDMiddleware
 import sys
 from pathlib import Path
 
@@ -104,6 +105,7 @@ app = FastAPI(
 
 # ── Spider Web Security Middleware ──
 app.add_middleware(SecurityMiddleware)
+app.add_middleware(RequestIDMiddleware)
 
 # ============================================================
 # Middlewareها

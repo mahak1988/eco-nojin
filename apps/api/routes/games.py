@@ -24,6 +24,7 @@ from apps.api.schemas.games import (
     GamesStats
 )
 from apps.api.services.games import GamesService
+from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/games", tags=["🎮 Games"])
 
@@ -47,7 +48,7 @@ async def list_vocabulary(
 @router.post("/vocabulary", response_model=VocabularyWordResponse, status_code=status.HTTP_201_CREATED)
 async def create_vocabulary(
     payload: VocabularyWordCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> VocabularyWordResponse:
     """Create a new vocabulary word."""
     service = GamesService(session)
@@ -74,7 +75,7 @@ async def get_vocabulary(
 async def update_vocabulary(
     word_id: int,
     payload: VocabularyWordUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> VocabularyWordResponse:
     """Update a vocabulary word."""
     service = GamesService(session)
@@ -89,7 +90,7 @@ async def update_vocabulary(
 @router.delete("/vocabulary/{word_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_vocabulary(
     word_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a vocabulary word."""
     service = GamesService(session)
@@ -119,7 +120,7 @@ async def list_quizzes(
 
 @router.post("/quizzes", response_model=QuizResponse, status_code=status.HTTP_201_CREATED)
 async def create_quiz(
-    author_id: int = Query(..., description="Author user ID"),
+    author_id: int = Query(..., description="Author user ID", require_write_auth: None = Depends(require_write_auth)),
     payload: QuizCreate = ...,
     session: AsyncSession = Depends(get_db_session)
 ) -> QuizResponse:
@@ -148,7 +149,7 @@ async def get_quiz(
 async def update_quiz(
     quiz_id: int,
     payload: QuizUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> QuizResponse:
     """Update a quiz."""
     service = GamesService(session)
@@ -163,7 +164,7 @@ async def update_quiz(
 @router.delete("/quizzes/{quiz_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_quiz(
     quiz_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a quiz."""
     service = GamesService(session)
@@ -193,7 +194,7 @@ async def list_questions(
 async def create_question(
     quiz_id: int,
     payload: QuizQuestionCreate = ...,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> QuizQuestionResponse:
     """Create a new question within a quiz."""
     service = GamesService(session)
@@ -223,7 +224,7 @@ async def get_question(
 async def update_question(
     question_id: int,
     payload: QuizQuestionUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> QuizQuestionResponse:
     """Update a question."""
     service = GamesService(session)
@@ -238,7 +239,7 @@ async def update_question(
 @router.delete("/questions/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_question(
     question_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a question."""
     service = GamesService(session)
@@ -267,7 +268,7 @@ async def list_attempts(
 @router.post("/quizzes/{quiz_id}/attempts", response_model=QuizAttemptResponse, status_code=status.HTTP_201_CREATED)
 async def create_attempt(
     quiz_id: int,
-    user_id: int = Query(..., description="User ID taking the quiz"),
+    user_id: int = Query(..., description="User ID taking the quiz", require_write_auth: None = Depends(require_write_auth)),
     score: int = Query(0, ge=0, description="Score earned"),
     percentage: int = Query(0, ge=0, le=100, description="Percentage score"),
     time_taken: int = Query(0, ge=0, description="Time in seconds"),

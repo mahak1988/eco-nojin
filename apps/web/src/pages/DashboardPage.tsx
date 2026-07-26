@@ -5,6 +5,8 @@ import {
   LayoutDashboard, TrendingUp, Users, Leaf, ArrowUpRight, ArrowDownRight,
   Activity, MapPin, Satellite, FlaskConical, BookOpen, ShieldCheck,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getDashboardStats } from "../lib/apiServices";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
@@ -136,6 +138,8 @@ const SPARK_DATA: Record<string, number[]> = {
 };
 
 export default function DashboardPage() {
+  const [apiSource, setApiSource] = useState<string | null>(null);
+  useEffect(() => { getDashboardStats().then(r => setApiSource(r.source)); }, []);
   const { lang } = useLang();
   const s = DASH_STR[lang as DashLang];
   const locale = lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
@@ -157,6 +161,8 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
+            <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
+            {apiSource && <span className={"ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold " + (apiSource === "api" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700")}><span className={"h-1.5 w-1.5 rounded-full " + (apiSource === "api" ? "bg-green-500" : "bg-amber-500")} />{apiSource === "api" ? "LIVE" : "SAMPLE"}</span>}
             <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
           </div>
         </div>

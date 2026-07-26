@@ -20,6 +20,7 @@ from apps.api.schemas.community import (
     CommentResponse, LikeResponse
 )
 from apps.api.services.community import CommunityService
+from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/community", tags=["💬 Community"])
 
@@ -51,7 +52,7 @@ async def get_post_stats(session: AsyncSession = Depends(get_db_session)) -> Pos
 
 @router.post("/posts", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 async def create_post(
-    author_id: int = Query(..., description="Author user ID"),
+    author_id: int = Query(..., description="Author user ID", require_write_auth: None = Depends(require_write_auth)),
     payload: PostCreate = ...,
     session: AsyncSession = Depends(get_db_session)
 ) -> PostResponse:
@@ -80,7 +81,7 @@ async def get_post(
 async def update_post(
     post_id: int,
     payload: PostUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> PostResponse:
     """Update an existing post."""
     service = CommunityService(session)
@@ -95,7 +96,7 @@ async def update_post(
 @router.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_post(
     post_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a post."""
     service = CommunityService(session)
@@ -124,7 +125,7 @@ async def list_comments(
 @router.post("/posts/{post_id}/comments", response_model=CommentResponse, status_code=status.HTTP_201_CREATED)
 async def create_comment(
     post_id: int,
-    author_id: int = Query(..., description="Author user ID"),
+    author_id: int = Query(..., description="Author user ID", require_write_auth: None = Depends(require_write_auth)),
     payload: CommentCreate = ...,
     session: AsyncSession = Depends(get_db_session)
 ) -> CommentResponse:
@@ -142,7 +143,7 @@ async def create_comment(
 async def update_comment(
     comment_id: int,
     payload: CommentUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> CommentResponse:
     """Update a comment."""
     service = CommunityService(session)
@@ -157,7 +158,7 @@ async def update_comment(
 @router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_comment(
     comment_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a comment."""
     service = CommunityService(session)
@@ -173,7 +174,7 @@ async def delete_comment(
 @router.post("/posts/{post_id}/like", response_model=LikeResponse, status_code=status.HTTP_201_CREATED)
 async def like_post(
     post_id: int,
-    user_id: int = Query(..., description="User ID liking the post"),
+    user_id: int = Query(..., description="User ID liking the post", require_write_auth: None = Depends(require_write_auth)),
     session: AsyncSession = Depends(get_db_session)
 ) -> LikeResponse:
     """Like a post."""
@@ -189,7 +190,7 @@ async def like_post(
 @router.post("/comments/{comment_id}/like", response_model=LikeResponse, status_code=status.HTTP_201_CREATED)
 async def like_comment(
     comment_id: int,
-    user_id: int = Query(..., description="User ID liking the comment"),
+    user_id: int = Query(..., description="User ID liking the comment", require_write_auth: None = Depends(require_write_auth)),
     session: AsyncSession = Depends(get_db_session)
 ) -> LikeResponse:
     """Like a comment."""
@@ -205,7 +206,7 @@ async def like_comment(
 @router.delete("/likes/{like_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_like(
     like_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Remove a like."""
     service = CommunityService(session)
