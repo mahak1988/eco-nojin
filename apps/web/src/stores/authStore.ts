@@ -1,12 +1,20 @@
-import { create } from "zustand";
+/**
+ * Lightweight auth session store (no external state library).
+ */
 import type { AuthUser } from "../types/auth";
 
-interface AuthStore {
+type Listener = () => void;
+
+interface AuthState {
   user: AuthUser | null;
   token: string | null;
-  setSession: (token: string, user?: AuthUser | null) => void;
-  clearSession: () => void;
-  hydrate: () => void;
+}
+
+let state: AuthState = { user: null, token: null };
+const listeners = new Set<Listener>();
+
+function emit() {
+  listeners.forEach((l) => l());
 }
 
 function readToken(): string | null {
@@ -17,17 +25,21 @@ function readToken(): string | null {
   }
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  token: null,
-  setSession: (token, user = null) => {
+export const authStore = {
+  getState: () => state,
+  subscribe: (listener: Listener) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  },
+  setSession: (token: string, user: AuthUser | null = null) => {
     try {
       localStorage.setItem("access_token", token);
       localStorage.setItem("token", token);
     } catch {
       /* ignore */
     }
-    set({ token, user });
+    state = { token, user };
+    emit();
   },
   clearSession: () => {
     try {
@@ -36,7 +48,28 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } catch {
       /* ignore */
     }
-    set({ token: null, user: null });
+    state = { token: null, user: null };
+    emit();
   },
-  hydrate: () => set({ token: readToken() }),
-}));
+  hydrate: () => {
+    state = { ...state, token: readToken() };
+    emit();
+  },
+};
+
+/** React-friendly hook without zustand */
+import { useSyncExternalStore } from "react";
+
+export function useAuthStore() {
+  const snap = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getState,
+    authStore.getState,
+  );
+  return {
+    ...snap,
+    setSession: authStore.setSession,
+    clearSession: authStore.clearSession,
+    hydrate: authStore.hydrate,
+  };
+}

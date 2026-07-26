@@ -1,17 +1,45 @@
-import { create } from "zustand";
+import { useSyncExternalStore } from "react";
 
-interface UiStore {
+type Listener = () => void;
+
+interface UiState {
   sidebarOpen: boolean;
   adminSidebarOpen: boolean;
-  toggleSidebar: () => void;
-  toggleAdminSidebar: () => void;
-  setSidebarOpen: (v: boolean) => void;
 }
 
-export const useUiStore = create<UiStore>((set) => ({
-  sidebarOpen: true,
-  adminSidebarOpen: true,
-  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
-  toggleAdminSidebar: () => set((s) => ({ adminSidebarOpen: !s.adminSidebarOpen })),
-  setSidebarOpen: (v) => set({ sidebarOpen: v }),
-}));
+let state: UiState = { sidebarOpen: true, adminSidebarOpen: true };
+const listeners = new Set<Listener>();
+
+function emit() {
+  listeners.forEach((l) => l());
+}
+
+export const uiStore = {
+  getState: () => state,
+  subscribe: (l: Listener) => {
+    listeners.add(l);
+    return () => listeners.delete(l);
+  },
+  toggleSidebar: () => {
+    state = { ...state, sidebarOpen: !state.sidebarOpen };
+    emit();
+  },
+  toggleAdminSidebar: () => {
+    state = { ...state, adminSidebarOpen: !state.adminSidebarOpen };
+    emit();
+  },
+  setSidebarOpen: (v: boolean) => {
+    state = { ...state, sidebarOpen: v };
+    emit();
+  },
+};
+
+export function useUiStore() {
+  const snap = useSyncExternalStore(uiStore.subscribe, uiStore.getState, uiStore.getState);
+  return {
+    ...snap,
+    toggleSidebar: uiStore.toggleSidebar,
+    toggleAdminSidebar: uiStore.toggleAdminSidebar,
+    setSidebarOpen: uiStore.setSidebarOpen,
+  };
+}
