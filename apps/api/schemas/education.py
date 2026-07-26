@@ -1,17 +1,12 @@
-"""
-Education Schemas
-==================
-Pydantic models for request/response validation.
-"""
+"""Education Pydantic schemas."""
 
-import logging
+from __future__ import annotations
 
-logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 from enum import Enum
+from typing import List, Optional
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CourseLevelEnum(str, Enum):
@@ -31,8 +26,8 @@ class CourseCategoryEnum(str, Enum):
 class CourseBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=2000)
-    category: CourseCategoryEnum = CourseCategoryEnum.AGRICULTURE
-    level: CourseLevelEnum = CourseLevelEnum.BEGINNER
+    category: str = Field(default="agriculture")
+    level: str = Field(default="beginner")
     duration_hours: int = Field(0, ge=0)
     instructor: Optional[str] = Field(None, max_length=255)
 
@@ -44,8 +39,8 @@ class CourseCreate(CourseBase):
 class CourseUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
-    category: Optional[CourseCategoryEnum] = None
-    level: Optional[CourseLevelEnum] = None
+    category: Optional[str] = None
+    level: Optional[str] = None
     duration_hours: Optional[int] = Field(None, ge=0)
     instructor: Optional[str] = None
     is_active: Optional[bool] = None
@@ -58,8 +53,8 @@ class LessonResponse(BaseModel):
     title: str
     content: Optional[str] = None
     video_url: Optional[str] = None
-    duration_minutes: int
-    order: int
+    duration_minutes: int = 0
+    order: int = 0
 
 
 class EnrollmentResponse(BaseModel):
@@ -67,7 +62,7 @@ class EnrollmentResponse(BaseModel):
 
     id: int
     user_id: int
-    progress: int
+    progress: int = 0
     enrolled_at: datetime
     completed_at: Optional[datetime] = None
 
@@ -76,7 +71,7 @@ class CourseResponse(CourseBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    is_active: bool
+    is_active: bool = True
     created_at: datetime
     updated_at: datetime
     lessons: List[LessonResponse] = Field(default_factory=list)

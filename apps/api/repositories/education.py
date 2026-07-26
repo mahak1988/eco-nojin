@@ -1,34 +1,35 @@
-"""
-Education Repository
-====================
-Data access layer — all database queries live here.
-"""
+"""Education repository — async queries with explicit relationship loading."""
+
+from __future__ import annotations
 
 import logging
+from typing import List, Optional
+
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from apps.api.models.education import Course, Enrollment, Lesson
+from apps.api.schemas.education import CourseCreate, CourseUpdate
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
-
-from sqlalchemy import select, func
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from apps.api.models.education import Course, Lesson, Enrollment
-from apps.api.schemas.education import CourseCreate, CourseUpdate
 
 
 class EducationRepository:
-    """Repository for Education entities."""
-
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
-    # ==================== Course Operations ====================
+    def _course_options(self):
+        return (
+            selectinload(Course.lessons),
+            selectinload(Course.enrollments),
+        )
 
     async def get_course_by_id(self, course_id: int) -> Optional[Course]:
-        """Handle get_course_by_id (course_id)."""
         result = await self.session.execute(
-            select(Course).where(Course.id == course_id)
+            select(Course)
+            .where(Course.id == course_id)
+            .options(*self._course_options())
         )
         return result.scalar_one_or_none()
 
@@ -38,48 +39,42 @@ class EducationRepository:
         limit: int = 100,
         search: Optional[str] = None,
         category: Optional[str] = None,
-        level: Optional[str] = None
+        level: Optional[str] = None,
     ) -> tuple[List[Course], int]:
-        """Handle list_courses (skip, limit, search, category, level)."""
-        query = select(Course)
+        query = select(Course).options(*self._course_options())
 
         if search:
-            search_term = f"%{search.lower()}%"
+            term = f"%{search.lower()}%"
             query = query.where(
-                (Course.title.ilike(search_term)) |
-                (Course.description.ilike(search_term)) |
-                (Course.instructor.ilike(search_term))
+                (Course.title.ilike(term))
+                | (Course.description.ilike(term))
+                | (Course.instructor.ilike(term))
             )
-
         if category:
             query = query.where(Course.category == category)
-
         if level:
             query = query.where(Course.level == level)
 
-        query = query.order_by(Course.title).offset(skip).limit(limit)
-        result = await self.session.execute(query)
-        items = list(result.scalars().all())
-
         count_query = select(func.count()).select_from(Course)
         if search:
-            search_term = f"%{search.lower()}%"
+            term = f"%{search.lower()}%"
             count_query = count_query.where(
-                (Course.title.ilike(search_term)) |
-                (Course.description.ilike(search_term)) |
-                (Course.instructor.ilike(search_term))
+                (Course.title.ilike(term))
+                | (Course.description.ilike(term))
+                | (Course.instructor.ilike(term))
             )
         if category:
             count_query = count_query.where(Course.category == category)
         if level:
             count_query = count_query.where(Course.level == level)
 
-        count_result = await self.session.execute(count_query)
-        total = count_result.scalar_one()
-        return items, total
+        total = (await self.session.execute(count_query)).scalar_one()
+        result = await self.session.execute(
+            query.order_by(Course.id.desc()).offset(skip).limit(limit)
+        )
+        return list(result.scalars().unique().all()), int(total)
 
     async def create_course(self, data: CourseCreate) -> Course:
-        """Handle create_course (data)."""
         obj = Course(**data.model_dump(exclude={"lessons"}))
         self.session.add(obj)
         await self.session.flush()
@@ -87,21 +82,15 @@ class EducationRepository:
         return obj
 
     async def update_course(self, course_id: int, data: CourseUpdate) -> Optional[Course]:
-        """Handle update_course (course_id, data)."""
         obj = await self.get_course_by_id(course_id)
         if not obj:
             return None
-
-        update_data = data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
+        for key, value in data.model_dump(exclude_unset=True).items():
             setattr(obj, key, value)
-
         await self.session.flush()
-        await self.session.refresh(obj)
-        return obj
+        return await self.get_course_by_id(course_id)
 
     async def delete_course(self, course_id: int) -> bool:
-        """Handle delete_course (course_id)."""
         obj = await self.get_course_by_id(course_id)
         if not obj:
             return False
@@ -109,31 +98,29 @@ class EducationRepository:
         await self.session.flush()
         return True
 
-    # ==================== Lesson Operations ====================
-
     async def get_lesson_by_id(self, lesson_id: int) -> Optional[Lesson]:
-        """Handle get_lesson_by_id (lesson_id)."""
-        result = await self.session.execute(
-            select(Lesson).where(Lesson.id == lesson_id)
-        )
+        result = await self.session.execute(select(Lesson).where(Lesson.id == lesson_id))
         return result.scalar_one_or_none()
 
     async def list_lessons_by_course(
         self, course_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[Lesson], int]:
-        """Handle list_lessons_by_course (course_id, skip, limit)."""
-        query = select(Lesson).where(Lesson.course_id == course_id)
-        query = query.order_by(Lesson.order).offset(skip).limit(limit)
-        result = await self.session.execute(query)
-        items = list(result.scalars().all())
-
-        count_query = select(func.count()).select_from(Lesson).where(Lesson.course_id == course_id)
-        count_result = await self.session.execute(count_query)
-        total = count_result.scalar_one()
-        return items, total
+        q = (
+            select(Lesson)
+            .where(Lesson.course_id == course_id)
+            .order_by(Lesson.order)
+            .offset(skip)
+            .limit(limit)
+        )
+        items = list((await self.session.execute(q)).scalars().all())
+        total = (
+            await self.session.execute(
+                select(func.count()).select_from(Lesson).where(Lesson.course_id == course_id)
+            )
+        ).scalar_one()
+        return items, int(total)
 
     async def create_lesson(self, course_id: int, data: dict) -> Lesson:
-        """Handle create_lesson (course_id, data)."""
         obj = Lesson(course_id=course_id, **data)
         self.session.add(obj)
         await self.session.flush()
@@ -141,23 +128,18 @@ class EducationRepository:
         return obj
 
     async def update_lesson(self, lesson_id: int, data: dict) -> Optional[Lesson]:
-        """Handle update_lesson (lesson_id, data)."""
         from apps.api.schemas.education import LessonUpdate
+
         obj = await self.get_lesson_by_id(lesson_id)
         if not obj:
             return None
-
-        update_schema = LessonUpdate(**data)
-        update_data = update_schema.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
+        for key, value in LessonUpdate(**data).model_dump(exclude_unset=True).items():
             setattr(obj, key, value)
-
         await self.session.flush()
         await self.session.refresh(obj)
         return obj
 
     async def delete_lesson(self, lesson_id: int) -> bool:
-        """Handle delete_lesson (lesson_id)."""
         obj = await self.get_lesson_by_id(lesson_id)
         if not obj:
             return False
@@ -165,10 +147,7 @@ class EducationRepository:
         await self.session.flush()
         return True
 
-    # ==================== Enrollment Operations ====================
-
     async def get_enrollment_by_id(self, enrollment_id: int) -> Optional[Enrollment]:
-        """Handle get_enrollment_by_id (enrollment_id)."""
         result = await self.session.execute(
             select(Enrollment).where(Enrollment.id == enrollment_id)
         )
@@ -177,29 +156,31 @@ class EducationRepository:
     async def list_enrollments_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
     ) -> tuple[List[Enrollment], int]:
-        """Handle list_enrollments_by_user (user_id, skip, limit)."""
-        query = select(Enrollment).where(Enrollment.user_id == user_id)
-        query = query.order_by(Enrollment.enrolled_at.desc()).offset(skip).limit(limit)
-        result = await self.session.execute(query)
-        items = list(result.scalars().all())
-
-        count_query = select(func.count()).select_from(Enrollment).where(Enrollment.user_id == user_id)
-        count_result = await self.session.execute(count_query)
-        total = count_result.scalar_one()
-        return items, total
+        q = (
+            select(Enrollment)
+            .where(Enrollment.user_id == user_id)
+            .order_by(Enrollment.enrolled_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        items = list((await self.session.execute(q)).scalars().all())
+        total = (
+            await self.session.execute(
+                select(func.count()).select_from(Enrollment).where(Enrollment.user_id == user_id)
+            )
+        ).scalar_one()
+        return items, int(total)
 
     async def get_user_enrollment(self, course_id: int, user_id: int) -> Optional[Enrollment]:
-        """Handle get_user_enrollment (course_id, user_id)."""
         result = await self.session.execute(
             select(Enrollment).where(
                 Enrollment.course_id == course_id,
-                Enrollment.user_id == user_id
+                Enrollment.user_id == user_id,
             )
         )
         return result.scalar_one_or_none()
 
     async def create_enrollment(self, course_id: int, user_id: int) -> Enrollment:
-        """Handle create_enrollment (course_id, user_id)."""
         obj = Enrollment(course_id=course_id, user_id=user_id)
         self.session.add(obj)
         await self.session.flush()
@@ -207,23 +188,18 @@ class EducationRepository:
         return obj
 
     async def update_enrollment(self, enrollment_id: int, data: dict) -> Optional[Enrollment]:
-        """Handle update_enrollment (enrollment_id, data)."""
         from apps.api.schemas.education import EnrollmentUpdate
+
         obj = await self.get_enrollment_by_id(enrollment_id)
         if not obj:
             return None
-
-        update_schema = EnrollmentUpdate(**data)
-        update_data = update_schema.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
+        for key, value in EnrollmentUpdate(**data).model_dump(exclude_unset=True).items():
             setattr(obj, key, value)
-
         await self.session.flush()
         await self.session.refresh(obj)
         return obj
 
     async def delete_enrollment(self, enrollment_id: int) -> bool:
-        """Handle delete_enrollment (enrollment_id)."""
         obj = await self.get_enrollment_by_id(enrollment_id)
         if not obj:
             return False
@@ -232,26 +208,42 @@ class EducationRepository:
         return True
 
     async def get_stats(self) -> dict:
-        """Handle get_stats."""
-        result = await self.session.execute(select(Course))
-        courses = result.scalars().all()
+        total_courses = (
+            await self.session.execute(select(func.count()).select_from(Course))
+        ).scalar_one()
+        total_lessons = (
+            await self.session.execute(select(func.count()).select_from(Lesson))
+        ).scalar_one()
+        total_enrollments = (
+            await self.session.execute(select(func.count()).select_from(Enrollment))
+        ).scalar_one()
 
-        lessons_result = await self.session.execute(select(Lesson))
-        lessons = lessons_result.scalars().all()
+        by_category: dict[str, int] = {}
+        for cat in (
+            "agriculture",
+            "water-management",
+            "environmental-science",
+            "economics",
+            "technology",
+        ):
+            by_category[cat] = (
+                await self.session.execute(
+                    select(func.count()).select_from(Course).where(Course.category == cat)
+                )
+            ).scalar_one()
 
-        enrollments_result = await self.session.execute(select(Enrollment))
-        enrollments = enrollments_result.scalars().all()
+        by_level: dict[str, int] = {}
+        for lvl in ("beginner", "intermediate", "advanced"):
+            by_level[lvl] = (
+                await self.session.execute(
+                    select(func.count()).select_from(Course).where(Course.level == lvl)
+                )
+            ).scalar_one()
 
         return {
-            "total_courses": len(courses),
-            "total_lessons": len(lessons),
-            "total_enrollments": len(enrollments),
-            "by_category": {
-                cat: len([c for c in courses if c.category == cat])
-                for cat in ["agriculture", "water-management", "environmental-science", "economics", "technology"]
-            },
-            "by_level": {
-                lvl: len([c for c in courses if c.level == lvl])
-                for lvl in ["beginner", "intermediate", "advanced"]
-            }
+            "total_courses": int(total_courses),
+            "total_lessons": int(total_lessons),
+            "total_enrollments": int(total_enrollments),
+            "by_category": by_category,
+            "by_level": by_level,
         }
