@@ -6,6 +6,12 @@ interface Segment {
   value: number;
   color: string;
 }
+export interface DonutSegment {
+  label: string;
+  value: number;
+  color: string;
+}
+
 interface Props {
   segments: Segment[];
   centerValue?: string;

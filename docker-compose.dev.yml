@@ -1,0 +1,57 @@
+﻿# docker-compose.dev.yml — Econojin Development Environment (Phase 0)
+# Quickstart: docker compose -f docker-compose.dev.yml up -d
+
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: econojin-api-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=local
+      - DATABASE_URL=sqlite+aiosqlite:///./econojin.db
+      - SECRET_KEY=dev-secret-change-in-production-min-32-chars!!
+      - LLM_PROVIDER=fake
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/__pycache__
+    command: uvicorn apps.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  web:
+    image: node:22-alpine
+    container_name: econojin-web-dev
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/apps/web/node_modules
+    command: sh -c "cd apps/web && npx pnpm install && npx pnpm dev"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Optional: PostgreSQL for staging-like local
+  # db:
+  #   image: postgis/postgis:17-3.5
+  #   container_name: econojin-db-dev
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_USER: econojin
+  #     POSTGRES_PASSWORD: econojin
+  #     POSTGRES_DB: econojin
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
+  # volumes:
+  #   pg_data:

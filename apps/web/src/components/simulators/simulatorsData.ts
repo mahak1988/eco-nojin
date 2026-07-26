@@ -11,6 +11,7 @@ export interface ParamDef {
   labelKey: string;          // may be a direct label (simText falls back to the key itself)
   min: number; max: number; step: number; default: number;
   unitKey?: string;
+  decimals?: number;
   options?: string[];        // for select-type params (from API)
 }
 export interface Series {
@@ -20,8 +21,13 @@ export interface Series {
   values: number[];
   kind?: "line" | "bars";
   fill?: boolean;
+  data?: { x: number; y: number }[];
 }
 export interface SimConfig {
+  category?: string;
+  version?: string;
+  tags?: string[];
+  params?: Record<string, number>;
   id: SimType;
   nameKey: string;           // may be a direct name (simText falls back to the key itself)
   descKey: string;

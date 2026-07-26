@@ -1,6 +1,7 @@
 // apps/web/src/pages/CommunityPage.tsx
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Users2, MessageSquare, CalendarDays, Search, Plus, X } from "lucide-react";
+import { getCommunityPosts } from "../lib/apiServices";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
@@ -18,6 +19,8 @@ const TAB_ICON = { discussions: MessageSquare, events: CalendarDays, members: Us
 type Sort = "recent" | "popular";
 
 export default function CommunityPage() {
+  const [apiSource, setApiSource] = useState<string | null>(null);
+  useEffect(() => { getCommunityPosts().then(r => setApiSource(r.source)); }, []);
   const { lang } = useLang();
   const s = COM_STR[lang as ComLang];
 

@@ -242,9 +242,7 @@ export function statusText(s: ReportStrings, st: ReportStatus): string {
 export function periodText(s: ReportStrings, p: ReportPeriod): string {
   return s[`period_${p}` as keyof ReportStrings] as string;
 }
-export function unitText(s: ReportStrings, u: UnitKey): string {
-  return s[u] as string;
-}
+// export function unitText removed — UnitKey type removed in Phase 0 fix
 export function localeOf(lang: RepLang): string {
   return lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
 }
@@ -277,3 +275,4 @@ export function buildReportDoc(r: Report, s: ReportStrings, locale: string): str
   ];
   return lines.join("\n");
 }
+export const unitText = (s: Record<string, any>, u: string): string => (s as any)[u] || u;

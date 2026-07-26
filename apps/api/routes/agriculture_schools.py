@@ -18,6 +18,7 @@ from apps.api.schemas.agriculture_school import (
     AgricultureSchoolResponse, AgricultureSchoolListResponse, SchoolStats
 )
 from apps.api.services.agriculture_school import AgricultureSchoolService
+from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/agriculture-schools", tags=["🏯 Agriculture Schools"])
 
@@ -51,7 +52,7 @@ async def get_stats(session: AsyncSession = Depends(get_db_session)) -> SchoolSt
 @router.post("/", response_model=AgricultureSchoolResponse, status_code=status.HTTP_201_CREATED)
 async def create_school(
     payload: AgricultureSchoolCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> AgricultureSchoolResponse:
     """Create a new agriculture school."""
     service = AgricultureSchoolService(session)
@@ -78,7 +79,7 @@ async def get_school(
 async def update_school(
     school_id: int,
     payload: AgricultureSchoolUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> AgricultureSchoolResponse:
     """Update an existing agriculture school."""
     service = AgricultureSchoolService(session)
@@ -93,7 +94,7 @@ async def update_school(
 @router.delete("/{school_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_school(
     school_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete an agriculture school."""
     service = AgricultureSchoolService(session)

@@ -21,6 +21,7 @@ from apps.api.schemas.library import (
     FileUploadResponse
 )
 from apps.api.services.library import LibraryService
+from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/library", tags=["📖 Library"])
 
@@ -52,7 +53,7 @@ async def get_stats(session: AsyncSession = Depends(get_db_session)) -> LibraryS
 @router.post("/", response_model=LibraryResourceResponse, status_code=status.HTTP_201_CREATED)
 async def create_resource(
     payload: LibraryResourceCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> LibraryResourceResponse:
     """Create a new library resource."""
     service = LibraryService(session)
@@ -63,7 +64,7 @@ async def create_resource(
 
 @router.post("/upload", response_model=FileUploadResponse, status_code=status.HTTP_201_CREATED)
 async def upload_file(
-    file: UploadFile = File(...),
+    file: UploadFile = File(..., require_write_auth: None = Depends(require_write_auth)),
     title: str = Query(..., description="Resource title"),
     category: str = Query(..., description="Resource category"),
     session: AsyncSession = Depends(get_db_session)
@@ -126,7 +127,7 @@ async def get_resource(
 async def update_resource(
     resource_id: int,
     payload: LibraryResourceUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> LibraryResourceResponse:
     """Update an existing library resource."""
     service = LibraryService(session)
@@ -141,7 +142,7 @@ async def update_resource(
 @router.delete("/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_resource(
     resource_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> None:
     """Delete a library resource."""
     service = LibraryService(session)
@@ -155,7 +156,7 @@ async def delete_resource(
 @router.post("/{resource_id}/download", response_model=LibraryResourceResponse)
 async def download_resource(
     resource_id: int,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> LibraryResourceResponse:
     """Record a download for a resource."""
     service = LibraryService(session)

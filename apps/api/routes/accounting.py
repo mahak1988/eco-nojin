@@ -29,7 +29,7 @@ from apps.api.services.accounting import (
     PaymentService, BudgetService
 )
 
-router = APIRouter(prefix="/api/accounting", tags=["accounting"])
+router = APIRouter(prefix="/api/v1/accounting", tags=["accounting"])
 
 
 # ── Accounts ─────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ async def get_account(
 @router.post("/accounts", response_model=AccountResponse, status_code=status.HTTP_201_CREATED)
 async def create_account(
     payload: AccountCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> AccountResponse:
     """Create a new account."""
     service = AccountService(session)
@@ -82,7 +82,7 @@ async def create_account(
 async def update_account(
     account_id: str,
     payload: AccountUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> AccountResponse:
     """Update an existing account."""
     service = AccountService(session)
@@ -114,7 +114,7 @@ async def list_journal_entries(
 @router.post("/journal-entries", response_model=JournalEntryResponse, status_code=status.HTTP_201_CREATED)
 async def create_journal_entry(
     payload: JournalEntryCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> JournalEntryResponse:
     """Create a new journal entry (double-entry)."""
     service = JournalEntryService(session)
@@ -146,7 +146,7 @@ async def list_invoices(
 @router.post("/invoices", response_model=InvoiceResponse, status_code=status.HTTP_201_CREATED)
 async def create_invoice(
     payload: InvoiceCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> InvoiceResponse:
     """Create a new invoice."""
     service = InvoiceService(session)
@@ -159,7 +159,7 @@ async def create_invoice(
 async def update_invoice(
     invoice_id: str,
     payload: InvoiceUpdate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> InvoiceResponse:
     """Update an existing invoice."""
     service = InvoiceService(session)
@@ -190,7 +190,7 @@ async def list_payments(
 @router.post("/payments", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
 async def create_payment(
     payload: PaymentCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> PaymentResponse:
     """Create a new payment."""
     service = PaymentService(session)
@@ -218,7 +218,7 @@ async def list_budgets(
 @router.post("/budgets", response_model=BudgetResponse, status_code=status.HTTP_201_CREATED)
 async def create_budget(
     payload: BudgetCreate,
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session, require_write_auth: None = Depends(require_write_auth))
 ) -> BudgetResponse:
     """Create a new budget."""
     service = BudgetService(session)
@@ -235,6 +235,7 @@ async def get_dashboard_summary(
     """Get accounting dashboard summary with real data."""
     from sqlalchemy import select, func
     from apps.api.models.accounting import JournalItem, EntryType
+from apps.shared_core.deps import require_write_auth
     
     # Calculate income (sum of all credits to income accounts)
     income_result = await session.execute(

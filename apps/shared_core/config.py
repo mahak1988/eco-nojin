@@ -54,6 +54,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = Field(default="HS256", description="الگوریتم رمزنگاری JWT")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=60 * 24, description="مدت زمان انقضای توکن دسترسی")
 
+    REQUIRE_AUTH_FOR_WRITES: bool = Field(
+        default=True,
+        description="Require authentication for write operations (POST/PATCH/PUT/DELETE)"
+    )
+
     # =========================================================================
     # 4. تنظیمات بلاکچین و EcoCoin (Blockchain & Web3)
     # =========================================================================

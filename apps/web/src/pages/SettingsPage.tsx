@@ -1,6 +1,3 @@
-// apps/web/src/pages/SettingsPage.tsx  (محتوای کامل فایل ۴ بالا)
-// apps/web/src/pages/SettingsPage.tsx
-// تنظیمات یکپارچه با useLang + تنظیمات کارا (theme/اعلان/دسترس‌پذیری/حریم‌خصوصی).
 import { useState, type ComponentType } from "react";
 import {
   Globe, Palette, Bell, Accessibility, ShieldCheck, Download, RotateCcw,
@@ -11,7 +8,6 @@ import { useSettings } from "../components/settings/useSettings";
 import { SET_STR, type SetLang } from "../components/settings/settingsI18n";
 import { exportUserData, type Theme } from "../components/settings/settingsData";
 
-// نام زبان‌ها به زبان خودشان (ثابت، نه ترجمه)
 const LANGS: { code: SetLang; label: string }[] = [
   { code: "fa", label: "فارسی" },
   { code: "en", label: "English" },
@@ -20,7 +16,8 @@ const LANGS: { code: SetLang; label: string }[] = [
 
 export default function SettingsPage() {
   const { lang, setLang } = useLang();
-  const s = SET_STR[lang as SetLang];
+  // استفاده از fallback به فارسی در صورتی که زبان فعلی در دیکشنری تعریف نشده باشد
+  const s = SET_STR[lang as SetLang] || SET_STR.fa;
   const { settings, update, reset } = useSettings();
 
   const [exported, setExported] = useState(false);
@@ -32,8 +29,13 @@ export default function SettingsPage() {
     setExported(true);
     setTimeout(() => setExported(false), 1800);
   };
+
   const doReset = () => {
-    if (!confirmReset) { setConfirmReset(true); setTimeout(() => setConfirmReset(false), 2500); return; }
+    if (!confirmReset) { 
+      setConfirmReset(true); 
+      setTimeout(() => setConfirmReset(false), 2500); 
+      return; 
+    }
     reset();
     setConfirmReset(false);
     setResetDone(true);
@@ -41,10 +43,10 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 p-5 sm:p-8">
+    <div className="mx-auto max-w-2xl space-y-6 p-5 sm:p-8" dir={lang === 'fa' || lang === 'ar' ? 'rtl' : 'ltr'}>
       <header>
-        <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
-        <p className="mt-1 text-stone-600">{s.subtitle}</p>
+        <h1 className="font-display text-3xl text-slate-800 dark:text-slate-100">{s.title}</h1>
+        <p className="mt-1 text-slate-600 dark:text-slate-400">{s.subtitle}</p>
       </header>
 
       {/* ── Language ── */}
@@ -53,10 +55,16 @@ export default function SettingsPage() {
           {LANGS.map((l) => {
             const active = lang === l.code;
             return (
-              <button key={l.code} onClick={() => setLang(l.code)} aria-pressed={active}
+              <button 
+                key={l.code} 
+                onClick={() => setLang(l.code)} 
+                aria-pressed={active}
                 className={`rounded-xl border px-3 py-3 text-sm font-bold transition-all hover:-translate-y-0.5 ${
-                  active ? "border-green-500 bg-green-50 text-green-700 ring-1 ring-green-600/20" : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
-                }`}>
+                  active 
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-900/20 dark:text-emerald-400" 
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                }`}
+              >
                 {l.label}
               </button>
             );
@@ -66,66 +74,121 @@ export default function SettingsPage() {
 
       {/* ── Appearance ── */}
       <Section icon={Palette} title={s.section_appearance} desc={s.appearance_desc}>
-        <div className="grid grid-cols-3 gap-2">
-          <ThemeOption value="light" current={settings.theme} icon={Sun} label={s.theme_light} desc={s.theme_light_desc}
-            onSelect={(v) => update({ theme: v })} preview={<Preview kind="light" />} />
-          <ThemeOption value="dark" current={settings.theme} icon={Moon} label={s.theme_dark} desc={s.theme_dark_desc}
-            onSelect={(v) => update({ theme: v })} preview={<Preview kind="dark" />} />
-          <ThemeOption value="system" current={settings.theme} icon={Monitor} label={s.theme_system} desc={s.theme_system_desc}
-            onSelect={(v) => update({ theme: v })} preview={<Preview kind="system" />} />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <ThemeOption 
+            value="light" 
+            current={settings.theme} 
+            icon={Sun} 
+            label={s.theme_light} 
+            desc={s.theme_light_desc}
+            onSelect={(v) => update({ theme: v })} 
+            preview={<Preview kind="light" />} 
+          />
+          <ThemeOption 
+            value="dark" 
+            current={settings.theme} 
+            icon={Moon} 
+            label={s.theme_dark} 
+            desc={s.theme_dark_desc}
+            onSelect={(v) => update({ theme: v })} 
+            preview={<Preview kind="dark" />} 
+          />
+          <ThemeOption 
+            value="system" 
+            current={settings.theme} 
+            icon={Monitor} 
+            label={s.theme_system} 
+            desc={s.theme_system_desc}
+            onSelect={(v) => update({ theme: v })} 
+            preview={<Preview kind="system" />} 
+          />
         </div>
       </Section>
 
       {/* ── Notifications ── */}
       <Section icon={Bell} title={s.section_notifications} desc={s.notifications_desc}>
         <div className="space-y-2">
-          <ToggleRow label={s.notif_email} desc={s.notif_email_desc} checked={settings.notifications.email}
-            onChange={(v) => update({ notifications: { ...settings.notifications, email: v } })} />
-          <ToggleRow label={s.notif_product} desc={s.notif_product_desc} checked={settings.notifications.product}
-            onChange={(v) => update({ notifications: { ...settings.notifications, product: v } })} />
-          <ToggleRow label={s.notif_weekly} desc={s.notif_weekly_desc} checked={settings.notifications.weekly}
-            onChange={(v) => update({ notifications: { ...settings.notifications, weekly: v } })} />
+          <ToggleRow 
+            label={s.notif_email} 
+            desc={s.notif_email_desc} 
+            checked={settings.notifications?.email ?? false}
+            onChange={(v) => update({ notifications: { ...settings.notifications, email: v } })} 
+          />
+          <ToggleRow 
+            label={s.notif_product} 
+            desc={s.notif_product_desc} 
+            checked={settings.notifications?.product ?? false}
+            onChange={(v) => update({ notifications: { ...settings.notifications, product: v } })} 
+          />
+          <ToggleRow 
+            label={s.notif_weekly} 
+            desc={s.notif_weekly_desc} 
+            checked={settings.notifications?.weekly ?? false}
+            onChange={(v) => update({ notifications: { ...settings.notifications, weekly: v } })} 
+          />
         </div>
       </Section>
 
       {/* ── Accessibility ── */}
       <Section icon={Accessibility} title={s.section_accessibility} desc={s.accessibility_desc}>
         <div className="space-y-2">
-          <ToggleRow label={s.a11y_reduce_motion} desc={s.a11y_reduce_motion_desc} checked={settings.reduceMotion}
-            onChange={(v) => update({ reduceMotion: v })} />
-          <ToggleRow label={s.a11y_larger_text} desc={s.a11y_larger_text_desc} checked={settings.largerText}
-            onChange={(v) => update({ largerText: v })} />
+          <ToggleRow 
+            label={s.a11y_reduce_motion} 
+            desc={s.a11y_reduce_motion_desc} 
+            checked={settings.reduceMotion ?? false}
+            onChange={(v) => update({ reduceMotion: v })} 
+          />
+          <ToggleRow 
+            label={s.a11y_larger_text} 
+            desc={s.a11y_larger_text_desc} 
+            checked={settings.largerText ?? false}
+            onChange={(v) => update({ largerText: v })} 
+          />
         </div>
       </Section>
 
       {/* ── Privacy & Data ── */}
       <Section icon={ShieldCheck} title={s.section_privacy} desc={s.privacy_desc}>
-        <ToggleRow label={s.privacy_analytics} desc={s.privacy_analytics_desc} checked={settings.analytics}
-          onChange={(v) => update({ analytics: v })} />
+        <ToggleRow 
+          label={s.privacy_analytics} 
+          desc={s.privacy_analytics_desc} 
+          checked={settings.analytics ?? false}
+          onChange={(v) => update({ analytics: v })} 
+        />
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50 p-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/50">
           <div className="min-w-0">
-            <p className="text-sm font-bold text-stone-800">{s.export_data}</p>
-            <p className="text-xs text-stone-500">{s.export_data_desc}</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{s.export_data}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{s.export_data_desc}</p>
           </div>
-          <button onClick={doExport}
+          <button 
+            onClick={doExport}
             className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-colors ${
-              exported ? "bg-green-50 text-green-700" : "bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-100"
-            }`}>
+              exported 
+                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
+                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-700"
+            }`}
+          >
             {exported ? <Check className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
             {exported ? s.exported : s.export_data}
           </button>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50/60 p-3">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50/60 p-3 dark:border-red-900/50 dark:bg-red-900/20">
           <div className="min-w-0">
-            <p className="text-sm font-bold text-red-800">{s.reset_settings}</p>
-            <p className="text-xs text-red-700/80">{s.reset_settings_desc}</p>
+            <p className="text-sm font-bold text-red-800 dark:text-red-400">{s.reset_settings}</p>
+            <p className="text-xs text-red-700/80 dark:text-red-300/80">{s.reset_settings_desc}</p>
           </div>
-          <button onClick={doReset}
+          <button 
+            onClick={doReset}
             className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-colors ${
-              resetDone ? "bg-green-600 text-white" : confirmReset ? "bg-red-600 text-white" : "bg-white text-red-700 ring-1 ring-red-200 hover:bg-red-100"
-            }`}>
+              resetDone 
+                ? "bg-emerald-600 text-white" 
+                : confirmReset 
+                  ? "bg-red-600 text-white hover:bg-red-700" 
+                  : "bg-white text-red-700 ring-1 ring-red-200 hover:bg-red-100 dark:bg-slate-800 dark:text-red-400 dark:ring-red-900/50 dark:hover:bg-red-900/30"
+            }`}
+          >
             {resetDone ? <Check className="h-3.5 w-3.5" /> : <RotateCcw className="h-3.5 w-3.5" />}
             {resetDone ? s.reset_done : confirmReset ? s.reset_confirm : s.reset_settings}
           </button>
@@ -135,19 +198,19 @@ export default function SettingsPage() {
   );
 }
 
-/* ── بخش (کارت) ── */
+/* ── کامپوننت بخش (Section) ── */
 function Section({ icon: Icon, title, desc, children }: {
   icon: ComponentType<{ className?: string }>; title: string; desc: string; children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-sm sm:p-6">
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:p-6">
       <div className="mb-4 flex items-start gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-green-50 text-green-700 ring-1 ring-green-600/15">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/15 dark:bg-emerald-900/20 dark:text-emerald-400">
           <Icon className="h-4 w-4" />
         </span>
         <div>
-          <h2 className="font-display text-lg text-stone-800">{title}</h2>
-          <p className="text-sm text-stone-500">{desc}</p>
+          <h2 className="font-display text-lg text-slate-800 dark:text-slate-200">{title}</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{desc}</p>
         </div>
       </div>
       {children}
@@ -155,65 +218,88 @@ function Section({ icon: Icon, title, desc, children }: {
   );
 }
 
-/* ── سطر toggle (RTL-safe) ── */
+/* ── سطر Toggle (سازگار با RTL) ── */
 function ToggleRow({ label, desc, checked, onChange }: {
   label: string; desc: string; checked: boolean; onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-3">
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800">
       <div className="min-w-0">
-        <p className="text-sm font-bold text-stone-800">{label}</p>
-        <p className="text-xs text-stone-500">{desc}</p>
+        <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{label}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{desc}</p>
       </div>
-      <button role="switch" aria-checked={checked} aria-label={label} onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500/40 ${
-          checked ? "bg-green-600" : "bg-stone-300"
-        }`}>
-        <span className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all duration-300"
-          style={{ insetInlineStart: checked ? "calc(100% - 1.375rem)" : "0.125rem" }} />
+      <button 
+        role="switch" 
+        aria-checked={checked} 
+        aria-label={label} 
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 ${
+          checked ? "bg-emerald-600" : "bg-slate-300 dark:bg-slate-600"
+        }`}
+      >
+        <span 
+          className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all duration-300"
+          style={{ insetInlineStart: checked ? "calc(100% - 1.375rem)" : "0.125rem" }} 
+        />
       </button>
     </div>
   );
 }
 
-/* ── گزینهٔ theme با mini-preview ── */
+/* ── گزینهٔ Theme با پیش‌نمایش کوچک ── */
 function ThemeOption({ value, current, icon: Icon, label, desc, onSelect, preview }: {
   value: Theme; current: Theme; icon: ComponentType<{ className?: string }>;
   label: string; desc: string; onSelect: (v: Theme) => void; preview: React.ReactNode;
 }) {
   const active = current === value;
   return (
-    <button onClick={() => onSelect(value)} aria-pressed={active}
+    <button 
+      onClick={() => onSelect(value)} 
+      aria-pressed={active}
       className={`flex flex-col gap-2 rounded-xl border p-3 text-start transition-all hover:-translate-y-0.5 ${
-        active ? "border-green-500 bg-green-50/60 ring-1 ring-green-600/20" : "border-stone-200 bg-white hover:bg-stone-50"
-      }`}>
+        active 
+          ? "border-emerald-500 bg-emerald-50/60 ring-1 ring-emerald-600/20 dark:bg-emerald-900/20" 
+          : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+      }`}
+    >
       {preview}
       <span className="flex items-center gap-1.5">
-        <Icon className={`h-4 w-4 ${active ? "text-green-700" : "text-stone-500"}`} />
-        <span className={`text-sm font-bold ${active ? "text-green-700" : "text-stone-800"}`}>{label}</span>
+        <Icon className={`h-4 w-4 ${active ? "text-emerald-700 dark:text-emerald-400" : "text-slate-500"}`} />
+        <span className={`text-sm font-bold ${active ? "text-emerald-700 dark:text-emerald-400" : "text-slate-800 dark:text-slate-200"}`}>
+          {label}
+        </span>
       </span>
-      <span className="text-[11px] leading-snug text-stone-500">{desc}</span>
+      <span className="text-[11px] leading-snug text-slate-500 dark:text-slate-400">{desc}</span>
     </button>
   );
 }
 
-/* ── mini-preview رنگ‌ها ── */
+/* ── پیش‌نمایش کوچک رنگ‌ها ── */
 function Preview({ kind }: { kind: "light" | "dark" | "system" }) {
   const light = (
-    <span className="flex h-9 w-full overflow-hidden rounded-md ring-1 ring-black/5">
-      <span className="flex-1 bg-white" /><span className="w-1/3 bg-stone-800" />
+    <span className="flex h-9 w-full overflow-hidden rounded-md ring-1 ring-black/5 dark:ring-white/10">
+      <span className="flex-1 bg-white dark:bg-slate-800" />
+      <span className="w-1/3 bg-slate-800 dark:bg-slate-200" />
     </span>
   );
   const dark = (
-    <span className="flex h-9 w-full overflow-hidden rounded-md ring-1 ring-black/10">
-      <span className="flex-1 bg-stone-900" /><span className="w-1/3 bg-stone-100" />
+    <span className="flex h-9 w-full overflow-hidden rounded-md ring-1 ring-black/10 dark:ring-white/10">
+      <span className="flex-1 bg-slate-900" />
+      <span className="w-1/3 bg-slate-100" />
     </span>
   );
+  
   if (kind === "system") {
     return (
-      <span className="flex h-9 w-full overflow-hidden rounded-md ring-1 ring-black/10">
-        <span className="flex flex-1"><span className="flex-1 bg-white" /><span className="w-1/2 bg-stone-800" /></span>
-        <span className="flex flex-1"><span className="flex-1 bg-stone-900" /><span className="w-1/2 bg-stone-100" /></span>
+      <span className="flex h-9 w-full overflow-hidden rounded-md ring-1 ring-black/10 dark:ring-white/10">
+        <span className="flex flex-1">
+          <span className="flex-1 bg-white dark:bg-slate-800" />
+          <span className="w-1/2 bg-slate-800 dark:bg-slate-200" />
+        </span>
+        <span className="flex flex-1">
+          <span className="flex-1 bg-slate-900" />
+          <span className="w-1/2 bg-slate-100" />
+        </span>
       </span>
     );
   }

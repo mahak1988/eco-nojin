@@ -37,10 +37,10 @@ export const ACTIVE_USERS_SERIES = [2980, 3120, 3050, 3240, 3380, 3410, 3456];
 
 // توزیع کاربران بر اساس نقش (برای DonutChart)
 export const USER_ROLES: DonutSegment[] = [
-  { value: 42, color: "#15803d" }, // farmer
-  { value: 26, color: "#1d4ed8" }, // expert
-  { value: 18, color: "#d97706" }, // researcher
-  { value: 14, color: "#7c3aed" }, // student
+  { label: "Farmer", value: 42, color: "#15803d" }, // farmer
+  { label: "Expert", value: 26, color: "#1d4ed8" }, // expert
+  { label: "Researcher", value: 18, color: "#d97706" }, // researcher
+  { label: "Student", value: 14, color: "#7c3aed" }, // student
 ];
 
 export const RECENT_ACTIVITY: Activity[] = [

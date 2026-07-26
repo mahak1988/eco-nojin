@@ -18,17 +18,18 @@ from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db
+from apps.shared_core.config import settings
 from apps.users.models import User
 
 # ---------------------------------------------------------------------------
 # Configuration
-# ---------------------------------------------------------------------------
-router = APIRouter(prefix="/auth", tags=["🔐 Authentication"])
-
-SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key-change-in-production")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+# SECRET_KEY now from apps.shared_core.config.settings (Phase 0 security fix)
+# ALGORITHM now from apps.shared_core.config.settings
+# ACCESS_TOKEN_EXPIRE_MINUTES now from config
+# SECRET_KEY now from apps.shared_core.config.settings (Phase 0 security fix)
+# ALGORITHM now from apps.shared_core.config.settings
+# ACCESS_TOKEN_EXPIRE_MINUTES now from config
+REFRESH_TOKEN_EXPIRE_DAYS = 7  # kept as local constant
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
@@ -97,14 +98,14 @@ def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire, "type": "access"})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def create_refresh_token(data: dict) -> str:
     """Handle create_refresh_token (data)."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.utcnow() + timedelta(days=7)
     to_encode.update({"exp": expire, "type": "refresh"})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -117,7 +118,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
         if email is None or payload.get("type") != "access":
             raise credentials_exception
@@ -237,7 +238,7 @@ async def logout(current_user: User = Depends(get_current_user)) -> None:
 async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)) -> None:
     """Handle refresh_token (request, db)."""
     try:
-        payload = jwt.decode(request.refreshToken, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(request.refreshToken, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
         if payload.get("type") != "refresh":
             raise HTTPException(status_code=401, detail="Invalid token type")

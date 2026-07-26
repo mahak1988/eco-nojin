@@ -17,6 +17,42 @@
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 📋 فهرست
 
 - [معرفی](#معرفی)
@@ -32,6 +68,42 @@
 - [مشارکت](#مشارکت)
 
 ---
+
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
 
 ## 🚀 معرفی
 
@@ -50,6 +122,42 @@
 - ✅ **CI/CD** با GitHub Actions
 
 ---
+
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
 
 ## 🏗 معماری
 
@@ -98,6 +206,42 @@
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 📊 وضعیت فعلی
 
 | لایه | وضعیت | توضیح |
@@ -112,6 +256,42 @@
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 📋 پیش‌نیازها
 
 - **Node.js** 20+
@@ -121,6 +301,42 @@
 - **Docker** (اختیاری — برای اجرا با Docker Compose)
 
 ---
+
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
 
 ## 🚀 راه‌اندازی محلی
 
@@ -165,6 +381,42 @@ docker compose -f docker-compose.apps.yml up --build
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 📁 ساختار پروژه
 
 ```
@@ -203,6 +455,42 @@ econojin.com/
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 🛠 تکنولوژی‌ها
 
 | بخش | تکنولوژی |
@@ -223,6 +511,42 @@ econojin.com/
 | **مانیتورینگ** | Prometheus + Grafana + Sentry |
 
 ---
+
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
 
 ## 📚 API Reference
 
@@ -247,6 +571,42 @@ econojin.com/
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 🧪 تست
 
 ```powershell
@@ -261,6 +621,42 @@ pnpm lint
 ```
 
 ---
+
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
 
 ## 🌐 استقرار
 
@@ -285,6 +681,42 @@ docker compose -f docker-compose.apps.yml up --build
 
 ---
 
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
+
 ## 🤝 مشارکت
 
 1. روی شاخه `feature/*` کار کنید
@@ -293,6 +725,42 @@ docker compose -f docker-compose.apps.yml up --build
 4. از commit messages معنادار استفاده کنید
 
 ---
+
+
+## ?? Quickstart (Phase 0)
+
+```bash
+# 1. Clone & enter
+git clone https://github.com/mahak1988/eco-nojin.git
+cd eco-nojin
+
+# 2. Copy env
+cp .env.example .env
+# Edit .env: set SECRET_KEY (min 32 chars)
+
+# 3. Backend (Python 3.12+)
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --port 8000
+
+# 4. Frontend (Node 22+)
+cd apps/web
+pnpm install
+pnpm dev
+
+# 5. Open
+# API Docs: http://localhost:8000/docs
+# Web App:  http://localhost:5173
+
+# OR one-command Docker:
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## ?? Security (Phase 0)
+- All secrets in `.env` � no hardcoded values in code
+- Write operations require JWT authentication (`REQUIRE_AUTH_FOR_WRITES=true`)
+- Rate limiting on auth endpoints (120 req/min)
+- X-Request-ID on every response for tracing
+- All API routes under `/api/v1/`
 
 ## 📄 مجوز
 

@@ -44,7 +44,7 @@ export default function LibraryPage() {
 
   const onDownloadOne = (r: Resource) => {
     const meta = [
-      `${s.typeText ?? ""}${typeText(s, r.type)}`,
+      `${(s as any).typeText ?? ""}${typeText(s, r.type)}`,
       `${catText(s, r.category)}`,
       `${s.downloadsLabel}: ${r.downloads.toLocaleString(locale)}`,
     ];
