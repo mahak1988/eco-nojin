@@ -3,8 +3,8 @@ import { lazy, Suspense, Component, useEffect, type ReactNode } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
 import Layout from "./components/Layout/Layout";
+import { AdminShell } from "./features/admin/AdminShell";
 
-// ── Lazy Pages (با fallback برای خطاهای شبکه یا version-skew در Vite) ──
 const HomePage = lazy(() => import("./pages/HomePage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
@@ -35,8 +35,13 @@ const PoliciesPage = lazy(() => import("./pages/PoliciesPage"));
 const SimulatorDetailPage = lazy(() => import("./pages/SimulatorDetailPage"));
 const MySimulationsPage = lazy(() => import("./pages/MySimulationsPage"));
 const ComparisonDashboard = lazy(() => import("./pages/ComparisonDashboard"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
+const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
+const AdminModulesPage = lazy(() => import("./pages/admin/AdminModulesPage"));
+const AdminHealthPage = lazy(() => import("./pages/admin/AdminHealthPage"));
+const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
 
-// ── Scroll to top on route change ──
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -45,7 +50,6 @@ function ScrollToTop() {
   return null;
 }
 
-// ── Loading fallback ──
 function PageLoader() {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
@@ -54,7 +58,6 @@ function PageLoader() {
   );
 }
 
-// ── Error boundary (جلوگیری از کرش کامل در صورت خطای لود Chunk) ──
 interface EBProps { children: ReactNode; }
 interface EBState { hasError: boolean; }
 
@@ -70,15 +73,15 @@ class ErrorBoundary extends Component<EBProps, EBState> {
     if (this.state.hasError) {
       return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-          <p className="font-display text-2xl text-stone-800 dark:text-stone-100">مشکلی پیش آمد</p>
+          <p className="font-display text-2xl text-stone-800 dark:text-stone-100">Something went wrong</p>
           <p className="max-w-sm text-sm text-stone-600 dark:text-stone-400">
-            ممکن است نسخهٔ جدیدی از برنامه منتشر شده باشد یا اتصال شبکه قطع باشد. لطفاً صفحه را دوباره بارگذاری کنید.
+            A new version may have been deployed, or the network dropped. Please reload.
           </p>
           <button
             onClick={() => window.location.reload()}
             className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
           >
-            بارگذاری مجدد
+            Reload
           </button>
         </div>
       );
@@ -87,7 +90,6 @@ class ErrorBoundary extends Component<EBProps, EBState> {
   }
 }
 
-// ── App Component ──
 export default function App() {
   return (
     <LanguageProvider>
@@ -95,6 +97,16 @@ export default function App() {
       <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>
           <Routes>
+            <Route path="login" element={<LoginPage />} />
+
+            <Route path="admin" element={<AdminShell />}>
+              <Route index element={<AdminOverviewPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route path="modules" element={<AdminModulesPage />} />
+              <Route path="health" element={<AdminHealthPage />} />
+              <Route path="settings" element={<AdminSettingsPage />} />
+            </Route>
+
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="dashboard" element={<DashboardPage />} />
@@ -110,7 +122,6 @@ export default function App() {
               <Route path="regional" element={<RegionalPage />} />
               <Route path="satellite" element={<SatelliteImageryDashboard />} />
               <Route path="simulators" element={<SimulatorsPage />} />
-              {/* اصلاح مسیرهای تو در تو به فرمت نسبی */}
               <Route path="simulators/:id" element={<SimulatorDetailPage />} />
               <Route path="my-simulations" element={<MySimulationsPage />} />
               <Route path="comparison" element={<ComparisonDashboard />} />
