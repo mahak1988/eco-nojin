@@ -6,11 +6,13 @@ export type AccentColor = "green" | "blue" | "amber" | "violet" | "rose" | "teal
 export interface Course {
   id: string;
   titleKey: string;
-  icon: string;          // emoji
+  /** When set (API-backed courses), shown instead of i18n titleKey */
+  titleLiteral?: string;
+  icon: string;
   accent: AccentColor;
   levelKey: LevelKey;
   tagKey: string;
-  rating: number;        // 0..5
+  rating: number;
   learners: number;
   durationH: number;
   durationM: number;
@@ -36,12 +38,11 @@ export interface LearningPathData {
 export interface Certification {
   id: string;
   nameKey: string;
-  date: string;          // ISO
+  date: string;
   statusKey: CertStatusKey;
   icon: string;
 }
 
-// دانشجویان فعال سراسری (مفهوم global — mock)
 export const GLOBAL_LEARNERS = 1240;
 
 export const INITIAL_COURSES: Course[] = [

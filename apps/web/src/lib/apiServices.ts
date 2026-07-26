@@ -1,5 +1,4 @@
 // Unified API service layer with timeout + graceful mock fallback.
-// Always prefixes VITE_API_BASE_URL so calls hit the backend, not Vite.
 
 const TIMEOUT = 8000;
 
@@ -34,24 +33,30 @@ async function fetchSafe<T>(path: string, fallback: T): Promise<{ data: T; sourc
 
 export async function getAccountingSummary() {
   return fetchSafe("/api/v1/accounting/summary", {
-    revenue: 0,
-    expenses: 0,
-    profit: 0,
-    balance: 0,
-    accounts: [],
+    total_income: 0,
+    total_expense: 0,
+    net_profit: 0,
+    current_balance: 0,
+    transactions_count: 0,
   });
 }
 
+export async function getAccountingAccounts() {
+  return fetchSafe("/api/v1/accounting/accounts?limit=20", { items: [], total: 0 });
+}
+
 export async function getEducationCourses() {
-  return fetchSafe("/api/v1/education/courses", []);
+  return fetchSafe("/api/v1/education/courses?limit=50", { items: [], total: 0 });
 }
 
 export async function getEducationStats() {
-  return fetchSafe("/api/v1/education/stats", {
-    totalCourses: 0,
-    totalLearners: 0,
-    totalPaths: 0,
-    totalCerts: 0,
+  // Backend path is /courses/stats
+  return fetchSafe("/api/v1/education/courses/stats", {
+    total_courses: 0,
+    total_lessons: 0,
+    total_enrollments: 0,
+    by_category: {},
+    by_level: {},
   });
 }
 
@@ -65,7 +70,7 @@ export async function getDashboardStats() {
 }
 
 export async function getCommunityPosts() {
-  return fetchSafe("/api/v1/community/posts", []);
+  return fetchSafe("/api/v1/community/posts", { items: [], total: 0 });
 }
 
 export async function getSimulatorList() {
