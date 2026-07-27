@@ -2,14 +2,13 @@
 
 ## [Unreleased]
 
-### 2026-07-27 — Wave A / F1.1 (R13–R14)
-- `apps/shared_core/schemas/pagination.py` — ListMeta, page_to_offset, build_meta
-- Education `GET /courses` accepts `page`, `size`, `sort` (legacy `skip`/`limit` still work)
-- Response includes R14 `{ data, meta }` **and** legacy `{ items, total }` for FE compatibility
-- FE mapper reads both shapes
+### Phase 0 / F0.1
+- `pyproject.toml`: real runtime dependencies + optional `worker` / `dev` extras
+- `requirements.txt` / `requirements-worker.txt` synced
+- `docs/PHASE0_PROGRESS.md` tracker
 
-### Protocol / R1
-- INTERACTION_PROTOCOL, VITE_USE_MOCK, credentials include
+### Wave A / F1.1
+- Education list R13/R14 page+size+sort envelope (legacy compatible)
 
-### Foundation
-- Constitution R1–R23, CORS explicit, model registry, requirements restore
+### Earlier
+- Constitution, interaction protocol, CORS R10, education MissingGreenlet fixes
