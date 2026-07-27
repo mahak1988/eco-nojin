@@ -1,4 +1,4 @@
-"""Monitoring API — sensors, readings, alerts, rules."""
+"""Monitoring API — sensors, readings, alerts + WebSocket fan-out."""
 
 from __future__ import annotations
 
@@ -55,6 +55,18 @@ class RuleOut(RuleIn):
     is_active: bool = True
 
     model_config = {"from_attributes": True}
+
+
+async def _broadcast_alert(payload: dict) -> None:
+    try:
+        from apps.shared_core.websocket.manager import manager
+
+        await manager.broadcast(
+            "monitoring",
+            {"type": "alert", "channel": "monitoring", **payload},
+        )
+    except Exception:
+        pass
 
 
 @router.get("/monitoring/overview")
@@ -142,7 +154,6 @@ async def push_reading(
         raise HTTPException(404, "Sensor not found")
     reading = SensorReading(sensor_id=sensor_id, value=value)
     session.add(reading)
-    # evaluate rules
     rules = (
         await session.execute(
             select(AlertRule).where(
@@ -164,14 +175,25 @@ async def push_reading(
         elif rule.operator == "gte":
             ok = value >= rule.threshold
         if ok:
+            msg = f"{s.name}: {value} {rule.operator} {rule.threshold}"
             ev = AlertEvent(
                 rule_id=rule.id,
                 sensor_id=sensor_id,
-                message=f"{s.name}: {value} {rule.operator} {rule.threshold}",
+                message=msg,
                 severity=rule.severity,
             )
             session.add(ev)
             fired.append(rule.name)
+            await _broadcast_alert(
+                {
+                    "severity": rule.severity,
+                    "message": msg,
+                    "sensor_id": sensor_id,
+                    "rule": rule.name,
+                    "value": value,
+                    "ts": datetime.now(timezone.utc).isoformat(),
+                }
+            )
     await session.flush()
     await session.refresh(reading)
     return {"reading": ReadingOut.model_validate(reading), "alerts_fired": fired}
