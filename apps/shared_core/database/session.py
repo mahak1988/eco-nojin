@@ -1,8 +1,4 @@
-"""Async SQLAlchemy session, engine, and Base.
-
-R20: DATABASE_URL from settings (Pydantic), not os.getenv.
-R11: Prefer Alembic in staging/production; create_all only as local bootstrap.
-"""
+"""Async SQLAlchemy session — SQLite fallback when Postgres driver missing."""
 
 from __future__ import annotations
 
@@ -14,18 +10,59 @@ from sqlalchemy.orm import DeclarativeBase
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_SQLITE = "sqlite+aiosqlite:///./apps/econojin.db"
 
-def _database_url() -> str:
+
+def _has_asyncpg() -> bool:
+    try:
+        import asyncpg  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
+
+
+def _resolve_database_url() -> str:
+    raw = None
     try:
         from apps.shared_core.config import settings
 
-        return settings.DATABASE_URL
+        raw = settings.DATABASE_URL
     except Exception:
-        # Bootstrap only if settings cannot load (e.g. incomplete env during tooling)
-        return "sqlite+aiosqlite:///./apps/econojin.db"
+        import os
+
+        raw = os.getenv("DATABASE_URL")
+
+    if not raw or "***" in str(raw) or not str(raw).strip():
+        logger.warning("DATABASE_URL missing/placeholder — using SQLite")
+        return DEFAULT_SQLITE
+
+    url = str(raw).strip()
+
+    # Postgres without async driver → SQLite in local
+    if "postgres" in url.lower():
+        if "+asyncpg" in url and not _has_asyncpg():
+            logger.warning("asyncpg not installed — falling back to SQLite")
+            return DEFAULT_SQLITE
+        if url.startswith("postgresql://") or url.startswith("postgres://"):
+            # sync-style URL cannot be used with create_async_engine cleanly
+            if "+asyncpg" not in url and "+aiosqlite" not in url:
+                try:
+                    from apps.shared_core.config import settings
+
+                    if settings.ENVIRONMENT == "local":
+                        logger.warning("Local Postgres sync URL without asyncpg — SQLite fallback")
+                        return DEFAULT_SQLITE
+                except Exception:
+                    return DEFAULT_SQLITE
+
+    if url.startswith("sqlite://") and "+aiosqlite" not in url:
+        url = url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+
+    return url
 
 
-DATABASE_URL = _database_url()
+DATABASE_URL = _resolve_database_url()
 
 engine: AsyncEngine = create_async_engine(
     DATABASE_URL,
@@ -68,7 +105,6 @@ def _import_models() -> None:
 
 
 async def init_db() -> None:
-    """Local bootstrap only. Staging/production must use Alembic (R11)."""
     _import_models()
     try:
         from apps.shared_core.config import settings

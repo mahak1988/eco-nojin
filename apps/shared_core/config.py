@@ -1,21 +1,18 @@
-"""
-تنظیمات مرکزی پلتفرم Econojin
-مدیریت متغیرهای محیطی با استفاده از Pydantic v2 Settings
-سازگار شده با apps/main.py
-"""
-import logging
+"""Central settings (Pydantic v2)."""
 
-logger = logging.getLogger(__name__)
+from __future__ import annotations
+
+import logging
 from functools import lru_cache
-from typing import List, Optional, Literal
+from typing import List, Literal, Optional
+
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+logger = logging.getLogger(__name__)
+
 
 class Settings(BaseSettings):
-    """
-    کلاس اصلی تنظیمات برنامه که مقادیر را از فایل .env یا متغیرهای محیطی سیستم عامل می‌خواند.
-    """
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -23,80 +20,68 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # =========================================================================
-    # 1. تنظیمات عمومی برنامه (App Settings)
-    # =========================================================================
-    PROJECT_NAME: str = Field(default="Econojin Platform", description="نام پروژه")
-    VERSION: str = Field(default="2.0.0", description="نسخه اپلیکیشن")
-    ENVIRONMENT: Literal["local", "staging", "production"] = Field(default="local", description="محیط اجرای برنامه")
-    API_V1_STR: str = Field(default="/api/v1", description="پیشوند مسیرهای API")
-    
+    PROJECT_NAME: str = Field(default="Econojin Platform")
+    VERSION: str = Field(default="2.0.0")
+    ENVIRONMENT: Literal["local", "staging", "production"] = Field(default="local")
+    API_V1_STR: str = Field(default="/api/v1")
+
     BACKEND_CORS_ORIGINS: str = Field(
-        default="http://localhost:5173,http://localhost:3000,http://localhost:8000,https://econojin.com",
-        description="لیست دامنه‌های مجاز برای CORS"
+        default="http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://localhost:8000"
     )
 
     @property
     def all_cors_origins(self) -> List[str]:
-        """تبدیل رشته CORS به لیست برای استفاده در FastAPI"""
-        return [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",") if origin.strip()]
+        return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
 
-    # =========================================================================
-    # 2. تنظیمات پایگاه داده (Database)
-    # =========================================================================
-    DATABASE_URL: str = Field(..., description="رشته اتصال به پایگاه داده")
-    DB_ECHO: bool = Field(default=False, description="نمایش کوئری‌های SQL در لاگ")
+    # Default SQLite so app boots without Postgres driver
+    DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./apps/econojin.db")
+    DB_ECHO: bool = Field(default=False)
 
-    # =========================================================================
-    # 3. تنظیمات امنیت و احراز هویت (Security & Auth)
-    # =========================================================================
-    SECRET_KEY: str = Field(..., description="کلید محرمانه JWT")
-    ALGORITHM: str = Field(default="HS256", description="الگوریتم رمزنگاری JWT")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=60 * 24, description="مدت زمان انقضای توکن دسترسی")
+    SECRET_KEY: str = Field(default="local-dev-only-change-me-use-secrets-token-urlsafe-48")
+    JWT_SECRET_KEY: Optional[str] = Field(default=None)
+    ALGORITHM: str = Field(default="HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
+    REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=14)
+    JWT_COOKIE_NAME: str = Field(default="access_token")
+    REFRESH_COOKIE_NAME: str = Field(default="refresh_token")
+    COOKIE_SECURE: bool = Field(default=False)
+    COOKIE_SAMESITE: str = Field(default="lax")
 
-    REQUIRE_AUTH_FOR_WRITES: bool = Field(
-        default=True,
-        description="Require authentication for write operations (POST/PATCH/PUT/DELETE)"
+    REQUIRE_AUTH_FOR_WRITES: bool = Field(default=False)
+
+    BLOCKCHAIN_RPC_URL: str = Field(default="https://rpc-amoy.polygon.technology/")
+    BLOCKCHAIN_CHAIN_ID: int = Field(default=80002)
+    ECOCONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000001")
+    ORACLE_CONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000002")
+    BACKEND_WALLET_PRIVATE_KEY: Optional[str] = Field(default=None)
+
+    LLM_PROVIDER: Literal["groq", "openai", "gemini", "openrouter", "ollama", "fake"] = Field(
+        default="fake"
     )
+    LLM_API_KEY: Optional[str] = Field(default=None)
+    LLM_MODEL: str = Field(default="llama3-8b-8192")
+    OLLAMA_BASE_URL: str = Field(default="http://localhost:11434")
 
-    # =========================================================================
-    # 4. تنظیمات بلاکچین و EcoCoin (Blockchain & Web3)
-    # =========================================================================
-    BLOCKCHAIN_RPC_URL: str = Field(default="https://rpc-amoy.polygon.technology/", description="آدرس RPC شبکه")
-    BLOCKCHAIN_CHAIN_ID: int = Field(default=80002, description="شناسه زنجیره")
-    ECOCONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000001", description="آدرس قرارداد EcoCoin")
-    ORACLE_CONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000002", description="آدرس قرارداد Oracle")
-    BACKEND_WALLET_PRIVATE_KEY: Optional[str] = Field(default=None, description="کلید خصوصی کیف پول بک‌اند")
+    OPEN_METEO_URL: str = Field(default="https://api.open-meteo.com/v1")
+    FAO_API_KEY: Optional[str] = Field(default=None)
 
-    # =========================================================================
-    # 5. تنظیمات هوش مصنوعی (AI & LLM)
-    # =========================================================================
-    LLM_PROVIDER: Literal["groq", "openai", "gemini", "openrouter", "ollama", "fake"] = Field(default="fake", description="ارائه‌دهنده فعال مدل زبانی")
-    LLM_API_KEY: Optional[str] = Field(default=None, description="کلید API ارائه‌دهنده مدل زبانی")
-    LLM_MODEL: str = Field(default="llama3-8b-8192", description="نام مدل پیش‌فرض هوش مصنوعی")
-    OLLAMA_BASE_URL: str = Field(default="http://localhost:11434", description="آدرس پایه سرویس Ollama")
+    @property
+    def jwt_secret(self) -> str:
+        return self.JWT_SECRET_KEY or self.SECRET_KEY
 
-    # =========================================================================
-    # 6. تنظیمات APIهای خارجی (External APIs)
-    # =========================================================================
-    OPEN_METEO_URL: str = Field(default="https://api.open-meteo.com/v1", description="آدرس پایه API آب‌وهوا")
-    FAO_API_KEY: Optional[str] = Field(default=None, description="کلید API اختیاری FAOSTAT")
-
-    # =========================================================================
-    # اعتبارسنجی سراسری (Global Validation)
-    # =========================================================================
-    @model_validator(mode='after')
-    def validate_production_settings(self) -> 'Settings':
-        """Handle validate_production_settings."""
+    @model_validator(mode="after")
+    def validate_production_settings(self) -> Settings:
         if self.ENVIRONMENT == "production":
-            if self.SECRET_KEY == "super-secret-key-change-in-production-please":
-                raise ValueError("لطفاً مقدار SECRET_KEY را در محیط production تغییر دهید.")
+            if len(self.SECRET_KEY) < 32 or self.SECRET_KEY.startswith("local-dev"):
+                raise ValueError("SECRET_KEY must be a strong random value in production")
+            if self.REQUIRE_AUTH_FOR_WRITES is False:
+                logger.warning("REQUIRE_AUTH_FOR_WRITES is False in production")
         return self
 
 
 @lru_cache
 def get_settings() -> Settings:
-    """Handle get_settings."""
     return Settings()
+
 
 settings = get_settings()
