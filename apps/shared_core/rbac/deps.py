@@ -2,34 +2,60 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Any, Callable
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db_session
-from apps.shared_core.deps import get_current_active_user
+from apps.shared_core.deps import TokenDep, _extract_token, get_current_user
 from apps.shared_core.rbac.service import user_has_permission
 
 
 def require_permission(code: str) -> Callable:
-    """Decorator-style dependency: @router.get(..., dependencies=[Depends(require_permission('farms:write'))])."""
+    """Protect endpoint with permission code e.g. education:write."""
 
     async def _checker(
-        current_user=Depends(get_current_active_user),
+        request: Request,
+        token: TokenDep,
         session: AsyncSession = Depends(get_db_session),
-    ):
-        user_id = current_user.get("id") if isinstance(current_user, dict) else getattr(
-            current_user, "id", None
-        )
+    ) -> dict[str, Any] | None:
+        # Local soft mode: same gate as require_write_auth
+        if not settings.REQUIRE_AUTH_FOR_WRITES and settings.ENVIRONMENT == "local":
+            return None
+
+        raw = _extract_token(request, token)
+        if not raw:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authenticated",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        current_user = await get_current_user(request, session, raw)
+        if current_user.get("is_superuser"):
+            return current_user
+
+        user_id = current_user.get("id")
         if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-        # Superuser short-circuit
-        if isinstance(current_user, dict) and current_user.get("is_superuser"):
-            return current_user
-        if hasattr(current_user, "is_superuser") and getattr(current_user, "is_superuser"):
-            return current_user
-        ok = await user_has_permission(session, int(user_id), code)
+
+        try:
+            uid = int(user_id)
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={
+                    "error": {
+                        "code": "PERMISSION_DENIED",
+                        "message": f"Missing permission: {code}",
+                        "details": [{"permission": code}],
+                    }
+                },
+            )
+
+        ok = await user_has_permission(session, uid, code)
         if not ok:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

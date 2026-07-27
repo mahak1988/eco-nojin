@@ -39,7 +39,7 @@ from apps.api.services.accounting import (
     PaymentService,
 )
 from apps.shared_core.database.session import get_db_session
-from apps.shared_core.deps import require_write_auth
+from apps.shared_core.rbac import require_permission
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/accounting", tags=["accounting"])
@@ -79,7 +79,7 @@ async def get_account(
 async def create_account(
     payload: AccountCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> AccountResponse:
     service = AccountService(session)
     try:
@@ -94,7 +94,7 @@ async def update_account(
     account_id: str,
     payload: AccountUpdate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> AccountResponse:
     service = AccountService(session)
     try:
@@ -129,7 +129,7 @@ async def list_journal_entries(
 async def create_journal_entry(
     payload: JournalEntryCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> JournalEntryResponse:
     service = JournalEntryService(session)
     try:
@@ -160,7 +160,7 @@ async def list_invoices(
 async def create_invoice(
     payload: InvoiceCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> InvoiceResponse:
     service = InvoiceService(session)
     invoice = await service.create(payload)
@@ -172,7 +172,7 @@ async def update_invoice(
     invoice_id: str,
     payload: InvoiceUpdate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> InvoiceResponse:
     service = InvoiceService(session)
     try:
@@ -202,7 +202,7 @@ async def list_payments(
 async def create_payment(
     payload: PaymentCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> PaymentResponse:
     service = PaymentService(session)
     payment = await service.create(payload)
@@ -229,7 +229,7 @@ async def list_budgets(
 async def create_budget(
     payload: BudgetCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("accounting:write")),
 ) -> BudgetResponse:
     service = BudgetService(session)
     budget = await service.create(payload)
