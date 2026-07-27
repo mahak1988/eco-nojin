@@ -1,9 +1,9 @@
-import logging
+"""Admin panel API."""
 
-logger = logging.getLogger(__name__)
 from __future__ import annotations
 
-from typing import Annotated, Optional, TYPE_CHECKING
+import logging
+from typing import TYPE_CHECKING, Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -20,8 +20,10 @@ from apps.users.dependencies import get_current_active_superuser
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from apps.shared_core.models import AdminSetting, AuditLog, SystemReport
+
     from apps.users.models import User
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -34,6 +36,7 @@ async def get_admin_service(
 ) -> AdminService:
     return AdminService(session)
 
+
 AdminServiceDependency = Annotated[AdminService, Depends(get_admin_service)]
 
 
@@ -41,7 +44,7 @@ AdminServiceDependency = Annotated[AdminService, Depends(get_admin_service)]
 async def admin_dashboard(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-) -> dict[str, int]:
+):
     return await admin_service.get_dashboard_summary()
 
 
@@ -51,9 +54,9 @@ async def list_system_settings(
     admin_service: AdminServiceDependency,
     limit: int = 100,
     offset: int = 0,
-) -> list[AdminSettingResponse]:
-    settings: list[AdminSetting] = await admin_service.get_system_settings(limit=limit, offset=offset)
-    return [AdminSettingResponse.model_validate(setting) for setting in settings]
+):
+    settings_list = await admin_service.get_system_settings(limit=limit, offset=offset)
+    return [AdminSettingResponse.model_validate(s) for s in settings_list]
 
 
 @router.put("/settings/{key}", response_model=AdminSettingResponse)
@@ -62,14 +65,19 @@ async def upsert_system_setting(
     payload: AdminSettingUpdate,
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-) -> AdminSettingResponse:
-    if not any([payload.value is not None, payload.description is not None, payload.is_active is not None]):
+):
+    if not any(
+        [
+            payload.value is not None,
+            payload.description is not None,
+            payload.is_active is not None,
+        ]
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="حداقل یکی از فیلدهای value، description یا is_active باید تنظیم شود"
+            detail="At least one of value, description, is_active required",
         )
-
-    setting: AdminSetting = await admin_service.upsert_system_setting(
+    setting = await admin_service.upsert_system_setting(
         key=key,
         value=payload.value,
         description=payload.description,
@@ -85,9 +93,11 @@ async def list_audit_logs(
     event_type: Optional[str] = None,
     limit: int = 100,
     offset: int = 0,
-) -> list[AuditLogResponse]:
-    audit_logs: list[AuditLog] = await admin_service.list_audit_logs(event_type=event_type, limit=limit, offset=offset)
-    return [AuditLogResponse.model_validate(log) for log in audit_logs]
+):
+    logs = await admin_service.list_audit_logs(
+        event_type=event_type, limit=limit, offset=offset
+    )
+    return [AuditLogResponse.model_validate(log) for log in logs]
 
 
 @router.get("/reports", response_model=list[SystemReportResponse])
@@ -96,6 +106,6 @@ async def list_system_reports(
     admin_service: AdminServiceDependency,
     limit: int = 100,
     offset: int = 0,
-) -> list[SystemReportResponse]:
-    reports: list[SystemReport] = await admin_service.list_system_reports(limit=limit, offset=offset)
-    return [SystemReportResponse.model_validate(report) for report in reports]
+):
+    reports = await admin_service.list_system_reports(limit=limit, offset=offset)
+    return [SystemReportResponse.model_validate(r) for r in reports]

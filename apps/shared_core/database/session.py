@@ -34,24 +34,22 @@ def _resolve_database_url() -> str:
         raw = os.getenv("DATABASE_URL")
 
     if not raw or "***" in str(raw) or not str(raw).strip():
-        logger.warning("DATABASE_URL missing/placeholder — using SQLite")
+        logger.info("DATABASE_URL unset — using local SQLite")
         return DEFAULT_SQLITE
 
     url = str(raw).strip()
 
-    # Postgres without async driver → SQLite in local
     if "postgres" in url.lower():
         if "+asyncpg" in url and not _has_asyncpg():
-            logger.warning("asyncpg not installed — falling back to SQLite")
+            logger.info("asyncpg not installed — local SQLite")
             return DEFAULT_SQLITE
         if url.startswith("postgresql://") or url.startswith("postgres://"):
-            # sync-style URL cannot be used with create_async_engine cleanly
             if "+asyncpg" not in url and "+aiosqlite" not in url:
                 try:
                     from apps.shared_core.config import settings
 
                     if settings.ENVIRONMENT == "local":
-                        logger.warning("Local Postgres sync URL without asyncpg — SQLite fallback")
+                        logger.info("Local Postgres URL without async driver — SQLite")
                         return DEFAULT_SQLITE
                 except Exception:
                     return DEFAULT_SQLITE

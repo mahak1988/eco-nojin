@@ -1,12 +1,19 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.1] Phase 0 complete
 
-### Phase 0 / F0.3
-- RBAC models + migration 20260727_0002
-- Five roles + permission catalog + seed endpoint
-- `require_permission("...")` FastAPI dependency (R6)
-- Alembic: force SQLite when Postgres driver missing / local
+### Fixed
+- JWT via python-jose only (no PyJWT import)
+- auth router registration
+- Broken Depends syntax across API routers
+- admin_panel / scenario `from __future__` order
+- validation `await` outside async
+- Optional modules (numba, satellite) logged at DEBUG
 
-### F0.1–F0.2
-- pyproject, baseline education migration, key rotation docs
+### Added
+- RBAC tables + seed + require_permission
+- Pagination envelope (data/meta)
+- Access + refresh token helpers + cookie kwargs
+
+### Verified
+- health, rbac/seed, education/courses, accounting/summary

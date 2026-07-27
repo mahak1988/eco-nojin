@@ -2,25 +2,27 @@
 # -*- coding: utf-8 -*-
 """Econojin API entrypoint."""
 
-from security.middleware.security_middleware import SecurityMiddleware
-from apps.shared_core.middleware.request_id import RequestIDMiddleware
-import sys
-from pathlib import Path
+from __future__ import annotations
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-import os
-import time
 import logging
+import os
+import sys
+import time
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Any
+from pathlib import Path
+from typing import Any, AsyncGenerator
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from security.middleware.security_middleware import SecurityMiddleware
+from apps.shared_core.middleware.request_id import RequestIDMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -32,6 +34,13 @@ logger = logging.getLogger("econojin")
 from apps.shared_core.config import settings
 
 _db_status = {"ok": False, "detail": "not_initialized"}
+
+# Optional modules: log once at DEBUG, not WARNING
+_OPTIONAL_MODULE_HINTS = (
+    "numba",
+    "satellite",
+    "psycopg2",
+)
 
 
 @asynccontextmanager
@@ -56,7 +65,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         logger.info("AI module loaded (provider: %s)", settings.LLM_PROVIDER)
     except Exception as e:
-        logger.warning("AI module unavailable: %s", e)
+        logger.debug("AI module unavailable: %s", e)
 
     try:
         from apps.shared_core.monitoring.sentry import init_sentry
@@ -64,7 +73,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         init_sentry(app)
         logger.info("Sentry initialized")
     except Exception as e:
-        logger.warning("Sentry unavailable: %s", e)
+        logger.debug("Sentry unavailable: %s", e)
 
     logger.info("Startup complete in %.2fs", time.time() - start_time)
     yield
@@ -74,7 +83,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         await close_db()
     except Exception as e:
-        logger.warning("close_db failed: %s", e)
+        logger.debug("close_db failed: %s", e)
 
 
 _docs = "/docs" if settings.ENVIRONMENT != "production" else None
@@ -119,7 +128,14 @@ app.add_middleware(
     allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "X-Request-ID"],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+        "X-Request-ID",
+    ],
     expose_headers=["X-Total-Count", "X-Page-Count", "X-Request-ID", "X-Process-Time"],
     max_age=600,
 )
@@ -168,32 +184,73 @@ async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
     )
 
 
+def _is_optional_failure(msg: str) -> bool:
+    lower = msg.lower()
+    return any(h in lower for h in _OPTIONAL_MODULE_HINTS)
+
+
 def _include(label: str, loader: Any, **kwargs: Any) -> None:
     try:
         router = loader()
         app.include_router(router, **kwargs)
         logger.info("%s: router loaded", label)
     except Exception as e:
-        logger.warning("%s: %s", label, e)
+        err = str(e)
+        if _is_optional_failure(err):
+            logger.debug("%s skipped (optional): %s", label, err)
+        else:
+            logger.warning("%s: %s", label, e)
 
 
-_include("users", lambda: __import__("apps.users.router", fromlist=["router"]).router, prefix=f"{settings.API_V1_STR}/users", tags=["Users"])
-_include("auth", lambda: __import__("apps.users.auth_router", fromlist=["router"]).router, prefix=settings.API_V1_STR, tags=["Authentication"])
-_include("ai_agents", lambda: __import__("apps.ai_agents.router", fromlist=["router"]).router, prefix=f"{settings.API_V1_STR}/ai-agents", tags=["AI Agents"])
+_include(
+    "users",
+    lambda: __import__("apps.users.router", fromlist=["router"]).router,
+    prefix=f"{settings.API_V1_STR}/users",
+    tags=["Users"],
+)
+_include(
+    "auth",
+    lambda: __import__("apps.users.auth_router", fromlist=["router"]).router,
+    prefix=settings.API_V1_STR,
+    tags=["Authentication"],
+)
+_include(
+    "ai_agents",
+    lambda: __import__("apps.ai_agents.router", fromlist=["router"]).router,
+    prefix=f"{settings.API_V1_STR}/ai-agents",
+    tags=["AI Agents"],
+)
 _include("accounting", lambda: __import__("apps.api.routes.accounting", fromlist=["router"]).router)
 _include("ecocoin", lambda: __import__("apps.api.routes.ecocoin", fromlist=["router"]).router)
 _include("monitoring", lambda: __import__("apps.api.routes.monitoring", fromlist=["router"]).router)
 _include("simulator", lambda: __import__("apps.api.routes.simulator", fromlist=["router"]).router)
-_include("admin_panel", lambda: __import__("apps.admin_panel.router", fromlist=["router"]).router, prefix=settings.API_V1_STR, tags=["Admin"])
-_include("simulation", lambda: __import__("apps.simulation.router", fromlist=["router"]).router, prefix=f"{settings.API_V1_STR}/simulation", tags=["Simulation"])
+_include(
+    "admin_panel",
+    lambda: __import__("apps.admin_panel.router", fromlist=["router"]).router,
+    prefix=settings.API_V1_STR,
+    tags=["Admin"],
+)
+_include(
+    "simulation",
+    lambda: __import__("apps.simulation.router", fromlist=["router"]).router,
+    prefix=f"{settings.API_V1_STR}/simulation",
+    tags=["Simulation"],
+)
 _include("data", lambda: __import__("apps.simulation.data.router", fromlist=["router"]).router)
 _include("advisory", lambda: __import__("apps.simulation.advisory.router", fromlist=["router"]).router)
 _include("runs", lambda: __import__("apps.simulation.runs.router", fromlist=["router"]).router)
 _include("scenario", lambda: __import__("apps.simulation.scenario.router", fromlist=["router"]).router)
-_include("validation", lambda: __import__("apps.simulation.validation.router", fromlist=["router"]).router)
-_include("agriculture_schools", lambda: __import__("apps.api.routes.agriculture_schools", fromlist=["router"]).router)
+_include(
+    "validation", lambda: __import__("apps.simulation.validation.router", fromlist=["router"]).router
+)
+_include(
+    "agriculture_schools",
+    lambda: __import__("apps.api.routes.agriculture_schools", fromlist=["router"]).router,
+)
 _include("education", lambda: __import__("apps.api.routes.education", fromlist=["router"]).router)
-_include("education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router)
+_include(
+    "education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router
+)
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
@@ -240,9 +297,15 @@ async def health() -> dict[str, Any]:
 @app.get("/modules", tags=["Modules"])
 async def list_modules() -> dict[str, Any]:
     modules = [
-        "users", "auth", "ai_agents", "accounting", "ecocoin",
-        "monitoring", "simulator", "admin_panel", "simulation",
-        "agriculture_schools", "education", "rbac", "community", "games", "chain", "reports",
+        "users",
+        "auth",
+        "accounting",
+        "education",
+        "rbac",
+        "community",
+        "games",
+        "simulation",
+        "admin",
     ]
     return {"modules": modules, "total": len(modules)}
 

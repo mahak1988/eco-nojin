@@ -1,19 +1,20 @@
+"""Validation / calibration endpoints."""
+
+from __future__ import annotations
+
 import logging
-logger = logging.getLogger('econojin')
-"""
-Validation Router — calibration data + goodness-of-fit + uncertainty + sensitivity.
-"""
-from typing import Optional
+from typing import Any, Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from apps.simulation.data.faostat import fetch_crop_yield
-from apps.simulation.validation.engine import (
-    goodness_of_fit, monte_carlo, morris_sensitivity,
-)
 from apps.simulation.base import SimulationRegistry
+from apps.simulation.data.faostat import fetch_crop_yield
+from apps.simulation.validation.engine import goodness_of_fit, monte_carlo, morris_sensitivity
 
-router = APIRouter(prefix="/api/v1/simulation", tags=["🔬 Validation"])
+logger = logging.getLogger("econojin")
+
+router = APIRouter(prefix="/api/v1/simulation", tags=["Validation"])
 
 
 class CalibrationRequest(BaseModel):
@@ -26,43 +27,18 @@ class CalibrationRequest(BaseModel):
 
 
 @router.post("/validation", summary="Calibration + validation + uncertainty + sensitivity")
-def _validation_extracted():
-    """Extracted from validation() — Try block (18 lines)."""
-    try:
-        result = await sim.run(validated_params)
-        metrics = result.metrics or {}
-        # Try multiple metric keys (not just yield_t_ha)
-        sim_yield = None
-        for k in ("yield_t_ha", "yield", "grain_yield", "biomass_t_ha", "total_biomass"):
-            if k in metrics and isinstance(metrics[k], (int, float)):
-                sim_yield = metrics[k]
-                break
-        if sim_yield is None:
-            # Fallback: first numeric metric
-            for v in metrics.values():
-                if isinstance(v, (int, float)):
-                    sim_yield = v
-                    break
-    except Exception as e:
-        sim_yield = None
-        metrics = {"error": str(e)}
-
-async def validation(req: CalibrationRequest) -> None:
-    # ۱. دادهٔ واقعی از FAOSTAT
+async def validation(req: CalibrationRequest) -> dict[str, Any]:
     fao = await fetch_crop_yield(req.crop, req.area_code)
     observed = list(fao.get("data", {}).values())
 
-    # ۲. اجرای شبیه‌ساز برای مقایسه (با میانگین شرایط)
     sim_cls = SimulationRegistry.get(req.simulator_id)
     if not sim_cls:
         raise HTTPException(404, f"Simulator '{req.simulator_id}' not found")
-    # Instantiate if it's a class (Registry might return class or instance)
     sim = sim_cls() if isinstance(sim_cls, type) else sim_cls
 
-    # Filter parameters through simulator's schema to drop unsupported ones
     sim_params = dict(req.parameters)
     sim_params.setdefault("crop", req.crop)
-    validated_params = {}
+    validated_params: dict[str, Any] = {}
     try:
         config_schema = getattr(sim, "config", None) or getattr(sim_cls, "config", None)
         if config_schema and hasattr(config_schema, "parameters"):
@@ -70,7 +46,6 @@ async def validation(req: CalibrationRequest) -> None:
             for k, v in sim_params.items():
                 if k in valid_keys:
                     validated_params[k] = v
-            # اگر پارامتر ضروری نیست، crop را حتماً نگه دار
             if "crop" not in validated_params:
                 validated_params["crop"] = req.crop
         else:
@@ -78,41 +53,58 @@ async def validation(req: CalibrationRequest) -> None:
     except Exception:
         validated_params = sim_params
 
-    _validation_extracted()  # refactored: was Try block
+    sim_yield: Optional[float] = None
+    metrics: dict[str, Any] = {}
+    try:
+        result = await sim.run(validated_params)
+        metrics = result.metrics or {}
+        for k in ("yield_t_ha", "yield", "grain_yield", "biomass_t_ha", "total_biomass"):
+            if k in metrics and isinstance(metrics[k], (int, float)):
+                sim_yield = float(metrics[k])
+                break
+        if sim_yield is None:
+            for v in metrics.values():
+                if isinstance(v, (int, float)):
+                    sim_yield = float(v)
+                    break
+    except Exception as e:
+        metrics = {"error": str(e)}
 
-    # ۳. اعتبارسنجی (مقایسهٔ عملکرد شبیه‌سازی‌شده با میانگین دادهٔ واقعی)
     gof = None
     if observed and isinstance(sim_yield, (int, float)):
         mean_obs = round(sum(observed) / len(observed), 3)
-        # ساخت سری شبیه‌سازی‌شده حول مقدار مدل برای مقایسه با سری مشاهده‌ای
         simulated_series = [sim_yield] * len(observed)
         gof = goodness_of_fit(observed, simulated_series)
         gof["observed_mean_t_ha"] = mean_obs
         gof["simulated_t_ha"] = round(sim_yield, 3)
-        gof["yield_gap_pct"] = round((sim_yield - mean_obs) / mean_obs * 100, 1) if mean_obs else 0
+        gof["yield_gap_pct"] = (
+            round((sim_yield - mean_obs) / mean_obs * 100, 1) if mean_obs else 0
+        )
 
-    # ۴. عدم قطعیت (Monte Carlo)
     uncertainty = None
     if req.run_uncertainty:
-        async def run_fn(p) -> None:
+
+        async def run_fn(p: dict) -> dict:
             try:
                 r = await sim.run(p)
                 return {"metrics": r.metrics or {}, "outputs": r.outputs or {}}
             except Exception as e:
-                logger.warning(f'Monte Carlo run failed: {e}')
+                logger.warning("Monte Carlo run failed: %s", e)
                 return {"metrics": {}, "outputs": {}}
+
         uncertainty = await monte_carlo(run_fn, validated_params)
 
-    # ۵. حساسیت (Morris)
     sensitivity = None
     if req.run_sensitivity:
-        async def run_fn2(p) -> None:
+
+        async def run_fn2(p: dict) -> dict:
             try:
                 r = await sim.run(p)
                 return {"metrics": r.metrics or {}, "outputs": r.outputs or {}}
             except Exception as e:
-                logger.warning(f'Monte Carlo run failed: {e}')
+                logger.warning("Sensitivity run failed: %s", e)
                 return {"metrics": {}, "outputs": {}}
+
         sensitivity = await morris_sensitivity(run_fn2, validated_params)
 
     return {
@@ -122,4 +114,5 @@ async def validation(req: CalibrationRequest) -> None:
         "goodness_of_fit": gof,
         "uncertainty": uncertainty,
         "sensitivity": sensitivity,
+        "metrics": metrics,
     }
