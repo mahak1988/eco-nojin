@@ -1,33 +1,38 @@
-"""Authentication router — JWT in HttpOnly cookies (R4/R5) + optional body tokens."""
+"""Authentication — HttpOnly cookies + RS256/HS256 via shared security module."""
 
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jose import JWTError
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db
-from apps.shared_core.security import cookie_kwargs
+from apps.shared_core.security import (
+    cookie_kwargs,
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    get_password_hash,
+    verify_password,
+)
+from apps.shared_core.token_store import is_refresh_revoked, revoke_refresh
 from apps.users.models import User
-from apps.users.password import get_password_hash, verify_password
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
-
 security = HTTPBearer(auto_error=False)
 
 ACCESS_COOKIE = settings.JWT_COOKIE_NAME
 REFRESH_COOKIE = settings.REFRESH_COOKIE_NAME
-
 ALLOWED_ROLES = {"farmer", "expert", "viewer"}
 
 
@@ -94,20 +99,6 @@ class RefreshRequest(BaseModel):
     refreshToken: Optional[str] = None
 
 
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "type": "access"})
-    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.ALGORITHM)
-
-
-def create_refresh_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire, "type": "refresh"})
-    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.ALGORITHM)
-
-
 def _user_response(user: User) -> UserResponse:
     return UserResponse(
         id=user.id,
@@ -158,7 +149,7 @@ async def get_current_user(
     if not token:
         raise credentials_exception
     try:
-        payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.ALGORITHM])
+        payload = decode_token(token)
         email: str | None = payload.get("sub")
         if email is None or payload.get("type") != "access":
             raise credentials_exception
@@ -197,8 +188,8 @@ async def register(
     await db.commit()
     await db.refresh(new_user)
 
-    access = create_access_token({"sub": new_user.email})
-    refresh = create_refresh_token({"sub": new_user.email})
+    access = create_access_token(new_user.email)
+    refresh = create_refresh_token(new_user.email)
     _set_auth_cookies(response, access, refresh)
 
     return AuthResponse(
@@ -228,8 +219,8 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access = create_access_token({"sub": user.email})
-    refresh = create_refresh_token({"sub": user.email})
+    access = create_access_token(user.email)
+    refresh = create_refresh_token(user.email)
     _set_auth_cookies(response, access, refresh)
 
     return AuthResponse(
@@ -245,7 +236,16 @@ async def get_me(current_user: User = Depends(get_current_user)) -> UserResponse
 
 
 @router.post("/logout")
-async def logout(response: Response) -> dict[str, str]:
+async def logout(request: Request, response: Response) -> dict[str, str]:
+    raw = request.cookies.get(REFRESH_COOKIE)
+    if raw:
+        try:
+            payload = decode_token(raw)
+            jti = payload.get("jti")
+            if jti:
+                revoke_refresh(str(jti))
+        except JWTError:
+            pass
     _clear_auth_cookies(response)
     return {"message": "Successfully logged out"}
 
@@ -266,20 +266,27 @@ async def refresh_token(
         raise HTTPException(status_code=401, detail="Missing refresh token")
 
     try:
-        payload = jwt.decode(raw, settings.jwt_secret, algorithms=[settings.ALGORITHM])
+        payload = decode_token(raw)
         email = payload.get("sub")
+        jti = payload.get("jti")
         if payload.get("type") != "refresh" or not email:
             raise HTTPException(status_code=401, detail="Invalid token type")
+        if jti and is_refresh_revoked(str(jti)):
+            raise HTTPException(status_code=401, detail="Refresh token revoked")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    # rotation: revoke old jti
+    if jti:
+        revoke_refresh(str(jti))
 
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
 
-    access = create_access_token({"sub": user.email})
-    refresh = create_refresh_token({"sub": user.email})
+    access = create_access_token(user.email)
+    refresh = create_refresh_token(user.email)
     _set_auth_cookies(response, access, refresh)
 
     return AuthResponse(
