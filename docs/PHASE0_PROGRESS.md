@@ -2,29 +2,28 @@
 
 | Item | Status |
 |------|--------|
-| F0.1 pyproject | DONE |
-| F0.2 Alembic baseline | DONE — fix sync URL if stamp failed on psycopg2 |
-| F0.3 RBAC | pending |
-| F0.4 Auth RS256 + cookies | pending |
+| F0.1 | DONE |
+| F0.2 | DONE (use SQLite fallback if no Postgres driver) |
+| **F0.3 RBAC** | **DONE** |
+| F0.4 Auth RS256 + HttpOnly | next |
 
-## If `alembic` failed with psycopg2
+## F0.3 deliverables
+- Tables: `roles`, `permissions`, `role_permissions`, `user_roles`
+- Migration `20260727_0002`
+- Roles: superadmin, admin, expert, farmer, viewer
+- `require_permission("resource:action")` dependency
+- `POST /api/v1/rbac/seed` (non-production)
 
-Cause: `DATABASE_URL` pointed at Postgres and Alembic tried a sync Postgres driver.
+## Alembic local
 
-Fix (local):
+```powershell
+$env:ALEMBIC_FORCE_SQLITE="1"
+$env:ENVIRONMENT="local"
+alembic upgrade head
+```
 
-```env
+Or set in `.env`:
+```
 DATABASE_URL=sqlite+aiosqlite:///./apps/econojin.db
 ENVIRONMENT=local
 ```
-
-Then:
-
-```bash
-git pull
-alembic upgrade head
-# or if tables already exist:
-alembic stamp 20260727_0001
-```
-
-Postgres staging: `pip install "psycopg[binary]"` and use `postgresql+asyncpg://` in app URL (Alembic converts to `postgresql+psycopg://`).

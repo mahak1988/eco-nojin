@@ -2,13 +2,11 @@
 
 ## [Unreleased]
 
-### Phase 0 / F0.2
-- Alembic baseline migration `20260727_0001` (courses, lessons, enrollments)
-- `docs/DB_VERSIONING.md` — schema policy + crypto key handling
-- Fixed `pyproject.toml` for `pip install -e` (SPDX license string, no readme table error)
+### Phase 0 / F0.3
+- RBAC models + migration 20260727_0002
+- Five roles + permission catalog + seed endpoint
+- `require_permission("...")` FastAPI dependency (R6)
+- Alembic: force SQLite when Postgres driver missing / local
 
-### Phase 0 / F0.1
-- Real dependencies in pyproject + requirements
-
-### Wave A / F1.1
-- Education R13/R14 list envelope
+### F0.1–F0.2
+- pyproject, baseline education migration, key rotation docs
