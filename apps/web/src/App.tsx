@@ -37,6 +37,8 @@ const MySimulationsPage = lazy(() => import("./pages/MySimulationsPage"));
 const ComparisonDashboard = lazy(() => import("./pages/ComparisonDashboard"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const VerifyOtpPage = lazy(() => import("./pages/VerifyOtpPage"));
 const FarmsPage = lazy(() => import("./pages/FarmsPage"));
 const FarmNewPage = lazy(() => import("./pages/FarmNewPage"));
 const FarmDetailPage = lazy(() => import("./pages/FarmDetailPage"));
@@ -44,8 +46,13 @@ const FarmWizardPage = lazy(() => import("./pages/FarmWizardPage"));
 const CropsPage = lazy(() => import("./pages/CropsPage"));
 const CropDetailPage = lazy(() => import("./pages/CropDetailPage"));
 const WaterPage = lazy(() => import("./pages/WaterPage"));
+const WaterIrrigationPage = lazy(() => import("./pages/WaterIrrigationPage"));
 const PlantingCalendarPage = lazy(() => import("./pages/PlantingCalendarPage"));
 const TasksPage = lazy(() => import("./pages/TasksPage"));
+const InventoryPage = lazy(() => import("./pages/InventoryPage"));
+const WeatherPage = lazy(() => import("./pages/WeatherPage"));
+const AccountSecurityPage = lazy(() => import("./pages/AccountSecurityPage"));
+const AccountNotificationsPage = lazy(() => import("./pages/AccountNotificationsPage"));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
 const AdminModulesPage = lazy(() => import("./pages/admin/AdminModulesPage"));
@@ -107,6 +114,8 @@ export default function App() {
           <Routes>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="verify-otp" element={<VerifyOtpPage />} />
             <Route path="admin" element={<AdminShell />}>
               <Route index element={<AdminOverviewPage />} />
               <Route path="users" element={<AdminUsersPage />} />
@@ -124,8 +133,14 @@ export default function App() {
               <Route path="crops" element={<CropsPage />} />
               <Route path="crops/:id" element={<CropDetailPage />} />
               <Route path="water" element={<WaterPage />} />
+              <Route path="water/irrigation" element={<WaterIrrigationPage />} />
               <Route path="planting" element={<PlantingCalendarPage />} />
               <Route path="tasks" element={<TasksPage />} />
+              <Route path="inventory" element={<InventoryPage />} />
+              <Route path="weather" element={<WeatherPage />} />
+              <Route path="account" element={<AccountPage />} />
+              <Route path="account/security" element={<AccountSecurityPage />} />
+              <Route path="account/notifications" element={<AccountNotificationsPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="alerts" element={<AlertsPage />} />
               <Route path="community" element={<CommunityPage />} />
@@ -144,7 +159,6 @@ export default function App() {
               <Route path="tourism" element={<TourismPage />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="accounting" element={<AccountingPage />} />
-              <Route path="account" element={<AccountPage />} />
               <Route path="invoices" element={<InvoicesPage />} />
               <Route path="journal" element={<JournalEntriesPage />} />
               <Route path="payments" element={<PaymentsPage />} />
