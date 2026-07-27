@@ -37,6 +37,9 @@ const MySimulationsPage = lazy(() => import("./pages/MySimulationsPage"));
 const ComparisonDashboard = lazy(() => import("./pages/ComparisonDashboard"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const FarmsPage = lazy(() => import("./pages/FarmsPage"));
+const FarmNewPage = lazy(() => import("./pages/FarmNewPage"));
+const FarmDetailPage = lazy(() => import("./pages/FarmDetailPage"));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
 const AdminModulesPage = lazy(() => import("./pages/admin/AdminModulesPage"));
@@ -77,8 +80,8 @@ class ErrorBoundary extends Component<EBProps, EBState> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-          <p className="font-display text-2xl text-stone-800 dark:text-stone-100">Something went wrong</p>
+        <div className="flex flex-col items-center justify-center gap-4 p-8 text-center min-h-[60vh]">
+          <p className="font-display text-2xl text-stone-800">Something went wrong</p>
           <button
             type="button"
             onClick={() => window.location.reload()}
@@ -114,6 +117,9 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="farms" element={<FarmsPage />} />
+              <Route path="farms/new" element={<FarmNewPage />} />
+              <Route path="farms/:id" element={<FarmDetailPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="alerts" element={<AlertsPage />} />
               <Route path="community" element={<CommunityPage />} />
