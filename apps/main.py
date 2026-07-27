@@ -34,7 +34,6 @@ logger = logging.getLogger("econojin")
 from apps.shared_core.config import settings
 
 _db_status = {"ok": False, "detail": "not_initialized"}
-
 _OPTIONAL_MODULE_HINTS = ("numba", "satellite", "psycopg2")
 
 
@@ -42,7 +41,6 @@ _OPTIONAL_MODULE_HINTS = ("numba", "satellite", "psycopg2")
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Econojin API v%s starting (%s)", settings.VERSION, settings.ENVIRONMENT)
     start_time = time.time()
-
     try:
         from apps.shared_core.database.session import init_db
 
@@ -54,14 +52,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         _db_status["ok"] = False
         _db_status["detail"] = str(e)[:200]
         logger.warning("init_db failed: %s", e)
-
     try:
         from apps.shared_ai.ai.llm_factory import LLMFactory  # noqa: F401
 
         logger.info("AI module loaded (provider: %s)", settings.LLM_PROVIDER)
     except Exception as e:
         logger.debug("AI module unavailable: %s", e)
-
     try:
         from apps.shared_core.monitoring.sentry import init_sentry
 
@@ -69,10 +65,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("Sentry initialized")
     except Exception as e:
         logger.debug("Sentry unavailable: %s", e)
-
     logger.info("Startup complete in %.2fs", time.time() - start_time)
     yield
-
     try:
         from apps.shared_core.database.session import close_db
 
@@ -255,6 +249,7 @@ _include("community", lambda: __import__("apps.api.routes.community", fromlist=[
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
 _include("chain", lambda: __import__("apps.simulation.chain.router", fromlist=["router"]).router)
 _include("reports", lambda: __import__("apps.simulation.reports.router", fromlist=["router"]).router)
+_include("farms", lambda: __import__("apps.farms.router", fromlist=["router"]).router)
 
 
 @app.get("/", tags=["Root"])
@@ -283,7 +278,6 @@ async def health() -> dict[str, Any]:
     except Exception as e:
         db_live = False
         db_detail = str(e)[:200]
-
     return {
         "status": "healthy" if db_live else "degraded",
         "version": settings.VERSION,
@@ -291,22 +285,6 @@ async def health() -> dict[str, Any]:
         "database": "ok" if db_live else "fail",
         "database_detail": db_detail,
     }
-
-
-@app.get("/modules", tags=["Modules"])
-async def list_modules() -> dict[str, Any]:
-    modules = [
-        "users",
-        "auth",
-        "accounting",
-        "education",
-        "rbac",
-        "community",
-        "games",
-        "simulation",
-        "admin",
-    ]
-    return {"modules": modules, "total": len(modules)}
 
 
 if __name__ == "__main__":
