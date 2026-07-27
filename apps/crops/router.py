@@ -18,7 +18,7 @@ router = APIRouter(prefix="/api/v1/crops", tags=["Crops"])
 @router.get("", response_model=CropListResponse)
 async def list_crops(
     page: int = Query(1, ge=1),
-    size: int = Query(50, ge=1, le=100),
+    size: int = Query(100, ge=1, le=200),
     search: Optional[str] = None,
     category: Optional[str] = None,
     session: AsyncSession = Depends(get_db_session),
@@ -37,8 +37,11 @@ async def get_crop(crop_id: int, session: AsyncSession = Depends(get_db_session)
 
 
 @router.post("/seed-demo")
-async def seed_crops(session: AsyncSession = Depends(get_db_session)):
+async def seed_crops(
+    force: bool = Query(False),
+    session: AsyncSession = Depends(get_db_session),
+):
     if settings.ENVIRONMENT == "production":
         raise HTTPException(status_code=403, detail="Seed disabled")
-    n = await CropService(session).seed_demo()
+    n = await CropService(session).seed_demo(force=force)
     return {"seeded": n, "message": "ok"}
