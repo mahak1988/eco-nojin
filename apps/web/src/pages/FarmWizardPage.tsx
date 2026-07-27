@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,65 +10,9 @@ import {
   Wheat,
 } from "lucide-react";
 import { farmsApi } from "../lib/farmsApi";
+import { LeafletPicker } from "../components/maps/LeafletPicker";
 
 const STEPS = ["Basics", "Map", "Confirm"] as const;
-
-/** Simple clickable map preview (no external map SDK). */
-function ClickMap({
-  lat,
-  lng,
-  onPick,
-}: {
-  lat: number | null;
-  lng: number | null;
-  onPick: (lat: number, lng: number) => void;
-}) {
-  // Rough Iran-centered bounds for demo click mapping
-  const bounds = { minLat: 25, maxLat: 40, minLng: 44, maxLng: 63 };
-
-  const marker = useMemo(() => {
-    if (lat == null || lng == null) return null;
-    const x = ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
-    const y = (1 - (lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * 100;
-    return { left: `${Math.min(98, Math.max(2, x))}%`, top: `${Math.min(98, Math.max(2, y))}%` };
-  }, [lat, lng]);
-
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const px = (e.clientX - rect.left) / rect.width;
-        const py = (e.clientY - rect.top) / rect.height;
-        const pickLng = bounds.minLng + px * (bounds.maxLng - bounds.minLng);
-        const pickLat = bounds.maxLat - py * (bounds.maxLat - bounds.minLat);
-        onPick(Number(pickLat.toFixed(5)), Number(pickLng.toFixed(5)));
-      }}
-      className="relative h-64 w-full overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-100 via-sky-50 to-amber-50 shadow-inner"
-      title="Click to set location"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          backgroundImage:
-            "linear-gradient(#059669 1px, transparent 1px), linear-gradient(90deg, #059669 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
-      <span className="absolute start-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold text-emerald-700">
-        Click map · Iran demo bounds
-      </span>
-      {marker && (
-        <span
-          className="absolute z-10 -translate-x-1/2 -translate-y-full text-2xl drop-shadow"
-          style={{ left: marker.left, top: marker.top }}
-        >
-          📍
-        </span>
-      )}
-    </button>
-  );
-}
 
 export default function FarmWizardPage() {
   const navigate = useNavigate();
@@ -85,7 +29,7 @@ export default function FarmWizardPage() {
 
   const useMyLocation = () => {
     if (!navigator.geolocation) {
-      setError("Geolocation not supported in this browser");
+      setError("Geolocation not supported");
       return;
     }
     setGeoLoading(true);
@@ -96,22 +40,17 @@ export default function FarmWizardPage() {
         setGeoLoading(false);
       },
       () => {
-        setError("Could not read location — allow GPS or pick on map");
+        setError("Could not read GPS — pick on map");
         setGeoLoading(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 },
+      { enableHighAccuracy: true, timeout: 12000 },
     );
   };
 
   const canNext =
-    step === 0
-      ? name.trim().length > 0
-      : step === 1
-        ? lat != null && lng != null
-        : true;
+    step === 0 ? name.trim().length > 0 : step === 1 ? lat != null && lng != null : true;
 
-  async function onSubmit(e?: FormEvent) {
-    e?.preventDefault();
+  async function onSubmit() {
     setError(null);
     setLoading(true);
     try {
@@ -125,7 +64,7 @@ export default function FarmWizardPage() {
       });
       navigate(`/farms/${farm.id}`, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create farm");
+      setError(err instanceof Error ? err.message : "Failed");
     } finally {
       setLoading(false);
     }
@@ -133,18 +72,17 @@ export default function FarmWizardPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-5 sm:p-8">
-      <Link to="/farms" className="inline-flex items-center gap-1 text-sm font-bold text-stone-500 hover:text-stone-800">
+      <Link to="/farms" className="inline-flex items-center gap-1 text-sm font-bold text-stone-500">
         <ArrowLeft className="h-4 w-4" />
         Farms
       </Link>
-
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-50">
           <Wheat className="h-5 w-5 text-emerald-700" />
         </div>
         <div>
-          <h1 className="font-display text-2xl text-stone-800">Farm wizard</h1>
-          <p className="text-sm text-stone-500">Name → map pin → confirm</p>
+          <h1 className="font-display text-2xl text-stone-800">Farm map wizard</h1>
+          <p className="text-sm text-stone-500">OpenStreetMap · click to pin · GPS optional</p>
         </div>
       </div>
 
@@ -178,7 +116,6 @@ export default function FarmWizardPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
-              placeholder="North Field"
             />
           </label>
           <label className="block text-sm">
@@ -187,7 +124,6 @@ export default function FarmWizardPage() {
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
-              placeholder="Isfahan"
             />
           </label>
           <label className="block text-sm">
@@ -215,23 +151,16 @@ export default function FarmWizardPage() {
 
       {step === 1 && (
         <div className="space-y-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <ClickMap
-            lat={lat}
-            lng={lng}
-            onPick={(a, b) => {
-              setLat(a);
-              setLng(b);
-            }}
-          />
+          <LeafletPicker lat={lat} lng={lng} onPick={(a, b) => { setLat(a); setLng(b); }} />
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={useMyLocation}
               disabled={geoLoading}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 px-3 py-2 text-xs font-bold"
             >
               {geoLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Crosshair className="h-3.5 w-3.5" />}
-              Use my location
+              GPS
             </button>
             {lat != null && lng != null && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800">
@@ -266,10 +195,9 @@ export default function FarmWizardPage() {
       )}
 
       {step === 2 && (
-        <div className="space-y-2 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm text-sm">
+        <div className="space-y-2 rounded-2xl border border-stone-200 bg-white p-5 text-sm shadow-sm">
           <p>
-            <span className="text-stone-400">Name</span>{" "}
-            <span className="font-bold text-stone-800">{name}</span>
+            <span className="text-stone-400">Name</span> <span className="font-bold">{name}</span>
           </p>
           <p>
             <span className="text-stone-400">Region</span> {region || "—"}
@@ -278,22 +206,20 @@ export default function FarmWizardPage() {
             <span className="text-stone-400">Area</span> {areaHa ? `${areaHa} ha` : "—"}
           </p>
           <p>
-            <span className="text-stone-400">Coordinates</span>{" "}
+            <span className="text-stone-400">Pin</span>{" "}
             {lat != null && lng != null ? `${lat}, ${lng}` : "—"}
           </p>
-          <p className="text-stone-500">{description || "No description"}</p>
         </div>
       )}
 
-      <div className="flex justify-between gap-2">
+      <div className="flex justify-between">
         <button
           type="button"
           disabled={step === 0}
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
-          className="inline-flex items-center gap-1 rounded-xl border border-stone-200 px-4 py-2.5 text-sm font-bold text-stone-600 disabled:opacity-40"
+          onClick={() => setStep((s) => s - 1)}
+          className="inline-flex items-center gap-1 rounded-xl border px-4 py-2.5 text-sm font-bold disabled:opacity-40"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back
+          <ArrowLeft className="h-4 w-4" /> Back
         </button>
         {step < 2 ? (
           <button
@@ -302,8 +228,7 @@ export default function FarmWizardPage() {
             onClick={() => setStep((s) => s + 1)}
             className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40"
           >
-            Next
-            <ArrowRight className="h-4 w-4" />
+            Next <ArrowRight className="h-4 w-4" />
           </button>
         ) : (
           <button
