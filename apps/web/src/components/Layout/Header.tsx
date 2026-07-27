@@ -24,6 +24,7 @@ import {
   LogIn,
   LogOut,
   UserRound,
+  Wheat,
 } from "lucide-react";
 import { useLang, CONTENT } from "../eco/i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -31,11 +32,11 @@ import { useAuth } from "../../hooks/useAuth";
 
 const MAIN_NAV = [
   { key: "nav_dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { key: "nav_farms", to: "/farms", icon: Wheat, label: "Farms" },
+  { key: "nav_education", to: "/education", icon: BookOpen },
   { key: "nav_satellite", to: "/satellite", icon: Satellite },
   { key: "nav_simulators", to: "/simulators", icon: FlaskConical },
   { key: "nav_mrv", to: "/mrv", icon: ShieldCheck },
-  { key: "nav_reports", to: "/reports", icon: FileText },
-  { key: "nav_education", to: "/education", icon: BookOpen },
 ];
 
 const MORE_GROUPS_KEYS = [
@@ -45,6 +46,7 @@ const MORE_GROUPS_KEYS = [
       { key: "nav_analytics", to: "/analytics", icon: TrendingUp },
       { key: "nav_alerts", to: "/alerts", icon: ShieldAlert },
       { key: "nav_risks", to: "/risks", icon: ShieldAlert },
+      { key: "nav_reports", to: "/reports", icon: FileText },
     ],
   },
   {
@@ -92,28 +94,18 @@ export function Header() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
-  const [moreOpen, setMoreOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
 
   const canGoBack = location.pathname !== "/";
 
   useEffect(() => {
-    setMoreOpen(false);
     setMobileOpen(false);
   }, [location.pathname]);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
   const navLinkCls = (to: string) =>
     `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-      location.pathname === to
+      location.pathname === to || location.pathname.startsWith(to + "/")
         ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
         : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50"
     }`;
@@ -122,6 +114,9 @@ export function Header() {
     await logout();
     navigate("/");
   };
+
+  const labelOf = (item: { key: string; label?: string }) =>
+    item.label || (t as Record<string, string>)[item.key] || item.key;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
@@ -132,7 +127,7 @@ export function Header() {
               type="button"
               onClick={() => navigate(-1)}
               aria-label="back"
-              className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800"
+              className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100"
             >
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             </button>
@@ -151,16 +146,14 @@ export function Header() {
           {MAIN_NAV.map((item) => (
             <Link key={item.key} to={item.to} className={navLinkCls(item.to)}>
               <item.icon className="h-4 w-4" />
-              <span>{(t as Record<string, string>)[item.key] || item.key}</span>
+              <span>{labelOf(item)}</span>
             </Link>
           ))}
 
           <div className="group relative" ref={moreRef}>
             <button
               type="button"
-              aria-expanded={moreOpen}
-              aria-haspopup="menu"
-              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-700 dark:text-slate-300"
+              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-700"
             >
               {(t as Record<string, string>).menu || "More"}
               <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
@@ -176,11 +169,10 @@ export function Header() {
                       <Link
                         key={item.key}
                         to={item.to}
-                        role="menuitem"
-                        className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                        className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
                           location.pathname === item.to
                             ? "bg-emerald-50 text-emerald-700"
-                            : "text-slate-600 hover:bg-slate-100 dark:text-slate-300"
+                            : "text-slate-600 hover:bg-slate-100"
                         }`}
                       >
                         <item.icon className="h-4 w-4 opacity-70" />
@@ -196,12 +188,11 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
-
           {isAuthenticated ? (
             <div className="hidden items-center gap-1 sm:flex">
               <Link
                 to="/account"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
                 <UserRound className="h-3.5 w-3.5" />
                 <span className="max-w-[120px] truncate">{user?.email || t.profile}</span>
@@ -209,28 +200,33 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => void onLogout()}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800 dark:bg-emerald-600"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 {t.logout}
               </button>
             </div>
           ) : (
-            <Link
-              to="/login"
-              className="hidden items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 sm:inline-flex"
-            >
-              <LogIn className="h-3.5 w-3.5" />
-              Sign in
-            </Link>
+            <div className="hidden items-center gap-1 sm:flex">
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                Sign in
+              </Link>
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700"
+              >
+                Register
+              </Link>
+            </div>
           )}
-
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            aria-label="menu"
-            aria-expanded={mobileOpen}
-            className="grid h-9 w-9 place-items-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 lg:hidden"
+            className="grid h-9 w-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -238,31 +234,28 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:hidden">
-          <nav className="mx-auto max-w-7xl space-y-4 px-4 py-4" aria-label="Mobile">
+        <div className="border-t border-slate-200 bg-white lg:hidden">
+          <nav className="mx-auto max-w-7xl space-y-3 px-4 py-4">
             <div className="grid grid-cols-2 gap-1">
               {MAIN_NAV.map((item) => (
                 <Link
                   key={item.key}
                   to={item.to}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
-                    location.pathname === item.to
+                    location.pathname.startsWith(item.to)
                       ? "bg-emerald-50 text-emerald-700"
-                      : "text-slate-600 hover:bg-slate-100"
+                      : "text-slate-600"
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
-                  {(t as Record<string, string>)[item.key] || item.key}
+                  {labelOf(item)}
                 </Link>
               ))}
             </div>
             <div className="flex gap-2 border-t border-slate-100 pt-3">
               {isAuthenticated ? (
                 <>
-                  <Link
-                    to="/account"
-                    className="flex-1 rounded-xl border border-slate-200 py-2 text-center text-sm font-bold"
-                  >
+                  <Link to="/account" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
                     {t.profile}
                   </Link>
                   <button
@@ -274,12 +267,17 @@ export function Header() {
                   </button>
                 </>
               ) : (
-                <Link
-                  to="/login"
-                  className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white"
-                >
-                  Sign in
-                </Link>
+                <>
+                  <Link to="/login" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
+                    Sign in
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white"
+                  >
+                    Register
+                  </Link>
+                </>
               )}
             </div>
           </nav>
