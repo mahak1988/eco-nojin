@@ -33,7 +33,6 @@ class Settings(BaseSettings):
     def all_cors_origins(self) -> List[str]:
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
 
-    # Default SQLite so app boots without Postgres driver
     DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./apps/econojin.db")
     DB_ECHO: bool = Field(default=False)
 
@@ -48,6 +47,16 @@ class Settings(BaseSettings):
     COOKIE_SAMESITE: str = Field(default="lax")
 
     REQUIRE_AUTH_FOR_WRITES: bool = Field(default=False)
+
+    REDIS_URL: str = Field(default="redis://localhost:6379/0")
+    CELERY_BROKER_URL: Optional[str] = Field(default=None)
+
+    # Satellite / EO (Section 6)
+    GEE_SERVICE_ACCOUNT: Optional[str] = Field(default=None)
+    GEE_CREDENTIALS_FILE: Optional[str] = Field(default=None)
+    GEE_PROJECT_ID: Optional[str] = Field(default=None)
+    COPERNICUS_USERNAME: Optional[str] = Field(default=None)
+    COPERNICUS_PASSWORD: Optional[str] = Field(default=None)
 
     BLOCKCHAIN_RPC_URL: str = Field(default="https://rpc-amoy.polygon.technology/")
     BLOCKCHAIN_CHAIN_ID: int = Field(default=80002)
