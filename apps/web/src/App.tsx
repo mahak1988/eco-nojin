@@ -36,6 +36,7 @@ const SimulatorDetailPage = lazy(() => import("./pages/SimulatorDetailPage"));
 const MySimulationsPage = lazy(() => import("./pages/MySimulationsPage"));
 const ComparisonDashboard = lazy(() => import("./pages/ComparisonDashboard"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
 const AdminModulesPage = lazy(() => import("./pages/admin/AdminModulesPage"));
@@ -58,8 +59,12 @@ function PageLoader() {
   );
 }
 
-interface EBProps { children: ReactNode; }
-interface EBState { hasError: boolean; }
+interface EBProps {
+  children: ReactNode;
+}
+interface EBState {
+  hasError: boolean;
+}
 
 class ErrorBoundary extends Component<EBProps, EBState> {
   constructor(props: EBProps) {
@@ -74,12 +79,10 @@ class ErrorBoundary extends Component<EBProps, EBState> {
       return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
           <p className="font-display text-2xl text-stone-800 dark:text-stone-100">Something went wrong</p>
-          <p className="max-w-sm text-sm text-stone-600 dark:text-stone-400">
-            A new version may have been deployed, or the network dropped. Please reload.
-          </p>
           <button
+            type="button"
             onClick={() => window.location.reload()}
-            className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
+            className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white"
           >
             Reload
           </button>
@@ -98,6 +101,7 @@ export default function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
 
             <Route path="admin" element={<AdminShell />}>
               <Route index element={<AdminOverviewPage />} />
