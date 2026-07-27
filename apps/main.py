@@ -102,7 +102,6 @@ if settings.ENVIRONMENT != "local":
     except Exception as e:
         logger.warning("Security middleware failed: %s", e)
 
-# R10: explicit origins only — never "*"
 _cors_origins = list(settings.all_cors_origins)
 for extra in (
     "http://localhost:5173",
@@ -141,7 +140,6 @@ def _request_id(request: Request) -> str | None:
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.error("Unhandled error: %s", exc, exc_info=True)
-    # Moving toward R17 nested error shape
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -196,6 +194,7 @@ _include("validation", lambda: __import__("apps.simulation.validation.router", f
 _include("agriculture_schools", lambda: __import__("apps.api.routes.agriculture_schools", fromlist=["router"]).router)
 _include("education", lambda: __import__("apps.api.routes.education", fromlist=["router"]).router)
 _include("education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router)
+_include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
 _include("chain", lambda: __import__("apps.simulation.chain.router", fromlist=["router"]).router)
@@ -243,7 +242,7 @@ async def list_modules() -> dict[str, Any]:
     modules = [
         "users", "auth", "ai_agents", "accounting", "ecocoin",
         "monitoring", "simulator", "admin_panel", "simulation",
-        "agriculture_schools", "education", "community", "games", "chain", "reports",
+        "agriculture_schools", "education", "rbac", "community", "games", "chain", "reports",
     ]
     return {"modules": modules, "total": len(modules)}
 
@@ -251,7 +250,7 @@ async def list_modules() -> dict[str, Any]:
 if __name__ == "__main__":
     import uvicorn
 
-    host = os.getenv("HOST", "0.0.0.0")  # process bind only; app config uses settings
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8000"))
     reload = settings.ENVIRONMENT == "local"
     uvicorn.run("apps.main:app", host=host, port=port, reload=reload, log_level="info", access_log=True)
