@@ -8,6 +8,7 @@ import {
   AlertCircle,
   RefreshCw,
   Wheat,
+  Map,
 } from "lucide-react";
 import { farmsApi, type FarmDto } from "../lib/farmsApi";
 
@@ -49,7 +50,7 @@ export default function FarmsPage() {
             <p className="text-sm text-stone-500">{total} registered · manage boundaries & area</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => void load()}
@@ -59,11 +60,18 @@ export default function FarmsPage() {
             Refresh
           </button>
           <Link
+            to="/farms/wizard"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800 hover:bg-emerald-100"
+          >
+            <Map className="h-4 w-4" />
+            Map wizard
+          </Link>
+          <Link
             to="/farms/new"
             className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
           >
             <Plus className="h-4 w-4" />
-            New farm
+            Quick add
           </Link>
         </div>
       </div>
@@ -103,10 +111,10 @@ export default function FarmsPage() {
           <MapPin className="h-10 w-10 text-stone-300" />
           <p className="text-stone-500">No farms yet</p>
           <Link
-            to="/farms/new"
+            to="/farms/wizard"
             className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
           >
-            Create first farm
+            Create with map wizard
           </Link>
         </div>
       )}

@@ -40,6 +40,10 @@ const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const FarmsPage = lazy(() => import("./pages/FarmsPage"));
 const FarmNewPage = lazy(() => import("./pages/FarmNewPage"));
 const FarmDetailPage = lazy(() => import("./pages/FarmDetailPage"));
+const FarmWizardPage = lazy(() => import("./pages/FarmWizardPage"));
+const CropsPage = lazy(() => import("./pages/CropsPage"));
+const CropDetailPage = lazy(() => import("./pages/CropDetailPage"));
+const WaterPage = lazy(() => import("./pages/WaterPage"));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
 const AdminModulesPage = lazy(() => import("./pages/admin/AdminModulesPage"));
@@ -80,7 +84,7 @@ class ErrorBoundary extends Component<EBProps, EBState> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center gap-4 p-8 text-center min-h-[60vh]">
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
           <p className="font-display text-2xl text-stone-800">Something went wrong</p>
           <button
             type="button"
@@ -119,7 +123,11 @@ export default function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="farms" element={<FarmsPage />} />
               <Route path="farms/new" element={<FarmNewPage />} />
+              <Route path="farms/wizard" element={<FarmWizardPage />} />
               <Route path="farms/:id" element={<FarmDetailPage />} />
+              <Route path="crops" element={<CropsPage />} />
+              <Route path="crops/:id" element={<CropDetailPage />} />
+              <Route path="water" element={<WaterPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="alerts" element={<AlertsPage />} />
               <Route path="community" element={<CommunityPage />} />

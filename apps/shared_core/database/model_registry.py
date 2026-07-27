@@ -16,6 +16,7 @@ _MODEL_MODULES = [
     "apps.api.models.games",
     "apps.api.models.ecocoin",
     "apps.farms.models",
+    "apps.crops.models",
 ]
 
 
