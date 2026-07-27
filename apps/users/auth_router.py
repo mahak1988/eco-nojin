@@ -9,7 +9,6 @@ from typing import Any, Literal, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,12 +17,12 @@ from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db
 from apps.shared_core.security import cookie_kwargs
 from apps.users.models import User
+from apps.users.password import get_password_hash, verify_password
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
 
 ACCESS_COOKIE = settings.JWT_COOKIE_NAME
@@ -50,7 +49,7 @@ class LoginRequest(BaseModel):
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str = Field(..., min_length=8, max_length=128)
+    password: str = Field(..., min_length=8, max_length=72)
     full_name: Optional[str] = Field(None, max_length=255)
     phone: Optional[str] = Field(None, max_length=40)
     organization: Optional[str] = Field(None, max_length=255)
@@ -93,14 +92,6 @@ class AuthResponse(BaseModel):
 
 class RefreshRequest(BaseModel):
     refreshToken: Optional[str] = None
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
 
 
 def create_access_token(data: dict) -> str:
