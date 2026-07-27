@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -28,6 +28,21 @@ class RothCParams(BaseModel):
     years: int = Field(10, ge=1, le=100)
     c_input_t_ha_y: float = 1.5
     async_mode: bool = False
+
+
+class CompareBody(BaseModel):
+    aquacrop: AquaCropParams | None = None
+    rothc: RothCParams | None = None
+
+
+@router.get("")
+async def list_sim_models() -> dict[str, Any]:
+    return {
+        "data": [
+            {"id": "aquacrop", "name": "AquaCrop", "kind": "crop_water"},
+            {"id": "rothc", "name": "RothC", "kind": "soil_carbon"},
+        ]
+    }
 
 
 @router.post("/aquacrop")
@@ -62,6 +77,20 @@ async def start_rothc(body: RothCParams) -> dict[str, Any]:
             result["celery_error"] = str(e)[:120]
             return result
     return run_rothc_local(params)
+
+
+@router.post("/compare")
+async def compare_runs(body: CompareBody) -> dict[str, Any]:
+    aq = run_aquacrop_local((body.aquacrop or AquaCropParams()).model_dump(exclude={"async_mode"}))
+    rt = run_rothc_local((body.rothc or RothCParams()).model_dump(exclude={"async_mode"}))
+    return {
+        "aquacrop": aq,
+        "rothc": rt,
+        "summary": {
+            "irrigation_need_mm": aq.get("irrigation_need_mm"),
+            "soc_delta": rt.get("delta"),
+        },
+    }
 
 
 @router.get("/jobs/{task_id}")
