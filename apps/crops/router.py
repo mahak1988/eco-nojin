@@ -1,4 +1,4 @@
-"""Crops API /api/v1/crops."""
+"""Crops API."""
 
 from __future__ import annotations
 
@@ -7,7 +7,12 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.crops.schemas import CropListResponse, CropResponse
+from apps.crops.schemas import (
+    CropListResponse,
+    CropResponse,
+    IrrigationCalcRequest,
+    IrrigationCalcResponse,
+)
 from apps.crops.service import CropService
 from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db_session
@@ -23,8 +28,9 @@ async def list_crops(
     category: Optional[str] = None,
     session: AsyncSession = Depends(get_db_session),
 ):
-    service = CropService(session)
-    items, meta = await service.list_crops(page=page, size=size, search=search, category=category)
+    items, meta = await CropService(session).list_crops(
+        page=page, size=size, search=search, category=category
+    )
     return CropListResponse(data=items, meta=meta)
 
 
@@ -45,3 +51,9 @@ async def seed_crops(
         raise HTTPException(status_code=403, detail="Seed disabled")
     n = await CropService(session).seed_demo(force=force)
     return {"seeded": n, "message": "ok"}
+
+
+@router.post("/irrigation/calculate", response_model=IrrigationCalcResponse)
+async def irrigation_calculate(body: IrrigationCalcRequest):
+    """ETc = ET0 × Kc; gross = ETc / efficiency; volume = gross_mm × area_ha × 10."""
+    return CropService.calc_irrigation(body)
