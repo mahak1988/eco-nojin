@@ -2,7 +2,7 @@
 
 import { USE_MOCK } from "../api/http";
 
-const TIMEOUT = 8000;
+const TIMEOUT = 12000;
 
 function readEnv(key: string): string | undefined {
   try {
@@ -30,7 +30,7 @@ export type DataSource = "api" | "mock" | "error";
 async function fetchSafe<T>(
   path: string,
   fallback: T,
-): Promise<{ data: T; source: DataSource }> {
+): Promise<{ data: T; source: DataSource; errorMessage?: string }> {
   if (USE_MOCK) {
     return { data: fallback, source: "mock" };
   }
@@ -43,12 +43,18 @@ async function fetchSafe<T>(
       headers: { Accept: "application/json" },
     });
     clearTimeout(timer);
-    if (!res.ok) throw new Error(`API ${res.status}`);
+    if (!res.ok) {
+      return {
+        data: fallback,
+        source: "error",
+        errorMessage: `HTTP ${res.status}`,
+      };
+    }
     const data = (await res.json()) as T;
     return { data, source: "api" };
-  } catch {
-    // Without VITE_USE_MOCK we still return fallback for resilience but mark source
-    return { data: fallback, source: "error" };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "network_error";
+    return { data: fallback, source: "error", errorMessage: msg };
   }
 }
 
@@ -66,8 +72,13 @@ export async function getAccountingAccounts() {
   return fetchSafe("/api/v1/accounting/accounts?limit=20", { items: [], total: 0 });
 }
 
-export async function getEducationCourses() {
-  return fetchSafe("/api/v1/education/courses?limit=50", { items: [], total: 0 });
+export async function getEducationCourses(page = 1, size = 50) {
+  return fetchSafe(`/api/v1/education/courses?page=${page}&size=${size}&sort=-id`, {
+    data: [],
+    items: [],
+    meta: { total: 0, page: 1, pages: 0, size },
+    total: 0,
+  });
 }
 
 export async function getEducationStats() {
@@ -116,7 +127,7 @@ export async function seedEducationDemo() {
     const res = await fetch(url("/api/v1/education/seed-demo"), {
       method: "POST",
       credentials: "include",
-      headers: { Accept: "application/json", "User-Agent": "EcoNojin-Web" },
+      headers: { Accept: "application/json" },
     });
     if (!res.ok) throw new Error(String(res.status));
     return { data: await res.json(), source: "api" as const };

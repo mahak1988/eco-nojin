@@ -1,7 +1,17 @@
-// apps/web/src/pages/EducationPage.tsx
-import { useMemo, useState, useEffect } from "react";
-import { GraduationCap, BookOpen, Route, Award, Search, Users } from "lucide-react";
-import { getEducationCourses, getEducationStats } from "../lib/apiServices";
+// apps/web/src/pages/EducationPage.tsx — R1 real API + R16 Loading/Error/Empty
+import { useMemo, useState, useEffect, useCallback } from "react";
+import {
+  GraduationCap,
+  BookOpen,
+  Route,
+  Award,
+  Search,
+  Users,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
+import { getEducationCourses, getEducationStats, seedEducationDemo } from "../lib/apiServices";
 import { extractCourseList, mapApiCourseToUi } from "../lib/mappers/education";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
@@ -12,54 +22,89 @@ import { LearningPath } from "../components/education/LearningPath";
 import { DataSourceBadge } from "../components/ui/DataSourceBadge";
 import { EDU_STR, eduText, levelText, type EduLang } from "../components/education/educationI18n";
 import {
-  GLOBAL_LEARNERS, INITIAL_COURSES, INITIAL_PATHS, CERTIFICATIONS,
-  type Course, type LearningPathData, type LevelKey,
+  GLOBAL_LEARNERS,
+  INITIAL_PATHS,
+  CERTIFICATIONS,
+  type Course,
+  type LearningPathData,
+  type LevelKey,
 } from "../components/education/educationData";
 import type { DataSource } from "../types/common";
 
 type LevelFilter = "all" | LevelKey;
 const LEVEL_FILTERS: LevelFilter[] = ["all", "level_beginner", "level_intermediate", "level_advanced"];
 
+type LoadState = "loading" | "ready" | "empty" | "error";
+
 export default function EducationPage() {
   const [apiSource, setApiSource] = useState<DataSource>("mock");
   const [apiLearners, setApiLearners] = useState<number | null>(null);
+  const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const { lang } = useLang();
   const s = EDU_STR[lang as EduLang];
 
-  const [courses, setCourses] = useState<Course[]>(INITIAL_COURSES);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [paths, setPaths] = useState<LearningPathData[]>(INITIAL_PATHS);
   const [level, setLevel] = useState<LevelFilter>("all");
   const [query, setQuery] = useState("");
+  const [seeding, setSeeding] = useState(false);
+
+  const loadCourses = useCallback(async () => {
+    setLoadState("loading");
+    setErrorMsg(null);
+    const [coursesRes, statsRes] = await Promise.all([getEducationCourses(1, 50), getEducationStats()]);
+
+    if (coursesRes.source === "error") {
+      setApiSource("error");
+      setCourses([]);
+      setLoadState("error");
+      setErrorMsg(coursesRes.errorMessage || "Failed to load courses");
+      return;
+    }
+
+    const list = extractCourseList(coursesRes.data);
+    if (coursesRes.source === "api") {
+      setApiSource("api");
+      if (list.length === 0) {
+        setCourses([]);
+        setLoadState("empty");
+      } else {
+        setCourses(list.map((c, i) => mapApiCourseToUi(c, i)));
+        setLoadState("ready");
+      }
+    } else if (coursesRes.source === "mock") {
+      setApiSource("mock");
+      setCourses([]);
+      setLoadState("empty");
+    }
+
+    const st = statsRes.data as { total_enrollments?: number; total_courses?: number };
+    if (statsRes.source === "api" && typeof st.total_enrollments === "number") {
+      setApiLearners(st.total_enrollments);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [coursesRes, statsRes] = await Promise.all([
-        getEducationCourses(),
-        getEducationStats(),
-      ]);
       if (cancelled) return;
-
-      const list = extractCourseList(coursesRes.data);
-      if (coursesRes.source === "api" && list.length > 0) {
-        setCourses(list.map((c, i) => mapApiCourseToUi(c, i)));
-        setApiSource("api");
-      } else {
-        setApiSource(coursesRes.source === "api" ? "api" : "mock");
-      }
-
-      const st = statsRes.data as {
-        total_enrollments?: number;
-        total_courses?: number;
-      };
-      if (statsRes.source === "api" && typeof st.total_enrollments === "number") {
-        setApiLearners(st.total_enrollments);
-      }
+      await loadCourses();
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [loadCourses]);
+
+  const handleSeed = async () => {
+    setSeeding(true);
+    try {
+      await seedEducationDemo();
+      await loadCourses();
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const enroll = (id: string) =>
     setCourses((prev) => prev.map((c) => (c.id === id ? { ...c, enrolled: true } : c)));
@@ -83,7 +128,7 @@ export default function EducationPage() {
   const visibleCourses = useMemo(() => {
     const q = query.trim().toLowerCase();
     return courses.filter((c) => {
-      const title = (c.titleLiteral || eduText(s, c.titleKey)).toLowerCase();
+      const title = (c.titleLiteral || eduText(s, c.titleKey) || "").toLowerCase();
       return (level === "all" || c.levelKey === level) && (q === "" || title.includes(q));
     });
   }, [courses, level, query, s]);
@@ -110,14 +155,26 @@ export default function EducationPage() {
               <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
             </div>
           </div>
-          <DataSourceBadge source={apiSource} />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void loadCourses()}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-600 hover:bg-stone-50"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Refresh
+            </button>
+            <DataSourceBadge source={apiSource} />
+          </div>
         </div>
       </SectionReveal>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {stats.map((c, i) => (
           <SectionReveal key={c.label} delay={i * 70}>
-            <div className={`flex flex-col items-center rounded-2xl border border-stone-200/80 p-5 text-center shadow-sm ${c.bg}`}>
+            <div
+              className={`flex flex-col items-center rounded-2xl border border-stone-200/80 p-5 text-center shadow-sm ${c.bg}`}
+            >
               <c.icon className={`mb-2 h-7 w-7 ${c.color}`} />
               <p className={`font-display text-3xl font-black tabular-nums ${c.color}`}>
                 <AnimatedCounter end={c.value} />
@@ -151,6 +208,7 @@ export default function EducationPage() {
           {LEVEL_FILTERS.map((f) => (
             <button
               key={f}
+              type="button"
               onClick={() => setLevel(f)}
               className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
                 level === f ? "bg-green-600 text-white shadow-sm" : "text-stone-600 hover:bg-stone-100"
@@ -162,12 +220,53 @@ export default function EducationPage() {
         </div>
       </div>
 
-      {visibleCourses.length === 0 ? (
+      {loadState === "loading" && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+          <p className="text-sm font-medium text-stone-500">Loading courses…</p>
+        </div>
+      )}
+
+      {loadState === "error" && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/50 py-16 text-center">
+          <AlertCircle className="h-10 w-10 text-rose-500" />
+          <p className="font-medium text-rose-800">Could not load courses</p>
+          <p className="max-w-md text-sm text-rose-600">{errorMsg}</p>
+          <button
+            type="button"
+            onClick={() => void loadCourses()}
+            className="mt-2 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Retry
+          </button>
+        </div>
+      )}
+
+      {loadState === "empty" && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center">
+          <BookOpen className="h-10 w-10 text-stone-300" />
+          <p className="text-stone-500">{s.noCourses || "No courses yet"}</p>
+          <button
+            type="button"
+            disabled={seeding}
+            onClick={() => void handleSeed()}
+            className="mt-2 inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-700 disabled:opacity-60"
+          >
+            {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Seed demo courses
+          </button>
+        </div>
+      )}
+
+      {loadState === "ready" && visibleCourses.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center">
           <BookOpen className="h-10 w-10 text-stone-300" />
           <p className="text-stone-500">{s.noCourses}</p>
         </div>
-      ) : (
+      )}
+
+      {loadState === "ready" && visibleCourses.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleCourses.map((c, i) => (
             <SectionReveal key={c.id} delay={Math.min(i * 60, 240)}>
