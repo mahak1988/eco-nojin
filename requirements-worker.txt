@@ -1,0 +1,4 @@
+# Celery worker extras (F0.5)
+-r requirements.txt
+celery[redis]>=5.4.0
+redis>=5.2.0
