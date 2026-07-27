@@ -1,4 +1,4 @@
-"""FastAPI dependencies — auth & session (python-jose only, no PyJWT)."""
+"""FastAPI dependencies — auth & session (python-jose only)."""
 
 from __future__ import annotations
 
@@ -54,7 +54,6 @@ async def get_current_user(
 
         from apps.users.models import User
 
-        # sub may be email or id
         if str(sub).isdigit():
             result = await session.execute(select(User).where(User.id == int(sub)))
         else:
@@ -113,10 +112,10 @@ CurrentSuperUser = Annotated[dict, Depends(get_current_superuser)]
 
 
 async def require_write_auth(
-    token: TokenDep = None,
-    session: SessionDep = None,
+    token: TokenDep,
+    session: SessionDep,
 ) -> dict[str, Any] | None:
-    """When REQUIRE_AUTH_FOR_WRITES is False (local default), allow without token."""
+    """Local default: REQUIRE_AUTH_FOR_WRITES=false → no token required."""
     if not settings.REQUIRE_AUTH_FOR_WRITES:
         return None
     if not token:
