@@ -1,4 +1,4 @@
-"""Satellite API — catalog, NDVI, topography, thermal, change detection."""
+"""Satellite API — expanded catalog, soil moisture, role probes."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from typing import Optional
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
 
-from apps.satellite.catalog import ROLES, catalog_by_role
+from apps.satellite.catalog import ROLES, catalog_by_role, roles_list
 from apps.satellite.providers.chain import default_chain
 
 router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
@@ -24,12 +24,17 @@ class ChangeRequest(BaseModel):
 
 @router.get("/catalog")
 async def satellite_catalog(role: Optional[str] = None):
-    return {"roles": ROLES, "items": catalog_by_role(role)}
+    return {
+        "roles": ROLES,
+        "roles_count": len(ROLES),
+        "items": catalog_by_role(role),
+        "items_count": len(catalog_by_role(role)),
+    }
 
 
 @router.get("/roles")
 async def satellite_roles():
-    return ROLES
+    return {"count": len(ROLES), "items": roles_list()}
 
 
 @router.get("/availability")
@@ -73,9 +78,19 @@ async def thermal(
     return await _chain.by_role("thermal", lat, lon, date)
 
 
+@router.get("/soil-moisture")
+async def soil_moisture(
+    lat: float = Query(32.65),
+    lon: float = Query(51.67),
+    date: Optional[str] = None,
+):
+    """Surface & root-zone SM — Open-Meteo when online, else synthetic."""
+    return await _chain.by_role("soil_moisture", lat, lon, date)
+
+
 @router.get("/by-role")
 async def by_role(
-    role: str = Query(..., description="vegetation|thermal|topography|optical"),
+    role: str = Query(..., description="Any code from /roles"),
     lat: float = Query(32.65),
     lon: float = Query(51.67),
     date: Optional[str] = None,
