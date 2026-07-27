@@ -23,13 +23,13 @@ from apps.api.schemas.education import (
 from apps.api.services.education import EducationService
 from apps.shared_core.database.session import get_db_session
 from apps.shared_core.deps import require_write_auth
+from apps.shared_core.schemas.pagination import build_meta
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/education", tags=["Education"])
 
 
 def _course_to_response(course) -> CourseResponse:
-    """Map ORM course to response without triggering lazy IO."""
     lessons = getattr(course, "lessons", None) or []
     enrollments = getattr(course, "enrollments", None) or []
     return CourseResponse(
@@ -50,20 +50,36 @@ def _course_to_response(course) -> CourseResponse:
 
 @router.get("/courses", response_model=CourseListResponse)
 async def list_courses(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
+    page: int = Query(1, ge=1, description="R13 page (1-based)"),
+    size: int = Query(20, ge=1, le=200, description="R13 page size"),
+    sort: str = Query("-id", description="Sort field, prefix - for desc"),
+    skip: Optional[int] = Query(None, ge=0, description="Legacy offset"),
+    limit: Optional[int] = Query(None, ge=1, le=200, description="Legacy limit"),
     search: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     level: Optional[str] = Query(None),
     session: AsyncSession = Depends(get_db_session),
 ) -> CourseListResponse:
     service = EducationService(session)
-    courses, total = await service.list_courses(skip, limit, search, category, level)
-    return CourseListResponse(
-        items=[_course_to_response(c) for c in courses],
-        total=total,
+    courses, total, page_out, size_out = await service.list_courses(
+        page=page,
+        size=size,
         skip=skip,
         limit=limit,
+        search=search,
+        category=category,
+        level=level,
+        sort=sort,
+    )
+    items = [_course_to_response(c) for c in courses]
+    meta = build_meta(total, page_out, size_out)
+    return CourseListResponse(
+        data=items,
+        meta=meta,
+        items=items,
+        total=total,
+        skip=(page_out - 1) * size_out,
+        limit=size_out,
     )
 
 
@@ -83,7 +99,6 @@ async def create_course(
 ) -> CourseResponse:
     service = EducationService(session)
     course = await service.create_course(payload)
-    # re-load with relationships
     course = await service.get_course(course.id)
     return _course_to_response(course)
 

@@ -2,15 +2,14 @@
 
 ## [Unreleased]
 
-### 2026-07-27 — Protocol + R1 mock flag
-- `docs/INTERACTION_PROTOCOL.md` — coding order & phase acceptance checklist
-- **R1:** `VITE_USE_MOCK` in `http.ts` / `apiServices.ts` (mock only when explicitly true)
-- **R5 prep:** `credentials: "include"` on fetch
-- **R14:** `apps/web/src/types/list.ts` list envelope + legacy adapter
-- Constitution + gap matrix maintained
+### 2026-07-27 — Wave A / F1.1 (R13–R14)
+- `apps/shared_core/schemas/pagination.py` — ListMeta, page_to_offset, build_meta
+- Education `GET /courses` accepts `page`, `size`, `sort` (legacy `skip`/`limit` still work)
+- Response includes R14 `{ data, meta }` **and** legacy `{ items, total }` for FE compatibility
+- FE mapper reads both shapes
 
-### Earlier 2026-07-27
-- R10 CORS explicit, R20 settings DATABASE_URL, model registry, R11 local-only create_all
+### Protocol / R1
+- INTERACTION_PROTOCOL, VITE_USE_MOCK, credentials include
 
-### 2026-07-26
-- Middleware, health, education MissingGreenlet, seed, requirements, README
+### Foundation
+- Constitution R1–R23, CORS explicit, model registry, requirements restore

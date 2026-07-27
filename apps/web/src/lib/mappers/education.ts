@@ -1,60 +1,61 @@
-import type { Course, AccentColor, LevelKey } from "../../components/education/educationData";
+/** Map education API payloads → UI models. Supports R14 envelope + legacy items. */
 
-const ACCENTS: AccentColor[] = ["green", "amber", "rose", "blue", "violet", "teal"];
-
-const LEVEL_MAP: Record<string, LevelKey> = {
-  beginner: "level_beginner",
-  intermediate: "level_intermediate",
-  advanced: "level_advanced",
-};
-
-const CAT_ICON: Record<string, string> = {
-  agriculture: "🌾",
-  "water-management": "💧",
-  "environmental-science": "🌍",
-  economics: "📊",
-  technology: "🛰️",
-};
-
-export interface ApiCourse {
-  id: number | string;
+export interface UiCourse {
+  id: string;
   title: string;
+  titleLiteral?: string;
+  description?: string;
+  category?: string;
+  level?: string;
+  durationHours?: number;
+  instructor?: string;
+  isActive?: boolean;
+}
+
+interface ApiCourse {
+  id: number | string;
+  title?: string;
   description?: string | null;
   category?: string;
   level?: string;
   duration_hours?: number;
   instructor?: string | null;
   is_active?: boolean;
-  lessons?: unknown[];
-  enrollments?: unknown[];
 }
 
-export function mapApiCourseToUi(c: ApiCourse, index = 0): Course {
-  const levelKey = LEVEL_MAP[(c.level || "beginner").toLowerCase()] || "level_beginner";
-  const lessonsCount = Array.isArray(c.lessons) ? c.lessons.length : Math.max(1, Number(c.duration_hours) || 6);
+interface CoursesPayload {
+  data?: ApiCourse[];
+  items?: ApiCourse[];
+  meta?: { total?: number; page?: number; pages?: number; size?: number };
+  total?: number;
+}
+
+export function mapCourse(raw: ApiCourse): UiCourse {
+  const title = raw.title || `Course ${raw.id}`;
   return {
-    id: String(c.id),
-    titleKey: `api_${c.id}`,
-    titleLiteral: c.title,
-    icon: CAT_ICON[c.category || ""] || "📚",
-    accent: ACCENTS[index % ACCENTS.length],
-    levelKey,
-    tagKey: "tag_climate",
-    rating: 4.6,
-    learners: Array.isArray(c.enrollments) ? c.enrollments.length : 0,
-    durationH: Number(c.duration_hours) || 0,
-    durationM: 0,
-    lessonsCount,
-    completedLessons: 0,
-    enrolled: false,
+    id: String(raw.id),
+    title,
+    titleLiteral: title,
+    description: raw.description || undefined,
+    category: raw.category,
+    level: raw.level,
+    durationHours: raw.duration_hours,
+    instructor: raw.instructor || undefined,
+    isActive: raw.is_active,
   };
 }
 
-export function extractCourseList(payload: unknown): ApiCourse[] {
-  if (!payload) return [];
-  if (Array.isArray(payload)) return payload as ApiCourse[];
-  const p = payload as { items?: ApiCourse[]; data?: ApiCourse[] };
-  if (Array.isArray(p.items)) return p.items;
-  if (Array.isArray(p.data)) return p.data;
-  return [];
+export function mapCoursesResponse(payload: unknown): {
+  courses: UiCourse[];
+  total: number;
+  page: number;
+  pages: number;
+} {
+  const p = (payload || {}) as CoursesPayload;
+  const list = p.data || p.items || [];
+  const courses = list.map(mapCourse);
+  const total = p.meta?.total ?? p.total ?? courses.length;
+  const page = p.meta?.page ?? 1;
+  const pages = p.meta?.pages ?? 1;
+  return { courses, total, page, pages };
 }
