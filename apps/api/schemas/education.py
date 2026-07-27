@@ -8,6 +8,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from apps.shared_core.schemas.pagination import ListMeta
+
 
 class CourseLevelEnum(str, Enum):
     BEGINNER = "beginner"
@@ -79,10 +81,15 @@ class CourseResponse(CourseBase):
 
 
 class CourseListResponse(BaseModel):
-    items: List[CourseResponse]
-    total: int
+    """R14 envelope + legacy fields for existing FE mappers."""
+
+    data: List[CourseResponse] = Field(default_factory=list)
+    meta: ListMeta
+    # legacy (until all clients migrate)
+    items: List[CourseResponse] = Field(default_factory=list)
+    total: int = 0
     skip: int = 0
-    limit: int = 100
+    limit: int = 20
 
 
 class LessonBase(BaseModel):

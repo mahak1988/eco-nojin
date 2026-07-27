@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import asc, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -13,6 +13,14 @@ from apps.api.models.education import Course, Enrollment, Lesson
 from apps.api.schemas.education import CourseCreate, CourseUpdate
 
 logger = logging.getLogger(__name__)
+
+_SORTABLE = {
+    "id": Course.id,
+    "title": Course.title,
+    "created_at": Course.created_at,
+    "updated_at": Course.updated_at,
+    "duration_hours": Course.duration_hours,
+}
 
 
 class EducationRepository:
@@ -25,11 +33,17 @@ class EducationRepository:
             selectinload(Course.enrollments),
         )
 
+    def _apply_sort(self, query, sort: Optional[str]):
+        if not sort:
+            return query.order_by(desc(Course.id))
+        direction = desc if sort.startswith("-") else asc
+        key = sort[1:] if sort.startswith("-") else sort
+        col = _SORTABLE.get(key, Course.id)
+        return query.order_by(direction(col))
+
     async def get_course_by_id(self, course_id: int) -> Optional[Course]:
         result = await self.session.execute(
-            select(Course)
-            .where(Course.id == course_id)
-            .options(*self._course_options())
+            select(Course).where(Course.id == course_id).options(*self._course_options())
         )
         return result.scalar_one_or_none()
 
@@ -40,6 +54,7 @@ class EducationRepository:
         search: Optional[str] = None,
         category: Optional[str] = None,
         level: Optional[str] = None,
+        sort: Optional[str] = None,
     ) -> tuple[List[Course], int]:
         query = select(Course).options(*self._course_options())
 
@@ -69,9 +84,8 @@ class EducationRepository:
             count_query = count_query.where(Course.level == level)
 
         total = (await self.session.execute(count_query)).scalar_one()
-        result = await self.session.execute(
-            query.order_by(Course.id.desc()).offset(skip).limit(limit)
-        )
+        query = self._apply_sort(query, sort).offset(skip).limit(limit)
+        result = await self.session.execute(query)
         return list(result.scalars().unique().all()), int(total)
 
     async def create_course(self, data: CourseCreate) -> Course:
