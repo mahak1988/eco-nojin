@@ -9,6 +9,8 @@ export interface AuthUserDto {
   id: number;
   email: string;
   full_name?: string | null;
+  phone?: string | null;
+  organization?: string | null;
   role?: string;
   is_active?: boolean;
   is_superuser?: boolean;
@@ -26,7 +28,10 @@ export interface RegisterPayload {
   email: string;
   password: string;
   full_name?: string;
-  role?: string;
+  phone?: string;
+  organization?: string;
+  role?: "farmer" | "expert" | "viewer";
+  accept_terms: boolean;
 }
 
 function accessOf(res: AuthResponse): string {
@@ -39,7 +44,7 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify(body),
     });
-    return { ...res, access_token: accessOf(res) };
+    return { ...res, access_token: accessOf(res), user: res.user };
   },
 
   register: async (body: RegisterPayload) => {
@@ -47,10 +52,9 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify(body),
     });
-    return { ...res, access_token: accessOf(res) };
+    return { ...res, access_token: accessOf(res), user: res.user };
   },
 
-  /** Prefer /auth/me (cookie + bearer). No fallback storm to /users/me. */
   me: () => apiFetch<AuthUserDto>(v1("/auth/me")).catch(() => null),
 
   logout: async () => {

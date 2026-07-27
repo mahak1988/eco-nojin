@@ -43,29 +43,54 @@ export function useAuth() {
     };
   }, [hydrate, setSession, token]);
 
-  const login = useCallback(
-    async (email: string, password: string) => {
-      const res = await authApi.login({ email, password });
-      const tok = res.access_token || "";
-      if (tok) setSession(tok);
-      const me = res.user || (await authApi.me());
-      if (me && typeof me === "object" && "id" in me) {
-        setSession(tok || "cookie", mapUser(me as never));
+  const setSessionFromAuth = useCallback(
+    (tok: string, u?: unknown) => {
+      if (u && typeof u === "object" && u !== null && "id" in u) {
+        setSession(tok || "cookie", mapUser(u as never));
+      } else if (tok) {
+        setSession(tok);
       }
-      return res;
     },
     [setSession],
   );
 
-  const register = useCallback(
-    async (email: string, password: string, full_name?: string) => {
-      const res = await authApi.register({ email, password, full_name });
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const res = await authApi.login({ email, password });
       const tok = res.access_token || "";
-      if (tok) setSession(tok);
-      if (res.user) setSession(tok || "cookie", mapUser(res.user as never));
+      if (res.user) setSessionFromAuth(tok, res.user);
+      else if (tok) setSession(tok);
       return res;
     },
-    [setSession],
+    [setSession, setSessionFromAuth],
+  );
+
+  const register = useCallback(
+    async (
+      email: string,
+      password: string,
+      extra?: {
+        full_name?: string;
+        phone?: string;
+        organization?: string;
+        role?: "farmer" | "expert" | "viewer";
+      },
+    ) => {
+      const res = await authApi.register({
+        email,
+        password,
+        full_name: extra?.full_name,
+        phone: extra?.phone,
+        organization: extra?.organization,
+        role: extra?.role || "farmer",
+        accept_terms: true,
+      });
+      const tok = res.access_token || "";
+      if (res.user) setSessionFromAuth(tok, res.user);
+      else if (tok) setSession(tok);
+      return res;
+    },
+    [setSession, setSessionFromAuth],
   );
 
   const logout = useCallback(async () => {
@@ -81,5 +106,6 @@ export function useAuth() {
     login,
     register,
     logout,
+    setSessionFromAuth,
   };
 }
