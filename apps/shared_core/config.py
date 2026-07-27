@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = Field(default="local-dev-only-change-me-use-secrets-token-urlsafe-48")
     JWT_SECRET_KEY: Optional[str] = Field(default=None)
     ALGORITHM: str = Field(default="HS256")
+    JWT_PRIVATE_KEY_PATH: Optional[str] = Field(default=None)
+    JWT_PUBLIC_KEY_PATH: Optional[str] = Field(default=None)
+    JWT_PRIVATE_KEY: Optional[str] = Field(default=None)
+    JWT_PUBLIC_KEY: Optional[str] = Field(default=None)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=14)
     JWT_COOKIE_NAME: str = Field(default="access_token")
@@ -51,7 +55,6 @@ class Settings(BaseSettings):
     REDIS_URL: str = Field(default="redis://localhost:6379/0")
     CELERY_BROKER_URL: Optional[str] = Field(default=None)
 
-    # Satellite / EO (Section 6)
     GEE_SERVICE_ACCOUNT: Optional[str] = Field(default=None)
     GEE_CREDENTIALS_FILE: Optional[str] = Field(default=None)
     GEE_PROJECT_ID: Optional[str] = Field(default=None)
@@ -83,6 +86,8 @@ class Settings(BaseSettings):
         if self.ENVIRONMENT == "production":
             if len(self.SECRET_KEY) < 32 or self.SECRET_KEY.startswith("local-dev"):
                 raise ValueError("SECRET_KEY must be a strong random value in production")
+            if self.ALGORITHM.upper().startswith("HS"):
+                logger.warning("Production still on HS* — prefer RS256 with mounted keys")
             if self.REQUIRE_AUTH_FOR_WRITES is False:
                 logger.warning("REQUIRE_AUTH_FOR_WRITES is False in production")
         return self

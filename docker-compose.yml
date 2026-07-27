@@ -1,15 +1,79 @@
-version: '3.8'
-
 services:
-  backend:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: econojin
+      POSTGRES_PASSWORD: econojin
+      POSTGRES_DB: econojin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U econojin -d econojin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
     build: .
+    command: uvicorn apps.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
+    env_file:
+      - .env.docker
     environment:
-      - ENVIRONMENT=production
-      - DATABASE_URL=sqlite+aiosqlite:///./econojin.db
+      ENVIRONMENT: staging
+      DATABASE_URL: postgresql+asyncpg://econojin:econojin@postgres:5432/econojin
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      COOKIE_SECURE: "false"
     volumes:
-      - ./apps:/app/apps
-    restart: unless-stopped
+      - ./:/app
+      - ./secrets:/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
-  # frontend service can be added here using Node image
+  worker:
+    build: .
+    command: celery -A apps.shared_core.celery_app.celery_app worker -l info
+    env_file:
+      - .env.docker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://econojin:econojin@postgres:5432/econojin
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    volumes:
+      - ./:/app
+      - ./secrets:/secrets:ro
+    depends_on:
+      - redis
+      - postgres
+
+  beat:
+    build: .
+    command: celery -A apps.shared_core.celery_app.celery_app beat -l info
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+      - worker
+
+volumes:
+  pgdata:
