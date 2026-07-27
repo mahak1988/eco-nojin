@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from typing import AsyncGenerator
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -102,6 +103,32 @@ def _import_models() -> None:
     logger.info("ORM models registered: %s", len(loaded))
 
 
+async def _sqlite_patch_users(conn) -> None:
+    """create_all does not ALTER existing tables — patch missing user columns."""
+    if "sqlite" not in str(engine.url):
+        return
+    try:
+        rows = await conn.execute(text("PRAGMA table_info(users)"))
+        cols = {r[1] for r in rows.fetchall()}
+    except Exception as e:
+        logger.debug("PRAGMA users skip: %s", e)
+        return
+    if not cols:
+        return
+    patches = [
+        ("phone", "ALTER TABLE users ADD COLUMN phone VARCHAR(40)"),
+        ("organization", "ALTER TABLE users ADD COLUMN organization VARCHAR(255)"),
+        ("role", "ALTER TABLE users ADD COLUMN role VARCHAR(40) DEFAULT 'farmer'"),
+    ]
+    for name, sql in patches:
+        if name not in cols:
+            try:
+                await conn.execute(text(sql))
+                logger.info("SQLite schema patch: users.%s added", name)
+            except Exception as e:
+                logger.warning("SQLite patch %s failed: %s", name, e)
+
+
 async def init_db() -> None:
     _import_models()
     try:
@@ -114,6 +141,7 @@ async def init_db() -> None:
         pass
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await _sqlite_patch_users(conn)
 
 
 async def close_db() -> None:
