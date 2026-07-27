@@ -1,68 +1,53 @@
-"""
-Eco Nojin - Authentication Router (Final Version with RBAC)
-===========================================================
-"""
-import logging
+"""Authentication router — login/register/refresh (HS256; RS256 later)."""
 
-logger = logging.getLogger(__name__)
-import os
-from datetime import datetime, timedelta
-from typing import Optional, Any
+from __future__ import annotations
+
+import logging
+from datetime import datetime, timedelta, timezone
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, model_validator
-from sqlalchemy import select, or_
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.shared_core.database.session import get_db
 from apps.shared_core.config import settings
+from apps.shared_core.database.session import get_db
 from apps.users.models import User
 
-# ---------------------------------------------------------------------------
-# Configuration
-# SECRET_KEY now from apps.shared_core.config.settings (Phase 0 security fix)
-# ALGORITHM now from apps.shared_core.config.settings
-# ACCESS_TOKEN_EXPIRE_MINUTES now from config
-# SECRET_KEY now from apps.shared_core.config.settings (Phase 0 security fix)
-# ALGORITHM now from apps.shared_core.config.settings
-# ACCESS_TOKEN_EXPIRE_MINUTES now from config
-REFRESH_TOKEN_EXPIRE_DAYS = 7  # kept as local constant
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
-# ---------------------------------------------------------------------------
-# Schemas
-# ---------------------------------------------------------------------------
+
 class LoginRequest(BaseModel):
     email: Optional[EmailStr] = None
     username: Optional[str] = None
     password: str
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def check_email_or_username(cls, values: Any) -> Any:
-        """Handle check_email_or_username (cls, values)."""
         if isinstance(values, dict):
-            has_email = bool(values.get('email'))
-            has_username = bool(values.get('username'))
-            
-            if not has_email and not has_username:
+            if not values.get("email") and not values.get("username"):
                 raise ValueError("Either email or username must be provided")
-            
-            if has_username and not has_email and "@" in values['username']:
-                values['email'] = values['username']
-                
+            if values.get("username") and not values.get("email") and "@" in str(values["username"]):
+                values["email"] = values["username"]
         return values
+
 
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str
     full_name: Optional[str] = None
-    role: str = "farmer"  # نقش پیش‌فرض
+    role: str = "farmer"
+
 
 class UserResponse(BaseModel):
     id: int
@@ -71,198 +56,164 @@ class UserResponse(BaseModel):
     role: str = "user"
     is_active: bool
     is_superuser: bool = False
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
 
 class AuthResponse(BaseModel):
     accessToken: str
     refreshToken: str
     user: UserResponse
 
+
 class RefreshRequest(BaseModel):
     refreshToken: str
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Handle verify_password (plain_password, hashed_password)."""
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_password_hash(password: str) -> str:
-    """Handle get_password_hash (password)."""
     return pwd_context.hash(password)
 
+
 def create_access_token(data: dict) -> str:
-    """Handle create_access_token (data)."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire, "type": "access"})
-    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.ALGORITHM)
+
 
 def create_refresh_token(data: dict) -> str:
-    """Handle create_refresh_token (data)."""
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=7)
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "refresh"})
-    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.ALGORITHM)
+
+
+def _user_response(user: User) -> UserResponse:
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        full_name=getattr(user, "full_name", None),
+        role=getattr(user, "role", "user") or "user",
+        is_active=bool(getattr(user, "is_active", True)),
+        is_superuser=bool(getattr(user, "is_superuser", False)),
+        created_at=getattr(user, "created_at", None),
+        updated_at=getattr(user, "updated_at", None),
+    )
+
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncSession = Depends(get_db)
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
+    db: AsyncSession = Depends(get_db),
 ) -> User:
-    """Handle get_current_user (credentials, db)."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    if not credentials:
+        raise credentials_exception
     try:
-        payload = jwt.decode(credentials.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
+        payload = jwt.decode(
+            credentials.credentials,
+            settings.jwt_secret,
+            algorithms=[settings.ALGORITHM],
+        )
+        email: str | None = payload.get("sub")
         if email is None or payload.get("type") != "access":
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
     if user is None:
         raise credentials_exception
     return user
 
-# ---------------------------------------------------------------------------
-# Endpoints
-# ---------------------------------------------------------------------------
+
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)) -> None:
-    """Handle register (request, db)."""
+async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
     result = await db.execute(select(User).where(User.email == request.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_pw = get_password_hash(request.password)
-    
-    user_data = {
-        "email": request.email,
-        "hashed_password": hashed_pw,
-        "full_name": request.full_name,
-        "role": request.role,  # <-- نقش از درخواست خوانده می‌شود
-        "is_active": True,
-        "is_superuser": False
-    }
 
-    new_user = User(**user_data)
+    new_user = User(
+        email=request.email,
+        hashed_password=get_password_hash(request.password),
+        full_name=request.full_name,
+        role=request.role,
+        is_active=True,
+        is_superuser=False,
+    )
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
-    
-    user_response = UserResponse(
-        id=new_user.id,
-        email=new_user.email,
-        full_name=getattr(new_user, "full_name", None),
-        role=getattr(new_user, "role", "user"),
-        is_active=getattr(new_user, "is_active", True),
-        is_superuser=getattr(new_user, "is_superuser", False),
-        created_at=new_user.created_at,
-        updated_at=new_user.updated_at
+
+    return AuthResponse(
+        accessToken=create_access_token({"sub": new_user.email}),
+        refreshToken=create_refresh_token({"sub": new_user.email}),
+        user=_user_response(new_user),
     )
-    
-    return {
-        "accessToken": create_access_token({"sub": new_user.email}),
-        "refreshToken": create_refresh_token({"sub": new_user.email}),
-        "user": user_response
-    }
+
 
 @router.post("/login", response_model=AuthResponse)
-async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> None:
-    """Handle login (request, db)."""
+async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
     identifier = request.email or request.username
-    
     if not identifier:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid login credentials"
-        )
+        raise HTTPException(status_code=400, detail="Invalid login credentials")
 
-    query = select(User).where(User.email == identifier)
-    result = await db.execute(query)
+    result = await db.execute(select(User).where(User.email == identifier))
     user = result.scalar_one_or_none()
-    
-    stored_password = getattr(user, "hashed_password", None) or getattr(user, "password", None)
-    
-    if not user or not verify_password(request.password, stored_password):
+    stored = getattr(user, "hashed_password", None) if user else None
+    if not user or not stored or not verify_password(request.password, stored):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email/username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    user_response = UserResponse(
-        id=user.id,
-        email=user.email,
-        full_name=getattr(user, "full_name", None),
-        role=getattr(user, "role", "user"),
-        is_active=getattr(user, "is_active", True),
-        is_superuser=getattr(user, "is_superuser", False),
-        created_at=user.created_at,
-        updated_at=user.updated_at
+
+    return AuthResponse(
+        accessToken=create_access_token({"sub": user.email}),
+        refreshToken=create_refresh_token({"sub": user.email}),
+        user=_user_response(user),
     )
-    
-    return {
-        "accessToken": create_access_token({"sub": user.email}),
-        "refreshToken": create_refresh_token({"sub": user.email}),
-        "user": user_response
-    }
+
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(current_user: User = Depends(get_current_user)) -> None:
-    """Handle get_me (current_user)."""
-    return UserResponse(
-        id=current_user.id,
-        email=current_user.email,
-        full_name=getattr(current_user, "full_name", None),
-        role=getattr(current_user, "role", "user"),
-        is_active=getattr(current_user, "is_active", True),
-        is_superuser=getattr(current_user, "is_superuser", False),
-        created_at=current_user.created_at,
-        updated_at=current_user.updated_at
-    )
+async def get_me(current_user: User = Depends(get_current_user)) -> UserResponse:
+    return _user_response(current_user)
+
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)) -> None:
-    """Handle logout (current_user)."""
+async def logout(current_user: User = Depends(get_current_user)) -> dict[str, str]:
     return {"message": "Successfully logged out"}
 
+
 @router.post("/refresh", response_model=AuthResponse)
-async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)) -> None:
-    """Handle refresh_token (request, db)."""
+async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
     try:
-        payload = jwt.decode(request.refreshToken, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
-        if payload.get("type") != "refresh":
+        payload = jwt.decode(
+            request.refreshToken,
+            settings.jwt_secret,
+            algorithms=[settings.ALGORITHM],
+        )
+        email = payload.get("sub")
+        if payload.get("type") != "refresh" or not email:
             raise HTTPException(status_code=401, detail="Invalid token type")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
-    
+
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
-    
-    user_response = UserResponse(
-        id=user.id,
-        email=user.email,
-        full_name=getattr(user, "full_name", None),
-        role=getattr(user, "role", "user"),
-        is_active=getattr(user, "is_active", True),
-        is_superuser=getattr(user, "is_superuser", False),
-        created_at=user.created_at,
-        updated_at=user.updated_at
+
+    return AuthResponse(
+        accessToken=create_access_token({"sub": user.email}),
+        refreshToken=create_refresh_token({"sub": user.email}),
+        user=_user_response(user),
     )
-    
-    return {
-        "accessToken": create_access_token({"sub": user.email}),
-        "refreshToken": create_refresh_token({"sub": user.email}),
-        "user": user_response
-    }
