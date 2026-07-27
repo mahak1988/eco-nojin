@@ -22,7 +22,7 @@ from apps.api.schemas.education import (
 )
 from apps.api.services.education import EducationService
 from apps.shared_core.database.session import get_db_session
-from apps.shared_core.deps import require_write_auth
+from apps.shared_core.rbac import require_permission
 from apps.shared_core.schemas.pagination import build_meta
 
 logger = logging.getLogger(__name__)
@@ -50,11 +50,11 @@ def _course_to_response(course) -> CourseResponse:
 
 @router.get("/courses", response_model=CourseListResponse)
 async def list_courses(
-    page: int = Query(1, ge=1, description="R13 page (1-based)"),
-    size: int = Query(20, ge=1, le=200, description="R13 page size"),
-    sort: str = Query("-id", description="Sort field, prefix - for desc"),
-    skip: Optional[int] = Query(None, ge=0, description="Legacy offset"),
-    limit: Optional[int] = Query(None, ge=1, le=200, description="Legacy limit"),
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=200),
+    sort: str = Query("-id"),
+    skip: Optional[int] = Query(None, ge=0),
+    limit: Optional[int] = Query(None, ge=1, le=200),
     search: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     level: Optional[str] = Query(None),
@@ -95,7 +95,7 @@ async def get_course_stats(
 async def create_course(
     payload: CourseCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> CourseResponse:
     service = EducationService(session)
     course = await service.create_course(payload)
@@ -121,7 +121,7 @@ async def update_course(
     course_id: int,
     payload: CourseUpdate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> CourseResponse:
     service = EducationService(session)
     try:
@@ -135,7 +135,7 @@ async def update_course(
 async def delete_course(
     course_id: int,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> None:
     service = EducationService(session)
     try:
@@ -165,7 +165,7 @@ async def create_lesson(
     course_id: int,
     payload: LessonCreate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> LessonResponse:
     service = EducationService(session)
     try:
@@ -193,7 +193,7 @@ async def update_lesson(
     lesson_id: int,
     payload: LessonUpdate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> LessonResponse:
     service = EducationService(session)
     try:
@@ -207,7 +207,7 @@ async def update_lesson(
 async def delete_lesson(
     lesson_id: int,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> None:
     service = EducationService(session)
     try:
@@ -235,9 +235,9 @@ async def list_enrollments(
 )
 async def enroll_in_course(
     course_id: int,
-    user_id: int = Query(..., description="User ID to enroll"),
+    user_id: int = Query(...),
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> EnrollmentResponse:
     service = EducationService(session)
     try:
@@ -252,7 +252,7 @@ async def update_enrollment(
     enrollment_id: int,
     payload: EnrollmentUpdate,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> EnrollmentResponse:
     service = EducationService(session)
     try:
@@ -266,7 +266,7 @@ async def update_enrollment(
 async def delete_enrollment(
     enrollment_id: int,
     session: AsyncSession = Depends(get_db_session),
-    _: None = Depends(require_write_auth),
+    _: object = Depends(require_permission("education:write")),
 ) -> None:
     service = EducationService(session)
     try:
