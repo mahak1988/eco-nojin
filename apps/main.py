@@ -252,6 +252,7 @@ _include("reports", lambda: __import__("apps.simulation.reports.router", fromlis
 _include("farms", lambda: __import__("apps.farms.router", fromlist=["router"]).router)
 _include("crops", lambda: __import__("apps.crops.router", fromlist=["router"]).router)
 _include("water", lambda: __import__("apps.water.router", fromlist=["router"]).router)
+_include("planting", lambda: __import__("apps.planting.router", fromlist=["router"]).router)
 
 
 @app.get("/", tags=["Root"])
