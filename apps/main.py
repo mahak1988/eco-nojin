@@ -35,12 +35,7 @@ from apps.shared_core.config import settings
 
 _db_status = {"ok": False, "detail": "not_initialized"}
 
-# Optional modules: log once at DEBUG, not WARNING
-_OPTIONAL_MODULE_HINTS = (
-    "numba",
-    "satellite",
-    "psycopg2",
-)
+_OPTIONAL_MODULE_HINTS = ("numba", "satellite", "psycopg2")
 
 
 @asynccontextmanager
@@ -221,6 +216,10 @@ _include(
     tags=["AI Agents"],
 )
 _include("accounting", lambda: __import__("apps.api.routes.accounting", fromlist=["router"]).router)
+_include(
+    "accounting_seed",
+    lambda: __import__("apps.api.routes.accounting_seed", fromlist=["router"]).router,
+)
 _include("ecocoin", lambda: __import__("apps.api.routes.ecocoin", fromlist=["router"]).router)
 _include("monitoring", lambda: __import__("apps.api.routes.monitoring", fromlist=["router"]).router)
 _include("simulator", lambda: __import__("apps.api.routes.simulator", fromlist=["router"]).router)
