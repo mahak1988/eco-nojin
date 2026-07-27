@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +28,8 @@ security = HTTPBearer(auto_error=False)
 
 ACCESS_COOKIE = settings.JWT_COOKIE_NAME
 REFRESH_COOKIE = settings.REFRESH_COOKIE_NAME
+
+ALLOWED_ROLES = {"farmer", "expert", "viewer"}
 
 
 class LoginRequest(BaseModel):
@@ -48,16 +50,34 @@ class LoginRequest(BaseModel):
 
 class RegisterRequest(BaseModel):
     email: EmailStr
-    password: str
-    full_name: Optional[str] = None
-    role: str = "farmer"
+    password: str = Field(..., min_length=8, max_length=128)
+    full_name: Optional[str] = Field(None, max_length=255)
+    phone: Optional[str] = Field(None, max_length=40)
+    organization: Optional[str] = Field(None, max_length=255)
+    role: Literal["farmer", "expert", "viewer"] = "farmer"
+    accept_terms: bool = False
+
+    @field_validator("password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+    @model_validator(mode="after")
+    def must_accept_terms(self) -> RegisterRequest:
+        if not self.accept_terms:
+            raise ValueError("You must accept the Terms of Service and Privacy Policy")
+        return self
 
 
 class UserResponse(BaseModel):
     id: int
     email: str
     full_name: Optional[str] = None
-    role: str = "user"
+    phone: Optional[str] = None
+    organization: Optional[str] = None
+    role: str = "farmer"
     is_active: bool
     is_superuser: bool = False
     created_at: Optional[datetime] = None
@@ -65,8 +85,6 @@ class UserResponse(BaseModel):
 
 
 class AuthResponse(BaseModel):
-    """Tokens also set as HttpOnly cookies; body kept for mobile/API clients."""
-
     accessToken: str
     refreshToken: str
     token_type: str = "bearer"
@@ -104,7 +122,9 @@ def _user_response(user: User) -> UserResponse:
         id=user.id,
         email=user.email,
         full_name=getattr(user, "full_name", None),
-        role=getattr(user, "role", "user") or "user",
+        phone=getattr(user, "phone", None),
+        organization=getattr(user, "organization", None),
+        role=getattr(user, "role", None) or "farmer",
         is_active=bool(getattr(user, "is_active", True)),
         is_superuser=bool(getattr(user, "is_superuser", False)),
         created_at=getattr(user, "created_at", None),
@@ -130,10 +150,7 @@ def _token_from_request(
 ) -> str | None:
     if credentials and credentials.credentials:
         return credentials.credentials
-    cookie_tok = request.cookies.get(ACCESS_COOKIE)
-    if cookie_tok:
-        return cookie_tok
-    return None
+    return request.cookies.get(ACCESS_COOKIE)
 
 
 async def get_current_user(
@@ -150,11 +167,7 @@ async def get_current_user(
     if not token:
         raise credentials_exception
     try:
-        payload = jwt.decode(
-            token,
-            settings.jwt_secret,
-            algorithms=[settings.ALGORITHM],
-        )
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.ALGORITHM])
         email: str | None = payload.get("sub")
         if email is None or payload.get("type") != "access":
             raise credentials_exception
@@ -170,19 +183,22 @@ async def get_current_user(
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 async def register(
-    request: RegisterRequest,
+    body: RegisterRequest,
     response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> AuthResponse:
-    result = await db.execute(select(User).where(User.email == request.email))
+    result = await db.execute(select(User).where(User.email == body.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    role = body.role if body.role in ALLOWED_ROLES else "farmer"
     new_user = User(
-        email=request.email,
-        hashed_password=get_password_hash(request.password),
-        full_name=request.full_name,
-        role=request.role,
+        email=str(body.email).lower(),
+        hashed_password=get_password_hash(body.password),
+        full_name=body.full_name,
+        phone=body.phone,
+        organization=body.organization,
+        role=role,
         is_active=True,
         is_superuser=False,
     )
@@ -203,21 +219,21 @@ async def register(
 
 @router.post("/login", response_model=AuthResponse)
 async def login(
-    request: LoginRequest,
+    body: LoginRequest,
     response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> AuthResponse:
-    identifier = request.email or request.username
+    identifier = body.email or body.username
     if not identifier:
         raise HTTPException(status_code=400, detail="Invalid login credentials")
 
-    result = await db.execute(select(User).where(User.email == identifier))
+    result = await db.execute(select(User).where(User.email == str(identifier).lower()))
     user = result.scalar_one_or_none()
     stored = getattr(user, "hashed_password", None) if user else None
-    if not user or not stored or not verify_password(request.password, stored):
+    if not user or not stored or not verify_password(body.password, stored):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email/username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -239,7 +255,6 @@ async def get_me(current_user: User = Depends(get_current_user)) -> UserResponse
 
 @router.post("/logout")
 async def logout(response: Response) -> dict[str, str]:
-    """Clear HttpOnly cookies (auth optional so logout always works)."""
     _clear_auth_cookies(response)
     return {"message": "Successfully logged out"}
 
@@ -260,11 +275,7 @@ async def refresh_token(
         raise HTTPException(status_code=401, detail="Missing refresh token")
 
     try:
-        payload = jwt.decode(
-            raw,
-            settings.jwt_secret,
-            algorithms=[settings.ALGORITHM],
-        )
+        payload = jwt.decode(raw, settings.jwt_secret, algorithms=[settings.ALGORITHM])
         email = payload.get("sub")
         if payload.get("type") != "refresh" or not email:
             raise HTTPException(status_code=401, detail="Invalid token type")
