@@ -256,6 +256,7 @@ _include("planting", lambda: __import__("apps.planting.router", fromlist=["route
 _include("inventory", lambda: __import__("apps.inventory.router", fromlist=["router"]).router)
 _include("weather", lambda: __import__("apps.weather.router", fromlist=["router"]).router)
 _include("notifications", lambda: __import__("apps.notifications.router", fromlist=["router"]).router)
+_include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).router)
 
 
 @app.get("/", tags=["Root"])
