@@ -1,50 +1,86 @@
-"""Alembic environment — uses shared model registry (R11)."""
-from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
-from alembic import context
+"""Alembic environment — sync driver URLs (R11)."""
+from __future__ import annotations
+
 import os
 import sys
+from logging.config import fileConfig
+
+from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
-sys.path.insert(0, PROJECT_ROOT)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
+# Load .env early so DATABASE_URL is visible
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+except Exception:
+    pass
+
+
+def to_sync_url(url: str | None) -> str:
+    """Alembic needs a sync DBAPI. Convert async SQLAlchemy URLs."""
+    if not url or not str(url).strip() or "***" in str(url):
+        return "sqlite:///./apps/econojin.db"
+
+    u = str(url).strip()
+
+    # SQLite async → sync
+    if u.startswith("sqlite+aiosqlite:"):
+        return u.replace("sqlite+aiosqlite:", "sqlite:", 1)
+
+    # Postgres async → psycopg3 (package: psycopg[binary]) preferred over psycopg2
+    if "+asyncpg" in u:
+        u = u.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
+        u = u.replace("+asyncpg", "")
+        return u
+
+    # Bare postgres:// → postgresql://
+    if u.startswith("postgres://"):
+        u = "postgresql://" + u[len("postgres://") :]
+
+    return u
+
+
+def get_url() -> str:
+    raw = os.getenv("DATABASE_URL")
+    if not raw:
+        try:
+            from apps.shared_core.config import settings
+
+            raw = settings.DATABASE_URL
+        except Exception:
+            raw = None
+    if not raw:
+        raw = context.config.get_main_option("sqlalchemy.url")
+    return to_sync_url(raw)
+
+
+# Import metadata after path setup; tolerate missing optional drivers at import time
 try:
     from apps.shared_core.database.session import Base
-    from apps.shared_core.database.model_registry import import_all_models, MODEL_MODULES
+    from apps.shared_core.database.model_registry import MODEL_MODULES, import_all_models
 
     import_all_models(MODEL_MODULES)
-    # Ensure education is present for migrations
     for extra in ("apps.api.models.education", "apps.api.models.community"):
         try:
             __import__(extra, fromlist=["*"])
         except ImportError:
             pass
-except ImportError as e:
+except Exception as e:
     from sqlalchemy.orm import declarative_base
 
-    Base = declarative_base()
-    print(f"  [alembic] Warning: Could not import Base: {e}")
+    Base = declarative_base()  # type: ignore
+    print(f"  [alembic] Warning: Could not import Base/models: {e}")
 
 config = context.config
-
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
-
-
-def get_url():
-    try:
-        from apps.shared_core.config import settings
-
-        url = settings.DATABASE_URL
-        # Alembic sync engine: strip +aiosqlite / +asyncpg for offline tools if needed
-        return url.replace("+aiosqlite", "").replace("+asyncpg", "+psycopg2") if False else url
-    except Exception:
-        url = os.getenv("DATABASE_URL")
-        if url:
-            return url
-        return config.get_main_option("sqlalchemy.url")
 
 
 def run_migrations_offline() -> None:
@@ -63,13 +99,6 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section) or {}
     configuration["sqlalchemy.url"] = get_url()
-
-    # For async URLs, use a sync variant for Alembic classic engine
-    url = configuration["sqlalchemy.url"]
-    if url.startswith("sqlite+aiosqlite"):
-        configuration["sqlalchemy.url"] = url.replace("sqlite+aiosqlite", "sqlite")
-    elif "+asyncpg" in url:
-        configuration["sqlalchemy.url"] = url.replace("+asyncpg", "")
 
     connectable = engine_from_config(
         configuration,
