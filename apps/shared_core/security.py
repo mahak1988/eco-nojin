@@ -1,4 +1,4 @@
-"""JWT helpers — HS256 now; RS256-ready via ALGORITHM + key paths (F0.4)."""
+"""JWT helpers via python-jose (not PyJWT)."""
 
 from __future__ import annotations
 
@@ -21,16 +21,12 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def _encode(payload: dict[str, Any]) -> str:
-    return jwt.encode(payload, settings.jwt_secret, algorithm=settings.ALGORITHM)
-
-
 def create_access_token(subject: str | int, extra: Optional[dict[str, Any]] = None) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload: dict[str, Any] = {"sub": str(subject), "type": "access", "exp": expire}
     if extra:
         payload.update(extra)
-    return _encode(payload)
+    return jwt.encode(payload, settings.jwt_secret, algorithm=settings.ALGORITHM)
 
 
 def create_refresh_token(subject: str | int, jti: Optional[str] = None) -> str:
@@ -38,18 +34,17 @@ def create_refresh_token(subject: str | int, jti: Optional[str] = None) -> str:
     payload: dict[str, Any] = {"sub": str(subject), "type": "refresh", "exp": expire}
     if jti:
         payload["jti"] = jti
-    return _encode(payload)
+    return jwt.encode(payload, settings.jwt_secret, algorithm=settings.ALGORITHM)
 
 
 def decode_token(token: str) -> dict[str, Any]:
     try:
         return jwt.decode(token, settings.jwt_secret, algorithms=[settings.ALGORITHM])
-    except JWTError as e:
-        raise e
+    except JWTError:
+        raise
 
 
 def cookie_kwargs(max_age: int) -> dict[str, Any]:
-    """HttpOnly cookie options for access/refresh (R5)."""
     return {
         "httponly": True,
         "secure": settings.COOKIE_SECURE or settings.ENVIRONMENT == "production",
