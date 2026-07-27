@@ -18,7 +18,7 @@ const MrvPage = lazy(() => import("./pages/MrvPage"));
 const NewsPage = lazy(() => import("./pages/NewsPage"));
 const PilotsPage = lazy(() => import("./pages/PilotsPage"));
 const RegionalPage = lazy(() => import("./pages/RegionalPage"));
-const SatelliteImageryDashboard = lazy(() => import("./pages/SatelliteImageryDashboard"));
+const SatelliteDashboardPage = lazy(() => import("./pages/SatelliteDashboardPage"));
 const SimulatorsPage = lazy(() => import("./pages/SimulatorsPage"));
 const TourismPage = lazy(() => import("./pages/TourismPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
@@ -51,6 +51,7 @@ const PlantingCalendarPage = lazy(() => import("./pages/PlantingCalendarPage"));
 const TasksPage = lazy(() => import("./pages/TasksPage"));
 const InventoryPage = lazy(() => import("./pages/InventoryPage"));
 const WeatherPage = lazy(() => import("./pages/WeatherPage"));
+const MonitoringHubPage = lazy(() => import("./pages/MonitoringHubPage"));
 const AccountSecurityPage = lazy(() => import("./pages/AccountSecurityPage"));
 const AccountNotificationsPage = lazy(() => import("./pages/AccountNotificationsPage"));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
@@ -138,6 +139,7 @@ export default function App() {
               <Route path="tasks" element={<TasksPage />} />
               <Route path="inventory" element={<InventoryPage />} />
               <Route path="weather" element={<WeatherPage />} />
+              <Route path="monitoring" element={<MonitoringHubPage />} />
               <Route path="account" element={<AccountPage />} />
               <Route path="account/security" element={<AccountSecurityPage />} />
               <Route path="account/notifications" element={<AccountNotificationsPage />} />
@@ -151,7 +153,7 @@ export default function App() {
               <Route path="news" element={<NewsPage />} />
               <Route path="pilots" element={<PilotsPage />} />
               <Route path="regional" element={<RegionalPage />} />
-              <Route path="satellite" element={<SatelliteImageryDashboard />} />
+              <Route path="satellite" element={<SatelliteDashboardPage />} />
               <Route path="simulators" element={<SimulatorsPage />} />
               <Route path="simulators/:id" element={<SimulatorDetailPage />} />
               <Route path="my-simulations" element={<MySimulationsPage />} />
