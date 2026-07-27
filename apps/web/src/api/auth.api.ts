@@ -50,10 +50,8 @@ export const authApi = {
     return { ...res, access_token: accessOf(res) };
   },
 
-  me: () =>
-    apiFetch<AuthUserDto>(v1("/auth/me")).catch(() =>
-      apiFetch<AuthUserDto>(v1("/users/me")).catch(() => null),
-    ),
+  /** Prefer /auth/me (cookie + bearer). No fallback storm to /users/me. */
+  me: () => apiFetch<AuthUserDto>(v1("/auth/me")).catch(() => null),
 
   logout: async () => {
     try {

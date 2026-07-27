@@ -1,31 +1,30 @@
-"""Central ORM model registration."""
+"""Import all ORM models so metadata is complete for create_all / Alembic."""
 
 from __future__ import annotations
 
 import logging
-from typing import Iterable
+from typing import List
 
 logger = logging.getLogger(__name__)
 
-MODEL_MODULES: tuple[str, ...] = (
+_MODEL_MODULES = [
     "apps.users.models",
+    "apps.shared_core.rbac.models",
     "apps.api.models.education",
     "apps.api.models.accounting",
     "apps.api.models.community",
-    "apps.api.models.agriculture_school",
-    "apps.shared_core.rbac.models",
-    "apps.ai_agents.models",
-    "apps.simulation.models",
-    "apps.admin_panel.models",
-)
+    "apps.api.models.games",
+    "apps.api.models.ecocoin",
+    "apps.farms.models",
+]
 
 
-def import_all_models(modules: Iterable[str] | None = None) -> list[str]:
-    loaded: list[str] = []
-    for name in modules or MODEL_MODULES:
+def import_all_models() -> List[str]:
+    loaded: List[str] = []
+    for mod in _MODEL_MODULES:
         try:
-            __import__(name, fromlist=["*"])
-            loaded.append(name)
+            __import__(mod)
+            loaded.append(mod)
         except Exception as e:
-            logger.debug("model_registry skip %s: %s", name, e)
+            logger.debug("model import skip %s: %s", mod, e)
     return loaded
