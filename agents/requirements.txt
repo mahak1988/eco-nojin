@@ -1,6 +1,6 @@
 # AI Agent Dependencies - Flexible Versions
 langgraph>=0.6.11
-langchain>=0.2.0
+langchain>=0.3.30
 langchain-openai>=0.1.0
 langchain-community>=0.2.0
 qdrant-client>=1.9.0
