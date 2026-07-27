@@ -1,4 +1,4 @@
-"""Alembic environment — sync driver URLs (R11)."""
+"""Alembic environment — prefers local SQLite when Postgres driver missing."""
 from __future__ import annotations
 
 import os
@@ -12,7 +12,6 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# Load .env early so DATABASE_URL is visible
 try:
     from dotenv import load_dotenv
 
@@ -20,27 +19,59 @@ try:
 except Exception:
     pass
 
+DEFAULT_SQLITE = "sqlite:///./apps/econojin.db"
+
+
+def _has_postgres_driver() -> bool:
+    try:
+        import psycopg  # noqa: F401
+
+        return True
+    except ImportError:
+        pass
+    try:
+        import psycopg2  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
+
 
 def to_sync_url(url: str | None) -> str:
-    """Alembic needs a sync DBAPI. Convert async SQLAlchemy URLs."""
+    env = (os.getenv("ENVIRONMENT") or "local").lower()
+    force_sqlite = os.getenv("ALEMBIC_FORCE_SQLITE", "").lower() in ("1", "true", "yes")
+
+    if force_sqlite or (env == "local" and os.getenv("ALEMBIC_USE_SQLITE", "1") != "0"):
+        # Local default: avoid Postgres driver requirement unless explicitly disabled
+        if not url or "***" in str(url) or "postgres" in str(url).lower():
+            if not _has_postgres_driver() or force_sqlite or env == "local":
+                if not url or "postgres" in str(url or "").lower() or "***" in str(url or ""):
+                    return DEFAULT_SQLITE
+
     if not url or not str(url).strip() or "***" in str(url):
-        return "sqlite:///./apps/econojin.db"
+        return DEFAULT_SQLITE
 
     u = str(url).strip()
 
-    # SQLite async → sync
     if u.startswith("sqlite+aiosqlite:"):
         return u.replace("sqlite+aiosqlite:", "sqlite:", 1)
 
-    # Postgres async → psycopg3 (package: psycopg[binary]) preferred over psycopg2
     if "+asyncpg" in u:
-        u = u.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
-        u = u.replace("+asyncpg", "")
-        return u
+        if _has_postgres_driver():
+            try:
+                import psycopg  # noqa: F401
 
-    # Bare postgres:// → postgresql://
+                return u.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
+            except ImportError:
+                return u.replace("postgresql+asyncpg://", "postgresql+psycopg2://", 1)
+        return DEFAULT_SQLITE
+
     if u.startswith("postgres://"):
         u = "postgresql://" + u[len("postgres://") :]
+
+    if u.startswith("postgresql://") and not _has_postgres_driver():
+        print("  [alembic] No psycopg/psycopg2 — falling back to SQLite for migrations")
+        return DEFAULT_SQLITE
 
     return u
 
@@ -51,7 +82,7 @@ def get_url() -> str:
         try:
             from apps.shared_core.config import settings
 
-            raw = settings.DATABASE_URL
+            raw = getattr(settings, "DATABASE_URL", None)
         except Exception:
             raw = None
     if not raw:
@@ -59,13 +90,16 @@ def get_url() -> str:
     return to_sync_url(raw)
 
 
-# Import metadata after path setup; tolerate missing optional drivers at import time
 try:
     from apps.shared_core.database.session import Base
     from apps.shared_core.database.model_registry import MODEL_MODULES, import_all_models
 
     import_all_models(MODEL_MODULES)
-    for extra in ("apps.api.models.education", "apps.api.models.community"):
+    for extra in (
+        "apps.api.models.education",
+        "apps.api.models.community",
+        "apps.shared_core.rbac.models",
+    ):
         try:
             __import__(extra, fromlist=["*"])
         except ImportError:
@@ -99,6 +133,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     configuration = config.get_section(config.config_ini_section) or {}
     configuration["sqlalchemy.url"] = get_url()
+    print(f"  [alembic] using url dialect: {configuration['sqlalchemy.url'].split(':', 1)[0]}")
 
     connectable = engine_from_config(
         configuration,
