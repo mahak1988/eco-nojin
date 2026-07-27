@@ -19,7 +19,12 @@ const NewsPage = lazy(() => import("./pages/NewsPage"));
 const PilotsPage = lazy(() => import("./pages/PilotsPage"));
 const RegionalPage = lazy(() => import("./pages/RegionalPage"));
 const SatelliteDashboardPage = lazy(() => import("./pages/SatelliteDashboardPage"));
+const SatelliteTimeseriesPage = lazy(() => import("./pages/SatelliteTimeseriesPage"));
+const SatelliteChangePage = lazy(() => import("./pages/SatelliteChangePage"));
+const SatelliteFieldMapPage = lazy(() => import("./pages/SatelliteFieldMapPage"));
 const SimulatorsPage = lazy(() => import("./pages/SimulatorsPage"));
+const AquaCropRunPage = lazy(() => import("./pages/AquaCropRunPage"));
+const RothCRunPage = lazy(() => import("./pages/RothCRunPage"));
 const TourismPage = lazy(() => import("./pages/TourismPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const AccountingPage = lazy(() => import("./pages/AccountingPage"));
@@ -52,6 +57,11 @@ const TasksPage = lazy(() => import("./pages/TasksPage"));
 const InventoryPage = lazy(() => import("./pages/InventoryPage"));
 const WeatherPage = lazy(() => import("./pages/WeatherPage"));
 const MonitoringHubPage = lazy(() => import("./pages/MonitoringHubPage"));
+const MonitoringSoilPage = lazy(() => import("./pages/MonitoringSoilPage"));
+const MonitoringWeatherPage = lazy(() => import("./pages/MonitoringWeatherPage"));
+const MonitoringMapPage = lazy(() => import("./pages/MonitoringMapPage"));
+const MonitoringAlertsPage = lazy(() => import("./pages/MonitoringAlertsPage"));
+const MonitoringRulesPage = lazy(() => import("./pages/MonitoringRulesPage"));
 const AccountSecurityPage = lazy(() => import("./pages/AccountSecurityPage"));
 const AccountNotificationsPage = lazy(() => import("./pages/AccountNotificationsPage"));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
@@ -140,6 +150,11 @@ export default function App() {
               <Route path="inventory" element={<InventoryPage />} />
               <Route path="weather" element={<WeatherPage />} />
               <Route path="monitoring" element={<MonitoringHubPage />} />
+              <Route path="monitoring/soil" element={<MonitoringSoilPage />} />
+              <Route path="monitoring/weather" element={<MonitoringWeatherPage />} />
+              <Route path="monitoring/map" element={<MonitoringMapPage />} />
+              <Route path="monitoring/alerts" element={<MonitoringAlertsPage />} />
+              <Route path="monitoring/rules" element={<MonitoringRulesPage />} />
               <Route path="account" element={<AccountPage />} />
               <Route path="account/security" element={<AccountSecurityPage />} />
               <Route path="account/notifications" element={<AccountNotificationsPage />} />
@@ -154,7 +169,12 @@ export default function App() {
               <Route path="pilots" element={<PilotsPage />} />
               <Route path="regional" element={<RegionalPage />} />
               <Route path="satellite" element={<SatelliteDashboardPage />} />
+              <Route path="satellite/timeseries" element={<SatelliteTimeseriesPage />} />
+              <Route path="satellite/change" element={<SatelliteChangePage />} />
+              <Route path="satellite/fields" element={<SatelliteFieldMapPage />} />
               <Route path="simulators" element={<SimulatorsPage />} />
+              <Route path="simulators/aquacrop" element={<AquaCropRunPage />} />
+              <Route path="simulators/rothc" element={<RothCRunPage />} />
               <Route path="simulators/:id" element={<SimulatorDetailPage />} />
               <Route path="my-simulations" element={<MySimulationsPage />} />
               <Route path="comparison" element={<ComparisonDashboard />} />
