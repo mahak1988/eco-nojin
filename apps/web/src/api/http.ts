@@ -1,6 +1,6 @@
 /**
  * Shared fetch helper (R19: no axios).
- * R1: mock only when VITE_USE_MOCK=true.
+ * R5: credentials include for HttpOnly cookies; localStorage bearer is fallback only.
  */
 
 function readEnv(key: string): string | undefined {
@@ -11,7 +11,6 @@ function readEnv(key: string): string | undefined {
   }
 }
 
-/** Empty = same-origin (Vite proxy). */
 export const API_BASE =
   readEnv("VITE_API_BASE_URL") ||
   readEnv("VITE_API_BASE") ||
@@ -20,7 +19,6 @@ export const API_BASE =
 
 export const API_V1 = readEnv("VITE_API_V1") || "/api/v1";
 
-/** R1: explicit mock mode — never silent fake success without this flag. */
 export const USE_MOCK = (readEnv("VITE_USE_MOCK") || "").toLowerCase() === "true";
 
 export class ApiError extends Error {
@@ -45,8 +43,8 @@ export class ApiError extends Error {
   }
 }
 
+/** Prefer cookie session; optional Bearer for mobile/legacy. */
 function authHeader(): Record<string, string> {
-  // Temporary until R5 HttpOnly cookies fully replace bearer storage
   try {
     const token =
       localStorage.getItem("access_token") || localStorage.getItem("token") || "";
@@ -75,7 +73,7 @@ export async function apiFetch<T>(
     const res = await fetch(url, {
       ...init,
       signal: ctrl.signal,
-      credentials: "include", // prepare for R5 HttpOnly cookies
+      credentials: "include",
       headers: {
         Accept: "application/json",
         ...(init.body ? { "Content-Type": "application/json" } : {}),
@@ -116,4 +114,15 @@ export async function apiFetch<T>(
 export function v1(path: string): string {
   const p = path.startsWith("/") ? path : `/${path}`;
   return `${API_V1}${p}`;
+}
+
+/** Clear legacy localStorage tokens after cookie-based logout. */
+export function clearLegacyTokens(): void {
+  try {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("token");
+  } catch {
+    /* ignore */
+  }
 }
