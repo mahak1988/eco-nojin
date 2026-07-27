@@ -2,13 +2,13 @@
 
 ## [Unreleased]
 
+### Phase 0 / F0.2
+- Alembic baseline migration `20260727_0001` (courses, lessons, enrollments)
+- `docs/DB_VERSIONING.md` — schema policy + crypto key handling
+- Fixed `pyproject.toml` for `pip install -e` (SPDX license string, no readme table error)
+
 ### Phase 0 / F0.1
-- `pyproject.toml`: real runtime dependencies + optional `worker` / `dev` extras
-- `requirements.txt` / `requirements-worker.txt` synced
-- `docs/PHASE0_PROGRESS.md` tracker
+- Real dependencies in pyproject + requirements
 
 ### Wave A / F1.1
-- Education list R13/R14 page+size+sort envelope (legacy compatible)
-
-### Earlier
-- Constitution, interaction protocol, CORS R10, education MissingGreenlet fixes
+- Education R13/R14 list envelope
