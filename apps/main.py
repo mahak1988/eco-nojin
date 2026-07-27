@@ -257,6 +257,8 @@ _include("inventory", lambda: __import__("apps.inventory.router", fromlist=["rou
 _include("weather", lambda: __import__("apps.weather.router", fromlist=["router"]).router)
 _include("notifications", lambda: __import__("apps.notifications.router", fromlist=["router"]).router)
 _include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).router)
+_include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlist=["router"]).router)
+_include("satellite", lambda: __import__("apps.satellite.router", fromlist=["router"]).router)
 
 
 @app.get("/", tags=["Root"])
