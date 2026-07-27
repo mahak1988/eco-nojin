@@ -8,65 +8,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.crops.repository import CropRepository
 from apps.crops.schemas import CropCreate, CropResponse
+from apps.crops.seed_data import RAW_CROPS
 from apps.shared_core.schemas.pagination import build_meta, page_to_offset
 
-SEED_CROPS = [
-    CropCreate(
-        name="Wheat",
-        name_fa="گندم",
-        scientific_name="Triticum aestivum",
-        category="cereal",
-        season="winter",
-        water_need_mm=450,
-        growth_days=150,
-        description="Staple cereal for temperate climates",
-    ),
-    CropCreate(
-        name="Barley",
-        name_fa="جو",
-        scientific_name="Hordeum vulgare",
-        category="cereal",
-        season="winter",
-        water_need_mm=380,
-        growth_days=120,
-    ),
-    CropCreate(
-        name="Corn",
-        name_fa="ذرت",
-        scientific_name="Zea mays",
-        category="cereal",
-        season="summer",
-        water_need_mm=550,
-        growth_days=110,
-    ),
-    CropCreate(
-        name="Tomato",
-        name_fa="گوجه‌فرنگی",
-        scientific_name="Solanum lycopersicum",
-        category="vegetable",
-        season="summer",
-        water_need_mm=600,
-        growth_days=90,
-    ),
-    CropCreate(
-        name="Alfalfa",
-        name_fa="یونجه",
-        scientific_name="Medicago sativa",
-        category="forage",
-        season="perennial",
-        water_need_mm=800,
-        growth_days=365,
-    ),
-    CropCreate(
-        name="Saffron",
-        name_fa="زعفران",
-        scientific_name="Crocus sativus",
-        category="spice",
-        season="autumn",
-        water_need_mm=300,
-        growth_days=200,
-    ),
-]
+
+def _seed_items() -> list[CropCreate]:
+    return [
+        CropCreate(
+            name=n,
+            name_fa=nf,
+            scientific_name=sci,
+            category=cat,
+            season=season,
+            water_need_mm=float(w),
+            growth_days=int(d),
+            description=desc,
+        )
+        for n, nf, sci, cat, season, w, d, desc in RAW_CROPS
+    ]
 
 
 class CropService:
@@ -92,11 +51,19 @@ class CropService:
             raise ValueError("CROP_NOT_FOUND")
         return CropResponse.model_validate(crop)
 
-    async def seed_demo(self) -> int:
-        if await self.repo.count() > 0:
+    async def seed_demo(self, force: bool = False) -> int:
+        count = await self.repo.count()
+        if count >= 100 and not force:
             return 0
+        if force and count > 0:
+            # only fill missing names
+            existing_names = {r.name for r in (await self.repo.list(skip=0, limit=500))[0]}
+        else:
+            existing_names = set()
         n = 0
-        for item in SEED_CROPS:
+        for item in _seed_items():
+            if item.name in existing_names:
+                continue
             await self.repo.create(item)
             n += 1
         return n
