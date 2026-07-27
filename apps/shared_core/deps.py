@@ -1,11 +1,11 @@
-"""FastAPI dependencies — auth & session (python-jose only)."""
+"""FastAPI dependencies — cookie + bearer JWT (python-jose)."""
 
 from __future__ import annotations
 
 import logging
 from typing import Annotated, Any
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,23 +25,37 @@ SessionDep = Annotated[AsyncSession, Depends(get_db_session)]
 TokenDep = Annotated[str | None, Depends(reusable_oauth2)]
 
 
+def _extract_token(request: Request, bearer: str | None) -> str | None:
+    if bearer:
+        return bearer
+    cookie = request.cookies.get(settings.JWT_COOKIE_NAME)
+    return cookie or None
+
+
 async def get_current_user(
+    request: Request,
     session: SessionDep,
     token: TokenDep,
 ) -> dict[str, Any]:
-    if not token:
+    raw = _extract_token(request, token)
+    if not raw:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
     try:
-        payload = decode_token(token)
+        payload = decode_token(raw)
         sub = payload.get("sub")
         if sub is None:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Could not validate credentials",
+            )
+        if payload.get("type") and payload.get("type") != "access":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid token type",
             )
     except JWTError:
         raise HTTPException(
@@ -112,16 +126,17 @@ CurrentSuperUser = Annotated[dict, Depends(get_current_superuser)]
 
 
 async def require_write_auth(
+    request: Request,
     token: TokenDep,
     session: SessionDep,
 ) -> dict[str, Any] | None:
-    """Local default: REQUIRE_AUTH_FOR_WRITES=false → no token required."""
     if not settings.REQUIRE_AUTH_FOR_WRITES:
         return None
-    if not token:
+    raw = _extract_token(request, token)
+    if not raw:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required for write operations",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return await get_current_user(session, token)
+    return await get_current_user(request, session, raw)

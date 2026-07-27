@@ -1,4 +1,4 @@
-"""Authentication router — login/register/refresh (HS256; RS256 later)."""
+"""Authentication router — JWT in HttpOnly cookies (R4/R5) + optional body tokens."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db
+from apps.shared_core.security import cookie_kwargs
 from apps.users.models import User
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
+
+ACCESS_COOKIE = settings.JWT_COOKIE_NAME
+REFRESH_COOKIE = settings.REFRESH_COOKIE_NAME
 
 
 class LoginRequest(BaseModel):
@@ -61,13 +65,16 @@ class UserResponse(BaseModel):
 
 
 class AuthResponse(BaseModel):
+    """Tokens also set as HttpOnly cookies; body kept for mobile/API clients."""
+
     accessToken: str
     refreshToken: str
+    token_type: str = "bearer"
     user: UserResponse
 
 
 class RefreshRequest(BaseModel):
-    refreshToken: str
+    refreshToken: Optional[str] = None
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -105,7 +112,32 @@ def _user_response(user: User) -> UserResponse:
     )
 
 
+def _set_auth_cookies(response: Response, access: str, refresh: str) -> None:
+    access_max = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    refresh_max = settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600
+    response.set_cookie(ACCESS_COOKIE, access, **cookie_kwargs(access_max))
+    response.set_cookie(REFRESH_COOKIE, refresh, **cookie_kwargs(refresh_max))
+
+
+def _clear_auth_cookies(response: Response) -> None:
+    response.delete_cookie(ACCESS_COOKIE, path="/")
+    response.delete_cookie(REFRESH_COOKIE, path="/")
+
+
+def _token_from_request(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None,
+) -> str | None:
+    if credentials and credentials.credentials:
+        return credentials.credentials
+    cookie_tok = request.cookies.get(ACCESS_COOKIE)
+    if cookie_tok:
+        return cookie_tok
+    return None
+
+
 async def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(security),
     db: AsyncSession = Depends(get_db),
 ) -> User:
@@ -114,11 +146,12 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    if not credentials:
+    token = _token_from_request(request, credentials)
+    if not token:
         raise credentials_exception
     try:
         payload = jwt.decode(
-            credentials.credentials,
+            token,
             settings.jwt_secret,
             algorithms=[settings.ALGORITHM],
         )
@@ -136,7 +169,11 @@ async def get_current_user(
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
+async def register(
+    request: RegisterRequest,
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+) -> AuthResponse:
     result = await db.execute(select(User).where(User.email == request.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -153,15 +190,23 @@ async def register(request: RegisterRequest, db: AsyncSession = Depends(get_db))
     await db.commit()
     await db.refresh(new_user)
 
+    access = create_access_token({"sub": new_user.email})
+    refresh = create_refresh_token({"sub": new_user.email})
+    _set_auth_cookies(response, access, refresh)
+
     return AuthResponse(
-        accessToken=create_access_token({"sub": new_user.email}),
-        refreshToken=create_refresh_token({"sub": new_user.email}),
+        accessToken=access,
+        refreshToken=refresh,
         user=_user_response(new_user),
     )
 
 
 @router.post("/login", response_model=AuthResponse)
-async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
+async def login(
+    request: LoginRequest,
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+) -> AuthResponse:
     identifier = request.email or request.username
     if not identifier:
         raise HTTPException(status_code=400, detail="Invalid login credentials")
@@ -176,9 +221,13 @@ async def login(request: LoginRequest, db: AsyncSession = Depends(get_db)) -> Au
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    access = create_access_token({"sub": user.email})
+    refresh = create_refresh_token({"sub": user.email})
+    _set_auth_cookies(response, access, refresh)
+
     return AuthResponse(
-        accessToken=create_access_token({"sub": user.email}),
-        refreshToken=create_refresh_token({"sub": user.email}),
+        accessToken=access,
+        refreshToken=refresh,
         user=_user_response(user),
     )
 
@@ -189,15 +238,30 @@ async def get_me(current_user: User = Depends(get_current_user)) -> UserResponse
 
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)) -> dict[str, str]:
+async def logout(response: Response) -> dict[str, str]:
+    """Clear HttpOnly cookies (auth optional so logout always works)."""
+    _clear_auth_cookies(response)
     return {"message": "Successfully logged out"}
 
 
 @router.post("/refresh", response_model=AuthResponse)
-async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_db)) -> AuthResponse:
+async def refresh_token(
+    response: Response,
+    request: Request,
+    body: Optional[RefreshRequest] = None,
+    db: AsyncSession = Depends(get_db),
+) -> AuthResponse:
+    raw = None
+    if body and body.refreshToken:
+        raw = body.refreshToken
+    if not raw:
+        raw = request.cookies.get(REFRESH_COOKIE)
+    if not raw:
+        raise HTTPException(status_code=401, detail="Missing refresh token")
+
     try:
         payload = jwt.decode(
-            request.refreshToken,
+            raw,
             settings.jwt_secret,
             algorithms=[settings.ALGORITHM],
         )
@@ -212,8 +276,12 @@ async def refresh_token(request: RefreshRequest, db: AsyncSession = Depends(get_
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
 
+    access = create_access_token({"sub": user.email})
+    refresh = create_refresh_token({"sub": user.email})
+    _set_auth_cookies(response, access, refresh)
+
     return AuthResponse(
-        accessToken=create_access_token({"sub": user.email}),
-        refreshToken=create_refresh_token({"sub": user.email}),
+        accessToken=access,
+        refreshToken=refresh,
         user=_user_response(user),
     )
