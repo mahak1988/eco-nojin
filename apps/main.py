@@ -34,7 +34,7 @@ logger = logging.getLogger("econojin")
 from apps.shared_core.config import settings
 
 _db_status = {"ok": False, "detail": "not_initialized"}
-_OPTIONAL_MODULE_HINTS = ("numba", "satellite", "psycopg2")
+_OPTIONAL_MODULE_HINTS = ("numba", "psycopg2")
 
 
 @asynccontextmanager
@@ -259,6 +259,8 @@ _include("notifications", lambda: __import__("apps.notifications.router", fromli
 _include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).router)
 _include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlist=["router"]).router)
 _include("satellite", lambda: __import__("apps.satellite.router", fromlist=["router"]).router)
+_include("simulation_jobs", lambda: __import__("apps.simulation.jobs_router", fromlist=["router"]).router)
+_include("websocket", lambda: __import__("apps.shared_core.websocket.router", fromlist=["router"]).router)
 
 
 @app.get("/", tags=["Root"])

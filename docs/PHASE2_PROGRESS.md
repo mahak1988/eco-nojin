@@ -4,28 +4,42 @@
 
 | ID | Module | Status |
 |----|--------|--------|
-| F2.1 | apps/monitoring | Done — sensors, readings, alerts, rules, overview, seed |
-| F2.2 | apps/simulation | Existing routers; Celery/PDF upgrade pending |
-| F2.3 | apps/satellite | Done — provider chain + synthetic NDVI fallback; GEE/Copernicus slots ready |
+| F2.1 | apps/monitoring | Done — sensors, readings, alerts, rules |
+| F2.2 | Celery AquaCrop/RothC + PDF/CSV | Done (sync fallback if Redis down) |
+| F2.3 | apps/satellite | Catalog + roles + topography/thermal/NDVI |
+| WS | /ws/monitoring | Done |
 
-## Endpoints live
+## Free satellite / GIS sources (no key for dev)
 
-- GET /api/v1/monitoring/overview
-- GET/POST /api/v1/sensors
-- GET/POST /api/v1/sensors/:id/readings
-- GET /api/v1/alerts
-- POST /api/v1/alert-rules
-- GET /api/v1/satellite/availability|ndvi|timeseries|fields
-- POST /api/v1/satellite/change-detection
+| Source | Roles |
+|--------|-------|
+| Sentinel-2 | vegetation, optical |
+| Landsat 8/9 | vegetation, thermal, optical |
+| MODIS / VIIRS | vegetation, thermal |
+| Sentinel-1 SAR | radar, soil |
+| SRTM / ASTER / OpenTopoData | topography |
+| NASA POWER / Open-Meteo | precipitation, thermal |
+| OSM / NASA GIBS | gis_basemap, optical |
 
-## Frontend
+API:
+- GET /api/v1/satellite/catalog?role=topography
+- GET /api/v1/satellite/topography
+- GET /api/v1/satellite/thermal
+- GET /api/v1/satellite/ndvi
+- GET /api/v1/satellite/by-role?role=vegetation
 
-- /monitoring — hub
-- /satellite — NDVI map + timeseries
+Simulations:
+- POST /api/v1/simulations/aquacrop
+- POST /api/v1/simulations/rothc
+- GET /api/v1/simulations/jobs/{task_id}
 
-## Next
+WebSocket: ws://localhost:8000/ws/monitoring
 
-- Celery tasks for AquaCrop/RothC + PDF export
-- WS /ws/monitoring
-- Real GEE/Copernicus provider classes behind same interface
-- Remaining monitoring/simulator pages
+## Celery (optional)
+
+```bash
+redis-server
+celery -A apps.shared_core.celery_app.celery_app worker -l info
+```
+
+Without Redis, API runs models synchronously and still writes PDF/CSV under artifacts/simulation_exports/.
