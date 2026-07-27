@@ -253,6 +253,9 @@ _include("farms", lambda: __import__("apps.farms.router", fromlist=["router"]).r
 _include("crops", lambda: __import__("apps.crops.router", fromlist=["router"]).router)
 _include("water", lambda: __import__("apps.water.router", fromlist=["router"]).router)
 _include("planting", lambda: __import__("apps.planting.router", fromlist=["router"]).router)
+_include("inventory", lambda: __import__("apps.inventory.router", fromlist=["router"]).router)
+_include("weather", lambda: __import__("apps.weather.router", fromlist=["router"]).router)
+_include("notifications", lambda: __import__("apps.notifications.router", fromlist=["router"]).router)
 
 
 @app.get("/", tags=["Root"])
