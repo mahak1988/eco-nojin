@@ -1,4 +1,4 @@
-"""Satellite API — NDVI, timeseries, change detection."""
+"""Satellite API — catalog, NDVI, topography, thermal, change detection."""
 
 from __future__ import annotations
 
@@ -6,8 +6,9 @@ from datetime import date, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
+from apps.satellite.catalog import ROLES, catalog_by_role
 from apps.satellite.providers.chain import default_chain
 
 router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
@@ -21,11 +22,18 @@ class ChangeRequest(BaseModel):
     date_b: Optional[str] = None
 
 
+@router.get("/catalog")
+async def satellite_catalog(role: Optional[str] = None):
+    return {"roles": ROLES, "items": catalog_by_role(role)}
+
+
+@router.get("/roles")
+async def satellite_roles():
+    return ROLES
+
+
 @router.get("/availability")
-async def availability(
-    lat: float = Query(32.65),
-    lon: float = Query(51.67),
-):
+async def availability(lat: float = Query(32.65), lon: float = Query(51.67)):
     return await _chain.availability(lat, lon)
 
 
@@ -49,6 +57,30 @@ async def timeseries(
     end_s = end or today.isoformat()
     start_s = start or (today - timedelta(days=180)).isoformat()
     return await _chain.timeseries(lat, lon, start_s, end_s)
+
+
+@router.get("/topography")
+async def topography(lat: float = Query(32.65), lon: float = Query(51.67)):
+    return await _chain.by_role("topography", lat, lon)
+
+
+@router.get("/thermal")
+async def thermal(
+    lat: float = Query(32.65),
+    lon: float = Query(51.67),
+    date: Optional[str] = None,
+):
+    return await _chain.by_role("thermal", lat, lon, date)
+
+
+@router.get("/by-role")
+async def by_role(
+    role: str = Query(..., description="vegetation|thermal|topography|optical"),
+    lat: float = Query(32.65),
+    lon: float = Query(51.67),
+    date: Optional[str] = None,
+):
+    return await _chain.by_role(role, lat, lon, date)
 
 
 @router.post("/change-detection")
@@ -78,7 +110,6 @@ async def change_detection(body: ChangeRequest):
 
 @router.get("/fields")
 async def satellite_fields():
-    """Demo field footprints for map overlays."""
     return {
         "type": "FeatureCollection",
         "features": [
