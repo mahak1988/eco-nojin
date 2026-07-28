@@ -67,6 +67,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as e:
         logger.debug("PostGIS skip: %s", e)
     try:
+        from apps.ml.service import get_bundle
+
+        get_bundle()
+        logger.info("ML models ready")
+    except Exception as e:
+        logger.debug("ML warmup skip: %s", e)
+    try:
         from apps.shared_ai.ai.llm_factory import LLMFactory  # noqa: F401
 
         logger.info("AI module loaded (provider: %s)", settings.LLM_PROVIDER)
@@ -275,6 +282,7 @@ _include(
     "science_monitors",
     lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
 )
+_include("ml", lambda: __import__("apps.api.routes.ml", fromlist=["router"]).router)
 _include("science_phase3", lambda: __import__("apps.simulation.phase3_router", fromlist=["router"]).router)
 _include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
@@ -331,6 +339,7 @@ async def health() -> dict[str, Any]:
         "database_detail": db_detail,
         "science_loaded": "science" in _loaded_routers,
         "monitors_loaded": "science_monitors" in _loaded_routers,
+        "ml_loaded": "ml" in _loaded_routers,
         "loaded_routers": list(_loaded_routers),
         "failed_routers": list(_failed_routers),
     }
@@ -339,7 +348,7 @@ async def health() -> dict[str, Any]:
 @app.get("/api/v1/debug/routers", tags=["Debug"])
 async def debug_routers() -> dict[str, Any]:
     paths = sorted({getattr(r, "path", "") for r in app.routes if getattr(r, "path", None)})
-    science = [p for p in paths if "science" in p]
+    science = [p for p in paths if "science" in p or "/ml" in p]
     return {
         "project_root": str(PROJECT_ROOT),
         "loaded": _loaded_routers,
