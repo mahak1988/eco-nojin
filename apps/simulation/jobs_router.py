@@ -1,4 +1,4 @@
-"""Simulation job API — Celery when available, sync fallback + RBAC."""
+"""Simulation job API — Celery when available, sync fallback + RBAC + coupling."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from apps.shared_core.rbac import require_permission
+from apps.simulation.coupling_engine import run_coupled
 from apps.simulation.tasks import run_aquacrop_local, run_rothc_local
 
 router = APIRouter(prefix="/api/v1/simulations", tags=["Simulations"])
@@ -36,12 +37,26 @@ class CompareBody(BaseModel):
     rothc: RothCParams | None = None
 
 
+class CouplingBody(BaseModel):
+    area_ha: float = 1.0
+    et0_mm_day: float = 4.0
+    kc: float = 1.15
+    days: int = 30
+    rain_mm_total: float = 20.0
+    soc_t_ha: float = 40.0
+    clay_pct: float = 25.0
+    temp_c: float = 18.0
+    years: int = 10
+    c_input_t_ha_y: float = 1.5
+
+
 @router.get("")
 async def list_sim_models() -> dict[str, Any]:
     return {
         "data": [
             {"id": "aquacrop", "name": "AquaCrop", "kind": "crop_water"},
             {"id": "rothc", "name": "RothC", "kind": "soil_carbon"},
+            {"id": "coupling", "name": "AquaCrop+RothC", "kind": "coupled"},
         ]
     }
 
@@ -101,6 +116,14 @@ async def compare_runs(
             "soc_delta": rt.get("delta"),
         },
     }
+
+
+@router.post("/coupling/run")
+async def coupling_run(
+    body: CouplingBody,
+    _: object = Depends(require_permission("simulation:write")),
+) -> dict[str, Any]:
+    return run_coupled(body.model_dump())
 
 
 @router.get("/jobs/{task_id}")

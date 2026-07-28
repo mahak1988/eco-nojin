@@ -10,7 +10,7 @@ from fastapi import APIRouter, Query
 
 from apps.shared_core.config import settings
 from apps.weather.alerts import evaluate_alerts
-from apps.weather.era5_chirps import fetch_chirps_like, fetch_era5_land, synthetic_climate
+from apps.weather.era5_chirps import fetch_chirps_like, fetch_era5_land
 
 router = APIRouter(prefix="/api/v1/weather", tags=["Weather"])
 
@@ -69,13 +69,37 @@ async def forecast(
         return out
 
 
+@router.get("/current")
+async def current_weather(lat: float = Query(32.65), lon: float = Query(51.67)):
+    fc = _synthetic_forecast(lat, lon, 1)
+    day = (fc.get("daily") or [{}])[0]
+    return {
+        "provider": fc["provider"],
+        "lat": lat,
+        "lon": lon,
+        "observed_at": datetime.now(timezone.utc).isoformat(),
+        **day,
+    }
+
+
+@router.get("/historical")
+async def historical(
+    lat: float = Query(32.65),
+    lon: float = Query(51.67),
+    days: int = Query(30, ge=7, le=90),
+):
+    end = date.today() - timedelta(days=5)
+    start = end - timedelta(days=days)
+    return await fetch_era5_land(lat, lon, start, end)
+
+
 @router.get("/era5")
 async def era5(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
     days: int = Query(30, ge=7, le=90),
 ):
-    end = date.today() - timedelta(days=5)  # archive lag
+    end = date.today() - timedelta(days=5)
     start = end - timedelta(days=days)
     return await fetch_era5_land(lat, lon, start, end)
 

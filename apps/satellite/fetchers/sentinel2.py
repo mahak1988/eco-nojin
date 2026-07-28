@@ -6,10 +6,10 @@ import hashlib
 import logging
 import math
 from dataclasses import asdict, dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 from typing import Any, Optional
 
-from apps.satellite.processors.indices import ndmi, ndvi, ndwi, smi
+from apps.satellite.processors.indices import evi, ndmi, ndvi, ndwi, smi
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ class IndexSample:
     ndvi: float
     ndwi: float
     ndmi: float
+    evi: float
     smi: float
     cloud_pct: float
     source: str
@@ -41,7 +42,6 @@ def synthetic_series(
     end: date,
     step_days: int = 5,
 ) -> list[IndexSample]:
-    """Deterministic seasonal curves for offline/dev."""
     base = _seed(lat, lon)
     out: list[IndexSample] = []
     d = start
@@ -51,11 +51,13 @@ def synthetic_series(
         nir = 0.25 + 0.45 * seasonal
         red = 0.08 + 0.12 * (1 - seasonal)
         green = 0.10 + 0.15 * seasonal
+        blue = 0.05 + 0.05 * (1 - seasonal)
         swir = 0.15 + 0.20 * (1 - seasonal * 0.5)
-        lst = 0.3 + 0.4 * (1 - seasonal)  # hotter when sparse veg
+        lst = 0.3 + 0.4 * (1 - seasonal)
         n = ndvi(nir, red)
         w = ndwi(green, nir)
         m = ndmi(nir, swir)
+        ev = evi(nir, red, blue)
         s = smi(n, w, lst)
         cloud = 5 + 15 * abs(math.sin(doy / 20 + base))
         out.append(
@@ -64,6 +66,7 @@ def synthetic_series(
                 ndvi=round(n, 4),
                 ndwi=round(w, 4),
                 ndmi=round(m, 4),
+                evi=round(ev, 4),
                 smi=round(s, 4),
                 cloud_pct=round(cloud, 1),
                 source="sentinel-2",
@@ -81,19 +84,16 @@ def fetch_mpc_stac_mean(
     end: date,
     cloud_max: int = 30,
 ) -> Optional[list[IndexSample]]:
-    """Best-effort Planetary Computer STAC search (no key). Returns None if unavailable."""
     try:
         import planetary_computer
         import pystac_client
     except ImportError:
         return None
-
     try:
         catalog = pystac_client.Client.open(
             "https://planetarycomputer.microsoft.com/api/stac/v1",
             modifier=planetary_computer.sign_inplace,
         )
-        # small buffer ~0.02 deg ≈ 2 km
         bbox = [lon - 0.02, lat - 0.02, lon + 0.02, lat + 0.02]
         search = catalog.search(
             collections=["sentinel-2-l2a"],
@@ -105,12 +105,10 @@ def fetch_mpc_stac_mean(
         items = list(search.items())
         if not items:
             return None
-        # Without full raster stack we use scene-level EO stats when present + synthetic fill
         series = synthetic_series(lat, lon, start, end)
         for i, it in enumerate(items[: len(series)]):
             props = it.properties or {}
-            cc = float(props.get("eo:cloud_cover", series[i].cloud_pct))
-            series[i].cloud_pct = cc
+            series[i].cloud_pct = float(props.get("eo:cloud_cover", series[i].cloud_pct))
             series[i].provider = "planetary-computer-stac"
             series[i].source = "sentinel-2-l2a"
         return series
