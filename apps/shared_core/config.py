@@ -35,6 +35,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./apps/econojin.db")
     DB_ECHO: bool = Field(default=False)
+    FORCE_POSTGRES: bool = Field(default=False)
 
     SECRET_KEY: str = Field(default="local-dev-only-change-me-use-secrets-token-urlsafe-48")
     JWT_SECRET_KEY: Optional[str] = Field(default=None)
