@@ -278,6 +278,7 @@ _include(
 )
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
+_include("rothc_full", lambda: __import__("apps.api.routes.rothc_full", fromlist=["router"]).router)
 _include(
     "science_monitors",
     lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
