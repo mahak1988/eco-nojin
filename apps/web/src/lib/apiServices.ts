@@ -30,6 +30,7 @@ export type DataSource = "api" | "mock" | "error";
 async function fetchSafe<T>(
   path: string,
   fallback: T,
+  init?: RequestInit,
 ): Promise<{ data: T; source: DataSource; errorMessage?: string }> {
   if (USE_MOCK) {
     return { data: fallback, source: "mock" };
@@ -40,7 +41,8 @@ async function fetchSafe<T>(
     const res = await fetch(url(path), {
       signal: ctrl.signal,
       credentials: "include",
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json", ...(init?.headers || {}) },
+      ...init,
     });
     clearTimeout(timer);
     if (!res.ok) {
@@ -134,4 +136,45 @@ export async function seedEducationDemo() {
   } catch {
     return { data: { seeded: 0, message: "failed" }, source: "error" as const };
   }
+}
+
+export async function getScienceStatus() {
+  return fetchSafe("/api/v1/science/status", { ok: false, phase: 3 });
+}
+
+export async function getScienceRuns() {
+  return fetchSafe("/api/v1/science/runs", { data: [], count: 0 });
+}
+
+export async function getScienceNdviCanopy(lat: number, lon: number, days = 60) {
+  return fetchSafe(`/api/v1/science/ndvi-canopy?lat=${lat}&lon=${lon}&days=${days}`, {
+    ndvi: [],
+    canopy_cover: [],
+    provider: "none",
+    count: 0,
+  });
+}
+
+export async function postAquaCropAdvanced(body: Record<string, unknown>) {
+  return fetchSafe(
+    "/api/v1/science/aquacrop-advanced",
+    { model: "error" },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function postSwat(body: Record<string, unknown>) {
+  return fetchSafe(
+    "/api/v1/science/swat",
+    { model: "error" },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
 }

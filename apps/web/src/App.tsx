@@ -25,6 +25,7 @@ const SatelliteFieldMapPage = lazy(() => import("./pages/SatelliteFieldMapPage")
 const SimulatorsPage = lazy(() => import("./pages/SimulatorsPage"));
 const AquaCropRunPage = lazy(() => import("./pages/AquaCropRunPage"));
 const RothCRunPage = lazy(() => import("./pages/RothCRunPage"));
+const SciencePage = lazy(() => import("./pages/SciencePage"));
 const TourismPage = lazy(() => import("./pages/TourismPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const AccountingPage = lazy(() => import("./pages/AccountingPage"));
@@ -175,6 +176,7 @@ export default function App() {
               <Route path="simulators" element={<SimulatorsPage />} />
               <Route path="simulators/aquacrop" element={<AquaCropRunPage />} />
               <Route path="simulators/rothc" element={<RothCRunPage />} />
+              <Route path="science" element={<SciencePage />} />
               <Route path="simulators/:id" element={<SimulatorDetailPage />} />
               <Route path="my-simulations" element={<MySimulationsPage />} />
               <Route path="comparison" element={<ComparisonDashboard />} />
