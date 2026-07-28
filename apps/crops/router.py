@@ -1,4 +1,4 @@
-"""Crops API."""
+"""Crops API + RBAC on seed."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from apps.crops.schemas import (
 from apps.crops.service import CropService
 from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db_session
+from apps.shared_core.rbac import require_permission
 
 router = APIRouter(prefix="/api/v1/crops", tags=["Crops"])
 
@@ -46,6 +47,7 @@ async def get_crop(crop_id: int, session: AsyncSession = Depends(get_db_session)
 async def seed_crops(
     force: bool = Query(False),
     session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("crops:write")),
 ):
     if settings.ENVIRONMENT == "production":
         raise HTTPException(status_code=403, detail="Seed disabled")
@@ -55,5 +57,4 @@ async def seed_crops(
 
 @router.post("/irrigation/calculate", response_model=IrrigationCalcResponse)
 async def irrigation_calculate(body: IrrigationCalcRequest):
-    """ETc = ET0 × Kc; gross = ETc / efficiency; volume = gross_mm × area_ha × 10."""
     return CropService.calc_irrigation(body)

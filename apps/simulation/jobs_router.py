@@ -1,12 +1,13 @@
-"""Simulation job API — Celery when available, sync fallback."""
+"""Simulation job API — Celery when available, sync fallback + RBAC."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
+from apps.shared_core.rbac import require_permission
 from apps.simulation.tasks import run_aquacrop_local, run_rothc_local
 
 router = APIRouter(prefix="/api/v1/simulations", tags=["Simulations"])
@@ -46,7 +47,10 @@ async def list_sim_models() -> dict[str, Any]:
 
 
 @router.post("/aquacrop")
-async def start_aquacrop(body: AquaCropParams) -> dict[str, Any]:
+async def start_aquacrop(
+    body: AquaCropParams,
+    _: object = Depends(require_permission("simulation:write")),
+) -> dict[str, Any]:
     params = body.model_dump()
     async_mode = params.pop("async_mode", False)
     if async_mode:
@@ -63,7 +67,10 @@ async def start_aquacrop(body: AquaCropParams) -> dict[str, Any]:
 
 
 @router.post("/rothc")
-async def start_rothc(body: RothCParams) -> dict[str, Any]:
+async def start_rothc(
+    body: RothCParams,
+    _: object = Depends(require_permission("simulation:write")),
+) -> dict[str, Any]:
     params = body.model_dump()
     async_mode = params.pop("async_mode", False)
     if async_mode:
@@ -80,7 +87,10 @@ async def start_rothc(body: RothCParams) -> dict[str, Any]:
 
 
 @router.post("/compare")
-async def compare_runs(body: CompareBody) -> dict[str, Any]:
+async def compare_runs(
+    body: CompareBody,
+    _: object = Depends(require_permission("simulation:write")),
+) -> dict[str, Any]:
     aq = run_aquacrop_local((body.aquacrop or AquaCropParams()).model_dump(exclude={"async_mode"}))
     rt = run_rothc_local((body.rothc or RothCParams()).model_dump(exclude={"async_mode"}))
     return {
