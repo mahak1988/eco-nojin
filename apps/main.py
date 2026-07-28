@@ -54,9 +54,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.warning("init_db failed: %s", e)
     try:
         from apps.shared_core.database.session import get_engine
-        from apps.shared_core.geo.postgis import ensure_postgis
+        from apps.shared_core.geo.postgis import ensure_farms_spatial, ensure_postgis
 
-        await ensure_postgis(get_engine())
+        eng = get_engine()
+        await ensure_postgis(eng)
+        spatial = await ensure_farms_spatial(eng)
+        if spatial.get("ok"):
+            logger.info("Farms spatial index: %s", spatial.get("steps"))
     except Exception as e:
         logger.debug("PostGIS skip: %s", e)
     try:

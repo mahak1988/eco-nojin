@@ -16,7 +16,11 @@ celery_app = Celery(
     "econojin",
     broker=REDIS_URL,
     backend=REDIS_URL,
-    include=["apps.simulation.tasks", "apps.satellite.tasks"],
+    include=[
+        "apps.simulation.tasks",
+        "apps.simulation.tasks_phase3",
+        "apps.satellite.tasks",
+    ],
 )
 
 celery_app.conf.update(
@@ -31,12 +35,11 @@ celery_app.conf.update(
     beat_schedule={
         "weekly-vegetation-check": {
             "task": "satellite.weekly_vegetation_check",
-            "schedule": 60 * 60 * 24 * 7,  # seconds; override with crontab in prod
+            "schedule": 60 * 60 * 24 * 7,
         },
     },
 )
 
-# Register weekly task name if defined
 try:
     from apps.satellite.tasks import weekly_vegetation_check_sync
 

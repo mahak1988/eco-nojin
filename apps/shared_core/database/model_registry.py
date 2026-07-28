@@ -20,6 +20,7 @@ _MODEL_MODULES = [
     "apps.planting.models",
     "apps.inventory.models",
     "apps.monitoring.models",
+    "apps.simulation.models_runs",
 ]
 
 
