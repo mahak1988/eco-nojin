@@ -273,6 +273,7 @@ _include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).r
 _include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlist=["router"]).router)
 _include("satellite", lambda: __import__("apps.satellite.router", fromlist=["router"]).router)
 _include("simulation_jobs", lambda: __import__("apps.simulation.jobs_router", fromlist=["router"]).router)
+_include("science", lambda: __import__("apps.simulation.phase3_router", fromlist=["router"]).router)
 _include("websocket", lambda: __import__("apps.shared_core.websocket.router", fromlist=["router"]).router)
 
 
