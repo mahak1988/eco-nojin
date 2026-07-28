@@ -281,6 +281,10 @@ _include("science", lambda: __import__("apps.api.routes.science", fromlist=["rou
 _include("rothc_full", lambda: __import__("apps.api.routes.rothc_full", fromlist=["router"]).router)
 _include("soil_carbon", lambda: __import__("apps.api.routes.soil_carbon", fromlist=["router"]).router)
 _include(
+    "organic_matter",
+    lambda: __import__("apps.api.routes.organic_matter", fromlist=["router"]).router,
+)
+_include(
     "science_monitors",
     lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
 )
