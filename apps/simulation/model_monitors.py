@@ -1,8 +1,5 @@
 """
 Model monitors (پایشگرها) — evaluate science outputs against operational thresholds.
-
-Each monitor watches a process model and optional live sensor proxies.
-Produces severity-tagged events + fa/en messages for UI and alert fan-out.
 """
 
 from __future__ import annotations
@@ -10,7 +7,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-# Catalog of built-in monitors
 MONITOR_CATALOG: list[dict[str, Any]] = [
     {
         "id": "aquacrop_yield",
@@ -21,7 +17,7 @@ MONITOR_CATALOG: list[dict[str, Any]] = [
         "operator": "lt",
         "warning": 0.75,
         "critical": 0.55,
-        "unit": "0–1",
+        "unit": "0-1",
         "icon": "sprout",
     },
     {
@@ -45,7 +41,7 @@ MONITOR_CATALOG: list[dict[str, Any]] = [
         "operator": "lt",
         "warning": 0.7,
         "critical": 0.45,
-        "unit": "0–1",
+        "unit": "0-1",
         "icon": "activity",
     },
     {
@@ -69,7 +65,7 @@ MONITOR_CATALOG: list[dict[str, Any]] = [
         "operator": "gt",
         "warning": 5.0,
         "critical": 15.0,
-        "unit": "t/km²/y",
+        "unit": "t/km2/y",
         "icon": "mountain",
     },
     {
@@ -105,7 +101,7 @@ MONITOR_CATALOG: list[dict[str, Any]] = [
         "operator": "lt",
         "warning": 0.35,
         "critical": 0.2,
-        "unit": "0–1",
+        "unit": "0-1",
         "icon": "leaf",
     },
     {
@@ -129,7 +125,7 @@ MONITOR_CATALOG: list[dict[str, Any]] = [
         "operator": "gt",
         "warning": 38.0,
         "critical": 42.0,
-        "unit": "°C",
+        "unit": "C",
         "icon": "sun",
     },
 ]
@@ -148,7 +144,6 @@ def _cmp(op: str, value: float, threshold: float) -> bool:
 
 
 def _severity(op: str, value: float, warning: float, critical: float) -> str:
-    # critical is "worse" side of the operator
     if _cmp(op, value, critical):
         return "critical"
     if _cmp(op, value, warning):
@@ -157,7 +152,6 @@ def _severity(op: str, value: float, warning: float, critical: float) -> str:
 
 
 def extract_metrics(bundle: dict[str, Any]) -> dict[str, float]:
-    """Flatten metrics from model result dicts."""
     m: dict[str, float] = {}
     aq = bundle.get("aquacrop") or {}
     if aq:
@@ -171,8 +165,10 @@ def extract_metrics(bundle: dict[str, Any]) -> dict[str, float]:
         else:
             m["mean_ks"] = float(aq.get("relative_transpiration") or 1.0)
     scs = bundle.get("scs") or bundle.get("swat") or {}
-    outs = scs.get("outputs") or scs
-    if outs and ("runoff_mm_year" in outs or scs.get("model") == "scs_cn_basin_balance"):
+    outs = scs.get("outputs") or {}
+    if outs or scs.get("model") == "scs_cn_basin_balance":
+        if not outs and scs.get("outputs"):
+            outs = scs["outputs"]
         m["runoff_mm_year"] = float(outs.get("runoff_mm_year") or 0)
         m["sediment_t_km2_year"] = float(outs.get("sediment_t_km2_year") or 0)
         m["water_yield_mm_year"] = float(outs.get("water_yield_mm_year") or 0)
@@ -221,38 +217,43 @@ def evaluate_monitors(
                 "value": round(value, 4),
                 "unit": mon["unit"],
                 "severity": sev,
-                "thresholds": {"warning": mon["warning"], "critical": mon["critical"], "operator": mon["operator"]},
+                "thresholds": {
+                    "warning": mon["warning"],
+                    "critical": mon["critical"],
+                    "operator": mon["operator"],
+                },
                 "message_fa": _msg_fa(mon, value, sev),
                 "message_en": _msg_en(mon, value, sev),
                 "icon": mon.get("icon", "activity"),
                 "observed_at": datetime.now(timezone.utc).isoformat(),
             }
         )
-    # sort critical first
     order = {"critical": 0, "warning": 1, "ok": 2}
     events.sort(key=lambda e: order.get(e["severity"], 9))
     return events
 
 
 def _msg_fa(mon: dict[str, Any], value: float, sev: str) -> str:
+    title = mon["title_fa"]
+    unit = mon["unit"]
     if sev == "ok":
-        return f«{mon["title_fa"]}: مقدار {value:.3g} {mon["unit"]} در محدودهٔ ایمن است.»
+        return f"{title}: مقدار {value:.3g} {unit} در محدوده ایمن است."
     if sev == "warning":
-        return f«هشدار — {mon["title_fa"]}: {value:.3g} {mon["unit"]} از آستانه هشدار گذشته است.»
-    return f«بحرانی — {mon["title_fa"]}: {value:.3g} {mon["unit"]}؛ اقدام فوری توصیه می‌شود.»
+        return f"هشدار — {title}: {value:.3g} {unit} از آستانه هشدار گذشته است."
+    return f"بحرانی — {title}: {value:.3g} {unit}؛ اقدام فوری توصیه می شود."
 
 
 def _msg_en(mon: dict[str, Any], value: float, sev: str) -> str:
+    title = mon["title_en"]
+    unit = mon["unit"]
     if sev == "ok":
-        return f'{mon["title_en"]}: {value:.3g} {mon["unit"]} within safe range.'
+        return f"{title}: {value:.3g} {unit} within safe range."
     if sev == "warning":
-        return f'Warning — {mon["title_en"]}: {value:.3g} {mon["unit"]} breached warning threshold.'
-    return f'Critical — {mon["title_en"]}: {value:.3g} {mon["unit"]}; immediate action advised.'
+        return f"Warning — {title}: {value:.3g} {unit} breached warning threshold."
+    return f"Critical — {title}: {value:.3g} {unit}; immediate action advised."
 
 
 def synthetic_sensor_snapshot(lat: float = 32.65, lon: float = 51.67) -> dict[str, float]:
-    """Offline-friendly sensor proxies (replace with live IoT when available)."""
-    # mild spatial variation from lat/lon
     seed = abs(lat * 10 + lon) % 17
     return {
         "soil_moisture": 18.0 + (seed % 20),
@@ -271,7 +272,6 @@ def run_full_watch(
     scs_params: Optional[dict[str, Any]] = None,
     rothc_params: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
-    """Execute all process models + sensors and evaluate monitors."""
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
     from apps.simulation.models_swat import run_swat_plus
     from apps.simulation.rothc_model import run_rothc
@@ -312,14 +312,20 @@ def run_full_watch(
         import asyncio
 
         from apps.simulation.ndvi_canopy import fetch_ndvi_canopy_async
-        from apps.simulation.science_analysis import attach_analysis as aa
 
         async def _nd() -> dict[str, Any]:
-            return aa("ndvi", await fetch_ndvi_canopy_async(lat, lon, 60))
+            return attach_analysis("ndvi", await fetch_ndvi_canopy_async(lat, lon, 60))
 
         try:
-            ndvi_block = asyncio.get_event_loop().run_until_complete(_nd())
-        except RuntimeError:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                import concurrent.futures
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                    ndvi_block = pool.submit(lambda: asyncio.run(_nd())).result(timeout=60)
+            else:
+                ndvi_block = loop.run_until_complete(_nd())
+        except Exception:
             ndvi_block = asyncio.run(_nd())
     except Exception as e:
         from apps.simulation.ndvi_canopy import _synthetic_ndvi, ndvi_to_canopy
@@ -359,7 +365,11 @@ def run_full_watch(
         "events": events,
         "counts": counts,
         "models": {
-            "aquacrop": {k: aq.get(k) for k in ("model", "yield_relative", "irrigation_need_mm", "analysis") if k in aq},
+            "aquacrop": {
+                k: aq.get(k)
+                for k in ("model", "yield_relative", "irrigation_need_mm", "analysis")
+                if k in aq
+            },
             "scs": {"model": scs.get("model"), "outputs": scs.get("outputs"), "analysis": scs.get("analysis")},
             "rothc": {k: rt.get(k) for k in ("model", "delta", "soc_final", "analysis") if k in rt},
             "ndvi": {
