@@ -263,6 +263,7 @@ _include("water", lambda: __import__("apps.water.router", fromlist=["router"]).r
 _include("planting", lambda: __import__("apps.planting.router", fromlist=["router"]).router)
 _include("inventory", lambda: __import__("apps.inventory.router", fromlist=["router"]).router)
 _include("weather", lambda: __import__("apps.weather.router", fromlist=["router"]).router)
+_include("dashboard", lambda: __import__("apps.dashboard.router", fromlist=["router"]).router)
 _include("notifications", lambda: __import__("apps.notifications.router", fromlist=["router"]).router)
 _include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).router)
 _include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlist=["router"]).router)
