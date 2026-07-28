@@ -1,4 +1,4 @@
-"""Inventory API + RBAC on writes."""
+"""Inventory API + analytics + RBAC."""
 
 from __future__ import annotations
 
@@ -44,6 +44,7 @@ class ItemList(BaseModel):
 
 
 @router.get("/items", response_model=ItemList)
+@router.get("/resources", response_model=ItemList)
 async def list_items(
     page: int = Query(1, ge=1),
     size: int = Query(50, ge=1, le=100),
@@ -60,6 +61,75 @@ async def list_items(
         await session.execute(q.order_by(InventoryItem.name).offset(page_to_offset(page, size)).limit(size))
     ).scalars().all()
     return ItemList(data=[ItemOut.model_validate(r) for r in rows], meta=build_meta(total, page, size))
+
+
+@router.get("/usage-analytics")
+async def usage_analytics(session: AsyncSession = Depends(get_db_session)):
+    rows = (
+        await session.execute(select(InventoryItem).where(InventoryItem.is_deleted.is_(False)))
+    ).scalars().all()
+    by_cat: dict[str, float] = {}
+    value = 0.0
+    low = []
+    for r in rows:
+        by_cat[r.category] = by_cat.get(r.category, 0) + float(r.quantity or 0)
+        if r.unit_cost:
+            value += float(r.quantity or 0) * float(r.unit_cost)
+        if (r.quantity or 0) <= (r.min_stock or 0):
+            low.append({"id": r.id, "name": r.name, "quantity": r.quantity, "min_stock": r.min_stock})
+    return {
+        "by_category_qty": by_cat,
+        "stock_value_estimate": round(value, 2),
+        "reorder_candidates": low,
+        "item_count": len(rows),
+    }
+
+
+@router.get("/cost-report")
+async def cost_report(session: AsyncSession = Depends(get_db_session)):
+    rows = (
+        await session.execute(select(InventoryItem).where(InventoryItem.is_deleted.is_(False)))
+    ).scalars().all()
+    lines = []
+    total = 0.0
+    for r in rows:
+        line = float(r.quantity or 0) * float(r.unit_cost or 0)
+        total += line
+        lines.append(
+            {
+                "id": r.id,
+                "name": r.name,
+                "category": r.category,
+                "quantity": r.quantity,
+                "unit_cost": r.unit_cost,
+                "line_value": round(line, 2),
+            }
+        )
+    return {"lines": lines, "total_value": round(total, 2)}
+
+
+@router.post("/reorder-alert")
+async def reorder_alert(
+    item_id: int = Query(...),
+    min_stock: float = Query(..., ge=0),
+    session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("inventory:write")),
+):
+    r = (
+        await session.execute(
+            select(InventoryItem).where(InventoryItem.id == item_id, InventoryItem.is_deleted.is_(False))
+        )
+    ).scalar_one_or_none()
+    if not r:
+        from fastapi import HTTPException  # type: ignore
+
+    from fastapi import HTTPException
+
+    if not r:
+        raise HTTPException(404, "Item not found")
+    r.min_stock = min_stock
+    await session.flush()
+    return {"id": r.id, "min_stock": r.min_stock, "needs_reorder": (r.quantity or 0) <= min_stock}
 
 
 @router.post("/items", response_model=ItemOut, status_code=status.HTTP_201_CREATED)
