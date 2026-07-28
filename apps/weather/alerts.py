@@ -1,4 +1,4 @@
-"""Smart climate alerts: drought, flood, frost."""
+"""Smart climate alerts: drought, flood, frost, heat stress."""
 
 from __future__ import annotations
 
@@ -6,18 +6,14 @@ from typing import Any
 
 
 def evaluate_alerts(series: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """
-    Rule-based alerts on daily climate series.
-    - frost: temp_min <= 0
-    - flood: precip_mm >= 40 in a day OR 3-day sum >= 80
-    - drought: 14-day precip sum < 5 mm AND mean temp > 28 (warm-season stress)
-    """
     alerts: list[dict[str, Any]] = []
     if not series:
         return alerts
 
     for row in series:
         tmin = row.get("temp_min_c")
+        tmax = row.get("temp_max_c")
+        tmean = row.get("temp_mean_c")
         if tmin is not None and tmin <= 0:
             alerts.append(
                 {
@@ -26,6 +22,17 @@ def evaluate_alerts(series: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "date": row.get("date"),
                     "message": f"Frost risk: min temperature {tmin}°C",
                     "value": tmin,
+                }
+            )
+        peak = tmax if tmax is not None else tmean
+        if peak is not None and peak >= 38:
+            alerts.append(
+                {
+                    "type": "heat_stress",
+                    "severity": "warning" if peak < 42 else "critical",
+                    "date": row.get("date"),
+                    "message": f"Heat stress: max/mean temperature {peak}°C",
+                    "value": peak,
                 }
             )
         p = row.get("precip_mm") or 0
@@ -40,7 +47,6 @@ def evaluate_alerts(series: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 }
             )
 
-    # rolling windows
     precip = [float(r.get("precip_mm") or 0) for r in series]
     temps = [float(r.get("temp_mean_c") or r.get("temp_max_c") or 20) for r in series]
     for i in range(len(series)):
@@ -70,7 +76,6 @@ def evaluate_alerts(series: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     }
                 )
 
-    # de-duplicate by type+date
     seen = set()
     unique = []
     for a in alerts:
