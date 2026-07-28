@@ -102,6 +102,15 @@ export async function getDashboardStats() {
   });
 }
 
+export async function getDashboardOverview() {
+  return fetchSafe("/api/v1/dashboard/overview", {
+    ok: false,
+    runs: [],
+    science: { ok: false },
+    soil_snapshot: {},
+  });
+}
+
 export async function getCommunityPosts() {
   return fetchSafe("/api/v1/community/posts", { items: [], total: 0 });
 }
@@ -192,6 +201,19 @@ export async function postRothC(opts: {
     clay_pct: String(opts.clay_pct ?? 25),
   });
   return fetchSafe(`/api/v1/science/rothc?${q.toString()}`, { model: "error" }, { method: "POST" });
+}
+
+/** Full RothC climate + soil parameters */
+export async function postRothCFull(body: Record<string, unknown>) {
+  return fetchSafe(
+    "/api/v1/science/rothc/run",
+    { model: "error" },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 export async function postScienceWatch(body: {
