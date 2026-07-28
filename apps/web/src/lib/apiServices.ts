@@ -2,7 +2,7 @@
 
 import { USE_MOCK } from "../api/http";
 
-const TIMEOUT = 45000;
+const TIMEOUT = 60000;
 
 function readEnv(key: string): string | undefined {
   try {
@@ -286,4 +286,29 @@ export async function postMlPredictFromWatch(lat: number, lon: number, days = 40
 
 export async function getMlStatus() {
   return fetchSafe("/api/v1/ml/status", { ok: false });
+}
+
+export async function getMlSensitivity(rel_step = 0.1) {
+  return fetchSafe(`/api/v1/ml/sensitivity?rel_step=${rel_step}`, {
+    oat: {},
+    coefficient_importance: {},
+    partial_dependence: [],
+  });
+}
+
+export async function postMlSensitivity(body: {
+  baseline?: Record<string, number>;
+  rel_step?: number;
+  pd_features?: string[];
+  pd_points?: number;
+}) {
+  return fetchSafe(
+    "/api/v1/ml/sensitivity",
+    { oat: {}, coefficient_importance: {}, partial_dependence: [] },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
 }
