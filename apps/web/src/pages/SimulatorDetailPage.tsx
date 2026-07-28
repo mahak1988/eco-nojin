@@ -1,565 +1,534 @@
-// @ts-nocheck
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+/**
+ * /simulators/:id — detail lab for registry models.
+ * Route param is `id` (not simId).
+ * ready engines (aquacrop, rothc, swat) call science API; others use local COMPUTE proxy.
+ */
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
-  Play,
-  Pause,
-  RotateCcw,
   Download,
-  Loader2,
-  Globe,
-  Cpu,
-  CloudOff,
   FlaskConical,
-  Info,
-  Settings2,
+  Loader2,
+  Play,
+  RotateCcw,
+  SlidersHorizontal,
+  AlertTriangle,
   LineChart as LineChartIcon,
 } from "lucide-react";
-import { useLang } from "../components/eco/i18n";
-import { SimulatorChart } from "../components/simulators/SimulatorChart";
-import {
-  SIM_STR,
-  simText,
-  statusText,
-  localeOf,
-  type SimLang,
-  type SimStrings,
-} from "../components/simulators/simulatorsI18n";
-import { simName, simDesc } from "../components/simulators/simulatorsI18nExt";
-import { paramLabel, paramUnit } from "../components/simulators/paramI18n";
 import {
   COMPUTE,
-  defaultParams,
+  PARAM_DEFS,
   SIM_CONFIGS,
-  type Series,
+  defaultParams,
+  downloadCSV,
   type ParamDef,
-  type SimConfig,
-  type SimType,
+  type Series,
 } from "../components/simulators/simulatorsData";
-import { runOnServer, API_BASE, API_V1 } from "../lib/simulationApi";
+import { SimulatorChart } from "../components/simulators/SimulatorChart";
+import { runOnServer, fetchParameters } from "../lib/simulationApi";
+import { postAquaCropAdvanced, postRothC, postSwat } from "../lib/apiServices";
+import { BarChart, LineChart, MetricCard } from "../components/science/ScienceVisuals";
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Types
-───────────────────────────────────────────────────────────────────────────── */
+type EngineKind = "science_aquacrop" | "science_rothc" | "science_scs" | "local" | "server" | "stub";
 
-interface ParamValue {
-  key: string;
-  value: number;
-}
+const ENGINE: Record<string, EngineKind> = {
+  aquacrop: "science_aquacrop",
+  rothc: "science_rothc",
+  swat: "science_scs",
+  dssat: "local",
+  wofost: "local",
+  climate: "local",
+  water: "local",
+  agriculture: "local",
+  energy: "local",
+};
 
-type RunMode = "client" | "server";
-type PageStatus = "loading" | "ready" | "not_found";
+const META: Record<
+  string,
+  { title: string; desc: string; status: "ready" | "proxy" | "stub"; citation: string }
+> = {
+  aquacrop: {
+    title: "AquaCrop (conceptual / FAO Ky)",
+    desc: "بیلان آب روزانه + عملکرد نسبی. موتور science هم‌راستا با /science — نه باینری رسمی FAO.",
+    status: "ready",
+    citation: "FAO Ky yield response; process model",
+  },
+  dssat: {
+    title: "DSSAT (proxy)",
+    desc: "بدون باینری DSSAT. منحنی زیست‌توده پروکسی بر اساس potential_yield و ضرایب تنش آب/نیتروژن.",
+    status: "proxy",
+    citation: "Illustrative sigmoid biomass — not DSSAT-CSM",
+  },
+  rothc: {
+    title: "RothC-26.3",
+    desc: "کربن آلی خاک چندساله — موتور science.",
+    status: "ready",
+    citation: "Coleman & Jenkinson RothC",
+  },
+  swat: {
+    title: "SCS-CN basin (SWAT proxy)",
+    desc: "رواناب و آبدهی حوضه — نه باینری SWAT+.",
+    status: "ready",
+    citation: "NRCS SCS-CN",
+  },
+  wofost: {
+    title: "WOFOST (proxy)",
+    desc: "LAI و زیست‌توده تقریبی — اسکلت آموزشی.",
+    status: "proxy",
+    citation: "Simplified LAI–biomass",
+  },
+};
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Helpers
-───────────────────────────────────────────────────────────────────────────── */
-
-function clamp(v: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, v));
-}
-
-function seriesToCSV(series: Series[], simId: string): string {
-  if (!series.length) return "";
-  const headers = ["step", ...series.map((s) => s.label)];
-  const maxLen = Math.max(...series.map((s) => s.data.length));
-  const rows: string[] = [headers.join(",")];
-  for (let i = 0; i < maxLen; i++) {
-    const row = [String(i)];
-    for (const s of series) {
-      row.push(s.data[i] !== undefined ? s.data[i].toFixed(4) : "");
-    }
-    rows.push(row.join(","));
+function resolveParamDefs(id: string, apiDefs: ParamDef[] | null): ParamDef[] {
+  if (apiDefs && apiDefs.length) return apiDefs;
+  if (PARAM_DEFS[id]?.length) return PARAM_DEFS[id];
+  // sensible defaults per engine
+  if (id === "dssat") {
+    return [
+      { key: "potential_yield", labelKey: "Potential yield", min: 2, max: 18, step: 0.5, default: 10, unitKey: "t/ha" },
+      { key: "water_factor", labelKey: "Water factor", min: 0.3, max: 1, step: 0.05, default: 0.9 },
+      { key: "nitrogen_factor", labelKey: "N factor", min: 0.3, max: 1, step: 0.05, default: 0.9 },
+    ];
   }
-  return rows.join("\n");
+  if (id === "aquacrop") {
+    return [
+      { key: "days", labelKey: "Days", min: 20, max: 180, step: 1, default: 90 },
+      { key: "et0_mm_day", labelKey: "ET0", min: 2, max: 8, step: 0.1, default: 4.5, unitKey: "mm/d" },
+      { key: "kc", labelKey: "Kc", min: 0.4, max: 1.4, step: 0.05, default: 1.1 },
+      { key: "rain_mm_day", labelKey: "Rain", min: 0, max: 3, step: 0.1, default: 0.5, unitKey: "mm/d" },
+      { key: "taw_mm", labelKey: "TAW", min: 40, max: 200, step: 5, default: 100, unitKey: "mm" },
+      { key: "ky", labelKey: "Ky", min: 0.7, max: 1.5, step: 0.05, default: 1.15 },
+      { key: "y_potential_t_ha", labelKey: "Y potential", min: 2, max: 12, step: 0.5, default: 6, unitKey: "t/ha" },
+    ];
+  }
+  return [
+    { key: "intensity", labelKey: "Intensity", min: 0, max: 100, step: 1, default: 50 },
+  ];
 }
 
-function downloadCSV(csv: string, filename: string) {
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
+function oatLocal(seriesFn: (p: Record<string, number>) => number, base: Record<string, number>, keys: string[], step = 0.1) {
+  const y0 = seriesFn(base);
+  return keys.map((k) => {
+    const x0 = base[k] ?? 0;
+    const dx = Math.max(Math.abs(x0) * step, 0.05);
+    const lo = { ...base, [k]: x0 - dx };
+    const hi = { ...base, [k]: x0 + dx };
+    const dy = seriesFn(hi) - seriesFn(lo);
+    return { feature: k, delta: dy, abs_delta: Math.abs(dy), baseline: x0 };
+  }).sort((a, b) => b.abs_delta - a.abs_delta);
 }
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Sub-components
-───────────────────────────────────────────────────────────────────────────── */
-
-function ParamSlider({
-  param,
-  value,
-  onChange,
-  strings,
-  lang,
-}: {
-  param: ParamDef;
-  value: number;
-  onChange: (v: number) => void;
-  strings: SimStrings;
-  lang: SimLang;
-}) {
-  const label = paramLabel(param.key, lang);
-  const unit = paramUnit(param.key, lang);
-  const step = param.step ?? (param.max - param.min) / 100;
-
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-sm">
-        <label className="font-medium text-gray-700 dark:text-gray-300">
-          {label}
-        </label>
-        <span className="tabular-nums text-gray-500 dark:text-gray-400">
-          {value.toFixed(param.decimals ?? 1)}
-          {unit ? ` ${unit}` : ""}
-        </span>
-      </div>
-      <input
-        type="range"
-        min={param.min}
-        max={param.max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(clamp(Number(e.target.value), param.min, param.max))}
-        className="w-full h-2 rounded-full appearance-none cursor-pointer
-                   bg-gray-200 dark:bg-gray-700
-                   accent-emerald-600 dark:accent-emerald-400"
-      />
-      <div className="flex justify-between text-[10px] text-gray-400">
-        <span>{param.min}</span>
-        <span>{param.max}</span>
-      </div>
-    </div>
-  );
-}
-
-function MetaBadge({
-  icon: Icon,
-  label,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 px-2.5 py-1 text-xs text-gray-600 dark:text-gray-300">
-      <Icon className="h-3 w-3" />
-      {label}
-    </span>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Main Page Component
-───────────────────────────────────────────────────────────────────────────── */
 
 export default function SimulatorDetailPage() {
-  const { simId } = useParams<{ simId: string }>();
-  const navigate = useNavigate();
-  const { lang } = useLang();
-  const s = SIM_STR[lang as SimLang] ?? SIM_STR.fa;
-  const locale = localeOf(lang as SimLang);
+  const { id: simId } = useParams<{ id: string }>();
+  const id = (simId || "").toLowerCase();
 
-  /* ── State ── */
-  const [pageStatus, setPageStatus] = useState<PageStatus>("loading");
-  const [config, setConfig] = useState<SimConfig | null>(null);
+  const [paramDefs, setParamDefs] = useState<ParamDef[]>([]);
   const [params, setParams] = useState<Record<string, number>>({});
   const [series, setSeries] = useState<Series[]>([]);
-  const [progress, setProgress] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [runMode, setRunMode] = useState<RunMode>("client");
+  const [metrics, setMetrics] = useState<Record<string, number>>({});
+  const [analysis, setAnalysis] = useState<Record<string, unknown> | null>(null);
+  const [oat, setOat] = useState<{ feature: string; abs_delta: number; delta: number }[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [elapsed, setElapsed] = useState(0);
+  const [progress, setProgress] = useState(0);
 
-  const abortRef = useRef<AbortController | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const meta = META[id] || {
+    title: id || "Simulator",
+    desc: "شبیه‌ساز از کاتالوگ registry.",
+    status: (COMPUTE[id] ? "proxy" : "stub") as "proxy" | "stub",
+    citation: "—",
+  };
+  const engine = ENGINE[id] || (COMPUTE[id] ? "local" : "stub");
 
-  /* ── Load simulator config ── */
   useEffect(() => {
-    if (!simId) {
-      setPageStatus("not_found");
-      return;
-    }
-    const found = SIM_CONFIGS.find((c) => c.id === simId);
-    if (!found) {
-      setPageStatus("not_found");
-      return;
-    }
-    setConfig(found);
-    setParams(defaultParams(found.id));
-    setPageStatus("ready");
-  }, [simId]);
-
-  /* ── Cleanup on unmount ── */
-  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!id) return;
+      const api = await fetchParameters(id);
+      const defs = resolveParamDefs(
+        id,
+        api
+          ? api.map((p) => ({
+              key: p.name,
+              labelKey: p.label || p.name,
+              min: p.min_value ?? 0,
+              max: p.max_value ?? 100,
+              step: p.type === "int" ? 1 : 0.1,
+              default: typeof p.default === "number" ? p.default : 0,
+              unitKey: p.unit || undefined,
+              options: p.options,
+            }))
+          : null,
+      );
+      if (cancelled) return;
+      setParamDefs(defs);
+      setParams(Object.fromEntries(defs.map((d) => [d.key, d.default])));
+    })();
     return () => {
-      abortRef.current?.abort();
-      if (timerRef.current) clearInterval(timerRef.current);
+      cancelled = true;
     };
-  }, []);
+  }, [id]);
 
-  /* ── Derived ── */
-  const name = useMemo(
-    () => (config ? simName(config.id, lang as SimLang) : ""),
-    [config, lang]
-  );
-  const desc = useMemo(
-    () => (config ? simDesc(config.id, lang as SimLang) : ""),
-    [config, lang]
-  );
+  const statusColor =
+    meta.status === "ready"
+      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+      : meta.status === "proxy"
+        ? "bg-amber-50 text-amber-900 border-amber-200"
+        : "bg-stone-100 text-stone-600 border-stone-200";
 
-  /* ── Handlers ── */
-  const handleParamChange = useCallback((key: string, value: number) => {
-    setParams((prev) => ({ ...prev, [key]: value }));
-  }, []);
-
-  const handleReset = useCallback(() => {
-    if (!config) return;
-    setParams(defaultParams(config.id));
-    setSeries([]);
-    setProgress(0);
-    setError(null);
-    setElapsed(0);
-  }, [config]);
-
-  const startTimer = useCallback(() => {
-    const start = Date.now();
-    timerRef.current = setInterval(() => {
-      setElapsed(Math.round((Date.now() - start) / 100) / 10);
-    }, 100);
-  }, []);
-
-  const stopTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+  const runLocal = useCallback(() => {
+    const fn = COMPUTE[id];
+    if (!fn) {
+      setError("مدل محلی برای این شبیه‌ساز تعریف نشده و موتور science هم مرتبط نیست.");
+      return;
     }
-  }, []);
+    const seed = SIM_CONFIGS.find((c) => c.id === id)?.seed ?? 7;
+    const out = fn(params, seed);
+    setSeries(out);
+    setProgress(100);
+    const last = out[0]?.values?.slice(-1)[0] ?? 0;
+    setMetrics({ terminal: last, n_points: out[0]?.values?.length ?? 0 });
+    // OAT on terminal of first series
+    const score = (p: Record<string, number>) => {
+      const s = fn(p, seed);
+      const v = s[0]?.values;
+      return v?.length ? v[v.length - 1] : 0;
+    };
+    setOat(oatLocal(score, params, Object.keys(params)));
+    setAnalysis({
+      summary_fa: meta.desc,
+      citation: meta.citation,
+    });
+  }, [id, params, meta.citation, meta.desc]);
 
-  const handleRun = useCallback(async () => {
-    if (!config || running) return;
+  const runScienceAqua = useCallback(async () => {
+    const res = await postAquaCropAdvanced({
+      days: params.days ?? 90,
+      et0_mm_day: params.et0_mm_day ?? 4.5,
+      kc: params.kc ?? 1.1,
+      rain_mm_day: params.rain_mm_day ?? 0.5,
+      taw_mm: params.taw_mm ?? 100,
+      ky: params.ky ?? 1.15,
+      y_potential_t_ha: params.y_potential_t_ha ?? 6,
+      persist: false,
+      crop: "wheat",
+    });
+    if (res.source === "error") throw new Error(res.errorMessage || "aquacrop failed");
+    const data = res.data as Record<string, unknown>;
+    const sample =
+      (data.series_sample as { depletion_mm?: number; ks?: number; ta_mm?: number }[]) || [];
+    const seriesOut: Series[] = [
+      {
+        labelKey: "depletion",
+        label: "Depletion mm",
+        color: "#059669",
+        values: sample.map((x) => Number(x.depletion_mm || 0)),
+        kind: "line",
+        fill: true,
+      },
+      {
+        labelKey: "ks",
+        label: "Ks",
+        color: "#7c3aed",
+        values: sample.map((x) => Number(x.ks || 0)),
+        kind: "line",
+      },
+    ];
+    setSeries(seriesOut);
+    setMetrics({
+      yield_relative: Number(data.yield_relative || 0),
+      irrigation_need_mm: Number(data.irrigation_need_mm || 0),
+      etc_mm: Number(data.etc_mm || 0),
+      yield_t_ha: Number(data.yield_t_ha || 0),
+    });
+    setAnalysis((data.analysis as Record<string, unknown>) || null);
+    // local OAT around science metrics using client COMPUTE as cheap proxy + one-shot deltas via repeated API would be slow
+    const score = (p: Record<string, number>) => {
+      // approximate with aquacrop COMPUTE terminal biomass
+      const fn = COMPUTE.aquacrop;
+      if (!fn) return 0;
+      const s = fn(
+        {
+          field_capacity: 30,
+          wilting_point: 14,
+          total_irrigation: (p.rain_mm_day ?? 0.5) * (p.days ?? 90) * 0.3 + 100,
+          fallback_precip: (p.rain_mm_day ?? 0.5) * (p.days ?? 90),
+          fallback_et0: p.et0_mm_day ?? 4.5,
+        },
+        3,
+      );
+      return s[1]?.values?.slice(-1)[0] ?? 0;
+    };
+    setOat(
+      oatLocal(score, params, ["et0_mm_day", "rain_mm_day", "kc", "taw_mm", "ky", "days"].filter((k) => k in params)),
+    );
+  }, [params]);
 
-    setRunning(true);
+  const handleRun = async () => {
+    if (!id) return;
+    setLoading(true);
     setError(null);
-    setSeries([]);
-    setProgress(0);
-    setElapsed(0);
-    startTimer();
-
-    const abort = new AbortController();
-    abortRef.current = abort;
-
+    setProgress(30);
     try {
-      if (runMode === "client" && COMPUTE[config.id]) {
-        /* ── Client-side computation ── */
-        const computeFn = COMPUTE[config.id];
-        const totalSteps = 100;
-
-        for (let step = 0; step <= totalSteps; step++) {
-          if (abort.signal.aborted) break;
-
-          const t = step / totalSteps;
-          const result = computeFn(params, t);
-
-          setSeries((prev) => {
-            if (step === 0) return result;
-            return result.map((newS, i) => ({
-              ...newS,
-              data: [...(prev[i]?.data ?? []), ...newS.data.slice(prev[i]?.data.length ?? 0)],
-            }));
-          });
-          setProgress(Math.round((step / totalSteps) * 100));
-
-          // Yield to UI thread
-          await new Promise((r) => setTimeout(r, 16));
-        }
+      if (engine === "science_aquacrop") {
+        await runScienceAqua();
+      } else if (engine === "science_rothc") {
+        const res = await postRothC({
+          years: Math.round(params.years ?? 15),
+          soc_t_ha: params.soc_t_ha ?? params.initial_soc ?? 40,
+          c_input_t_ha_y: params.c_input_t_ha_y ?? params.carbon_input ?? 1.5,
+          clay_pct: params.clay_pct ?? 25,
+        });
+        if (res.source === "error") throw new Error(res.errorMessage || "rothc failed");
+        const data = res.data as Record<string, unknown>;
+        const ser = (data.series as { soc_t_ha?: number }[]) || [];
+        setSeries([
+          {
+            labelKey: "soc",
+            label: "SOC t/ha",
+            color: "#d97706",
+            values: ser.map((x) => Number(x.soc_t_ha || 0)),
+            kind: "line",
+            fill: true,
+          },
+        ]);
+        setMetrics({
+          soc_final: Number(data.soc_final || 0),
+          delta: Number(data.delta || 0),
+        });
+        setAnalysis((data.analysis as Record<string, unknown>) || null);
+      } else if (engine === "science_scs") {
+        const res = await postSwat({
+          days: 365,
+          precip_mm_year: params.precipitation ?? 320,
+          curve_number: params.curve_number ?? params.runoff_coef ? 70 : 75,
+          persist: false,
+        });
+        if (res.source === "error") throw new Error(res.errorMessage || "scs failed");
+        const data = res.data as Record<string, unknown>;
+        const o = (data.outputs as Record<string, number>) || {};
+        setSeries([
+          {
+            labelKey: "balance",
+            label: "Basin mm/y",
+            color: "#0ea5e9",
+            values: [
+              Number(o.runoff_mm_year || 0),
+              Number(o.et_actual_mm_year || 0),
+              Number(o.baseflow_mm_year || 0),
+              Number(o.water_yield_mm_year || 0),
+            ],
+            kind: "bars",
+          },
+        ]);
+        setMetrics(o);
+        setAnalysis((data.analysis as Record<string, unknown>) || null);
+      } else if (engine === "local" || COMPUTE[id]) {
+        runLocal();
       } else {
-        /* ── Server-side computation ── */
-        const response = await runOnServer(config.id, params, abort.signal);
-
-        if (response && response.series) {
-          setSeries(response.series);
-          setProgress(100);
+        const srv = await runOnServer(id, params);
+        if (srv) {
+          setSeries(srv.series);
+          setMetrics(srv.metrics);
         } else {
-          throw new Error("Empty response from server");
+          setError("Backend unreachable and no local proxy for this id.");
         }
       }
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name === "AbortError") {
-        // User cancelled — not an error
-      } else {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        setError(msg);
-        // Fallback to client if server failed
-        if (runMode === "server" && COMPUTE[config.id]) {
-          setRunMode("client");
-        }
-      }
+      setProgress(100);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "run failed");
+      // fallback local if available
+      if (COMPUTE[id]) runLocal();
     } finally {
-      setRunning(false);
-      stopTimer();
-      abortRef.current = null;
+      setLoading(false);
     }
-  }, [config, params, running, runMode, startTimer, stopTimer]);
+  };
 
-  const handleStop = useCallback(() => {
-    abortRef.current?.abort();
-    setRunning(false);
-    stopTimer();
-  }, [stopTimer]);
+  const exportCsv = () => {
+    if (!series.length) return;
+    const n = Math.max(...series.map((s) => s.values.length));
+    const header = ["step", ...series.map((s) => s.label || s.labelKey)];
+    const rows = [header.join(",")];
+    for (let i = 0; i < n; i++) {
+      rows.push([String(i), ...series.map((s) => String(s.values[i] ?? ""))].join(","));
+    }
+    downloadCSV(`${id}_results.csv`, rows.join("\n"));
+  };
 
-  const handleDownload = useCallback(() => {
-    if (!config || !series.length) return;
-    const csv = seriesToCSV(series, config.id);
-    downloadCSV(csv, `${config.id}_results.csv`);
-  }, [config, series]);
+  const oatBars = useMemo(
+    () =>
+      oat.slice(0, 8).map((r) => ({
+        label: r.feature,
+        value: r.abs_delta * (Math.abs(r.abs_delta) < 2 ? 100 : 1),
+        color: r.delta >= 0 ? "#10b981" : "#f43f5e",
+      })),
+    [oat],
+  );
 
-  /* ── Render: Loading ── */
-  if (pageStatus === "loading") {
+  if (!id) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    );
-  }
-
-  /* ── Render: Not Found ── */
-  if (pageStatus === "not_found" || !config) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <FlaskConical className="h-12 w-12 text-gray-300" />
-        <p className="text-lg text-gray-500">{simText(s, "not_found")}</p>
-        <Link
-          to="/simulators"
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {simText(s, "back_to_list")}
+      <div className="p-8 text-center">
+        <p>شناسه نامعتبر</p>
+        <Link to="/simulators" className="text-emerald-700">
+          بازگشت
         </Link>
       </div>
     );
   }
 
-  /* ── Render: Ready ── */
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
-      {/* Header */}
-      <header className="space-y-3">
-        <Link
-          to="/simulators"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-emerald-600 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {simText(s, "back_to_list")}
-        </Link>
+    <div className="mx-auto max-w-6xl space-y-6 p-5 sm:p-8">
+      <Link to="/simulators" className="inline-flex items-center gap-1 text-sm text-stone-500 hover:text-emerald-700">
+        <ArrowLeft className="h-4 w-4" /> فهرست شبیه‌سازها
+      </Link>
 
+      <header className="rounded-3xl border border-stone-200 bg-gradient-to-br from-white to-stone-50 p-6 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {name}
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-2xl">
-              {desc}
-            </p>
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${statusColor}`}>{meta.status}</span>
+              <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-mono text-stone-600">{id}</span>
+              <span className="rounded-full bg-violet-50 px-2.5 py-0.5 text-[11px] text-violet-800">{engine}</span>
+            </div>
+            <h1 className="font-display text-2xl text-stone-900 sm:text-3xl">{meta.title}</h1>
+            <p className="mt-2 max-w-2xl text-sm text-stone-600">{meta.desc}</p>
+            <p className="mt-1 text-xs text-stone-400">{meta.citation}</p>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            <MetaBadge icon={FlaskConical} label={config.category ?? "—"} />
-            <MetaBadge icon={Cpu} label={`v${config.version ?? "1.0"}`} />
-            {config.tags?.map((tag) => (
-              <MetaBadge key={tag} icon={Info} label={tag} />
-            ))}
-          </div>
+          <FlaskConical className="h-10 w-10 text-emerald-600 opacity-80" />
         </div>
+        {meta.status !== "ready" && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            این صفحه با موتور proxy/stub اجرا می‌شود. برای AquaCrop/RothC/SCS از برچسب ready استفاده کنید یا /science.
+          </div>
+        )}
       </header>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ── Left Panel: Parameters ── */}
-        <aside className="lg:col-span-1 space-y-4">
-          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 space-y-5">
-            <div className="flex items-center gap-2">
-              <Settings2 className="h-4 w-4 text-emerald-600" />
-              <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                {simText(s, "parameters")}
-              </h2>
-            </div>
-
-            {Object.keys(config.params ?? {}).map((key: string) =>
-              <ParamSlider
-                key={key}
-                param={{ key, min: 0, max: 100, step: 1, default: 0, labelKey: key } as ParamDef}
-                value={params[key] ?? 0}
-                onChange={(v) => handleParamChange(key, v)}
-                strings={s}
-                lang={lang as SimLang}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <aside className="space-y-4 rounded-2xl border border-stone-200 bg-white p-5 lg:col-span-1">
+          <h2 className="flex items-center gap-2 text-sm font-semibold">
+            <SlidersHorizontal className="h-4 w-4 text-emerald-600" /> پارامترها
+          </h2>
+          {paramDefs.map((d) => (
+            <div key={d.key}>
+              <div className="mb-1 flex justify-between text-xs font-bold text-stone-700">
+                <span>{d.labelKey}</span>
+                <span className="tabular-nums text-emerald-700">
+                  {(params[d.key] ?? d.default).toFixed(d.step < 1 ? 2 : 0)}
+                  {d.unitKey ? ` ${d.unitKey}` : ""}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={d.min}
+                max={d.max}
+                step={d.step}
+                value={params[d.key] ?? d.default}
+                disabled={loading}
+                onChange={(e) => setParams((p) => ({ ...p, [d.key]: Number(e.target.value) }))}
+                className="w-full accent-emerald-600"
               />
-            )}
-          </div>
-
-          {/* Run Controls */}
-          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 space-y-4">
-            {/* Mode Toggle */}
-            <div className="flex items-center gap-2 text-xs">
-              <button
-                onClick={() => setRunMode("client")}
-                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 font-medium transition-colors ${
-                  runMode === "client"
-                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-                    : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-                }`}
-              >
-                <Cpu className="h-3 w-3" />
-                {simText(s, "client_mode")}
-              </button>
-              <button
-                onClick={() => setRunMode("server")}
-                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 font-medium transition-colors ${
-                  runMode === "server"
-                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-                    : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
-                }`}
-              >
-                <Globe className="h-3 w-3" />
-                {simText(s, "server_mode")}
-              </button>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              {!running ? (
-                <button
-                  onClick={handleRun}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 active:scale-[0.98] transition-all"
-                >
-                  <Play className="h-4 w-4" />
-                  {simText(s, "run")}
-                </button>
-              ) : (
-                <button
-                  onClick={handleStop}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 active:scale-[0.98] transition-all"
-                >
-                  <Pause className="h-4 w-4" />
-                  {simText(s, "stop")}
-                </button>
-              )}
-
-              <button
-                onClick={handleReset}
-                disabled={running}
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
-                title={simText(s, "reset")}
-              >
-                <RotateCcw className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Progress */}
-            {running && (
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{simText(s, "running")}…</span>
-                  <span>{progress}%</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-emerald-500 transition-all duration-200"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Elapsed Time */}
-            {elapsed > 0 && (
-              <p className="text-[11px] text-gray-400 text-center">
-                {elapsed.toFixed(1)}s
-              </p>
-            )}
-
-            {/* Error */}
-            {error && (
-              <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 p-3 text-xs text-red-700 dark:text-red-300">
-                <CloudOff className="h-4 w-4 shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
+          ))}
+          <div className="flex gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => void handleRun()}
+              disabled={loading}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white"
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              اجرا
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setParams(Object.fromEntries(paramDefs.map((d) => [d.key, d.default])));
+                setSeries([]);
+                setMetrics({});
+                setOat([]);
+                setError(null);
+              }}
+              className="rounded-xl border border-stone-200 px-3"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
           </div>
+          {error && <p className="text-xs text-red-600">{error}</p>}
         </aside>
 
-        {/* ── Right Panel: Chart & Results ── */}
-        <main className="lg:col-span-2 space-y-4">
-          {/* Chart Card */}
-          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <LineChartIcon className="h-4 w-4 text-emerald-600" />
-                <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                  {simText(s, "results")}
-                </h2>
-              </div>
-
+        <main className="space-y-4 lg:col-span-2">
+          <div className="rounded-2xl border border-stone-200 bg-white p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-sm font-semibold">
+                <LineChartIcon className="h-4 w-4 text-emerald-600" /> نمودار تعاملی
+              </h2>
               {series.length > 0 && (
-                <button
-                  onClick={handleDownload}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  CSV
+                <button type="button" onClick={exportCsv} className="inline-flex items-center gap-1 text-xs font-bold text-stone-600">
+                  <Download className="h-3.5 w-3.5" /> CSV
                 </button>
               )}
             </div>
-
             {series.length > 0 ? (
-              <SimulatorChart series={series} progress={progress} strings={s} />
+              <>
+                <SimulatorChart series={series} progress={progress || 100} strings={{
+                  // minimal chart strings
+                } as never} />
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {series.map((sr) => (
+                    <div key={sr.labelKey} className="rounded-xl border border-stone-100 bg-stone-50/80 p-3">
+                      <p className="mb-1 text-xs font-semibold text-stone-600">{sr.label || sr.labelKey}</p>
+                      <LineChart values={sr.values} color={sr.color} />
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                <FlaskConical className="h-10 w-10 mb-3 opacity-40" />
-                <p className="text-sm">{simText(s, "no_results_yet")}</p>
+              <div className="flex h-48 flex-col items-center justify-center text-stone-400">
+                <FlaskConical className="mb-2 h-10 w-10 opacity-40" />
+                <p className="text-sm">اجرا را بزنید تا سری زمانی رسم شود</p>
               </div>
             )}
           </div>
 
-          {/* Series Legend / Summary */}
-          {series.length > 0 && (
-            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                {simText(s, "series_legend")}
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {series.map((sr, i) => {
-                  const lastVal = (sr.data && sr.data.length > 0 ? sr.data[sr.data.length - 1] : null);
-                  const maxVal = sr.data && sr.data.length > 0 ? Math.max(...sr.data.map(d => d.y)) : 0;
-                  const minVal = sr.data && sr.data.length > 0 ? Math.min(...sr.data.map(d => d.y)) : 0;
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 rounded-lg bg-gray-50 dark:bg-gray-800 p-3"
-                    >
-                      <span
-                        className="h-3 w-3 rounded-full shrink-0"
-                        style={{ backgroundColor: sr.color ?? `hsl(${i * 60}, 70%, 50%)` }}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
-                          {sr.label}
-                        </p>
-                        <p className="text-[11px] text-gray-400 tabular-nums">
-                          {simText(s, "last")}: {(lastVal as any)?.y?.toFixed(3) ?? "—"}
-                          {" · "}
-                          {simText(s, "max")}: {(maxVal as any)?.toFixed?.(3) ?? "0.000"}
-                          {" · "}
-                          {simText(s, "min")}: {(minVal as any)?.toFixed?.(3) ?? "0.000"}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+          {Object.keys(metrics).length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {Object.entries(metrics)
+                .slice(0, 8)
+                .map(([k, v]) => (
+                  <MetricCard key={k} icon={<FlaskConical className="h-4 w-4" />} label={k} value={typeof v === "number" ? v.toFixed(2) : String(v)} tone="emerald" />
+                ))}
             </div>
           )}
+
+          {oatBars.length > 0 && (
+            <div className="rounded-2xl border border-cyan-200 bg-cyan-50/40 p-5">
+              <h3 className="mb-2 text-sm font-semibold text-cyan-950">حساسیت محلی (OAT) · |Δ خروجی|</h3>
+              <p className="mb-3 text-xs text-cyan-900/80">هر پارامتر ±۱۰٪ حول نقطه پایه؛ بقیه ثابت. برای AquaCrop با پروکسی زیست‌توده محلی تکمیل می‌شود.</p>
+              <BarChart items={oatBars} color="#0891b2" />
+            </div>
+          )}
+
+          {analysis && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 text-sm text-stone-700">
+              <p className="font-semibold text-emerald-900">تحلیل</p>
+              <p className="mt-1">{String(analysis.summary_fa || analysis.summary_en || meta.desc)}</p>
+              {analysis.advice_fa && <p className="mt-2 text-amber-950">توصیه: {String(analysis.advice_fa)}</p>}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            <Link to="/science" className="rounded-lg bg-emerald-600 px-3 py-1.5 font-bold text-white">
+              Science Lab
+            </Link>
+            <Link to="/simulators/aquacrop" className="rounded-lg border border-stone-200 px-3 py-1.5 font-semibold">
+              AquaCrop shortcut
+            </Link>
+            <Link to="/simulators" className="rounded-lg border border-stone-200 px-3 py-1.5 font-semibold">
+              همه شبیه‌سازها
+            </Link>
+          </div>
         </main>
       </div>
     </div>
