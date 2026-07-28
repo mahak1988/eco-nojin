@@ -1,10 +1,10 @@
-"""Machine learning API — yield / risk / anomaly."""
+"""Machine learning API — yield / risk / anomaly / sensitivity."""
 
 from __future__ import annotations
 
 from typing import Any, Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/api/v1/ml", tags=["Machine Learning"])
@@ -23,6 +23,13 @@ class PredictBody(BaseModel):
     soc_delta: float = 0.0
 
 
+class SensitivityBody(BaseModel):
+    baseline: Optional[dict[str, float]] = None
+    rel_step: float = Field(0.10, ge=0.01, le=0.5)
+    pd_features: Optional[list[str]] = None
+    pd_points: int = Field(12, ge=5, le=40)
+
+
 @router.get("/status")
 async def ml_status() -> dict[str, Any]:
     from apps.ml.service import get_bundle
@@ -35,6 +42,7 @@ async def ml_status() -> dict[str, Any]:
             "models": ["linear_yield", "logistic_risk", "zscore_anomaly"],
             "metrics": b.metrics,
             "sklearn": False,
+            "sensitivity": ["coefficient", "oat", "partial_dependence", "tornado"],
             "notes_fa": "بدون وابستگی sklearn — قابل اجرا روی هر محیط.",
         }
     except Exception as e:
@@ -57,11 +65,12 @@ async def ml_predict(body: PredictBody) -> dict[str, Any]:
 
 @router.post("/predict-from-watch")
 async def ml_from_watch(lat: float = 32.65, lon: float = 51.67, days: int = 40) -> dict[str, Any]:
-    """Run full science watch then ML on resulting metrics."""
     from apps.ml.service import predict_from_watch
     from apps.simulation.model_monitors import run_full_watch
 
-    watch = run_full_watch(lat=lat, lon=lon, include_sensors=True, aquacrop_params={"days": days, "lat": lat, "lon": lon})
+    watch = run_full_watch(
+        lat=lat, lon=lon, include_sensors=True, aquacrop_params={"days": days, "lat": lat, "lon": lon}
+    )
     pred = predict_from_watch(watch)
     pred["watch_counts"] = watch.get("counts")
     pred["watch_metrics"] = watch.get("metrics")
@@ -87,3 +96,51 @@ async def ml_features() -> dict[str, Any]:
             "soc_delta": "تغییر کربن آلی خاک",
         },
     }
+
+
+@router.get("/sensitivity")
+async def ml_sensitivity_get(
+    rel_step: float = Query(0.10, ge=0.01, le=0.5),
+) -> dict[str, Any]:
+    from apps.ml.sensitivity import full_sensitivity_report
+
+    return full_sensitivity_report(rel_step=rel_step)
+
+
+@router.post("/sensitivity")
+async def ml_sensitivity_post(body: SensitivityBody) -> dict[str, Any]:
+    from apps.ml.sensitivity import full_sensitivity_report
+
+    return full_sensitivity_report(
+        body.baseline,
+        rel_step=body.rel_step,
+        pd_features=body.pd_features,
+        pd_points=body.pd_points,
+    )
+
+
+@router.get("/sensitivity/oat")
+async def ml_sensitivity_oat(rel_step: float = Query(0.10, ge=0.01, le=0.5)) -> dict[str, Any]:
+    from apps.ml.sensitivity import oat_sensitivity
+
+    return oat_sensitivity(rel_step=rel_step)
+
+
+@router.get("/sensitivity/coefficients")
+async def ml_sensitivity_coef() -> dict[str, Any]:
+    from apps.ml.sensitivity import coefficient_importance
+
+    return coefficient_importance()
+
+
+@router.get("/sensitivity/partial")
+async def ml_sensitivity_pd(
+    feature: str = Query("mean_ndvi"),
+    points: int = Query(12, ge=5, le=40),
+) -> dict[str, Any]:
+    from apps.ml.sensitivity import partial_dependence
+
+    try:
+        return partial_dependence(feature, points=points)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
