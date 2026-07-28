@@ -2,7 +2,7 @@
 
 import { USE_MOCK } from "../api/http";
 
-const TIMEOUT = 20000;
+const TIMEOUT = 45000;
 
 function readEnv(key: string): string | undefined {
   try {
@@ -191,9 +191,26 @@ export async function postRothC(opts: {
     c_input_t_ha_y: String(opts.c_input_t_ha_y ?? 1.5),
     clay_pct: String(opts.clay_pct ?? 25),
   });
+  return fetchSafe(`/api/v1/science/rothc?${q.toString()}`, { model: "error" }, { method: "POST" });
+}
+
+export async function postScienceWatch(body: {
+  lat: number;
+  lon: number;
+  days?: number;
+  include_sensors?: boolean;
+}) {
   return fetchSafe(
-    `/api/v1/science/rothc?${q.toString()}`,
-    { model: "error" },
-    { method: "POST" },
+    "/api/v1/science/monitors/watch",
+    { events: [], counts: { ok: 0, warning: 0, critical: 0 } },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
   );
+}
+
+export async function getScienceMonitors() {
+  return fetchSafe("/api/v1/science/monitors", { items: [], count: 0 });
 }
