@@ -2,12 +2,14 @@
 
 | Track | Item | Status |
 |-------|------|--------|
-| Docker | postgres+postgis, redis, api, worker, beat | ✅ compose |
+| Docker | postgres+postgis, redis, api, worker, beat | ✅ |
+| Scripts | bootstrap_postgres.sh / .ps1 | ✅ |
+| Alembic | 20260728_0001 phase2 tables | ✅ |
 | Security | RS256 key paths + gen script | ✅ |
 | Security | refresh jti revoke/rotate | ✅ |
-| Security | native bcrypt in security.py | ✅ |
+| RBAC | farms/crops/inventory/monitoring/simulation writes | ✅ |
 | Monitoring | WS broadcast on rule fire | ✅ |
-| Beat | weekly vegetation task registered | ✅ |
-| GEE | provider + setup doc | ✅ (needs your GCP keys) |
-| Alembic full revision on PG | run `alembic revision --autogenerate` against compose PG | ⚠️ operator step |
-| RBAC on every write | partial | ⚠️ next |
+| Beat | weekly vegetation task | ✅ |
+| GEE | provider + OPS checklist | ✅ (needs your GCP keys) |
+
+See **docs/OPS_CHECKLIST.md** for operator steps.
