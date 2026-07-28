@@ -1,4 +1,4 @@
-"""Persist / load simulation runs (sync helpers for Celery + async for API)."""
+"""Persist / load science runs."""
 
 from __future__ import annotations
 
@@ -7,16 +7,49 @@ import logging
 from datetime import datetime
 from typing import Any, Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.simulation.models_runs import SimulationRun
+from apps.simulation.models_runs import ScienceRun
 
 logger = logging.getLogger(__name__)
 
+_DDL = """
+CREATE TABLE IF NOT EXISTS science_runs (
+    id SERIAL PRIMARY KEY,
+    model VARCHAR(64) NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'completed',
+    params_json TEXT,
+    result_json TEXT,
+    task_id VARCHAR(128),
+    farm_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
+_DDL_SQLITE = """
+CREATE TABLE IF NOT EXISTS science_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model VARCHAR(64) NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'completed',
+    params_json TEXT,
+    result_json TEXT,
+    task_id VARCHAR(128),
+    farm_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+"""
+
+
+async def ensure_science_runs_table(session: AsyncSession) -> None:
+    bind = session.get_bind()
+    dialect = bind.dialect.name if bind is not None else "sqlite"
+    ddl = _DDL if dialect == "postgresql" else _DDL_SQLITE
+    await session.execute(text(ddl))
+    await session.commit()
+
 
 def _sync_engine():
-    """Sync engine for Celery workers (asyncpg URL → psycopg/sqlite)."""
     from sqlalchemy import create_engine
 
     from apps.shared_core.database.session import DATABASE_URL
@@ -41,8 +74,11 @@ def save_run_sync(
     from sqlalchemy.orm import Session
 
     eng = _sync_engine()
+    with eng.begin() as conn:
+        dialect = eng.dialect.name
+        conn.execute(text(_DDL if dialect == "postgresql" else _DDL_SQLITE))
     with Session(eng) as session:
-        row = SimulationRun(
+        row = ScienceRun(
             model=model,
             status=status,
             params_json=json.dumps(params, default=str),
@@ -68,8 +104,13 @@ async def save_run_async(
     status: str = "completed",
     task_id: Optional[str] = None,
     farm_id: Optional[int] = None,
-) -> SimulationRun:
-    row = SimulationRun(
+) -> ScienceRun:
+    try:
+        await ensure_science_runs_table(session)
+    except Exception as e:
+        logger.debug("ensure table: %s", e)
+    # strip bulky nested analysis for storage size if needed — keep full
+    row = ScienceRun(
         model=model,
         status=status,
         params_json=json.dumps(params, default=str),
@@ -79,13 +120,13 @@ async def save_run_async(
         created_at=datetime.utcnow(),
     )
     session.add(row)
-    await session.flush()
+    await session.commit()
     await session.refresh(row)
     return row
 
 
-async def get_run(session: AsyncSession, run_id: int) -> Optional[SimulationRun]:
-    r = await session.execute(select(SimulationRun).where(SimulationRun.id == run_id))
+async def get_run(session: AsyncSession, run_id: int) -> Optional[ScienceRun]:
+    r = await session.execute(select(ScienceRun).where(ScienceRun.id == run_id))
     return r.scalar_one_or_none()
 
 
@@ -95,16 +136,20 @@ async def list_runs(
     model: Optional[str] = None,
     farm_id: Optional[int] = None,
     limit: int = 50,
-) -> list[SimulationRun]:
-    q = select(SimulationRun).order_by(SimulationRun.id.desc()).limit(limit)
+) -> list[ScienceRun]:
+    try:
+        await ensure_science_runs_table(session)
+    except Exception:
+        pass
+    q = select(ScienceRun).order_by(ScienceRun.id.desc()).limit(limit)
     if model:
-        q = q.where(SimulationRun.model == model)
+        q = q.where(ScienceRun.model == model)
     if farm_id is not None:
-        q = q.where(SimulationRun.farm_id == farm_id)
+        q = q.where(ScienceRun.farm_id == farm_id)
     return list((await session.execute(q)).scalars().all())
 
 
-def run_to_dict(row: SimulationRun) -> dict[str, Any]:
+def run_to_dict(row: ScienceRun) -> dict[str, Any]:
     return {
         "id": row.id,
         "model": row.model,
