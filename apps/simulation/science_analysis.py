@@ -103,14 +103,17 @@ def analyze_rothc(result: dict[str, Any]) -> dict[str, Any]:
     d0 = float(result.get("soc_initial", 0))
     d1 = float(result.get("soc_final", 0))
     delta = float(result.get("delta", d1 - d0))
+    mods = result.get("rate_modifiers") or {}
     fa = [
         f"کربن آلی خاک از {d0:.1f} به {d1:.1f} t C/ha تغییر کرد (Δ={delta:+.2f}).",
         "استخرها: DPM (سریع)، RPM (کند)، BIO، HUM، IOM (خنثی). نرخ‌ها با دما (a)، رطوبت (b) و پوشش (c) تعدیل می‌شوند.",
+        f"ضرایب نرخ: a≈{mods.get('a_temp', '—')}، b≈{mods.get('b_moisture', '—')}، c={mods.get('c_cover', '—')}.",
         "مرجع: Coleman & Jenkinson RothC-26.3 (پیاده‌سازی باز).",
     ]
     en = [
         f"SOC {d0:.1f} → {d1:.1f} t C/ha (Δ={delta:+.2f}).",
         "Pools: DPM, RPM, BIO, HUM, IOM; rates modified by temperature, moisture, plant cover.",
+        f"Rate modifiers a≈{mods.get('a_temp')}, b≈{mods.get('b_moisture')}, c={mods.get('c_cover')}.",
         "Ref: Coleman & Jenkinson RothC-26.3 (open reimplementation).",
     ]
     return {
@@ -121,8 +124,35 @@ def analyze_rothc(result: dict[str, Any]) -> dict[str, Any]:
             "decomposed = pool × (1 − exp(−k·a·b·c))",
             "BIO+HUM fraction from clay factor x",
         ],
-        "advice_fa": "برای افزایش SOC: بقایای بیشتر، کود آلی، کاهش آیش برهنه.",
-        "advice_en": "To raise SOC: more residues, manure, less bare fallow.",
+        "advice_fa": "برای افزایش SOC: بقایای بیشتر، کود آلی، کاهش آیش برهنه. حساسیت جهانی: معمولاً c_input و اقلیم.",
+        "advice_en": "To raise SOC: more residues, manure, less bare fallow. Global SA often highlights C input and climate.",
+    }
+
+
+def analyze_rusle(result: dict[str, Any]) -> dict[str, Any]:
+    inp = result.get("inputs") or {}
+    out = result.get("outputs") or {}
+    A = float(out.get("A_t_ha_year", 0))
+    risk = str(out.get("risk_class", "—"))
+    fa = [
+        f"تلفات خاک سالانه A≈{A:.2f} t/ha/year با کلاس ریسک «{risk}».",
+        f"عوامل: R={inp.get('R')}، K={inp.get('K')}، LS={inp.get('LS')}، C={inp.get('C')}، P={inp.get('P')}.",
+        "A = R·K·LS·C·P (USLE/RUSLE). نرم‌افزار رسمی USDA RUSLE2 نیست.",
+    ]
+    en = [
+        f"Annual soil loss A≈{A:.2f} t/ha/year (risk «{risk}»).",
+        f"Factors R={inp.get('R')}, K={inp.get('K')}, LS={inp.get('LS')}, C={inp.get('C')}, P={inp.get('P')}.",
+        "A = R·K·LS·C·P — not USDA RUSLE2 software.",
+    ]
+    advice_fa = "کاهش C (پوشش) و P (تراس/کشت روی خطوط تراز) و مدیریت شیب مؤثرترین اهرم‌ها هستند."
+    if A >= 15:
+        advice_fa = "فرسایش بالا: فوری پوشش دائمی، بانکت/تراس، و کاهش طول شیب را در اولویت بگذارید."
+    return {
+        "summary_fa": " ".join(fa),
+        "summary_en": " ".join(en),
+        "formulas": ["A = R · K · LS · C · P", "LS from slope length & steepness"],
+        "advice_fa": advice_fa,
+        "advice_en": "Lower C (cover) and improve support practice P; manage slope length.",
     }
 
 
@@ -161,6 +191,8 @@ def attach_analysis(model_key: str, result: dict[str, Any]) -> dict[str, Any]:
         out["analysis"] = analyze_aquacrop(result)
     elif model_key in ("rothc", "rothc_26_3"):
         out["analysis"] = analyze_rothc(result)
+    elif model_key in ("rusle", "rusle2", "rusle2_proxy"):
+        out["analysis"] = analyze_rusle(result)
     elif model_key in ("ndvi", "ndvi_canopy"):
         out["analysis"] = analyze_ndvi_canopy(result)
     return out
