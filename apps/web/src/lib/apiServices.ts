@@ -2,7 +2,7 @@
 
 import { USE_MOCK } from "../api/http";
 
-const TIMEOUT = 12000;
+const TIMEOUT = 20000;
 
 function readEnv(key: string): string | undefined {
   try {
@@ -176,5 +176,24 @@ export async function postSwat(body: Record<string, unknown>) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     },
+  );
+}
+
+export async function postRothC(opts: {
+  years?: number;
+  soc_t_ha?: number;
+  c_input_t_ha_y?: number;
+  clay_pct?: number;
+}) {
+  const q = new URLSearchParams({
+    years: String(opts.years ?? 15),
+    soc_t_ha: String(opts.soc_t_ha ?? 40),
+    c_input_t_ha_y: String(opts.c_input_t_ha_y ?? 1.5),
+    clay_pct: String(opts.clay_pct ?? 25),
+  });
+  return fetchSafe(
+    `/api/v1/science/rothc?${q.toString()}`,
+    { model: "error" },
+    { method: "POST" },
   );
 }
