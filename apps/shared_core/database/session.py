@@ -1,8 +1,9 @@
-"""Async SQLAlchemy session — SQLite fallback when Postgres driver missing."""
+"""Async SQLAlchemy session — Postgres preferred when forced/available."""
 
 from __future__ import annotations
 
 import logging
+import os
 from typing import AsyncGenerator
 
 from sqlalchemy import text
@@ -23,6 +24,19 @@ def _has_asyncpg() -> bool:
         return False
 
 
+def _force_postgres() -> bool:
+    v = (os.getenv("FORCE_POSTGRES") or os.getenv("USE_POSTGRES") or "").strip().lower()
+    return v in ("1", "true", "yes", "on")
+
+
+def _to_async_postgres(url: str) -> str:
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    if url.startswith("postgresql://") and "+asyncpg" not in url:
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    return url
+
+
 def _resolve_database_url() -> str:
     raw = None
     try:
@@ -30,8 +44,6 @@ def _resolve_database_url() -> str:
 
         raw = settings.DATABASE_URL
     except Exception:
-        import os
-
         raw = os.getenv("DATABASE_URL")
 
     if not raw or "***" in str(raw) or not str(raw).strip():
@@ -41,19 +53,34 @@ def _resolve_database_url() -> str:
     url = str(raw).strip()
 
     if "postgres" in url.lower():
+        url = _to_async_postgres(url)
         if "+asyncpg" in url and not _has_asyncpg():
+            if _force_postgres():
+                raise RuntimeError(
+                    "FORCE_POSTGRES=1 but asyncpg is not installed. "
+                    "pip install asyncpg"
+                )
             logger.info("asyncpg not installed — local SQLite")
             return DEFAULT_SQLITE
-        if url.startswith("postgresql://") or url.startswith("postgres://"):
-            if "+asyncpg" not in url and "+aiosqlite" not in url:
-                try:
-                    from apps.shared_core.config import settings
+        # Phase 3: allow Postgres on local when forced OR when asyncpg present and URL is explicit async
+        if _force_postgres():
+            logger.info("FORCE_POSTGRES=1 — using Postgres: %s", url.split("@")[-1] if "@" in url else url)
+            return url
+        try:
+            from apps.shared_core.config import settings
 
-                    if settings.ENVIRONMENT == "local":
-                        logger.info("Local Postgres URL without async driver — SQLite")
-                        return DEFAULT_SQLITE
-                except Exception:
-                    return DEFAULT_SQLITE
+            if settings.ENVIRONMENT == "local" and not _force_postgres():
+                # keep SQLite for zero-friction local unless user opts in
+                if os.getenv("DATABASE_URL", "").strip() and _has_asyncpg() and "+asyncpg" in url:
+                    # Explicit async Postgres URL in env → honor it
+                    if "localhost" in url or "127.0.0.1" in url or "postgres:" in url:
+                        logger.info("Local Postgres URL detected with asyncpg — using Postgres")
+                        return url
+                logger.info("Local without FORCE_POSTGRES — SQLite (set FORCE_POSTGRES=1 to use PG)")
+                return DEFAULT_SQLITE
+        except Exception:
+            if not _force_postgres():
+                return DEFAULT_SQLITE
 
     if url.startswith("sqlite://") and "+aiosqlite" not in url:
         url = url.replace("sqlite://", "sqlite+aiosqlite://", 1)
@@ -63,11 +90,11 @@ def _resolve_database_url() -> str:
 
 DATABASE_URL = _resolve_database_url()
 
-engine: AsyncEngine = create_async_engine(
-    DATABASE_URL,
-    echo=False,
-    pool_pre_ping=True,
-)
+_engine_kwargs: dict = {"echo": False, "pool_pre_ping": True}
+if "sqlite" not in DATABASE_URL:
+    _engine_kwargs.update({"pool_size": 5, "max_overflow": 10})
+
+engine: AsyncEngine = create_async_engine(DATABASE_URL, **_engine_kwargs)
 
 async_session_maker = async_sessionmaker(
     engine,
@@ -123,7 +150,6 @@ async def _add_col(conn, table: str, name: str, ddl: str, existing: set[str]) ->
 
 
 async def _sqlite_schema_patches(conn) -> None:
-    """create_all does not ALTER existing tables — patch missing columns."""
     if "sqlite" not in str(engine.url):
         return
 
@@ -164,8 +190,11 @@ async def init_db() -> None:
     try:
         from apps.shared_core.config import settings
 
-        if settings.ENVIRONMENT != "local":
+        if settings.ENVIRONMENT != "local" and not _force_postgres():
             logger.info("Skipping create_all (ENVIRONMENT=%s); use Alembic", settings.ENVIRONMENT)
+            return
+        if settings.ENVIRONMENT != "local" and "postgres" in DATABASE_URL:
+            logger.info("Skipping create_all on Postgres staging/prod — use alembic upgrade head")
             return
     except Exception:
         pass
