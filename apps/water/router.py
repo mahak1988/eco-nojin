@@ -1,4 +1,4 @@
-"""Water / irrigation API with schedules and quality."""
+"""Water / irrigation API with schedules, quality, balance."""
 
 from __future__ import annotations
 
@@ -79,6 +79,30 @@ async def water_dashboard(farm_id: Optional[int] = Query(None)):
     )
 
 
+@router.get("/balance")
+async def water_balance(
+    area_ha: float = Query(1.0, gt=0),
+    precip_mm: float = Query(5.0, ge=0),
+    et0_mm: float = Query(4.0, gt=0),
+    kc: float = Query(1.0, gt=0),
+    irrigation_mm: float = Query(0.0, ge=0),
+    runoff_mm: float = Query(0.5, ge=0),
+):
+    """Simplified field water balance: ΔS = P + I − ETc − R."""
+    etc = et0_mm * kc
+    delta = precip_mm + irrigation_mm - etc - runoff_mm
+    return {
+        "area_ha": area_ha,
+        "precip_mm": precip_mm,
+        "irrigation_mm": irrigation_mm,
+        "etc_mm": round(etc, 2),
+        "runoff_mm": runoff_mm,
+        "storage_change_mm": round(delta, 2),
+        "volume_change_m3": round(delta * area_ha * 10, 2),
+        "formula": "dS = P + I - ETc - R",
+    }
+
+
 @router.get("/sources", response_model=list[WaterSource])
 async def water_sources():
     return [
@@ -108,6 +132,11 @@ async def irrigation_systems() -> list[dict[str, Any]]:
 
 @router.get("/irrigation/schedules")
 async def list_schedules():
+    return {"data": _SCHEDULES}
+
+
+@router.get("/irrigation-schedule")
+async def irrigation_schedule_alias():
     return {"data": _SCHEDULES}
 
 

@@ -12,30 +12,26 @@ def _safe_div(a: float, b: float) -> float:
 
 
 def ndvi(nir: float, red: float) -> float:
-    """(NIR - Red) / (NIR + Red) — B08, B04."""
     return _safe_div(nir - red, nir + red)
 
 
 def ndwi(green: float, nir: float) -> float:
-    """McFeeters NDWI: (Green - NIR) / (Green + NIR) — B03, B08."""
     return _safe_div(green - nir, green + nir)
 
 
 def ndmi(nir: float, swir1: float) -> float:
-    """Normalized Difference Moisture Index — B08, B11."""
     return _safe_div(nir - swir1, nir + swir1)
 
 
+def evi(nir: float, red: float, blue: float = 0.05) -> float:
+    """Enhanced Vegetation Index."""
+    return 2.5 * _safe_div(nir - red, nir + 6 * red - 7.5 * blue + 1)
+
+
 def smi(ndvi_v: float, ndwi_v: float, lst_proxy: float = 0.5) -> float:
-    """
-    Simplified Soil Moisture Index in [0, 1].
-    Combines vegetation greenness, water index, and thermal dryness proxy.
-    lst_proxy: 0 cool/wet … 1 hot/dry (normalized).
-    """
     veg = max(0.0, min(1.0, (ndvi_v + 1) / 2))
     water = max(0.0, min(1.0, (ndwi_v + 1) / 2))
     dryness = max(0.0, min(1.0, lst_proxy))
-    # higher NDVI/NDWI and lower dryness → higher moisture
     raw = 0.45 * water + 0.35 * veg + 0.20 * (1.0 - dryness)
     return max(0.0, min(1.0, raw))
 
