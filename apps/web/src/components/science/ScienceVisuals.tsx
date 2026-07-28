@@ -95,10 +95,12 @@ export function BarChart({
       {items.map((it, idx) => (
         <div
           key={it.label}
-          className="grid grid-cols-[100px_1fr_64px] items-center gap-2 text-xs"
+          className="grid grid-cols-[minmax(0,7rem)_1fr_4rem] items-center gap-2 text-xs sm:grid-cols-[120px_1fr_72px]"
           style={{ animationDelay: `${idx * 0.07}s` }}
         >
-          <span className="truncate text-stone-600">{it.label}</span>
+          <span className="truncate text-stone-600" title={it.label}>
+            {it.label}
+          </span>
           <div className="h-3.5 overflow-hidden rounded-full bg-stone-100">
             <div
               className="sci-bar-fill h-full rounded-full"
@@ -109,7 +111,7 @@ export function BarChart({
               }}
             />
           </div>
-          <span className="sci-metric-value text-right font-mono text-stone-800">
+          <span className="sci-metric-value text-right font-mono tabular-nums text-stone-800">
             {it.value.toFixed(1)}
           </span>
         </div>
@@ -139,9 +141,7 @@ export function MetricCard({
     rose: "from-rose-50 to-white border-rose-200 text-rose-900",
   };
   return (
-    <div
-      className={`sci-card rounded-2xl border bg-gradient-to-br p-4 shadow-sm ${tones[tone]}`}
-    >
+    <div className={`sci-card rounded-2xl border bg-gradient-to-br p-4 shadow-sm ${tones[tone]}`}>
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide opacity-70">
         <span className="sci-icon-bob inline-flex">{icon}</span>
         {label}
@@ -152,21 +152,34 @@ export function MetricCard({
   );
 }
 
+/** Readable data table: sticky header, zebra, numeric columns RTL-aware */
 export function DataTable({
   columns,
   rows,
+  maxHeight = 320,
+  numericCols,
 }: {
   columns: string[];
   rows: (string | number)[][];
+  maxHeight?: number;
+  /** column indices treated as numbers (right-align + tabular) */
+  numericCols?: number[];
 }) {
   if (!rows.length) return <p className="text-xs text-stone-400">جدول خالی</p>;
+  const numSet = new Set(numericCols ?? columns.map((_, i) => i).filter((i) => i > 0));
   return (
-    <div className="overflow-x-auto rounded-xl border border-stone-200">
-      <table className="min-w-full text-left text-xs">
-        <thead className="bg-stone-100 text-stone-600">
+    <div
+      className="overflow-auto rounded-xl border border-stone-200 shadow-sm"
+      style={{ maxHeight }}
+    >
+      <table className="min-w-full border-collapse text-sm">
+        <thead className="sticky top-0 z-10 bg-stone-800 text-stone-50 shadow">
           <tr>
             {columns.map((c) => (
-              <th key={c} className="px-3 py-2 font-semibold">
+              <th
+                key={c}
+                className="whitespace-nowrap px-3 py-2.5 text-start text-xs font-semibold tracking-wide"
+              >
                 {c}
               </th>
             ))}
@@ -176,14 +189,26 @@ export function DataTable({
           {rows.map((r, i) => (
             <tr
               key={i}
-              className="sci-table-row border-t border-stone-100 odd:bg-white even:bg-stone-50/80"
+              className={`sci-table-row border-b border-stone-100 transition-colors hover:bg-emerald-50/60 ${
+                i % 2 === 0 ? "bg-white" : "bg-stone-50/90"
+              }`}
               style={{ animationDelay: `${Math.min(i, 12) * 0.04}s` }}
             >
-              {r.map((cell, j) => (
-                <td key={j} className="px-3 py-1.5 font-mono text-stone-800">
-                  {cell}
-                </td>
-              ))}
+              {r.map((cell, j) => {
+                const isNum = numSet.has(j) || typeof cell === "number";
+                return (
+                  <td
+                    key={j}
+                    className={`px-3 py-2 ${
+                      isNum
+                        ? "text-end font-mono text-[13px] tabular-nums text-stone-800"
+                        : "text-start text-stone-700"
+                    }`}
+                  >
+                    {cell}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
