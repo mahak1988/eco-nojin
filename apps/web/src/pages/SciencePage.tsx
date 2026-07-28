@@ -27,6 +27,7 @@ import {
   LineChart,
   MetricCard,
 } from "../components/science/ScienceVisuals";
+import { ScienceMonitorPanel } from "../components/science/ScienceMonitorPanel";
 
 type LoadState = "idle" | "loading" | "ok" | "error";
 type Analysis = {
@@ -237,7 +238,7 @@ export default function SciencePage() {
               فاز علمی / Science
             </h1>
             <p className="mt-2 max-w-xl text-sm text-emerald-50/90">
-              مدل‌های فرایندی با فرمول، نمودار، جدول و توصیه — نه باینری رسمی FAO/SWAT+.
+              مدل‌ها + پایشگرها (آستانه هشدار/بحرانی) + نمودار — نه باینری رسمی FAO/SWAT+.
             </p>
           </div>
           <div className="rounded-2xl bg-white/10 px-4 py-3 text-xs backdrop-blur">
@@ -247,6 +248,8 @@ export default function SciencePage() {
           </div>
         </div>
       </header>
+
+      <ScienceMonitorPanel lat={lat} lon={lon} days={days} />
 
       <section className="sci-stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {GUIDE.map((g) => (
