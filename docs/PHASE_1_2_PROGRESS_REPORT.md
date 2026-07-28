@@ -1,27 +1,19 @@
-# گزارش پیشرفت فاز ۱ و ۲ — هم‌تراز با مخزن (SSOT)
+# گزارش پیشرفت — نسخهٔ صادقانه (جایگزین گزارش بازاریابی)
 
-نسخهٔ نمایشی قبلی با اعداد Coverage/Performance غیرقابل‌اندازه‌گیری **باطل** است.  
-سند مرجع: **`docs/PHASE_1_2_SSOT.md`**
+**وضعیت:** گزارش قبلی با Coverage/Performance غیرقابل‌اندازه‌گیری **باطل** است.
 
-## وضعیت
+**مرجع واحد حقیقت:** [`docs/PHASE_1_2_SSOT.md`](PHASE_1_2_SSOT.md)
 
-**MVP فاز ۱–۲ در سطح قابلیت‌های چک‌لیست SSOT تکمیل شده است.**
+## خلاصه واقعی
 
-این به معنی production علمی کامل (SWAT+/FAO AquaCrop/sentinelhub پولی) نیست.
+- فاز ۰ زیرساخت: قابل استفاده
+- فاز ۱ هسته کشاورزی API: پیاده‌سازی‌شده در مخزن
+- فاز ۲ پایش/EO/شبیه‌ساز MVP: پیاده‌سازی‌شده (synthetic/GEE اختیاری)
+- فاز ۳ Wave 1–2: science API + persist + NDVI canopy + PostGIS farm index
 
-## دستاوردهای قابل‌اثبات
+## آنچه ادعا نمی‌شود
 
-- هسته کشاورزی: farms, crops (+rotation/yield/disease), water (+balance), planting (+season), inventory (+analytics)
-- پایش و EO: monitoring, satellite indices (NDVI/NDWI/NDMI/EVI/SMI), weather alerts (+heat)
-- شبیه‌سازی: aquacrop/rothc/compare/coupling (محلی)
-- داشبورد: `/api/v1/dashboard/overview`
-- AI: chat (auth) + providers/feedback عمومی
-- استقرار محلی بدون Docker: `scripts/deploy_local.ps1`
+- Coverage ۷۸٪ / Locust p95 / ۱۰۰٪ صفحات FE production
+- باینری رسمی SWAT+/AquaCrop FAO
 
-## تست
-
-Unit: indices, weather alerts, sentinel fetcher (۱۰ تست).
-
-## فاز بعد
-
-فاز ۳ علمی روی Postgres+PostGIS و کلیدهای EO واقعی، پس از تأیید SSOT.
+برای جزئیات endpointها و دستور verify → SSOT.

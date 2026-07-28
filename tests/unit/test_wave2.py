@@ -1,5 +1,5 @@
 from apps.simulation.ndvi_canopy import ndvi_to_canopy
-from apps.simulation.tasks_phase3 import run_aquacrop_advanced_local, run_swat_local
+from apps.simulation.runners import run_aquacrop_advanced_local, run_swat_local
 
 
 def test_ndvi_to_canopy():
@@ -18,3 +18,11 @@ def test_swat_local_no_persist():
 def test_aquacrop_local_no_persist():
     r = run_aquacrop_advanced_local({"days": 15}, persist=False)
     assert r["irrigation_need_mm"] >= 0
+
+
+def test_phase3_router_imports():
+    from apps.simulation.phase3_router import router
+
+    paths = {getattr(r, "path", None) for r in router.routes}
+    assert any(p and "runs" in p for p in paths if isinstance(p, str))
+    assert any(p and "ndvi-canopy" in p for p in paths if isinstance(p, str))

@@ -1,56 +1,62 @@
-# Source of Truth — Phase 1 & 2 (aligned with repository)
+# SSOT — Phase 0–3 status (honest, matches repository)
 
-**Date:** 2026-07-28  
-**Rule:** This document describes only what exists in `mahak1988/eco-nojin`. No marketing numbers.
+**Updated:** 2026-07-28  
+**Rule:** Numbers without measurement are forbidden. Inflated progress reports are obsolete.
 
-## Completion definition (MVP-100%)
+## What is true in the repo
 
-Phase 1–2 **MVP** is complete when all checklist rows below are ✅ in code and callable without Docker (SQLite) or with Docker (Postgres).
+### Phase 0 infrastructure
+- FastAPI entry `apps/main.py`, CORS limited, local rate-limit optional
+- Alembic chain through `20260728_0004`
+- RBAC models + `require_permission`
+- Auth with cookies path; JWT HS256 default, RS256 optional
+- Celery app + Redis config; works when Redis is up
+- Docker compose: postgres(postgis) + redis + api + worker + beat
 
-### Backend checklist
+### Phase 1 agriculture core (API)
+- `apps/farms`, `crops`, `water`, `planting`, `inventory`, `weather`, `notifications`
+- Auth/register/login paths under users
+- Specialized crop fields, rotation/yield/disease helpers
+- **Not claimed:** measured Lighthouse >80, full 26 FE pages production-polished
 
-| Area | Status | Notes |
-|------|--------|-------|
-| Auth + cookies + refresh revoke | ✅ | |
-| RBAC seed + require_permission | ✅ | soft-skip local if REQUIRE_AUTH_FOR_WRITES=false |
-| Farms CRUD + spatial nearby | ✅ | PostGIS when PG; else Haversine |
-| Crops catalog + rotation + yield + disease | ✅ | rule-based |
-| Water dashboard + balance + schedules | ✅ | |
-| Inventory + analytics + cost | ✅ | |
-| Planting plans/tasks + season/growth | ✅ | |
-| Monitoring sensors/alerts + WS | ✅ | |
-| Satellite NDVI/NDWI/NDMI/EVI/SMI | ✅ | synthetic default; STAC optional |
-| Weather forecast/current/ERA5/alerts | ✅ | Open-Meteo; heat/drought/flood/frost |
-| Simulation aquacrop/rothc/coupling | ✅ | local/Celery stub |
-| Dashboard overview | ✅ | |
-| AI agents chat (auth) + public providers/feedback | ✅ | LLM keys optional |
-| Alembic linear chain | ✅ | through 20260728_0002 |
+### Phase 2 monitoring / EO / simulation MVP
+- `apps/monitoring`, `apps/satellite` (GEE/MPC/synthetic providers)
+- Weather alerts: drought/flood/frost/heat
+- AquaCrop/RothC stubs + coupling + PDF/CSV export helpers
+- WebSocket module present
 
-### Explicitly NOT claimed
+### Phase 3 Wave 1–2
+- `/api/v1/science/*` — swat proxy, aquacrop advanced, scenarios, climate ETL
+- `simulation_runs` persist, NDVI→canopy, Celery tasks (lazy)
+- PostGIS `farms.geom` + GIST when Postgres
 
-- FAO AquaCrop binary package / full SWAT+ basin calibration
-- sentinelhub paid download pipeline
-- Measured 78% pytest coverage / Locust p95
-- Full PWA offline + Zustand migration of entire FE
-- Psychology / Store / Desktop product modules as production systems
+## Explicitly false / not measured
 
-### Frontend
+| Claim in marketing report | Reality |
+|---------------------------|---------|
+| Backend coverage 78% | Not measured project-wide; unit tests exist for indices/weather/phase3 |
+| Frontend 100% API-connected / 39 pages | Many pages exist; connection quality uneven |
+| p95 ~180ms Locust | Not run in this environment |
+| Official FAO AquaCrop / SWAT+ binary | Process proxies only |
+| sentinelhub paid pipeline | Optional/synthetic + GEE when keyed |
+| Zustand/PWA full production | Partial at best |
 
-~60 page components exist; many call real APIs; quality is uneven. **Not** asserted as 100% production UX.
-
-### Verify
+## Verify science routes after pull
 
 ```powershell
 git pull origin main
-pytest tests/unit/test_indices.py tests/unit/test_weather_alerts.py tests/unit/test_sentinel_fetcher.py -q
+# MUST fully stop and restart uvicorn (Ctrl+C then):
 uvicorn apps.main:app --reload --host 0.0.0.0 --port 8000
-curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/api/v1/dashboard/overview
-curl.exe -H "User-Agent: Mozilla/5.0" "http://localhost:8000/api/v1/satellite/indices?lat=32.65&lon=51.67"
-curl.exe -H "User-Agent: Mozilla/5.0" "http://localhost:8000/api/v1/weather/alerts?lat=32.65&lon=51.67"
-curl.exe -H "User-Agent: Mozilla/5.0" "http://localhost:8000/api/v1/planting/season-plan?crop=wheat"
-curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/api/v1/ai-agents/providers
+# Log must contain: science: router loaded
+
+curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/api/v1/science/status
+curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/api/v1/science/runs
+curl.exe -H "User-Agent: Mozilla/5.0" "http://localhost:8000/api/v1/science/ndvi-canopy?lat=32.65&lon=51.67&days=60"
+
+# PowerShell JSON body (use single-quoted -d):
+curl.exe -X POST -H "User-Agent: Mozilla/5.0" -H "Content-Type: application/json" `
+  -d '{"days":20,"persist":true}' `
+  http://localhost:8000/api/v1/science/aquacrop-advanced
 ```
 
-### Ready for next report (Phase 3)
-
-Inputs needed: Docker/Postgres, optional GEE keys, acceptance of SSOT scope above.
+If log shows `science: ...` warning, paste that line — do not assume 100% without `router loaded`.

@@ -1,4 +1,4 @@
-"""Phase 3 scientific APIs — Wave2: persist, Celery, NDVI canopy, runs list."""
+"""Phase 3 scientific APIs — no Celery import at module load."""
 
 from __future__ import annotations
 
@@ -10,11 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
 from apps.shared_core.rbac import require_permission
+from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
 from apps.simulation.climate_etl import fetch_climate_series
+from apps.simulation.models_swat import run_swat_plus
 from apps.simulation.ndvi_canopy import fetch_ndvi_canopy_async
 from apps.simulation.run_store import get_run, list_runs, run_to_dict, save_run_async
+from apps.simulation.runners import run_aquacrop_advanced_local, run_swat_local
 from apps.simulation.scenario_engine import run_scenarios
-from apps.simulation.tasks_phase3 import run_aquacrop_advanced_local, run_swat_local
 
 router = APIRouter(prefix="/api/v1/science", tags=["Phase3 Science"])
 
@@ -126,9 +128,7 @@ async def swat_run(
     result = run_swat_local(params, farm_id=farm_id, persist=False)
     if persist:
         try:
-            row = await save_run_async(
-                session, "swat_plus_proxy", params, result, farm_id=farm_id
-            )
+            row = await save_run_async(session, "swat_plus_proxy", params, result, farm_id=farm_id)
             result["run_id"] = row.id
         except Exception as e:
             result["persist_error"] = str(e)[:120]
@@ -155,24 +155,21 @@ async def aquacrop_adv(
         params["et0_mm_day"] = drivers.get("et0_mm_day", params["et0_mm_day"])
         params["rain_mm_day"] = drivers.get("rain_mm_day", params["rain_mm_day"])
 
+    ndvi_meta = None
     if use_ndvi and lat is not None and lon is not None and not params.get("canopy_cover"):
-        bridge = await fetch_ndvi_canopy_async(float(lat), float(lon), days=int(params.get("days", 90)))
+        bridge = await fetch_ndvi_canopy_async(
+            float(lat), float(lon), days=int(params.get("days", 90))
+        )
         params["canopy_cover"] = bridge["canopy_cover"]
         ndvi_meta = {"provider": bridge["provider"], "count": bridge["count"]}
-    else:
-        ndvi_meta = None
 
     if async_mode:
         try:
             from apps.simulation.tasks_phase3 import task_aquacrop_advanced
 
-            celery_params = {
-                k: v
-                for k, v in params.items()
-                if k not in ("use_live_climate",)
-            }
+            celery_params = dict(params)
             celery_params["farm_id"] = farm_id
-            celery_params["use_ndvi_canopy"] = use_ndvi and not params.get("canopy_cover")
+            celery_params["use_ndvi_canopy"] = False  # already resolved above
             task = task_aquacrop_advanced.delay(celery_params)
             return {"status": "queued", "task_id": task.id, "model": "aquacrop_advanced"}
         except Exception as e:
@@ -186,14 +183,20 @@ async def aquacrop_adv(
                 result["ndvi_meta"] = ndvi_meta
             return result
 
-    # strip routing-only keys before model
     model_params = {
         k: v
         for k, v in params.items()
-        if k not in ("lat", "lon", "use_live_climate", "use_ndvi_canopy", "async_mode", "persist", "farm_id")
+        if k
+        not in (
+            "lat",
+            "lon",
+            "use_live_climate",
+            "use_ndvi_canopy",
+            "async_mode",
+            "persist",
+            "farm_id",
+        )
     }
-    from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
-
     result = run_aquacrop_advanced(model_params)
     result["mode"] = "sync_local"
     if ndvi_meta:
@@ -277,7 +280,7 @@ async def farm_pipeline(
         bridge = await fetch_ndvi_canopy_async(lat, lon, days=60)
         canopy = bridge["canopy_cover"]
         ndvi_meta = {"provider": bridge["provider"], "count": bridge["count"]}
-    aq_params = {
+    aq_params: dict[str, Any] = {
         "area_ha": area_ha,
         "days": 60,
         "et0_mm_day": d.get("et0_mm_day", 4.5),
@@ -285,9 +288,6 @@ async def farm_pipeline(
     }
     if canopy:
         aq_params["canopy_cover"] = canopy
-    from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
-    from apps.simulation.models_swat import run_swat_plus
-
     aq = run_aquacrop_advanced(aq_params)
     if ndvi_meta:
         aq["ndvi_meta"] = ndvi_meta
@@ -298,7 +298,7 @@ async def farm_pipeline(
             "et0_mm_year": d.get("et0_mm_year_proxy", 1400),
         }
     )
-    out = {
+    out: dict[str, Any] = {
         "pipeline": "farm-run-v2",
         "climate": {"source": clim.get("source"), "drivers": d},
         "aquacrop": aq,
@@ -306,7 +306,9 @@ async def farm_pipeline(
         "ndvi_meta": ndvi_meta,
     }
     try:
-        row = await save_run_async(session, "farm_pipeline", {"lat": lat, "lon": lon, "area_ha": area_ha}, out)
+        row = await save_run_async(
+            session, "farm_pipeline", {"lat": lat, "lon": lon, "area_ha": area_ha}, out
+        )
         out["run_id"] = row.id
     except Exception as e:
         out["persist_error"] = str(e)[:120]
