@@ -270,9 +270,11 @@ _include(
     "education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router
 )
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
-# Primary science mount (same pattern as education — must load)
 _include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
-# Secondary (phase3 package) — ignore if fails
+_include(
+    "science_monitors",
+    lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
+)
 _include("science_phase3", lambda: __import__("apps.simulation.phase3_router", fromlist=["router"]).router)
 _include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
@@ -328,6 +330,7 @@ async def health() -> dict[str, Any]:
         "database": "ok" if db_live else "fail",
         "database_detail": db_detail,
         "science_loaded": "science" in _loaded_routers,
+        "monitors_loaded": "science_monitors" in _loaded_routers,
         "loaded_routers": list(_loaded_routers),
         "failed_routers": list(_failed_routers),
     }
