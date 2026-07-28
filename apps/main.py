@@ -53,6 +53,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         _db_status["detail"] = str(e)[:200]
         logger.warning("init_db failed: %s", e)
     try:
+        from apps.shared_core.database.session import get_engine
+        from apps.shared_core.geo.postgis import ensure_postgis
+
+        await ensure_postgis(get_engine())
+    except Exception as e:
+        logger.debug("PostGIS skip: %s", e)
+    try:
         from apps.shared_ai.ai.llm_factory import LLMFactory  # noqa: F401
 
         logger.info("AI module loaded (provider: %s)", settings.LLM_PROVIDER)
@@ -250,6 +257,7 @@ _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"
 _include("chain", lambda: __import__("apps.simulation.chain.router", fromlist=["router"]).router)
 _include("reports", lambda: __import__("apps.simulation.reports.router", fromlist=["router"]).router)
 _include("farms", lambda: __import__("apps.farms.router", fromlist=["router"]).router)
+_include("farms_spatial", lambda: __import__("apps.farms.spatial_router", fromlist=["router"]).router)
 _include("crops", lambda: __import__("apps.crops.router", fromlist=["router"]).router)
 _include("water", lambda: __import__("apps.water.router", fromlist=["router"]).router)
 _include("planting", lambda: __import__("apps.planting.router", fromlist=["router"]).router)
