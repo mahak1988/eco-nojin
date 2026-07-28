@@ -157,6 +157,14 @@ if SECURITY_ENABLED:
         logger.info("🔒 Security Headers Middleware فعال شد")
         app.add_middleware(SpiderSecurityMiddleware)
         logger.info("🕸️ Spider Security Middleware فعال شد")
+        
+        # ۲.۵. Rate Limiting Middleware (فعال‌سازی برای production)
+        is_production = os.getenv("ENV_STATE", "development") == "production"
+        if is_production:
+            app.add_middleware(RateLimitMiddleware)
+            logger.info("⏱️ Rate Limiting Middleware فعال شد (Production)")
+        else:
+            logger.info("ℹ️ Rate Limiting غیرفعال است (Development)")
     except Exception as e:
         logger.warning(f"⚠️  خطا در فعال‌سازی Spider Security: {e}")
 
