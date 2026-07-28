@@ -1,32 +1,29 @@
-```
-# Compiled Python files
-*.pyc
+```gitignore
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Dependencies
 .venv/
 venv/
-node_modules/
+env/
+pip-log.txt
+pip-selfcheck.json
 
-# Logs and temp files
+# Logs
 *.log
-*.tmp
 
-# Environment files
+# Temporary files
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Environment variables
 .env
 .env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# Python cache
-.mypy_cache/
-.pytest_cache/
+.env.*
 ```
