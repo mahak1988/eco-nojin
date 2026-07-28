@@ -259,3 +259,31 @@ export async function resetScienceThresholds() {
     { method: "POST" },
   );
 }
+
+export async function postMlTrain(n_samples = 1000) {
+  return fetchSafe(`/api/v1/ml/train?n_samples=${n_samples}`, { ok: false }, { method: "POST" });
+}
+
+export async function postMlPredict(body: Record<string, number>) {
+  return fetchSafe(
+    "/api/v1/ml/predict",
+    { yield_relative_pred: 0, risk_label: "unknown" },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function postMlPredictFromWatch(lat: number, lon: number, days = 40) {
+  return fetchSafe(
+    `/api/v1/ml/predict-from-watch?lat=${lat}&lon=${lon}&days=${days}`,
+    { yield_relative_pred: 0, risk_label: "unknown" },
+    { method: "POST" },
+  );
+}
+
+export async function getMlStatus() {
+  return fetchSafe("/api/v1/ml/status", { ok: false });
+}
