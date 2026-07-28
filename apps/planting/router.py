@@ -1,4 +1,4 @@
-"""Planting plans & tasks API."""
+"""Planting plans & tasks API + season helpers."""
 
 from __future__ import annotations
 
@@ -17,10 +17,33 @@ from apps.planting.schemas import (
     TaskListResponse,
     TaskResponse,
 )
+from apps.planting.season import GROWTH_STAGES, season_plan, seed_selection
 from apps.shared_core.database.session import get_db_session
 from apps.shared_core.schemas.pagination import ListMeta, build_meta, page_to_offset
 
 router = APIRouter(tags=["Planting"])
+
+
+@router.get("/api/v1/planting/season-plan")
+async def get_season_plan(
+    crop: str = Query("wheat"),
+    region: str = Query("central-iran"),
+):
+    return season_plan(crop, region)
+
+
+@router.post("/api/v1/planting/seed-selection")
+async def post_seed_selection(
+    soil_ph: float = Query(7.0),
+    water_limited: bool = Query(False),
+):
+    return seed_selection(soil_ph, water_limited)
+
+
+@router.get("/api/v1/planting/growth-stages")
+async def growth_stages(crop: str = Query("wheat")):
+    key = crop.lower().split()[0]
+    return {"crop": crop, "stages": GROWTH_STAGES.get(key, GROWTH_STAGES["default"])}
 
 
 @router.get("/api/v1/planting-plans", response_model=PlantingListResponse)
