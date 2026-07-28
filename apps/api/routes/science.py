@@ -1,4 +1,4 @@
-"""Science API — process models + user-facing analysis."""
+"""Science API — process models + soil + global SA + final reports."""
 
 from __future__ import annotations
 
@@ -59,6 +59,24 @@ class AquaBody(BaseModel):
     crop: str = "wheat"
 
 
+class RusleBody(BaseModel):
+    R: float = 150.0
+    K: float = 0.32
+    slope_length_m: float = 50.0
+    slope_pct: float = 5.0
+    C: float = 0.2
+    P: float = 0.8
+
+
+class SoilProfileBody(BaseModel):
+    sand_pct: float = 40.0
+    silt_pct: float = 35.0
+    clay_pct: float = 25.0
+    soc_surface_pct: float = 1.2
+    moisture_frac: float = 0.55
+    layers_cm: Optional[list[float]] = None
+
+
 @router.get("/status")
 async def science_status() -> dict[str, Any]:
     db_kind = "unknown"
@@ -76,10 +94,19 @@ async def science_status() -> dict[str, Any]:
         "wave": 2,
         "router": "apps.api.routes.science",
         "database": db_kind,
-        "models": ["aquacrop_advanced", "swat_plus_proxy", "rothc", "ndvi_canopy"],
+        "models": [
+            "aquacrop_advanced",
+            "swat_plus_proxy",
+            "rothc",
+            "ndvi_canopy",
+            "rusle2_proxy",
+            "soil_profile",
+        ],
+        "global_sa": ["rothc", "rusle", "ml"],
+        "reports": ["rothc", "rusle", "aquacrop", "scs"],
         "ok": True,
-        "notes_fa": "خروجی هر مدل شامل analysis (خلاصه فارسی/انگلیسی + فرمول + توصیه) است.",
-        "notes_en": "Each model response includes analysis (fa/en summary, formulas, advice).",
+        "notes_fa": "خروجی مدل‌ها: analysis + report نهایی؛ SA جهانی برای خاک و ML.",
+        "notes_en": "Model outputs include analysis + final report; global SA for soil and ML.",
     }
 
 
@@ -90,12 +117,14 @@ async def swat_run(
     _: object = Depends(_perm("simulation:write")),
 ) -> dict[str, Any]:
     from apps.simulation.models_swat import run_swat_plus
+    from apps.simulation.report_builder import report_scs
 
     params = body.model_dump()
     persist = params.pop("persist", True)
     farm_id = params.pop("farm_id", None)
     result = attach_analysis("scs", run_swat_plus(params))
     result["mode"] = "sync"
+    result["report"] = report_scs(result)
     if persist:
         try:
             from apps.simulation.run_store import save_run_async
@@ -114,6 +143,7 @@ async def aquacrop_run(
     _: object = Depends(_perm("simulation:write")),
 ) -> dict[str, Any]:
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
+    from apps.simulation.report_builder import report_aquacrop
 
     params = body.model_dump()
     persist = params.pop("persist", True)
@@ -140,6 +170,7 @@ async def aquacrop_run(
         raise HTTPException(status_code=500, detail=f"aquacrop failed: {e}") from e
     result = attach_analysis("aquacrop", raw)
     result["mode"] = "sync"
+    result["report"] = report_aquacrop(result)
     if ndvi_meta:
         result["ndvi_meta"] = ndvi_meta
     if persist:
@@ -221,9 +252,11 @@ async def rothc_run(
     soc_t_ha: float = Query(40.0),
     c_input_t_ha_y: float = Query(1.5),
     clay_pct: float = Query(25.0),
+    with_sa: bool = Query(False),
     session: AsyncSession = Depends(get_db_session),
     _: object = Depends(_perm("simulation:write")),
 ) -> dict[str, Any]:
+    from apps.simulation.report_builder import report_rothc
     from apps.simulation.rothc_model import run_rothc
 
     params = {
@@ -233,6 +266,13 @@ async def rothc_run(
         "clay_pct": clay_pct,
     }
     result = attach_analysis("rothc", run_rothc(params))
+    sa = None
+    if with_sa:
+        from apps.simulation.soil_sensitivity import global_sa_rothc
+
+        sa = global_sa_rothc(n_src=80, n_morris=8, n_sobol=24)
+        result["global_sensitivity"] = sa
+    result["report"] = report_rothc(result, sensitivity=sa)
     try:
         from apps.simulation.run_store import save_run_async
 
@@ -241,6 +281,59 @@ async def rothc_run(
     except Exception as e:
         result["persist_error"] = str(e)[:200]
     return result
+
+
+@router.post("/soil/rusle")
+async def soil_rusle(
+    body: RusleBody,
+    with_sa: bool = Query(False),
+    _: object = Depends(_perm("simulation:write")),
+) -> dict[str, Any]:
+    from apps.simulation.report_builder import report_rusle
+    from apps.simulation.soil_models import run_rusle2
+
+    raw = run_rusle2(body.model_dump())
+    result = attach_analysis("rusle", raw)
+    sa = None
+    if with_sa:
+        from apps.simulation.soil_sensitivity import global_sa_rusle
+
+        sa = global_sa_rusle(n_src=80, n_morris=8, n_sobol=24)
+        result["global_sensitivity"] = sa
+    result["report"] = report_rusle(result, sensitivity=sa)
+    return result
+
+
+@router.post("/soil/profile")
+async def soil_profile(body: SoilProfileBody) -> dict[str, Any]:
+    from apps.simulation.soil_models import run_soil_profile
+
+    params = body.model_dump()
+    if not params.get("layers_cm"):
+        params.pop("layers_cm", None)
+    return run_soil_profile(params)
+
+
+@router.get("/sensitivity/rothc")
+async def sa_rothc(
+    n_sobol: int = Query(32, ge=16, le=96),
+    n_morris: int = Query(10, ge=4, le=30),
+    n_src: int = Query(100, ge=40, le=400),
+) -> dict[str, Any]:
+    from apps.simulation.soil_sensitivity import global_sa_rothc
+
+    return global_sa_rothc(n_src=n_src, n_morris=n_morris, n_sobol=n_sobol)
+
+
+@router.get("/sensitivity/rusle")
+async def sa_rusle(
+    n_sobol: int = Query(32, ge=16, le=96),
+    n_morris: int = Query(10, ge=4, le=30),
+    n_src: int = Query(100, ge=40, le=400),
+) -> dict[str, Any]:
+    from apps.simulation.soil_sensitivity import global_sa_rusle
+
+    return global_sa_rusle(n_src=n_src, n_morris=n_morris, n_sobol=n_sobol)
 
 
 @router.post("/scenarios")
@@ -254,49 +347,35 @@ async def scenarios(
 
 @router.get("/formulas")
 async def formulas_catalog() -> dict[str, Any]:
-    """Catalog of formulas for UI."""
     return {
         "items": [
             {
                 "id": "scs_cn",
                 "title_fa": "رواناب SCS-CN",
                 "title_en": "SCS Curve Number runoff",
-                "formulas": [
-                    "S = 25.4 × (1000/CN − 10)",
-                    "Q = (P − 0.2S)² / (P + 0.8S)  if P > 0.2S",
-                ],
-                "why_fa": "برآورد سهم بارش که به رواناب سطحی تبدیل می‌شود؛ پایه مدیریت فرسایش و سیل.",
-                "why_en": "Estimates how much rainfall becomes surface runoff; erosion/flood planning.",
+                "formulas": ["S = 25.4 × (1000/CN − 10)", "Q = (P − 0.2S)² / (P + 0.8S)  if P > 0.2S"],
             },
             {
                 "id": "aquacrop_ky",
                 "title_fa": "بیلان آب و عملکرد (FAO Ky)",
-                "title_en": "Water balance & yield (FAO Ky)",
-                "formulas": [
-                    "ETc = Kc × ET0",
-                    "Y/Yx = 1 − Ky × (1 − Ta/Tc)",
-                ],
-                "why_fa": "ربط تنش آبی ریشه به کاهش عملکرد؛ کمک به زمان‌بندی آبیاری.",
-                "why_en": "Links root-zone water stress to yield loss; irrigation timing.",
+                "formulas": ["ETc = Kc × ET0", "Y/Yx = 1 − Ky × (1 − Ta/Tc)"],
             },
             {
                 "id": "rothc",
                 "title_fa": "کربن آلی خاک RothC",
-                "title_en": "Soil organic carbon RothC",
-                "formulas": ["pool decay with a(T)·b(θ)·c(cover)", "DPM/RPM/BIO/HUM/IOM"],
-                "why_fa": "مسیر کربن خاک تحت مدیریت بقایا و اقلیم.",
-                "why_en": "Soil C trajectory under residue and climate management.",
+                "formulas": ["a(T)·b(θ)·c(cover)", "DPM/RPM/BIO/HUM/IOM"],
+            },
+            {
+                "id": "rusle",
+                "title_fa": "فرسایش RUSLE",
+                "title_en": "RUSLE soil loss",
+                "formulas": ["A = R · K · LS · C · P"],
+                "why_fa": "برآورد تلفات خاک سالانه؛ مدیریت پوشش و شیب.",
             },
             {
                 "id": "ndvi",
                 "title_fa": "NDVI و پوشش تاج",
-                "title_en": "NDVI and canopy cover",
-                "formulas": [
-                    "NDVI = (NIR − Red)/(NIR + Red)",
-                    "CC = clamp((NDVI − 0.15)/0.70)",
-                ],
-                "why_fa": "پایش سبزینگی و کالیبره Kc در بیلان آب.",
-                "why_en": "Greenness monitoring and Kc scaling for water balance.",
+                "formulas": ["NDVI = (NIR − Red)/(NIR + Red)", "CC = clamp((NDVI − 0.15)/0.70)"],
             },
         ]
     }
