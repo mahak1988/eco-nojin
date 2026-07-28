@@ -1,4 +1,4 @@
-"""Machine learning API — yield / risk / anomaly / sensitivity."""
+"""Machine learning API — yield / risk / anomaly / local+global sensitivity."""
 
 from __future__ import annotations
 
@@ -42,8 +42,9 @@ async def ml_status() -> dict[str, Any]:
             "models": ["linear_yield", "logistic_risk", "zscore_anomaly"],
             "metrics": b.metrics,
             "sklearn": False,
-            "sensitivity": ["coefficient", "oat", "partial_dependence", "tornado"],
-            "notes_fa": "بدون وابستگی sklearn — قابل اجرا روی هر محیط.",
+            "sensitivity_local": ["coefficient", "oat", "partial_dependence", "tornado"],
+            "sensitivity_global": ["SRC", "Morris", "Saltelli-Sobol"],
+            "notes_fa": "بدون وابستگی sklearn/SALib — pure Python.",
         }
     except Exception as e:
         return {"ok": False, "error": str(e)[:160]}
@@ -144,3 +145,61 @@ async def ml_sensitivity_pd(
         return partial_dependence(feature, points=points)
     except ValueError as e:
         raise HTTPException(400, str(e)) from e
+
+
+@router.get("/sensitivity/global")
+async def ml_sensitivity_global(
+    n_src: int = Query(120, ge=40, le=800),
+    n_morris: int = Query(12, ge=4, le=40),
+    n_sobol: int = Query(32, ge=16, le=128),
+    target: str = Query("yield", pattern="^(yield|risk)$"),
+    seed: int = Query(42),
+) -> dict[str, Any]:
+    """SRC + Morris + Saltelli–Sobol combined report."""
+    from apps.ml.global_sensitivity import full_global_sensitivity
+
+    return full_global_sensitivity(
+        n_src=n_src, n_morris=n_morris, n_sobol=n_sobol, seed=seed, target=target
+    )
+
+
+@router.get("/sensitivity/sobol")
+async def ml_sensitivity_sobol(
+    n_base: int = Query(48, ge=16, le=128),
+    target: str = Query("yield", pattern="^(yield|risk)$"),
+    seed: int = Query(42),
+) -> dict[str, Any]:
+    from apps.ml.global_sensitivity import saltelli_sobol
+    from apps.ml.service import get_bundle
+
+    get_bundle()
+    return saltelli_sobol(n_base=n_base, seed=seed, target=target)
+
+
+@router.get("/sensitivity/morris")
+async def ml_sensitivity_morris(
+    n_trajectories: int = Query(16, ge=4, le=40),
+    levels: int = Query(6, ge=4, le=12),
+    target: str = Query("yield", pattern="^(yield|risk)$"),
+    seed: int = Query(42),
+) -> dict[str, Any]:
+    from apps.ml.global_sensitivity import morris_elementary_effects
+    from apps.ml.service import get_bundle
+
+    get_bundle()
+    return morris_elementary_effects(
+        n_trajectories=n_trajectories, levels=levels, seed=seed, target=target
+    )
+
+
+@router.get("/sensitivity/src")
+async def ml_sensitivity_src(
+    n_samples: int = Query(180, ge=40, le=1000),
+    target: str = Query("yield", pattern="^(yield|risk)$"),
+    seed: int = Query(42),
+) -> dict[str, Any]:
+    from apps.ml.global_sensitivity import standardized_regression_coefficients
+    from apps.ml.service import get_bundle
+
+    get_bundle()
+    return standardized_regression_coefficients(n_samples=n_samples, seed=seed, target=target)
