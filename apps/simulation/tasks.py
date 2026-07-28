@@ -12,7 +12,7 @@ from typing import Any
 
 from apps.shared_core.celery_app import celery_app
 from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
-from apps.simulation.rothc_model import run_rothc
+from apps.simulation.rothc_model import run_rothc as rothc_simulate
 
 logger = logging.getLogger(__name__)
 EXPORT_DIR = Path("artifacts/simulation_exports")
@@ -24,7 +24,7 @@ def _run_aquacrop_sync(params: dict[str, Any]) -> dict[str, Any]:
 
 
 def _run_rothc_sync(params: dict[str, Any]) -> dict[str, Any]:
-    return run_rothc(params)
+    return rothc_simulate(params)
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -93,7 +93,7 @@ def run_aquacrop(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
 
 
 @celery_app.task(name="simulation.run_rothc", bind=True)
-def run_rothc_task(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
+def run_rothc(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
     result = _run_rothc_sync(params or {})
     run_id = self.request.id or datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     csv_path = EXPORT_DIR / f"rothc_{run_id}.csv"
@@ -107,10 +107,6 @@ def run_rothc_task(self, params: dict[str, Any] | None = None) -> dict[str, Any]
     result["export_pdf"] = str(pdf_path)
     result["task_id"] = run_id
     return result
-
-
-# keep name run_rothc for imports
-run_rothc = run_rothc_task  # type: ignore
 
 
 def run_aquacrop_local(params: dict[str, Any] | None = None) -> dict[str, Any]:
