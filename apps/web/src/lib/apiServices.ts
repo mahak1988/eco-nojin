@@ -212,5 +212,50 @@ export async function postScienceWatch(body: {
 }
 
 export async function getScienceMonitors() {
-  return fetchSafe("/api/v1/science/monitors", { items: [], count: 0 });
+  return fetchSafe("/api/v1/science/monitors", { items: [], count: 0, presets: {} });
+}
+
+export async function getScienceThresholds() {
+  return fetchSafe("/api/v1/science/monitors/thresholds", {
+    effective: [],
+    defaults: [],
+    overrides: {},
+    preset: "default",
+  });
+}
+
+export async function putScienceThresholds(body: {
+  overrides: Record<string, { warning?: number; critical?: number; operator?: string; enabled?: boolean }>;
+  merge?: boolean;
+  preset?: string;
+}) {
+  return fetchSafe(
+    "/api/v1/science/monitors/thresholds",
+    { ok: false },
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export async function setScienceThresholdPreset(preset: string) {
+  return fetchSafe(
+    "/api/v1/science/monitors/thresholds/preset",
+    { ok: false },
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ preset }),
+    },
+  );
+}
+
+export async function resetScienceThresholds() {
+  return fetchSafe(
+    "/api/v1/science/monitors/thresholds/reset",
+    { ok: false },
+    { method: "POST" },
+  );
 }
