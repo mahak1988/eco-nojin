@@ -67,6 +67,41 @@ pytest tests/unit/test_real_science.py tests/contract/test_science_endpoints.py 
 
 ---
 
+## Security / سیستم امنیتی
+
+We added a new lightweight "SpiderGuard" module to help detect and mitigate automated/scanner traffic (عنکبوت‌ها/ربات‌ها). It's intentionally minimal and designed as a starting point you can extend.
+
+- Location: `apps/spider_security/`
+- Features included now:
+  - User-agent based bot heuristics (detect common crawler UA substrings)
+  - Simple in-memory rate limiter per IP (configurable window and threshold)
+  - FastAPI/Starlette middleware implementation (plug-and-play)
+  - Basic unit tests and README for the module
+
+Usage (example, add into your FastAPI app):
+
+```python
+from fastapi import FastAPI
+from apps.spider_security.middleware import SpiderGuardMiddleware
+
+app = FastAPI()
+app.add_middleware(SpiderGuardMiddleware,
+    max_requests=60, window_seconds=60, block_after=True)
+```
+
+Notes / Next steps:
+- In-memory rate-limiter is fine for development and single-instance deployment. For production/clustered deployments use Redis or another shared store.
+- Consider integrating with existing authentication, WAF, or reverse-proxy rules and adding richer heuristics (behavioral scoring, JS-challenges, CAPTCHA).
+- Add automated IP blocklists, logging to central ELK/Datadog, and observability metrics.
+
+---
+
+## Quick links
+
+- Spider security module: `apps/spider_security/README.md`
+
+---
+
 ## License
 
 MIT — see [License](License).
