@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -120,11 +120,6 @@ async def reorder_alert(
             select(InventoryItem).where(InventoryItem.id == item_id, InventoryItem.is_deleted.is_(False))
         )
     ).scalar_one_or_none()
-    if not r:
-        from fastapi import HTTPException  # type: ignore
-
-    from fastapi import HTTPException
-
     if not r:
         raise HTTPException(404, "Item not found")
     r.min_stock = min_stock
