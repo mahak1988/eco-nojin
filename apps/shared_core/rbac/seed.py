@@ -1,4 +1,4 @@
-"""Default roles & permissions (F0.3)."""
+"""Default roles & permissions (F0.3 + Phase1/2 resources)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.rbac.models import Permission, Role, RolePermission
 
-# Five system roles
 DEFAULT_ROLES: dict[str, str] = {
     "superadmin": "Full platform control",
     "admin": "Administration without destructive system ops",
@@ -16,7 +15,6 @@ DEFAULT_ROLES: dict[str, str] = {
     "viewer": "Read-only access",
 }
 
-# Permission catalog: resource:action
 DEFAULT_PERMISSIONS: list[tuple[str, str]] = [
     ("*:*", "All permissions"),
     ("users:read", "List/view users"),
@@ -28,6 +26,16 @@ DEFAULT_PERMISSIONS: list[tuple[str, str]] = [
     ("accounting:write", "Manage accounting"),
     ("farms:read", "View farms"),
     ("farms:write", "Manage farms"),
+    ("crops:read", "View crop catalog"),
+    ("crops:write", "Manage crops / seed"),
+    ("inventory:read", "View inventory"),
+    ("inventory:write", "Manage inventory"),
+    ("water:read", "View water modules"),
+    ("water:write", "Manage irrigation schedules"),
+    ("monitoring:read", "View sensors/alerts"),
+    ("monitoring:write", "Manage sensors/rules/readings"),
+    ("satellite:read", "View EO products"),
+    ("satellite:write", "Run change detection / heavy EO"),
     ("simulation:read", "View simulations"),
     ("simulation:write", "Run simulations"),
     ("admin:read", "Admin panel read"),
@@ -36,7 +44,6 @@ DEFAULT_PERMISSIONS: list[tuple[str, str]] = [
     ("community:write", "Post/moderate community"),
 ]
 
-# role -> permission codes
 ROLE_PERMISSION_MAP: dict[str, list[str]] = {
     "superadmin": ["*:*"],
     "admin": [
@@ -48,6 +55,16 @@ ROLE_PERMISSION_MAP: dict[str, list[str]] = {
         "accounting:write",
         "farms:read",
         "farms:write",
+        "crops:read",
+        "crops:write",
+        "inventory:read",
+        "inventory:write",
+        "water:read",
+        "water:write",
+        "monitoring:read",
+        "monitoring:write",
+        "satellite:read",
+        "satellite:write",
         "simulation:read",
         "simulation:write",
         "admin:read",
@@ -59,6 +76,14 @@ ROLE_PERMISSION_MAP: dict[str, list[str]] = {
         "education:read",
         "education:write",
         "farms:read",
+        "crops:read",
+        "crops:write",
+        "inventory:read",
+        "water:read",
+        "monitoring:read",
+        "monitoring:write",
+        "satellite:read",
+        "satellite:write",
         "simulation:read",
         "simulation:write",
         "community:read",
@@ -69,7 +94,16 @@ ROLE_PERMISSION_MAP: dict[str, list[str]] = {
         "education:read",
         "farms:read",
         "farms:write",
+        "crops:read",
+        "inventory:read",
+        "inventory:write",
+        "water:read",
+        "water:write",
+        "monitoring:read",
+        "monitoring:write",
+        "satellite:read",
         "simulation:read",
+        "simulation:write",
         "community:read",
         "community:write",
         "accounting:read",
@@ -77,6 +111,11 @@ ROLE_PERMISSION_MAP: dict[str, list[str]] = {
     "viewer": [
         "education:read",
         "farms:read",
+        "crops:read",
+        "inventory:read",
+        "water:read",
+        "monitoring:read",
+        "satellite:read",
         "simulation:read",
         "community:read",
         "accounting:read",
@@ -86,7 +125,6 @@ ROLE_PERMISSION_MAP: dict[str, list[str]] = {
 
 
 async def seed_rbac(session: AsyncSession) -> dict[str, int]:
-    """Idempotent seed of roles, permissions, and links."""
     perm_by_code: dict[str, Permission] = {}
     for code, desc in DEFAULT_PERMISSIONS:
         result = await session.execute(select(Permission).where(Permission.code == code))

@@ -1,4 +1,4 @@
-"""Monitoring API — sensors, readings, alerts + WebSocket fan-out."""
+"""Monitoring API — sensors, readings, alerts + WebSocket fan-out + RBAC on writes."""
 
 from __future__ import annotations
 
@@ -12,7 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.monitoring.models import AlertEvent, AlertRule, Sensor, SensorReading
 from apps.shared_core.database.session import get_db_session
-from apps.shared_core.schemas.pagination import ListMeta, build_meta, page_to_offset
+from apps.shared_core.rbac import require_permission
+from apps.shared_core.schemas.pagination import build_meta, page_to_offset
 
 router = APIRouter(prefix="/api/v1", tags=["Monitoring"])
 
@@ -116,7 +117,11 @@ async def list_sensors(
 
 
 @router.post("/sensors", status_code=status.HTTP_201_CREATED)
-async def create_sensor(body: SensorIn, session: AsyncSession = Depends(get_db_session)):
+async def create_sensor(
+    body: SensorIn,
+    session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("monitoring:write")),
+):
     s = Sensor(**body.model_dump())
     session.add(s)
     await session.flush()
@@ -146,6 +151,7 @@ async def push_reading(
     sensor_id: int,
     value: float = Query(...),
     session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("monitoring:write")),
 ):
     s = (
         await session.execute(select(Sensor).where(Sensor.id == sensor_id, Sensor.is_deleted.is_(False)))
@@ -227,7 +233,11 @@ async def list_alerts(
 
 
 @router.post("/alert-rules", status_code=status.HTTP_201_CREATED)
-async def create_rule(body: RuleIn, session: AsyncSession = Depends(get_db_session)):
+async def create_rule(
+    body: RuleIn,
+    session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("monitoring:write")),
+):
     rule = AlertRule(**body.model_dump())
     session.add(rule)
     await session.flush()
@@ -236,7 +246,10 @@ async def create_rule(body: RuleIn, session: AsyncSession = Depends(get_db_sessi
 
 
 @router.post("/monitoring/seed-demo")
-async def seed_monitoring(session: AsyncSession = Depends(get_db_session)):
+async def seed_monitoring(
+    session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("monitoring:write")),
+):
     count = int(
         (await session.execute(select(func.count()).select_from(Sensor).where(Sensor.is_deleted.is_(False)))).scalar_one()
     )

@@ -1,4 +1,4 @@
-"""Inventory API."""
+"""Inventory API + RBAC on writes."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.inventory.models import InventoryItem
 from apps.shared_core.database.session import get_db_session
+from apps.shared_core.rbac import require_permission
 from apps.shared_core.schemas.pagination import ListMeta, build_meta, page_to_offset
 
 router = APIRouter(prefix="/api/v1/inventory", tags=["Inventory"])
@@ -62,7 +63,11 @@ async def list_items(
 
 
 @router.post("/items", response_model=ItemOut, status_code=status.HTTP_201_CREATED)
-async def create_item(body: ItemIn, session: AsyncSession = Depends(get_db_session)):
+async def create_item(
+    body: ItemIn,
+    session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("inventory:write")),
+):
     item = InventoryItem(**body.model_dump())
     session.add(item)
     await session.flush()
@@ -71,7 +76,10 @@ async def create_item(body: ItemIn, session: AsyncSession = Depends(get_db_sessi
 
 
 @router.post("/seed-demo")
-async def seed_inventory(session: AsyncSession = Depends(get_db_session)):
+async def seed_inventory(
+    session: AsyncSession = Depends(get_db_session),
+    _: object = Depends(require_permission("inventory:write")),
+):
     count = int(
         (await session.execute(select(func.count()).select_from(InventoryItem).where(InventoryItem.is_deleted.is_(False)))).scalar_one()
     )
