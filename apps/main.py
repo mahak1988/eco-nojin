@@ -216,6 +216,10 @@ _include(
     prefix=f"{settings.API_V1_STR}/ai-agents",
     tags=["AI Agents"],
 )
+_include(
+    "ai_agents_public",
+    lambda: __import__("apps.ai_agents.public_router", fromlist=["router"]).router,
+)
 _include("accounting", lambda: __import__("apps.api.routes.accounting", fromlist=["router"]).router)
 _include(
     "accounting_seed",
