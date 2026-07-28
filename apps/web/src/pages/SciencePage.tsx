@@ -42,7 +42,6 @@ const GUIDE = [
     id: "scs",
     icon: <CloudRain className="h-5 w-5 text-sky-600" />,
     title: "SCS-CN حوضه",
-    color: "sky",
     formulas: ["S = 25.4×(1000/CN−10)", "Q = (P−0.2S)²/(P+0.8S)"],
     text: "CN نفوذ و پوشش را خلاصه می‌کند. اگر بارش واقعه < ۰.۲S باشد رواناب صفر است.",
   },
@@ -50,7 +49,6 @@ const GUIDE = [
     id: "aqua",
     icon: <Droplets className="h-5 w-5 text-emerald-600" />,
     title: "AquaCrop + Ky",
-    color: "emerald",
     formulas: ["ETc = Kc×ET0", "Y/Yx = 1−Ky(1−Ta/Tc)"],
     text: "تنش رطوبت ریشه (Ks) تعرق را کم می‌کند و از طریق Ky به عملکرد می‌رسد.",
   },
@@ -58,7 +56,6 @@ const GUIDE = [
     id: "ndvi",
     icon: <Satellite className="h-5 w-5 text-violet-600" />,
     title: "NDVI → تاج",
-    color: "violet",
     formulas: ["NDVI=(NIR−Red)/(NIR+Red)", "CC=clamp((NDVI−0.15)/0.70)"],
     text: "پوشش تاج برای مقیاس Kc؛ بدون GEE ممکن است سری synthetic باشد.",
   },
@@ -66,7 +63,6 @@ const GUIDE = [
     id: "rothc",
     icon: <Mountain className="h-5 w-5 text-amber-700" />,
     title: "RothC-26.3",
-    color: "amber",
     formulas: ["DPM/RPM/BIO/HUM/IOM", "نرخ × a·b·c"],
     text: "مسیر کربن آلی خاک چندساله تحت دما، رطوبت و ورودی بقایا.",
   },
@@ -75,9 +71,9 @@ const GUIDE = [
 function AnalysisPanel({ a }: { a?: Analysis }) {
   if (!a) return null;
   return (
-    <div className="mt-4 space-y-3 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 to-white p-4 shadow-inner">
+    <div className="sci-panel-enter mt-4 space-y-3 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/90 to-white p-4 shadow-inner">
       <div className="flex items-center gap-2 text-sm font-bold text-emerald-900">
-        <Sparkles className="h-4 w-4" /> تحلیل و تفسیر
+        <Sparkles className="sci-icon-bob h-4 w-4" /> تحلیل و تفسیر
       </div>
       {a.summary_fa && <p className="text-sm leading-relaxed text-stone-700">{a.summary_fa}</p>}
       {a.summary_en && <p className="text-xs leading-relaxed text-stone-500">{a.summary_en}</p>}
@@ -197,7 +193,14 @@ export default function SciencePage() {
   }
 
   const aquaSeries = useMemo(() => {
-    const s = (result?.series_sample as { day?: number; depletion_mm?: number; ta_mm?: number; ks?: number }[]) || [];
+    const s =
+      (result?.series_sample as {
+        day?: number;
+        depletion_mm?: number;
+        ta_mm?: number;
+        ks?: number;
+        irr_mm?: number;
+      }[]) || [];
     return s;
   }, [result]);
 
@@ -220,15 +223,19 @@ export default function SciencePage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 p-6 pb-16">
-      <header className="relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 p-8 text-white shadow-lg">
-        <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute bottom-0 left-10 h-24 w-24 animate-pulse rounded-full bg-emerald-300/20" />
+      <header className="sci-hero relative overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-600 via-teal-600 to-sky-700 p-8 text-white shadow-lg">
+        <div className="sci-hero-orb sci-hero-orb--a" />
+        <div className="sci-hero-orb sci-hero-orb--b" />
+        <div className="sci-hero-orb sci-hero-orb--c" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
-              <Leaf className="h-3.5 w-3.5" /> Phase 3 · Science Lab
+              <Leaf className="sci-icon-bob h-3.5 w-3.5" /> Phase 3 · Science Lab
+              <span className="sci-orbit-dot" />
             </div>
-            <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">فاز علمی / Science</h1>
+            <h1 className="sci-shimmer-text font-display text-3xl font-bold tracking-tight md:text-4xl">
+              فاز علمی / Science
+            </h1>
             <p className="mt-2 max-w-xl text-sm text-emerald-50/90">
               مدل‌های فرایندی با فرمول، نمودار، جدول و توصیه — نه باینری رسمی FAO/SWAT+.
             </p>
@@ -241,16 +248,16 @@ export default function SciencePage() {
         </div>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="sci-stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {GUIDE.map((g) => (
           <article
             key={g.id}
-            className={`group rounded-2xl border border-stone-200 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md ${
-              active === g.id ? "ring-2 ring-emerald-400" : ""
+            className={`sci-card group rounded-2xl border border-stone-200 bg-white p-4 shadow-sm ${
+              active === g.id ? "sci-card--active ring-2 ring-emerald-400" : ""
             }`}
           >
             <div className="flex items-center gap-2">
-              <div className="rounded-xl bg-stone-50 p-2 transition group-hover:scale-110">{g.icon}</div>
+              <div className="sci-icon-bob rounded-xl bg-stone-50 p-2">{g.icon}</div>
               <h3 className="font-semibold text-stone-900">{g.title}</h3>
             </div>
             <div className="mt-3 flex flex-col gap-1">
@@ -264,134 +271,69 @@ export default function SciencePage() {
       </section>
 
       {state === "loading" && (
-        <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="sci-loader-ring flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <Loader2 className="h-4 w-4 animate-spin" /> در حال اجرای مدل…
         </div>
       )}
       {err && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{err}</div>
+        <div className="sci-panel-enter rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          {err}
+        </div>
       )}
 
-      <section className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
+      <section className="sci-panel-enter rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-end gap-4">
           <label className="text-xs font-medium text-stone-600">
             عرض جغرافیایی
-            <input
-              type="number"
-              step="0.01"
-              value={lat}
-              onChange={(e) => setLat(Number(e.target.value))}
-              className="mt-1 block w-28 rounded-xl border border-stone-200 px-3 py-2 text-sm"
-            />
+            <input type="number" step="0.01" value={lat} onChange={(e) => setLat(Number(e.target.value))} className="mt-1 block w-28 rounded-xl border border-stone-200 px-3 py-2 text-sm" />
           </label>
           <label className="text-xs font-medium text-stone-600">
             طول جغرافیایی
-            <input
-              type="number"
-              step="0.01"
-              value={lon}
-              onChange={(e) => setLon(Number(e.target.value))}
-              className="mt-1 block w-28 rounded-xl border border-stone-200 px-3 py-2 text-sm"
-            />
+            <input type="number" step="0.01" value={lon} onChange={(e) => setLon(Number(e.target.value))} className="mt-1 block w-28 rounded-xl border border-stone-200 px-3 py-2 text-sm" />
           </label>
           <label className="text-xs font-medium text-stone-600">
             روز (AquaCrop)
-            <input
-              type="number"
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              className="mt-1 block w-24 rounded-xl border border-stone-200 px-3 py-2 text-sm"
-            />
+            <input type="number" value={days} onChange={(e) => setDays(Number(e.target.value))} className="mt-1 block w-24 rounded-xl border border-stone-200 px-3 py-2 text-sm" />
           </label>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => void runAqua()}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow transition hover:bg-emerald-700"
-            >
+            <button type="button" onClick={() => void runAqua()} className="sci-btn inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow">
               <Sprout className="h-4 w-4" /> AquaCrop
             </button>
-            <button
-              type="button"
-              onClick={() => void runSwat()}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-bold text-white shadow transition hover:bg-sky-700"
-            >
+            <button type="button" onClick={() => void runSwat()} className="sci-btn inline-flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-bold text-white shadow">
               <Waves className="h-4 w-4" /> SCS-CN
             </button>
-            <button
-              type="button"
-              onClick={() => void loadNdvi()}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold text-white shadow transition hover:bg-violet-700"
-            >
+            <button type="button" onClick={() => void loadNdvi()} className="sci-btn inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-bold text-white shadow">
               <Satellite className="h-4 w-4" /> NDVI
             </button>
-            <button
-              type="button"
-              onClick={() => void runRothc()}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow transition hover:bg-amber-700"
-            >
+            <button type="button" onClick={() => void runRothc()} className="sci-btn inline-flex items-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow">
               <Mountain className="h-4 w-4" /> RothC
             </button>
-            <button
-              type="button"
-              onClick={() => void refresh()}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-stone-300 px-4 py-2.5 text-sm font-semibold"
-            >
+            <button type="button" onClick={() => void refresh()} className="sci-btn inline-flex items-center gap-1.5 rounded-xl border border-stone-300 px-4 py-2.5 text-sm font-semibold">
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
           </div>
         </div>
       </section>
 
-      {/* AquaCrop / SCS result */}
       {result && (
-        <section className="animate-[fadeIn_0.4s_ease] space-y-4 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
+        <section className="sci-panel-enter space-y-4 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
           <h2 className="flex items-center gap-2 font-display text-xl text-stone-900">
-            <Activity className="h-5 w-5 text-emerald-600" />
+            <Activity className="sci-icon-bob h-5 w-5 text-emerald-600" />
             نتیجه: {String(result.model)}
           </h2>
-
-          {result.model === "aquacrop_fao_conceptual" || String(result.model).includes("aquacrop") ? (
+          {(result.model === "aquacrop_fao_conceptual" || String(result.model).includes("aquacrop")) && (
             <>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <MetricCard
-                  icon={<Droplets className="h-4 w-4" />}
-                  label="ETc"
-                  value={`${Number(result.etc_mm || 0).toFixed(0)} mm`}
-                  sub="نیاز تبخیر-تعرق فصل"
-                  tone="emerald"
-                />
-                <MetricCard
-                  icon={<CloudRain className="h-4 w-4" />}
-                  label="آبیاری"
-                  value={`${Number(result.irrigation_need_mm || 0).toFixed(0)} mm`}
-                  sub={`${Number(result.irrigation_m3 || 0).toFixed(0)} m³`}
-                  tone="sky"
-                />
-                <MetricCard
-                  icon={<Sprout className="h-4 w-4" />}
-                  label="عملکرد نسبی"
-                  value={`${(Number(result.yield_relative || 0) * 100).toFixed(0)}%`}
-                  sub={`${Number(result.yield_t_ha || 0).toFixed(2)} t/ha`}
-                  tone="amber"
-                />
-                <MetricCard
-                  icon={<Leaf className="h-4 w-4" />}
-                  label="Ky / محصول"
-                  value={String(result.ky ?? "—")}
-                  sub={String(result.crop || "")}
-                  tone="violet"
-                />
+              <div className="sci-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <MetricCard icon={<Droplets className="h-4 w-4" />} label="ETc" value={`${Number(result.etc_mm || 0).toFixed(0)} mm`} sub="نیاز تبخیر-تعرق فصل" tone="emerald" />
+                <MetricCard icon={<CloudRain className="h-4 w-4" />} label="آبیاری" value={`${Number(result.irrigation_need_mm || 0).toFixed(0)} mm`} sub={`${Number(result.irrigation_m3 || 0).toFixed(0)} m³`} tone="sky" />
+                <MetricCard icon={<Sprout className="h-4 w-4" />} label="عملکرد نسبی" value={`${(Number(result.yield_relative || 0) * 100).toFixed(0)}%`} sub={`${Number(result.yield_t_ha || 0).toFixed(2)} t/ha`} tone="amber" />
+                <MetricCard icon={<Leaf className="h-4 w-4" />} label="Ky / محصول" value={String(result.ky ?? "—")} sub={String(result.crop || "")} tone="violet" />
               </div>
               {aquaSeries.length > 0 && (
                 <div className="grid gap-4 lg:grid-cols-2">
                   <div className="rounded-2xl border border-stone-100 bg-stone-50/50 p-4">
                     <h3 className="mb-2 text-sm font-semibold text-stone-700">تخلیه رطوبت ریشه (mm)</h3>
-                    <LineChart
-                      values={aquaSeries.map((x) => Number(x.depletion_mm || 0))}
-                      color="#059669"
-                      unit=" mm"
-                    />
+                    <LineChart values={aquaSeries.map((x) => Number(x.depletion_mm || 0))} color="#059669" unit=" mm" />
                   </div>
                   <div className="rounded-2xl border border-stone-100 bg-stone-50/50 p-4">
                     <h3 className="mb-2 text-sm font-semibold text-stone-700">ضریب تنش Ks</h3>
@@ -406,43 +348,18 @@ export default function SciencePage() {
                   Number(x.depletion_mm || 0).toFixed(1),
                   Number(x.ta_mm || 0).toFixed(2),
                   Number(x.ks || 0).toFixed(2),
-                  Number((x as { irr_mm?: number }).irr_mm || 0).toFixed(1),
+                  Number(x.irr_mm || 0).toFixed(1),
                 ])}
               />
             </>
-          ) : null}
-
+          )}
           {result.model === "scs_cn_basin_balance" && (
             <>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <MetricCard
-                  icon={<CloudRain className="h-4 w-4" />}
-                  label="S (نگهداشت)"
-                  value={`${Number((result.inputs as { S_mm?: number })?.S_mm || 0).toFixed(0)} mm`}
-                  sub={`CN=${(result.inputs as { curve_number?: number })?.curve_number}`}
-                  tone="sky"
-                />
-                <MetricCard
-                  icon={<Waves className="h-4 w-4" />}
-                  label="رواناب"
-                  value={`${Number((result.outputs as { runoff_mm_year?: number })?.runoff_mm_year || 0).toFixed(1)} mm`}
-                  sub="سالانه"
-                  tone="emerald"
-                />
-                <MetricCard
-                  icon={<Droplets className="h-4 w-4" />}
-                  label="آبدهی"
-                  value={`${Number((result.outputs as { water_yield_mm_year?: number })?.water_yield_mm_year || 0).toFixed(0)} mm`}
-                  sub={`${Number((result.outputs as { water_yield_m3_year?: number })?.water_yield_m3_year || 0).toLocaleString()} m³`}
-                  tone="violet"
-                />
-                <MetricCard
-                  icon={<Mountain className="h-4 w-4" />}
-                  label="رسوب پروکسی"
-                  value={`${Number((result.outputs as { sediment_t_km2_year?: number })?.sediment_t_km2_year || 0).toFixed(2)}`}
-                  sub="t/km²/year"
-                  tone="rose"
-                />
+              <div className="sci-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <MetricCard icon={<CloudRain className="h-4 w-4" />} label="S (نگهداشت)" value={`${Number((result.inputs as { S_mm?: number })?.S_mm || 0).toFixed(0)} mm`} sub={`CN=${(result.inputs as { curve_number?: number })?.curve_number}`} tone="sky" />
+                <MetricCard icon={<Waves className="h-4 w-4" />} label="رواناب" value={`${Number((result.outputs as { runoff_mm_year?: number })?.runoff_mm_year || 0).toFixed(1)} mm`} sub="سالانه" tone="emerald" />
+                <MetricCard icon={<Droplets className="h-4 w-4" />} label="آبدهی" value={`${Number((result.outputs as { water_yield_mm_year?: number })?.water_yield_mm_year || 0).toFixed(0)} mm`} sub={`${Number((result.outputs as { water_yield_m3_year?: number })?.water_yield_m3_year || 0).toLocaleString()} m³`} tone="violet" />
+                <MetricCard icon={<Mountain className="h-4 w-4" />} label="رسوب پروکسی" value={`${Number((result.outputs as { sediment_t_km2_year?: number })?.sediment_t_km2_year || 0).toFixed(2)}`} sub="t/km²/year" tone="rose" />
               </div>
               <div className="rounded-2xl border border-stone-100 bg-stone-50/50 p-4">
                 <h3 className="mb-3 text-sm font-semibold text-stone-700">بیلان آبی حوضه (mm/سال)</h3>
@@ -457,43 +374,24 @@ export default function SciencePage() {
               />
             </>
           )}
-
           <AnalysisPanel a={result.analysis as Analysis} />
-          {result.run_id != null && (
-            <p className="text-xs text-emerald-700">ذخیره شد · run_id={String(result.run_id)}</p>
-          )}
-          {result.persist_error && (
-            <p className="text-xs text-amber-700">persist: {String(result.persist_error)}</p>
-          )}
+          {result.run_id != null && <p className="text-xs text-emerald-700">ذخیره شد · run_id={String(result.run_id)}</p>}
+          {result.persist_error && <p className="text-xs text-amber-700">persist: {String(result.persist_error)}</p>}
         </section>
       )}
 
       {ndvi && (
-        <section className="space-y-4 rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50/50 to-white p-5 shadow-sm">
+        <section className="sci-panel-enter space-y-4 rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50/50 to-white p-5 shadow-sm">
           <h2 className="flex items-center gap-2 font-display text-xl text-stone-900">
-            <Satellite className="h-5 w-5 text-violet-600" /> NDVI و پوشش تاج
+            <Satellite className="sci-icon-bob h-5 w-5 text-violet-600" /> NDVI و پوشش تاج
           </h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <MetricCard
-              icon={<Satellite className="h-4 w-4" />}
-              label="Provider"
-              value={String(ndvi.provider || "—")}
-              tone="violet"
-            />
-            <MetricCard
-              icon={<Activity className="h-4 w-4" />}
-              label="نمونه‌ها"
-              value={String(ndvi.count || 0)}
-              tone="emerald"
-            />
+          <div className="sci-stagger grid gap-3 sm:grid-cols-3">
+            <MetricCard icon={<Satellite className="h-4 w-4" />} label="Provider" value={String(ndvi.provider || "—")} tone="violet" />
+            <MetricCard icon={<Activity className="h-4 w-4" />} label="نمونه‌ها" value={String(ndvi.count || 0)} tone="emerald" />
             <MetricCard
               icon={<Leaf className="h-4 w-4" />}
               label="میانگین NDVI"
-              value={
-                ndviValues.length
-                  ? (ndviValues.reduce((a, b) => a + b, 0) / ndviValues.length).toFixed(3)
-                  : "—"
-              }
+              value={ndviValues.length ? (ndviValues.reduce((a, b) => a + b, 0) / ndviValues.length).toFixed(3) : "—"}
               tone="sky"
             />
           </div>
@@ -509,34 +407,20 @@ export default function SciencePage() {
           </div>
           <DataTable
             columns={["#", "NDVI", "Canopy"]}
-            rows={ndviValues.slice(0, 24).map((v, i) => [
-              i + 1,
-              v.toFixed(3),
-              (canopyValues[i] ?? 0).toFixed(3),
-            ])}
+            rows={ndviValues.slice(0, 24).map((v, i) => [i + 1, v.toFixed(3), (canopyValues[i] ?? 0).toFixed(3)])}
           />
           <AnalysisPanel a={ndvi.analysis as Analysis} />
         </section>
       )}
 
       {rothc && (
-        <section className="space-y-4 rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50/40 to-white p-5 shadow-sm">
+        <section className="sci-panel-enter space-y-4 rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50/40 to-white p-5 shadow-sm">
           <h2 className="flex items-center gap-2 font-display text-xl text-stone-900">
-            <Mountain className="h-5 w-5 text-amber-700" /> RothC-26.3 کربن خاک
+            <Mountain className="sci-icon-bob h-5 w-5 text-amber-700" /> RothC-26.3 کربن خاک
           </h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <MetricCard
-              icon={<Mountain className="h-4 w-4" />}
-              label="SOC اولیه"
-              value={`${Number(rothc.soc_initial || 0).toFixed(1)} t/ha`}
-              tone="amber"
-            />
-            <MetricCard
-              icon={<Leaf className="h-4 w-4" />}
-              label="SOC نهایی"
-              value={`${Number(rothc.soc_final || 0).toFixed(1)} t/ha`}
-              tone="emerald"
-            />
+          <div className="sci-stagger grid gap-3 sm:grid-cols-3">
+            <MetricCard icon={<Mountain className="h-4 w-4" />} label="SOC اولیه" value={`${Number(rothc.soc_initial || 0).toFixed(1)} t/ha`} tone="amber" />
+            <MetricCard icon={<Leaf className="h-4 w-4" />} label="SOC نهایی" value={`${Number(rothc.soc_final || 0).toFixed(1)} t/ha`} tone="emerald" />
             <MetricCard
               icon={<Activity className="h-4 w-4" />}
               label="Δ SOC"
@@ -546,11 +430,7 @@ export default function SciencePage() {
           </div>
           <div className="rounded-2xl border border-amber-100 bg-white p-4">
             <h3 className="mb-2 text-sm font-semibold">مسیر SOC در سال‌ها</h3>
-            <LineChart
-              values={rothcSeries.map((x) => Number(x.soc_t_ha || 0))}
-              color="#d97706"
-              unit=" t/ha"
-            />
+            <LineChart values={rothcSeries.map((x) => Number(x.soc_t_ha || 0))} color="#d97706" unit=" t/ha" />
           </div>
           <DataTable
             columns={["Year", "SOC", "DPM", "HUM"]}
@@ -565,7 +445,7 @@ export default function SciencePage() {
         </section>
       )}
 
-      <section className="rounded-3xl border border-stone-200 bg-white p-5">
+      <section className="sci-panel-enter rounded-3xl border border-stone-200 bg-white p-5">
         <h2 className="font-semibold text-stone-800">اجراهای ذخیره‌شده</h2>
         {runs.length === 0 ? (
           <p className="mt-2 text-sm text-stone-500">خالی — یک مدل را اجرا کنید</p>
@@ -581,13 +461,6 @@ export default function SciencePage() {
           </div>
         )}
       </section>
-
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-        .animate-draw { stroke-dasharray: 800; stroke-dashoffset: 800; animation: draw 1.2s ease forwards; }
-        @keyframes draw { to { stroke-dashoffset: 0; } }
-        .animate-fade-in { animation: fadeIn 0.6s ease; }
-      `}</style>
     </div>
   );
 }
