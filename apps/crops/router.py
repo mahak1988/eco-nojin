@@ -1,12 +1,14 @@
-"""Crops API + RBAC on seed."""
+"""Crops API + agronomy decision helpers."""
 
 from __future__ import annotations
 
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.crops.agronomy_services import disease_rules, rotation_plan, yield_prediction
 from apps.crops.schemas import (
     CropListResponse,
     CropResponse,
@@ -21,6 +23,11 @@ from apps.shared_core.rbac import require_permission
 router = APIRouter(prefix="/api/v1/crops", tags=["Crops"])
 
 
+class RotationIn(BaseModel):
+    current_crop: str = Field(..., min_length=1)
+    years: int = Field(3, ge=2, le=6)
+
+
 @router.get("", response_model=CropListResponse)
 async def list_crops(
     page: int = Query(1, ge=1),
@@ -33,6 +40,26 @@ async def list_crops(
         page=page, size=size, search=search, category=category
     )
     return CropListResponse(data=items, meta=meta)
+
+
+@router.get("/disease-rules")
+async def get_disease_rules(crop: Optional[str] = None):
+    return {"data": disease_rules(crop)}
+
+
+@router.get("/yield-prediction")
+async def get_yield_prediction(
+    crop: str = Query("wheat"),
+    area_ha: float = Query(1.0, gt=0),
+    water_stress: float = Query(0.2, ge=0, le=1),
+    fertility: float = Query(0.8, ge=0, le=1),
+):
+    return yield_prediction(crop, area_ha, water_stress, fertility)
+
+
+@router.post("/rotation-plan")
+async def post_rotation_plan(body: RotationIn):
+    return rotation_plan(body.current_crop, body.years)
 
 
 @router.get("/{crop_id}", response_model=CropResponse)
