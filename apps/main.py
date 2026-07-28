@@ -285,6 +285,7 @@ _include(
     lambda: __import__("apps.api.routes.organic_matter", fromlist=["router"]).router,
 )
 _include("nitrogen", lambda: __import__("apps.api.routes.nitrogen", fromlist=["router"]).router)
+_include("soil_suite", lambda: __import__("apps.api.routes.soil_suite", fromlist=["router"]).router)
 _include(
     "science_monitors",
     lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
