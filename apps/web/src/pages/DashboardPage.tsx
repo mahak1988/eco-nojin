@@ -1,16 +1,17 @@
-// apps/web/src/pages/DashboardPage.tsx
+// apps/web/src/pages/DashboardPage.tsx — live science/runs when API up
 import { useMemo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   LayoutDashboard, Users, Leaf, ArrowUpRight, ArrowDownRight,
-  Activity, MapPin, Satellite, FlaskConical, BookOpen, ShieldCheck,
+  Activity, MapPin, Satellite, FlaskConical, BookOpen, ShieldCheck, Mountain,
 } from "lucide-react";
-import { getDashboardStats } from "../lib/apiServices";
+import { getDashboardStats, getDashboardOverview } from "../lib/apiServices";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
 import { HealthWidget } from "../features/dashboard/HealthWidget";
 import { DataSourceBadge } from "../components/ui/DataSourceBadge";
+import { DataTable } from "../components/science/ScienceVisuals";
 import type { DataSource } from "../types/common";
 
 type DashLang = "fa" | "en" | "ar";
@@ -25,6 +26,8 @@ const FA = {
   carbon_unit: "تن CO₂e",
   recent: "فعالیت‌های اخیر",
   quick_links: "دسترسی سریع",
+  science_runs: "اجراهای علمی اخیر",
+  soil: "خاک / RothC",
   act1: "گزارش MRV سه‌ماهه منتشر شد",
   act2: "پایلوت کشاورزی اصفهان به ۴۵٪ پیشرفت رسید",
   act3: "۱۲۰ کاربر جدید در شبکه ثبت‌نام کردند",
@@ -39,6 +42,7 @@ const FA = {
   link_risks: "ریسک‌ها",
   link_admin: "پنل ادمین",
   link_accounting: "حسابداری",
+  link_science: "فاز علمی",
 };
 
 const EN: typeof FA = {
@@ -51,6 +55,8 @@ const EN: typeof FA = {
   carbon_unit: "tCO₂e",
   recent: "Recent Activity",
   quick_links: "Quick Access",
+  science_runs: "Recent science runs",
+  soil: "Soil / RothC",
   act1: "Q3 MRV report published",
   act2: "Isfahan farming pilot reached 45% progress",
   act3: "120 new users joined the network",
@@ -65,10 +71,10 @@ const EN: typeof FA = {
   link_risks: "Risks",
   link_admin: "Admin panel",
   link_accounting: "Accounting",
+  link_science: "Science",
 };
 
 const AR: typeof FA = { ...EN, title: "لوحة التحكم", subtitle: "نظرة عامة على أداء المنصة" };
-
 const DASH_STR: Record<DashLang, typeof FA> = { fa: FA, en: EN, ar: AR };
 
 const KPIS = [
@@ -81,6 +87,7 @@ const KPIS = [
 const ACTIVITY_ICONS = [ShieldCheck, FlaskConical, Users, Satellite, ShieldCheck];
 
 const QUICK_LINKS = [
+  { key: "link_science", to: "/science", icon: FlaskConical },
   { key: "link_satellite", to: "/satellite", icon: Satellite },
   { key: "link_simulators", to: "/simulators", icon: FlaskConical },
   { key: "link_mrv", to: "/mrv", icon: ShieldCheck },
@@ -112,8 +119,12 @@ const SPARK_DATA: Record<string, number[]> = {
 
 export default function DashboardPage() {
   const [apiSource, setApiSource] = useState<DataSource>("mock");
+  const [overview, setOverview] = useState<Record<string, unknown> | null>(null);
   useEffect(() => {
     getDashboardStats().then((r) => setApiSource(r.source));
+    getDashboardOverview().then((r) => {
+      if (r.source === "api") setOverview(r.data as Record<string, unknown>);
+    });
   }, []);
   const { lang } = useLang();
   const s = DASH_STR[(lang as DashLang) in DASH_STR ? (lang as DashLang) : "en"];
@@ -130,6 +141,10 @@ export default function DashboardPage() {
     [s],
   );
 
+  const runs = ((overview?.runs as Record<string, unknown>[]) || []).slice(0, 6);
+  const soil = (overview?.soil_snapshot as { rothc?: { soc_final?: number; delta?: number } }) || {};
+  const scienceOk = Boolean((overview?.science as { ok?: boolean })?.ok);
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
       <SectionReveal>
@@ -143,7 +158,16 @@ export default function DashboardPage() {
               <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
             </div>
           </div>
-          <DataSourceBadge source={apiSource} />
+          <div className="flex items-center gap-2">
+            {overview && (
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                scienceOk ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"
+              }`}>
+                science {scienceOk ? "ok" : "…"}
+              </span>
+            )}
+            <DataSourceBadge source={apiSource} />
+          </div>
         </div>
       </SectionReveal>
 
@@ -184,6 +208,40 @@ export default function DashboardPage() {
           })}
         </div>
       </div>
+
+      {(runs.length > 0 || soil.rothc) && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {soil.rothc && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4">
+              <h2 className="mb-2 flex items-center gap-2 font-display text-lg text-stone-800">
+                <Mountain className="h-5 w-5 text-amber-700" /> {s.soil}
+              </h2>
+              <p className="text-sm text-stone-700">
+                SOC نهایی: <span className="font-mono font-bold">{soil.rothc.soc_final ?? "—"}</span> t C/ha
+              </p>
+              <p className="text-sm text-stone-600">
+                Δ: <span className="font-mono">{soil.rothc.delta ?? "—"}</span>
+              </p>
+              <Link to="/science" className="mt-2 inline-block text-xs font-bold text-emerald-700">
+                Science Lab →
+              </Link>
+            </div>
+          )}
+          <div className="rounded-2xl border border-stone-200 bg-white p-4 lg:col-span-2">
+            <h2 className="mb-3 font-display text-lg text-stone-800">{s.science_runs}</h2>
+            <DataTable
+              columns={["ID", "Model", "Created"]}
+              rows={runs.map((r) => [
+                String(r.id ?? ""),
+                String(r.model ?? ""),
+                String(r.created_at ?? "").slice(0, 19),
+              ])}
+              maxHeight={220}
+              numericCols={[0]}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <SectionReveal delay={100} className="lg:col-span-2">
