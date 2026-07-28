@@ -1,5 +1,5 @@
 """
-Model monitors (پایشگرها) — evaluate science outputs against operational thresholds.
+Model monitors (پایشگرها) — evaluate science outputs against dynamic thresholds.
 """
 
 from __future__ import annotations
@@ -131,6 +131,43 @@ MONITOR_CATALOG: list[dict[str, Any]] = [
 ]
 
 
+def effective_catalog() -> list[dict[str, Any]]:
+    """Defaults + climate preset scaling + user overrides."""
+    from apps.simulation.threshold_store import apply_preset_to_value, get_overrides, get_store
+
+    store = get_store()
+    preset = str(store.get("preset") or "default")
+    overrides = get_overrides()
+    out: list[dict[str, Any]] = []
+    for base in MONITOR_CATALOG:
+        mon = dict(base)
+        w = float(mon["warning"])
+        c = float(mon["critical"])
+        op = str(mon["operator"])
+        model = str(mon["model"])
+        if preset != "default":
+            w = apply_preset_to_value(model, op, "warning", w, preset)
+            c = apply_preset_to_value(model, op, "critical", c, preset)
+        ov = overrides.get(mon["id"]) or {}
+        if "warning" in ov and ov["warning"] is not None:
+            w = float(ov["warning"])
+        if "critical" in ov and ov["critical"] is not None:
+            c = float(ov["critical"])
+        if "operator" in ov and ov["operator"]:
+            op = str(ov["operator"])
+        enabled = ov.get("enabled", True)
+        if enabled is False:
+            continue
+        mon["warning"] = round(w, 6)
+        mon["critical"] = round(c, 6)
+        mon["operator"] = op
+        mon["preset"] = preset
+        mon["overridden"] = bool(ov)
+        mon["defaults"] = {"warning": base["warning"], "critical": base["critical"], "operator": base["operator"]}
+        out.append(mon)
+    return out
+
+
 def _cmp(op: str, value: float, threshold: float) -> bool:
     if op == "lt":
         return value < threshold
@@ -167,8 +204,6 @@ def extract_metrics(bundle: dict[str, Any]) -> dict[str, float]:
     scs = bundle.get("scs") or bundle.get("swat") or {}
     outs = scs.get("outputs") or {}
     if outs or scs.get("model") == "scs_cn_basin_balance":
-        if not outs and scs.get("outputs"):
-            outs = scs["outputs"]
         m["runoff_mm_year"] = float(outs.get("runoff_mm_year") or 0)
         m["sediment_t_km2_year"] = float(outs.get("sediment_t_km2_year") or 0)
         m["water_yield_mm_year"] = float(outs.get("water_yield_mm_year") or 0)
@@ -197,9 +232,11 @@ def evaluate_monitors(
     metrics: dict[str, float],
     *,
     monitor_ids: Optional[list[str]] = None,
+    catalog: Optional[list[dict[str, Any]]] = None,
 ) -> list[dict[str, Any]]:
+    catalog = catalog or effective_catalog()
     events: list[dict[str, Any]] = []
-    for mon in MONITOR_CATALOG:
+    for mon in catalog:
         if monitor_ids and mon["id"] not in monitor_ids:
             continue
         key = mon["metric"]
@@ -221,6 +258,8 @@ def evaluate_monitors(
                     "warning": mon["warning"],
                     "critical": mon["critical"],
                     "operator": mon["operator"],
+                    "preset": mon.get("preset", "default"),
+                    "overridden": mon.get("overridden", False),
                 },
                 "message_fa": _msg_fa(mon, value, sev),
                 "message_en": _msg_en(mon, value, sev),
@@ -276,6 +315,7 @@ def run_full_watch(
     from apps.simulation.models_swat import run_swat_plus
     from apps.simulation.rothc_model import run_rothc
     from apps.simulation.science_analysis import attach_analysis
+    from apps.simulation.threshold_store import get_store
 
     aq = attach_analysis(
         "aquacrop",
@@ -351,12 +391,14 @@ def run_full_watch(
         "sensors": sensors,
     }
     metrics = extract_metrics(bundle)
-    events = evaluate_monitors(metrics)
+    catalog = effective_catalog()
+    events = evaluate_monitors(metrics, catalog=catalog)
     counts = {
         "ok": sum(1 for e in events if e["severity"] == "ok"),
         "warning": sum(1 for e in events if e["severity"] == "warning"),
         "critical": sum(1 for e in events if e["severity"] == "critical"),
     }
+    store = get_store()
     return {
         "watch": "full",
         "lat": lat,
@@ -364,6 +406,11 @@ def run_full_watch(
         "metrics": metrics,
         "events": events,
         "counts": counts,
+        "thresholds": {
+            "preset": store.get("preset", "default"),
+            "catalog": catalog,
+            "updated_at": store.get("updated_at"),
+        },
         "models": {
             "aquacrop": {
                 k: aq.get(k)
