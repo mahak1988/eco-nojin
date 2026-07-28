@@ -170,7 +170,7 @@ def _request_id(request: Request) -> str | None:
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.error("Unhandled error: %s", exc, exc_info=True)
+    logger.error("Unhandled error: %s", exc, exp_info=True)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -216,7 +216,7 @@ def _include(label: str, loader: Any, **kwargs: Any) -> None:
         if _is_optional_failure(err):
             logger.debug("%s skipped (optional): %s", label, err)
         else:
-            logger.warning("%s FAILED: %s", label, e, exc_info=True)
+            logger.warning("%s FAILED: %s", label, e, exp_info=True)
 
 
 _include(
@@ -279,6 +279,7 @@ _include(
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
 _include("rothc_full", lambda: __import__("apps.api.routes.rothc_full", fromlist=["router"]).router)
+_include("soil_carbon", lambda: __import__("apps.api.routes.soil_carbon", fromlist=["router"]).router)
 _include(
     "science_monitors",
     lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
