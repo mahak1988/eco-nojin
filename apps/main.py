@@ -35,11 +35,14 @@ from apps.shared_core.config import settings
 
 _db_status = {"ok": False, "detail": "not_initialized"}
 _OPTIONAL_MODULE_HINTS = ("numba", "psycopg2")
+_loaded_routers: list[str] = []
+_failed_routers: list[dict[str, str]] = []
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Econojin API v%s starting (%s)", settings.VERSION, settings.ENVIRONMENT)
+    logger.info("PROJECT_ROOT=%s", PROJECT_ROOT)
     start_time = time.time()
     try:
         from apps.shared_core.database.session import init_db
@@ -76,6 +79,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("Sentry initialized")
     except Exception as e:
         logger.debug("Sentry unavailable: %s", e)
+    logger.info(
+        "Routers loaded=%s failed=%s",
+        len(_loaded_routers),
+        [f["label"] for f in _failed_routers],
+    )
     logger.info("Startup complete in %.2fs", time.time() - start_time)
     yield
     try:
@@ -193,13 +201,15 @@ def _include(label: str, loader: Any, **kwargs: Any) -> None:
     try:
         router = loader()
         app.include_router(router, **kwargs)
+        _loaded_routers.append(label)
         logger.info("%s: router loaded", label)
     except Exception as e:
         err = str(e)
+        _failed_routers.append({"label": label, "error": err[:300]})
         if _is_optional_failure(err):
             logger.debug("%s skipped (optional): %s", label, err)
         else:
-            logger.warning("%s: %s", label, e)
+            logger.warning("%s FAILED: %s", label, e, exc_info=True)
 
 
 _include(
@@ -260,6 +270,10 @@ _include(
     "education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router
 )
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
+# Primary science mount (same pattern as education — must load)
+_include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
+# Secondary (phase3 package) — ignore if fails
+_include("science_phase3", lambda: __import__("apps.simulation.phase3_router", fromlist=["router"]).router)
 _include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
 _include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
 _include("chain", lambda: __import__("apps.simulation.chain.router", fromlist=["router"]).router)
@@ -277,7 +291,6 @@ _include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).r
 _include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlist=["router"]).router)
 _include("satellite", lambda: __import__("apps.satellite.router", fromlist=["router"]).router)
 _include("simulation_jobs", lambda: __import__("apps.simulation.jobs_router", fromlist=["router"]).router)
-_include("science", lambda: __import__("apps.simulation.phase3_router", fromlist=["router"]).router)
 _include("websocket", lambda: __import__("apps.shared_core.websocket.router", fromlist=["router"]).router)
 
 
@@ -289,6 +302,7 @@ async def root() -> dict[str, Any]:
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT,
         "docs": _docs,
+        "project_root": str(PROJECT_ROOT),
     }
 
 
@@ -313,6 +327,22 @@ async def health() -> dict[str, Any]:
         "environment": settings.ENVIRONMENT,
         "database": "ok" if db_live else "fail",
         "database_detail": db_detail,
+        "science_loaded": "science" in _loaded_routers,
+        "loaded_routers": list(_loaded_routers),
+        "failed_routers": list(_failed_routers),
+    }
+
+
+@app.get("/api/v1/debug/routers", tags=["Debug"])
+async def debug_routers() -> dict[str, Any]:
+    paths = sorted({getattr(r, "path", "") for r in app.routes if getattr(r, "path", None)})
+    science = [p for p in paths if "science" in p]
+    return {
+        "project_root": str(PROJECT_ROOT),
+        "loaded": _loaded_routers,
+        "failed": _failed_routers,
+        "science_paths": science,
+        "path_count": len(paths),
     }
 
 
