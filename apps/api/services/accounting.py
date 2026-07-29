@@ -1,8 +1,6 @@
 """
 Accounting Service | لایه کسب‌وکار حسابداری
 ============================================
-Business logic layer — orchestrates repositories and enforces rules.
-Controllers (routers) call services; services call repositories.
 """
 
 from __future__ import annotations
@@ -36,19 +34,16 @@ logger = logging.getLogger(__name__)
 
 
 def _attach_balance(account: Account, balance: Decimal) -> Account:
-    """Store computed balance without fighting the read-only @property."""
-    # Pydantic from_attributes reads instance attributes first via getattr;
-    # putting the value in __dict__ overrides the property for that instance.
-    object.__setattr__(account, "_computed_balance", balance)
-    # Make getattr(account, 'balance') prefer the computed value via a temp override
-    type(account).balance  # ensure property exists
-    account.__dict__["balance"] = balance
+    """Attach computed balance using Account.balance setter (_balance backing)."""
+    try:
+        account.balance = balance
+    except AttributeError:
+        # Fallback if an older model without setter is loaded
+        object.__setattr__(account, "_balance", balance)
     return account
 
 
 class AccountingService:
-    """Main service for accounting operations."""
-
     def __init__(self, session: AsyncSession) -> None:
         self.accounts = AccountRepository(session)
         self.journal_entries = JournalEntryRepository(session)
@@ -59,8 +54,6 @@ class AccountingService:
 
 
 class AccountService:
-    """Service for account operations."""
-
     def __init__(self, session: AsyncSession) -> None:
         self.repo = AccountRepository(session)
 
@@ -103,8 +96,6 @@ class AccountService:
 
 
 class JournalEntryService:
-    """Service for journal entry operations."""
-
     def __init__(self, session: AsyncSession) -> None:
         self.repo = JournalEntryRepository(session)
 
@@ -129,12 +120,9 @@ class JournalEntryService:
         )
         if total_debits != total_credits:
             raise ValueError("Journal entry must be balanced (debits = credits)")
-
         entry = await self.repo.create(data)
-
         if total_debits > 0:
             await self.repo.post_entry(entry.id)
-
         return entry
 
     async def post_entry(self, entry_id: str) -> JournalEntry:
@@ -145,8 +133,6 @@ class JournalEntryService:
 
 
 class InvoiceService:
-    """Service for invoice operations."""
-
     def __init__(self, session: AsyncSession) -> None:
         self.repo = InvoiceRepository(session)
         self.session = session
@@ -180,8 +166,6 @@ class InvoiceService:
 
 
 class PaymentService:
-    """Service for payment operations."""
-
     def __init__(self, session: AsyncSession) -> None:
         self.repo = PaymentRepository(session)
 
@@ -194,8 +178,6 @@ class PaymentService:
 
 
 class BudgetService:
-    """Service for budget operations."""
-
     def __init__(self, session: AsyncSession) -> None:
         self.repo = BudgetRepository(session)
 
