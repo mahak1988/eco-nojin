@@ -1,0 +1,16 @@
+simulator_id,simulator_name,created_at,metric_key,metric_value,parameter_key,parameter_value
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,yield_t_ha,75.7,,
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,biomass_t_ha,168.23,,
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,water_use_efficiency_kg_m3,158.02,,
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,total_et_mm,551.3,,
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,total_transpiration_mm,479.1,,
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,crop,wheat
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,planting_date,2024-03-15
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,latitude,35.7
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,longitude,51.4
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,use_real_climate,no
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,field_capacity,30
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,wilting_point,14
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,soil_depth,1.2
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,total_irrigation,250
+aquacrop,AquaCrop (بهره‌وری آب محصول فائو),2026-07-23 02:10:51.501501,,,co2_ppm,420

@@ -23,10 +23,14 @@ _MODEL_MODULES = [
     "apps.simulation.models_runs",
 ]
 
+# Public alias for Alembic env.py compatibility
+MODEL_MODULES = _MODEL_MODULES
 
-def import_all_models() -> List[str]:
+
+def import_all_models(module_list=None) -> List[str]:
     loaded: List[str] = []
-    for mod in _MODEL_MODULES:
+    modules = module_list if module_list is not None else _MODEL_MODULES
+    for mod in modules:
         try:
             __import__(mod)
             loaded.append(mod)

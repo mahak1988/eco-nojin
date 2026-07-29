@@ -1,0 +1,2 @@
+# Add to apps/main.py after ai_agents include:
+# _include("ai_agents_public", lambda: __import__("apps.ai_agents.public_router", fromlist=["router"]).router)

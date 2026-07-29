@@ -1,0 +1,459 @@
+{
+  "zones": {
+    "هستهٔ وبسایت": 116603,
+    "دیتاست/ML": 8296,
+    "زیرپروژه": 6402
+  },
+  "zone_kb": {
+    "هستهٔ وبسایت": 1129181,
+    "دیتاست/ML": 1842458,
+    "زیرپروژه": 53002
+  },
+  "web_roots": [
+    "repos\\bulletproof-react\\apps\\nextjs-app",
+    "repos\\bulletproof-react\\apps\\nextjs-pages",
+    "repos\\salvia-kit",
+    "repos\\shadcn-ui\\apps\\v4",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\next-app",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\next-app-custom-alias",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\next-app-imports",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\next-app-src",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\next-pages",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\next-pages-src",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\t3-app",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\frameworks\\t3-pages",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\next",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\next-app-js",
+    "repos\\shadcn-ui\\packages\\shadcn\\test\\fixtures\\next-src",
+    "repos\\shadcn-ui\\packages\\tests\\fixtures\\next-app",
+    "repos\\shadcn-ui\\packages\\tests\\fixtures\\next-app-imports",
+    "repos\\shadcn-ui\\packages\\tests\\fixtures\\next-app-init",
+    "repos\\shadcn-ui\\templates\\astro-app",
+    "repos\\shadcn-ui\\templates\\astro-monorepo\\apps\\web",
+    "repos\\shadcn-ui\\templates\\next-app",
+    "repos\\shadcn-ui\\templates\\next-monorepo\\apps\\web"
+  ],
+  "package_jsons": [
+    "package.json",
+    "__repo_sync_tmp__\\package.json",
+    "__repo_sync_tmp__\\packages\\api-client\\package.json",
+    "__repo_sync_tmp__\\packages\\config-eslint\\package.json",
+    "__repo_sync_tmp__\\packages\\config-typescript\\package.json",
+    "__repo_sync_tmp__\\packages\\features\\package.json",
+    "__repo_sync_tmp__\\packages\\hooks\\package.json",
+    "__repo_sync_tmp__\\packages\\lib\\package.json",
+    "__repo_sync_tmp__\\packages\\types\\package.json",
+    "__repo_sync_tmp__\\packages\\ui\\package.json",
+    "__repo_sync_tmp__\\apps\\cms\\package.json",
+    "__repo_sync_tmp__\\apps\\library\\package.json",
+    "__repo_sync_tmp__\\apps\\web\\package.json",
+    "repos\\agri-moon\\package.json",
+    "repos\\bulletproof-react\\package.json",
+    "repos\\fastapi-template\\package.json",
+    "repos\\salvia-kit\\package.json",
+    "repos\\shadcn-ui\\package.json",
+    "repos\\shadcn-ui\\templates\\astro-app\\package.json",
+    "repos\\shadcn-ui\\templates\\astro-monorepo\\package.json"
+  ],
+  "top_deps": [
+    [
+      "typescript",
+      54
+    ],
+    [
+      "react",
+      43
+    ],
+    [
+      "@types/react",
+      42
+    ],
+    [
+      "tailwindcss",
+      33
+    ],
+    [
+      "react-dom",
+      33
+    ],
+    [
+      "@types/react-dom",
+      32
+    ],
+    [
+      "@types/node",
+      30
+    ],
+    [
+      "eslint",
+      26
+    ],
+    [
+      "tailwind-merge",
+      19
+    ],
+    [
+      "clsx",
+      18
+    ],
+    [
+      "lucide-react",
+      16
+    ],
+    [
+      "prettier",
+      16
+    ],
+    [
+      "vite",
+      15
+    ],
+    [
+      "zod",
+      14
+    ],
+    [
+      "@tailwindcss/vite",
+      14
+    ],
+    [
+      "class-variance-authority",
+      13
+    ],
+    [
+      "@vitejs/plugin-react",
+      13
+    ],
+    [
+      "axios",
+      12
+    ],
+    [
+      "postcss",
+      12
+    ],
+    [
+      "eslint-plugin-react-hooks",
+      12
+    ],
+    [
+      "prettier-plugin-tailwindcss",
+      12
+    ],
+    [
+      "autoprefixer",
+      11
+    ],
+    [
+      "typescript-eslint",
+      10
+    ],
+    [
+      "tw-animate-css",
+      9
+    ],
+    [
+      "@eslint/js",
+      9
+    ],
+    [
+      "globals",
+      9
+    ],
+    [
+      "next",
+      9
+    ],
+    [
+      "@tailwindcss/postcss",
+      9
+    ],
+    [
+      "turbo",
+      8
+    ],
+    [
+      "@tanstack/react-query",
+      8
+    ]
+  ],
+  "extless": {
+    "count": 101924,
+    "total_kb": 807794,
+    "sample": [
+      {
+        "path": ".env",
+        "kb": 1.9,
+        "binary": false,
+        "preview": "# ======================"
+      },
+      {
+        "path": ".gitignore",
+        "kb": 2.8,
+        "binary": false,
+        "preview": "﻿\n# Environment Variab"
+      },
+      {
+        "path": ".npmrc",
+        "kb": 0.1,
+        "binary": false,
+        "preview": "# pnpm v11 configuration"
+      },
+      {
+        "path": "d",
+        "kb": 9.5,
+        "binary": false,
+        "preview": "/**\n * ================="
+      },
+      {
+        "path": "DataCollectionGuide",
+        "kb": 20.2,
+        "binary": false,
+        "preview": "#!/usr/bin/env python3\r\n"
+      },
+      {
+        "path": "Dockerfile",
+        "kb": 0.5,
+        "binary": false,
+        "preview": "FROM python:3.13-slim\r\n\r"
+      },
+      {
+        "path": "early_warning_engine",
+        "kb": 10.0,
+        "binary": false,
+        "preview": "\"\"\"\r\n🔧 تشخیص و "
+      },
+      {
+        "path": "License",
+        "kb": 1.4,
+        "binary": false,
+        "preview": "\r\n#### 7.2 Architecture "
+      },
+      {
+        "path": ".mypy_cache\\.gitignore",
+        "kb": 0.0,
+        "binary": false,
+        "preview": "# Automatically created "
+      },
+      {
+        "path": ".pytest_cache\\.gitignore",
+        "kb": 0.0,
+        "binary": false,
+        "preview": "# Created by pytest auto"
+      },
+      {
+        "path": "__repo_sync_tmp__\\.gitignore",
+        "kb": 2.8,
+        "binary": false,
+        "preview": "﻿\n# Environment Variab"
+      },
+      {
+        "path": "__repo_sync_tmp__\\.npmrc",
+        "kb": 0.1,
+        "binary": false,
+        "preview": "# pnpm v11 configuration"
+      }
+    ]
+  },
+  "web_images": {
+    "count": 317,
+    "total_kb": 25711,
+    "by_format": {
+      ".svg": 33,
+      ".ico": 13,
+      ".png": 239,
+      ".jpg": 28,
+      ".jpeg": 1,
+      ".avif": 2,
+      ".webp": 1
+    },
+    "over_200kb": [
+      [
+        "repos\\fastapi-best-practices\\images\\custom_responses.png",
+        684
+      ],
+      [
+        "repos\\AgriSync\\frontend\\public\\farm.avif",
+        473
+      ],
+      [
+        "repos\\fastapi-best-practices\\images\\type_hints.png",
+        390
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\images\\lift-mode-dark.png",
+        363
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\images\\lift-mode-light.png",
+        356
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\dashboard-01-light.png",
+        352
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\dashboard-01-dark.png",
+        350
+      ],
+      [
+        "repos\\salvia-kit\\public\\images\\dashboards\\dashv1.png",
+        344
+      ],
+      [
+        "repos\\fastapi-best-practices\\images\\type_hintsless.png",
+        329
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\examples\\cards-light.png",
+        293
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\images\\mcp.jpeg",
+        276
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\examples\\cards-dark.png",
+        274
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\sidebar-15-dark.png",
+        255
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\v0-sidebar-15-dark.png",
+        255
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\sidebar-15-light.png",
+        254
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\v0-sidebar-15-light.png",
+        254
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\images\\rhea-light.png",
+        251
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\r\\styles\\new-york\\sink-light.png",
+        245
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\examples\\tasks-dark.png",
+        243
+      ],
+      [
+        "repos\\shadcn-ui\\apps\\v4\\public\\examples\\tasks-light.png",
+        242
+      ]
+    ]
+  },
+  "dataset_images": {
+    "count": 4055,
+    "total_kb": 1052398
+  },
+  "img_tags_in_components": [
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\examples\\attachment-example.tsx",
+      "count": 21
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\base\\examples\\attachment-example.tsx",
+      "count": 21
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\aria\\examples\\attachment-example.tsx",
+      "count": 21
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\examples\\message-example.tsx",
+      "count": 4
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\base\\examples\\message-example.tsx",
+      "count": 4
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\aria\\examples\\message-example.tsx",
+      "count": 4
+    },
+    {
+      "file": "repos\\salvia-kit\\src\\components\\icons\\others.tsx",
+      "count": 3
+    },
+    {
+      "file": "repos\\fastapi-template\\frontend\\src\\components\\Common\\Logo.tsx",
+      "count": 3
+    },
+    {
+      "file": "repos\\shadcn-ui\\packages\\tests\\fixtures\\vite-app\\src\\App.tsx",
+      "count": 2
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\examples\\card-example.tsx",
+      "count": 2
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\base\\examples\\card-example.tsx",
+      "count": 2
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\aria\\examples\\card-example.tsx",
+      "count": 2
+    },
+    {
+      "file": "__repo_sync_tmp__\\apps\\web\\src\\pages\\Profile\\Profile.tsx",
+      "count": 1
+    },
+    {
+      "file": "__repo_sync_tmp__\\apps\\web\\src\\components\\eco\\HeroSection.tsx",
+      "count": 1
+    },
+    {
+      "file": "__repo_sync_tmp__\\apps\\web\\src\\components\\Layout\\Header.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\new-york-v4\\blocks\\login-02\\page.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\new-york-v4\\blocks\\signup-02\\page.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\new-york-v4\\blocks\\signup-04\\components\\signup-form.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\new-york-v4\\blocks\\login-04\\components\\login-form.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\examples\\component-example.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\blocks\\login-02\\page.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\blocks\\signup-02\\page.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\blocks\\signup-04\\components\\signup-form.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\blocks\\preview-03\\components\\part-file.tsx",
+      "count": 1
+    },
+    {
+      "file": "repos\\shadcn-ui\\apps\\v4\\registry\\bases\\radix\\blocks\\preview-02\\cards\\album-card.tsx",
+      "count": 1
+    }
+  ]
+}

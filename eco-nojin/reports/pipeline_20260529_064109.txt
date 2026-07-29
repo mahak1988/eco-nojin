@@ -1,0 +1,19 @@
+
+======================================================================
+📊 FINAL PIPELINE REPORT
+======================================================================
+
+⏱️  Total duration: 0.1 seconds
+✅ Successful steps: 0
+❌ Failed steps: 1
+
+❌ 🔒 Fix exec() security issues (0.1s)
+   Error: Traceback (most recent call last):
+  File "d:\econojin.com\scripts\security\fix_exec.py", line 15, in <module>
+    from core.safety import CodeAnalyzer
+  File "d:\econojin.com\scripts\core\safety.py", line 1, in <module>
+    from core.safety import SafeSubprocess
+ImportError: cannot import name 'SafeSubprocess' from partially initialized module 'core.safety' (most likely due to a circular import) (d:\econojin.com\scripts\core\safety.py)
+
+
+======================================================================

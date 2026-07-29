@@ -1,0 +1,41 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1'  # Every Monday 03:00 UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Secure Project Analyzer
+        run: |
+          python project_analyzer.py . --no-network \
+            --exclude ".pnpm-store/*" --exclude "node_modules/*" \
+            --exclude "reports/*" --exclude ".security_backup/*" \
+            --exclude "project-analysis.*" --exclude "*/tests/*" \
+            --exclude "*/test_*" --fail-on critical
+
+      - name: Upload Security Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: |
+            project-analysis.json
+            project-analysis.html
+          retention-days: 30

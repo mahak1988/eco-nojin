@@ -1,0 +1,52 @@
+{
+  "pilot_id": "wadi_rum",
+  "name": "وادی رم",
+  "country": "اردن",
+  "continent": "آسیا",
+  "province": "عقبه",
+  "climate_zone": "بیابانی گرم (BWh)",
+  "coordinates": {
+    "lat": 29.58,
+    "lon": 35.42
+  },
+  "area_hectares": 12000,
+  "elevation_m": 1200,
+  "annual_precipitation_mm": 60,
+  "avg_temperature_c": 22.0,
+  "soil_type": "شنی-سنگی، بسیار شور",
+  "land_use": [
+    "بادیه‌نوردی",
+    "اکوتوریسم",
+    "دامداری بدوی"
+  ],
+  "main_challenges": [
+    "فوق‌خشکسالی",
+    "تخریب میراث طبیعی",
+    "فقر شدید"
+  ],
+  "interventions": [
+    "اکوتوریسم پایدار",
+    "آب‌انبارهای بومی",
+    "انرژی تجدیدپذیر"
+  ],
+  "baseline_indicators": {
+    "water_availability_liters_per_day": 15,
+    "biodiversity_index": 0.35,
+    "income_per_capita_usd": 800
+  },
+  "target_indicators": {
+    "water_availability_liters_per_day": 40,
+    "biodiversity_index": 0.55,
+    "income_per_capita_usd": 2000
+  },
+  "beneficiaries": {
+    "households": 180,
+    "bedouin_families": 150,
+    "women": 60
+  },
+  "global_partnership": [
+    "UNESCO",
+    "GIZ",
+    "Jordanian Hashemite Fund"
+  ]
+}

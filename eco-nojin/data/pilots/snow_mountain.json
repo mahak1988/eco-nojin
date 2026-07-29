@@ -1,0 +1,47 @@
+{
+  "pilot_id": "snow_mountain",
+  "name": "کوهستان برفی (بویراحمد/آلاداغ)",
+  "country": "ایران",
+  "continent": "آسیا",
+  "province": "کهگیلویه و بویراحمد",
+  "climate_zone": "کوهستانی برفی (Dsa)",
+  "coordinates": {
+    "lat": 30.7,
+    "lon": 51.6
+  },
+  "area_hectares": 7000,
+  "elevation_m": 2500,
+  "annual_precipitation_mm": 650,
+  "avg_temperature_c": 10.5,
+  "soil_type": "کوهستانی، کم‌عمق",
+  "land_use": [
+    "مرتع کوهستانی",
+    "دامداری",
+    "زراعت خرد"
+  ],
+  "main_challenges": [
+    "کاهش برف‌پوشش",
+    "تغییر رژیم رواناب",
+    "تخریب مرتع"
+  ],
+  "interventions": [
+    "مدیریت برف و رواناب",
+    "احیای مرتع",
+    "سیلواپاستورال"
+  ],
+  "baseline_indicators": {
+    "snow_cover_days": 85,
+    "forage_production_kg_ha": 450,
+    "water_availability_days": 180
+  },
+  "target_indicators": {
+    "snow_cover_days": 95,
+    "forage_production_kg_ha": 750,
+    "water_availability_days": 240
+  },
+  "beneficiaries": {
+    "households": 280,
+    "herders": 220,
+    "women": 95
+  }
+}

@@ -1,0 +1,18 @@
+cd D:\econojin.com\frontend
+
+# پشتیبان‌گیری
+copy package.json package.json.backup
+
+# استفاده از نسخه ساده
+copy package.simple.json package.json
+
+# تنظیمات pnpm
+pnpm config set registry https://registry.npmmirror.com
+pnpm config set strict-ssl false
+pnpm config set network-concurrency 1
+
+# نصب
+pnpm install --no-frozen-lockfile
+
+# اجرا
+pnpm run dev

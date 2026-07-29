@@ -1,0 +1,69 @@
+
+#### 7.2 Architecture Decision Records
+Create file: `docs/ARCHITECTURE.md`
+
+```markdown
+# Architecture Decision Records
+
+## ADR 001: Use Supabase instead of Custom Backend
+
+### Status
+Accepted
+
+### Context
+We needed a backend solution that provides:
+- PostgreSQL database
+- Authentication
+- Real-time subscriptions
+- File storage
+- Edge functions
+
+### Decision
+We chose Supabase because:
+- Open source and self-hostable
+- Excellent developer experience
+- Built-in RLS for multi-tenancy
+- Generous free tier
+- Active community
+
+### Consequences
+- Faster development time
+- Less maintenance overhead
+- Vendor lock-in risk (mitigated by self-hosting option)
+
+## ADR 002: Monorepo with Turborepo
+
+### Status
+Accepted
+
+### Context
+We have multiple applications (web, CMS, admin) and shared packages.
+
+### Decision
+Use Turborepo for monorepo management because:
+- Fast incremental builds
+- Remote caching
+- Simple configuration
+- Great DX
+
+### Consequences
+- Single repository for all code
+- Shared dependencies
+- Coordinated deployments
+
+## ADR 003: Server Components First
+
+### Status
+Accepted
+
+### Context
+Next.js 15 provides both Server and Client Components.
+
+### Decision
+Default to Server Components, use Client Components only when needed.
+
+### Consequences
+- Better performance (less JS sent to client)
+- Improved SEO
+- Simpler mental model
+- Some features require 'use client'

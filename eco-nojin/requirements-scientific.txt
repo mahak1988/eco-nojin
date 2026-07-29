@@ -1,0 +1,12 @@
+# Optional Phase 3 scientific stack — install when running EO / GEE / spatial heavy jobs
+# pip install -r requirements-scientific.txt
+
+earthengine-api>=0.1.384
+# STAC clients (Planetary Computer path)
+pystac-client>=0.8.0
+planetary-computer>=1.0.0
+# Geo helpers
+shapely>=2.0.0
+# Keep asyncpg for Postgres phase3
+asyncpg>=0.30.0
+psycopg[binary]>=3.1.0

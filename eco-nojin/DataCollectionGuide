@@ -1,0 +1,455 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🌍 ایجاد کامپوننت DataCollectionGuide
+راهنمای جمع‌آوری داده شهروندی برای تمام ماژول‌ها
+"""
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).parent.resolve()
+WEB = ROOT / "apps" / "web" / "src"
+
+
+def write_file(path: Path, content: str):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    print(f"   ✅ {path.relative_to(ROOT)}")
+
+
+def create_guide_component():
+    print("\n📚 ایجاد کامپوننت DataCollectionGuide...")
+    
+    content = r'''"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  BookOpen, Smartphone, Wrench, AlertTriangle, CheckCircle2,
+  ChevronDown, ChevronUp, Users, Zap, TrendingUp, Globe,
+  Camera, Ruler, Scale, Droplets, Thermometer
+} from "lucide-react";
+
+interface GuideSection {
+  title: string;
+  icon: any;
+  difficulty: "آسان" | "متوسط" | "پیشرفته";
+  cost: string;
+  accuracy: string;
+  riskLevel: "کم" | "متوسط" | "بالا";
+  tools: string[];
+  steps: string[];
+  tips: string[];
+}
+
+interface DataCollectionGuideProps {
+  moduleType: "hydrology" | "soil" | "rainfall" | "erosion" | "ndvi" | "carbon";
+  moduleName: string;
+}
+
+const GUIDES: Record<string, GuideSection[]> = {
+  hydrology: [
+    {
+      title: "اندازه‌گیری دبی رودخانه (روش شناور)",
+      icon: Droplets,
+      difficulty: "متوسط",
+      cost: "رایگان",
+      accuracy: "±۱۵-۲۰٪",
+      riskLevel: "متوسط",
+      tools: ["توپ شناور", "متر یا طناب نشان‌دار", "کرنومتر موبایل", "ماشین‌حساب"],
+      steps: [
+        "یک مقطع مستقیم از رودخانه به طول ۱۰ متر انتخاب کنید",
+        "عرض رودخانه را در ۵ نقطه اندازه بگیرید و میانگین بگیرید (W)",
+        "عمق را در ۵ نقطه اندازه بگیرید و میانگین بگیرید (D)",
+        "توپ را رها کنید و زمان رسیدن به ۱۰ متر را ثبت کنید (T)",
+        "سرعت سطحی: V = ۱۰ ÷ T",
+        "سرعت متوسط ≈ ۰.۸۵ × V",
+        "دبی: Q = W × D × V_avg"
+      ],
+      tips: [
+        "بهترین زمان: صبح زود یا غروب (تبخیر کم)",
+        "حداقل ۳ بار اندازه‌گیری کنید و میانگین بگیرید",
+        "از نقاطی با گرداب دوری کنید"
+      ]
+    }
+  ],
+  soil: [
+    {
+      title: "اندازه‌گیری رطوبت خاک (روش وزنی)",
+      icon: Scale,
+      difficulty: "آسان",
+      cost: "رایگان",
+      accuracy: "±۱۰-۱۵٪",
+      riskLevel: "کم",
+      tools: ["ترازوی آشپزخانه", "ظرف فلزی", "فر یا آفتاب قوی", "قاشق"],
+      steps: [
+        "از عمق ۱۵ سانتی‌متری خاک برداشت کنید (۲۰۰ گرم)",
+        "وزن تر را یادداشت کنید (W_wet)",
+        "در آفتاب قوی ۲۴ ساعت یا فر ۱۰۵°C به مدت ۴ ساعت خشک کنید",
+        "وزن خشک را یادداشت کنید (W_dry)",
+        "رطوبت وزنی: θ = (W_wet - W_dry) ÷ W_dry × ۱۰۰"
+      ],
+      tips: [
+        "از چند نقطه مزرعه نمونه‌برداری کنید",
+        "ظرف را قبل از وزن کردن خنک کنید",
+        "هر هفته یک بار اندازه‌گیری کافی است"
+      ]
+    }
+  ],
+  rainfall: [
+    {
+      title: "ساخت باران‌سنج ساده",
+      icon: Droplets,
+      difficulty: "آسان",
+      cost: "رایگان",
+      accuracy: "±۱۰-۱۵٪",
+      riskLevel: "کم",
+      tools: ["بطری پلاستیکی شفاف", "قیچی", "خط‌کش", "ماژیک"],
+      steps: [
+        "بطری را از بالا ببرید (قیف درست کنید)",
+        "داخل بطری را با خط‌کش مدرج کنید (هر ۱ میلی‌لیتر = ۱ میلی‌متر)",
+        "در فضای باز، دور از درخت و ساختمان قرار دهید",
+        "هر روز صبح ساعت ۸ مقدار را یادداشت کنید",
+        "یک قطره روغن روی آب بریزید (جلوگیری از تبخیر)"
+      ],
+      tips: [
+        "بطری را کاملاً عمودی قرار دهید",
+        "در مناطق بادخیز، محافظ نصب کنید",
+        "داده‌ها را در اپلیکیشن اکو نوژین ثبت کنید"
+      ]
+    }
+  ],
+  erosion: [
+    {
+      title: "نصب میخ‌های فرسایش (Erosion Pins)",
+      icon: Ruler,
+      difficulty: "متوسط",
+      cost: "کم (زیر ۵ دلار)",
+      accuracy: "±۱۰٪",
+      riskLevel: "کم",
+      tools: ["۱۰ میخ فلزی ۳۰ سانتی", "چکش", "خط‌کش فلزی", "دفترچه"],
+      steps: [
+        "در یک شیب، میخ‌ها را به صورت شبکه ۵×۲ بکوبید",
+        "فقط ۵ سانتی‌متر از میخ بیرون بماند",
+        "فاصله لبه میخ تا سطح خاک را یادداشت کنید",
+        "هر ماه ارتفاع بیرون‌مانده را اندازه بگیرید",
+        "افزایش ارتفاع = فرسایش | کاهش = رسوب‌گذاری"
+      ],
+      tips: [
+        "میخ‌ها را در خط مستقیم نصب کنید",
+        "از میخ گالوانیزه استفاده کنید (زنگ نمی‌زند)",
+        "عکس ماهانه از شبکه بگیرید"
+      ]
+    }
+  ],
+  ndvi: [
+    {
+      title: "اندازه‌گیری NDVI با موبایل",
+      icon: Camera,
+      difficulty: "آسان",
+      cost: "رایگان",
+      accuracy: "±۱۵-۲۰٪",
+      riskLevel: "کم",
+      tools: ["موبایل هوشمند", "اپلیکیشن CropWatch یا NDVI Camera"],
+      steps: [
+        "اپلیکیشن را از فروشگاه دانلود کنید",
+        "در فضای باز، زیر نور مستقیم خورشید",
+        "از پوشش گیاهی از فاصله ۱ متری عکس بگیرید",
+        "اپلیکیشن NDVI را محاسبه می‌کند",
+        "نتیجه را در اکو نوژین ثبت کنید"
+      ],
+      tips: [
+        "همیشه در ساعت مشابه عکس بگیرید",
+        "سایه ابر یا درخت روی سوژه نباشد",
+        "از زوایای مختلف ۳ عکس بگیرید"
+      ]
+    }
+  ],
+  carbon: [
+    {
+      title: "تخمین کربن زیست‌توده درختان",
+      icon: TrendingUp,
+      difficulty: "متوسط",
+      cost: "رایگان",
+      accuracy: "±۲۰٪",
+      riskLevel: "متوسط",
+      tools: ["متر خیاطی", "کالیپر (یا خط‌کش)"],
+      steps: [
+        "قطر درخت را در ارتفاع ۱.۳ متری اندازه بگیرید (DBH)",
+        "ارتفاع درخت را تخمین بزنید",
+        "از فرمول آلومتریک استفاده کنید:",
+        "  Biomass = 0.05 × DBH².⁵ (برای درختان مناطق خشک)",
+        "کربن ≈ ۵۰٪ Biomass",
+        "CO₂ جذب‌شده = کربن × ۳.۶۷"
+      ],
+      tips: [
+        "قطر را در دو جهت عمود اندازه بگیرید و میانگین بگیرید",
+        "برای جنگل‌کاری‌های جوان، فرمول مخصوص نهال استفاده کنید",
+        "هر سال یک بار اندازه‌گیری کافی است"
+      ]
+    }
+  ]
+};
+
+export default function DataCollectionGuide({ moduleType, moduleName }: DataCollectionGuideProps) {
+  const [openGuide, setOpenGuide] = useState<number | null>(0);
+  const [showAll, setShowAll] = useState(false);
+
+  const guides = GUIDES[moduleType] || [];
+
+  const difficultyColor = (d: string) => {
+    if (d === "آسان") return "bg-emerald-500/20 text-emerald-400";
+    if (d === "متوسط") return "bg-amber-500/20 text-amber-400";
+    return "bg-red-500/20 text-red-400";
+  };
+
+  const riskColor = (r: string) => {
+    if (r === "کم") return "text-emerald-400";
+    if (r === "متوسط") return "text-amber-400";
+    return "text-red-400";
+  };
+
+  if (guides.length === 0) return null;
+
+  return (
+    <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 backdrop-blur-xl border border-slate-700 rounded-3xl p-8 my-8">
+      {/* Header */}
+      <div className="flex items-start gap-4 mb-6">
+        <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg">
+          <Users className="h-8 w-8 text-white" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-2xl font-black text-white mb-2">
+            🌱 راهنمای جمع‌آوری داده شهروندی
+          </h3>
+          <p className="text-slate-300 leading-relaxed">
+            بدون نیاز به تجهیزات گران‌قیمت! با ابزارهای ساده در دسترس، داده‌های ارزشمندی جمع‌آوری کنید
+            و به پایش محیط زیست منطقه‌تان کمک کنید.
+          </p>
+        </div>
+      </div>
+
+      {/* Why This Matters */}
+      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-5 mb-6">
+        <div className="flex items-start gap-3">
+          <Globe className="h-6 w-6 text-emerald-400 flex-shrink-0 mt-1" />
+          <div>
+            <h4 className="font-bold text-emerald-300 mb-2">چرا این مهم است؟</h4>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              بیش از ۲ میلیارد نفر در مناطق خشک جهان زندگی می‌کنند. حتی اگر سنسور IoT نداشته باشید،
+              داده‌های شما در کنار داده‌های ماهواره‌ای و سایر کاربران، با دقت ۹۰٪+ به تحلیل‌های ارزشمند
+              تبدیل می‌شود. هر اندازه‌گیری شما، قدمی برای آینده‌ای پایدارتر است.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Quality Promise */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+          <Zap className="h-6 w-6 text-yellow-400 mb-2" />
+          <p className="text-sm font-bold text-white mb-1">صحت‌سنجی ماهانه</p>
+          <p className="text-xs text-slate-400">داده‌های شما با داده‌های ماهواره‌ای و IoT کالیبره می‌شود</p>
+        </div>
+        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+          <TrendingUp className="h-6 w-6 text-blue-400 mb-2" />
+          <p className="text-sm font-bold text-white mb-1">کاهش خطا با زمان</p>
+          <p className="text-xs text-slate-400">هرچه بیشتر داده بدهید، سیستم هوشمندتر می‌شود</p>
+        </div>
+        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+          <CheckCircle2 className="h-6 w-6 text-emerald-400 mb-2" />
+          <p className="text-sm font-bold text-white mb-1">شفافیت کامل</p>
+          <p className="text-xs text-slate-400">ضریب خطای هر گزارش به شما نمایش داده می‌شود</p>
+        </div>
+      </div>
+
+      {/* Guides List */}
+      <div className="space-y-3">
+        {guides.map((guide, idx) => {
+          const Icon = guide.icon;
+          const isOpen = openGuide === idx;
+
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden"
+            >
+              {/* Header */}
+              <button
+                onClick={() => setOpenGuide(isOpen ? null : idx)}
+                className="w-full p-5 flex items-center gap-4 hover:bg-slate-800 transition-colors"
+              >
+                <div className="p-3 rounded-xl bg-slate-700/50">
+                  <Icon className="h-6 w-6 text-emerald-400" />
+                </div>
+                <div className="flex-1 text-right">
+                  <h4 className="font-bold text-white text-lg">{guide.title}</h4>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${difficultyColor(guide.difficulty)}`}>
+                      {guide.difficulty}
+                    </span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400">
+                      💰 {guide.cost}
+                    </span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-400">
+                      🎯 دقت {guide.accuracy}
+                    </span>
+                  </div>
+                </div>
+                {isOpen ? (
+                  <ChevronUp className="h-5 w-5 text-slate-400" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-slate-400" />
+                )}
+              </button>
+
+              {/* Content */}
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-5 pt-0 space-y-5 border-t border-slate-700">
+                      {/* Risk Warning */}
+                      <div className={`p-4 rounded-xl border ${
+                        guide.riskLevel === "کم" ? "bg-emerald-500/10 border-emerald-500/30" :
+                        guide.riskLevel === "متوسط" ? "bg-amber-500/10 border-amber-500/30" :
+                        "bg-red-500/10 border-red-500/30"
+                      }`}>
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className={`h-5 w-5 flex-shrink-0 mt-0.5 ${riskColor(guide.riskLevel)}`} />
+                          <div>
+                            <p className="text-sm font-bold text-white mb-1">
+                              سطح ریسک تصمیم‌گیری: <span className={riskColor(guide.riskLevel)}>{guide.riskLevel}</span>
+                            </p>
+                            <p className="text-xs text-slate-300">
+                              {guide.riskLevel === "کم" && "مناسب برای پایش روند و تصمیم‌های روزمره کشاورزی"}
+                              {guide.riskLevel === "متوسط" && "مناسب برای پایش بلندمدت و هشدارهای اولیه"}
+                              {guide.riskLevel === "بالا" && "فقط برای آگاهی‌بخشی، نه تصمیم‌های مالی"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tools */}
+                      <div>
+                        <h5 className="font-bold text-white mb-3 flex items-center gap-2">
+                          <Wrench className="h-4 w-4 text-amber-400" />
+                          وسایل مورد نیاز
+                        </h5>
+                        <div className="flex flex-wrap gap-2">
+                          {guide.tools.map((tool, i) => (
+                            <span key={i} className="px-3 py-1.5 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-slate-200">
+                              {tool}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Steps */}
+                      <div>
+                        <h5 className="font-bold text-white mb-3 flex items-center gap-2">
+                          <BookOpen className="h-4 w-4 text-blue-400" />
+                          مراحل گام‌به‌گام
+                        </h5>
+                        <ol className="space-y-2">
+                          {guide.steps.map((step, i) => (
+                            <li key={i} className="flex gap-3 text-sm text-slate-300">
+                              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">
+                                {i + 1}
+                              </span>
+                              <span className="flex-1 leading-relaxed">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+
+                      {/* Tips */}
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                        <h5 className="font-bold text-blue-300 mb-2 flex items-center gap-2">
+                          <Zap className="h-4 w-4" />
+                          نکات طلایی
+                        </h5>
+                        <ul className="space-y-1">
+                          {guide.tips.map((tip, i) => (
+                            <li key={i} className="text-sm text-slate-300 flex gap-2">
+                              <span className="text-blue-400">💡</span>
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button className="w-full py-3 bg-gradient-to-l from-emerald-500 to-green-600 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2">
+                        <Smartphone className="h-5 w-5" />
+                        ثبت داده در اکو نوژین
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 pt-6 border-t border-slate-700 text-center">
+        <p className="text-sm text-slate-400">
+          🌍 با هر اندازه‌گیری، شما بخشی از شبکه جهانی علم شهروندی می‌شوید
+        </p>
+        <p className="text-xs text-slate-500 mt-2">
+          داده‌های شما با استانداردهای UNCCD و FAO صحت‌سنجی می‌شود
+        </p>
+      </div>
+    </div>
+  );
+}
+'''
+    
+    write_file(WEB / "components" / "iot" / "DataCollectionGuide.tsx", content)
+
+
+def main():
+    print("🌍 ایجاد سیستم Citizen Science در اکو نوژین")
+    print("=" * 70)
+    
+    if not WEB.exists():
+        print(f"❌ دایرکتوری {WEB} یافت نشد!")
+        return 1
+    
+    create_guide_component()
+    
+    print("\n" + "=" * 70)
+    print("✅ کامپوننت DataCollectionGuide ایجاد شد!")
+    print("\n📚 نحوه استفاده در هر ماژول:")
+    print('''
+    import DataCollectionGuide from "@/components/iot/DataCollectionGuide";
+    
+    // در هر صفحه ماژول:
+    <DataCollectionGuide 
+      moduleType="hydrology" 
+      moduleName="هیدرولوژی" 
+    />
+    ''')
+    print("\n🎯 ماژول‌های پشتیبانی شده:")
+    print("   • hydrology - هیدرولوژی")
+    print("   • soil - رطوبت خاک")
+    print("   • rainfall - بارش")
+    print("   • erosion - فرسایش")
+    print("   • ndvi - پوشش گیاهی")
+    print("   • carbon - کربن خاک")
+    print("=" * 70)
+    
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

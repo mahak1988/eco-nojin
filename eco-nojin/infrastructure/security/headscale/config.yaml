@@ -1,0 +1,23 @@
+server_url: http://localhost:9000
+listen_addr: 0.0.0.0:9000
+
+db_type: "postgres"
+db_url: "postgresql://headscale:REPLACE_WITH_DB_PASSWORD@postgres:5432/headscale?sslmode=disable"
+
+private_key_path: /var/lib/headscale/keys/private.key
+
+log_level: info
+
+oidc:
+  issuer_url: ""
+  client_id: ""
+  client_secret: ""
+  scopes: ["openid", "profile", "email"]
+  redirect_uri: "http://localhost:9000/oauth/callback"
+
+tls:
+  cert_file: ""
+  key_file: ""
+
+user_settings:
+  create_users_if_not_exists: true

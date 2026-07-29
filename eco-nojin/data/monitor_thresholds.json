@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "preset": "arid",
+  "updated_at": "2026-07-28T05:28:48.134993+00:00",
+  "overrides": {
+    "aquacrop_yield": {
+      "warning": 3.75,
+      "critical": 6.55
+    },
+    "aquacrop_irrigation": {
+      "warning": 248.0,
+      "critical": 403.0
+    },
+    "aquacrop_stress": {
+      "warning": 0.7,
+      "critical": 0.45
+    },
+    "scs_runoff": {
+      "warning": 80.0,
+      "critical": 150.0
+    },
+    "scs_sediment": {
+      "warning": 5.0,
+      "critical": 15.0
+    },
+    "rothc_soc_loss": {
+      "warning": -0.5,
+      "critical": -2.0
+    },
+    "ndvi_greenness": {
+      "warning": 0.35,
+      "critical": 0.2
+    },
+    "ndvi_canopy": {
+      "warning": 0.35,
+      "critical": 0.2
+    },
+    "sensor_soil_moisture": {
+      "warning": 25.0,
+      "critical": 15.0
+    },
+    "sensor_temp": {
+      "warning": 38.0,
+      "critical": 42.0
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "jsx": "react-jsx",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "src*.ts",
+    "src*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/api/hooks/useAuth.ts",
+    "src/api/interceptors.ts",
+    "src/hooks/analysis/useAnalysisWebSocket.ts",
+    "src/hooks/useAnalysisWebSocket.ts",
+    "src/hooks/useTranslation.ts",
+    "src/hooks/useModuleData.ts",
+    "src/hooks/academy",
+    "src/hooks/ai",
+    "src/hooks/blockchain",
+    "src/hooks/drought",
+    "src/hooks/forest",
+    "src/hooks/iot",
+    "src/hooks/satellite",
+    "src/hooks/soil",
+    "src/hooks/weather",
+    "src/hooks/useApi.ts",
+    "src/hooks/useApiHooks.ts",
+    "src/hooks/useCalendar.ts"
+  ]
+}

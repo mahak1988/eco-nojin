@@ -4,7 +4,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 from typing import List, Any
-from langchain_core.tools import BaseTool
+
+# langchain_core is optional; fallback if not installed
+try:
+    from langchain_core.tools import BaseTool
+except ImportError:
+    from typing import Any as BaseTool  # type: ignore[assignment]
+
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
 from apps.shared_ai.ai.tools.database_tools import query_database, get_table_schema
 from apps.shared_ai.ai.tools.fast_compute import (

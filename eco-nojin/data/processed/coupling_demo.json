@@ -1,0 +1,15 @@
+{
+  "chain_complete": true,
+  "results": {},
+  "final_output": {
+    "subbasin_code": "PILOT_001",
+    "area_ha": 1000,
+    "annual_precip_mm": 340,
+    "annual_et_mm": 290,
+    "curve_number": 78,
+    "crop_type": "wheat",
+    "temp_avg_c": 19,
+    "clay_pct": 28
+  },
+  "timestamp": "2026-05-27T05:36:48.875045"
+}

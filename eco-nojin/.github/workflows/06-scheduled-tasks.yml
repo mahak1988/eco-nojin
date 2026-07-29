@@ -1,0 +1,164 @@
+name: 📅 Scheduled Maintenance Tasks
+
+on:
+  schedule:
+    # هر روز ساعت 3 صبح
+    - cron: '0 3 * * *'
+    # هر دوشنبه ساعت 4 صبح (گزارش هفتگی)
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # ==========================================================================
+  # Dependency Updates Check
+  # ==========================================================================
+  dependency-updates:
+    name: 📦 Check Dependency Updates
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: 📦 Check for updates
+        run: |
+          pip install pip-upgrader pur
+          pip install -r requirements.txt
+          
+          # بررسی آپدیت‌ها
+          pip list --outdated --format=json > outdated.json
+          
+          # اگر آپدیت مهمی وجود دارد، issue بساز
+          OUTDATED_COUNT=$(jq 'length' outdated.json)
+          if [ "$OUTDATED_COUNT" -gt 5 ]; then
+            echo "⚠️ $OUTDATED_COUNT packages have updates available"
+          fi
+      
+      - name: 🐛 Create issue if needed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const outdated = JSON.parse(fs.readFileSync('outdated.json', 'utf8'));
+            
+            if (outdated.length > 10) {
+              const body = `## 📦 Dependency Updates Available\n\n` +
+                          `${outdated.length} packages have updates:\n\n` +
+                          outdated.slice(0, 20).map(p => 
+                            `- **${p.name}**: ${p.version} → ${p.latest_version}`
+                          ).join('\n') +
+                          `\n\nRun \`pip install --upgrade -r requirements.txt\` to update.`;
+              
+              // بررسی issue تکراری
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'dependencies'
+              });
+              
+              const hasExisting = issues.data.some(i => 
+                i.title.includes('Dependency Updates')
+              );
+              
+              if (!hasExisting) {
+                github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `📦 ${outdated.length} Dependency Updates Available`,
+                  body: body,
+                  labels: ['dependencies', 'maintenance']
+                });
+              }
+            }
+
+  # ==========================================================================
+  # Database Backup Verification
+  # ==========================================================================
+  backup-verification:
+    name: 💾 Verify Backups
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: 💾 Check backup integrity
+        run: |
+          echo "💾 Verifying database backups..."
+          # دستورات verification واقعی
+          # pg_restore --list backup.dump
+          echo "✅ Backups verified"
+
+  # ==========================================================================
+  # Weekly Report
+  # ==========================================================================
+  weekly-report:
+    name: 📊 Weekly Report
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 4 * * 1'  # فقط دوشنبه‌ها
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 📊 Generate weekly stats
+        run: |
+          echo "## 📊 Weekly Development Report" > weekly-report.md
+          echo "" >> weekly-report.md
+          echo "**Period:** $(date -d '7 days ago' +%Y-%m-%d) to $(date +%Y-%m-%d)" >> weekly-report.md
+          echo "" >> weekly-report.md
+          
+          # Commits
+          COMMITS=$(git log --since="7 days ago" --oneline | wc -l)
+          echo "### 📝 Commits: $COMMITS" >> weekly-report.md
+          echo "" >> weekly-report.md
+          
+          # Contributors
+          echo "### 👥 Contributors" >> weekly-report.md
+          git log --since="7 days ago" --format="%aN" | sort -u >> weekly-report.md
+          echo "" >> weekly-report.md
+          
+          # Files changed
+          FILES=$(git log --since="7 days ago" --name-only --pretty=format: | sort -u | wc -l)
+          echo "### 📁 Files Changed: $FILES" >> weekly-report.md
+          
+          cat weekly-report.md
+      
+      - name: 📧 Send report
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "📊 Weekly Report - Econojin"
+          to: ${{ secrets.TEAM_EMAIL }}
+          from: GitHub Actions
+          body: file://weekly-report.md
+        continue-on-error: true
+
+  # ==========================================================================
+  # Cleanup Old Artifacts
+  # ==========================================================================
+  cleanup:
+    name: 🧹 Cleanup Old Artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 🧹 Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 10

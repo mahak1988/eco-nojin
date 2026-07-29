@@ -1,0 +1,261 @@
+{
+  "metadata": {
+    "standard": "Köppen-Geiger Climate Classification",
+    "version": "2023",
+    "source": "Peel, M.C., Finlayson, B.L., and McMahon, T.A. (2007)",
+    "description": "سیستم طبقه‌بندی اقلیمی جهانی بر اساس دما و بارش"
+  },
+  "groups": {
+    "A": {
+      "name": "Tropical (گرمسیری)",
+      "description": "دمای متوسط سردترین ماه ≥ 18°C",
+      "subtypes": {
+        "Af": {
+          "name": "Tropical rainforest",
+          "name_fa": "جنگل بارانی گرمسیری",
+          "criteria": "بارش خشک‌ترین ماه ≥ 60mm",
+          "examples": [
+            "آمازون",
+            "کنگو",
+            "اندونزی"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "2000-4000",
+            "temperature_range_c": "24-28",
+            "humidity_percent": "80-95",
+            "soil_type": "Latosol, Oxisol",
+            "vegetation": "جنگل بارانی همیشه سبز"
+          }
+        },
+        "Am": {
+          "name": "Tropical monsoon",
+          "name_fa": "مانسون گرمسیری",
+          "criteria": "بارش خشک‌ترین ماه < 60mm اما ≥ 100 - (annual/25)",
+          "examples": [
+            "ساحل غربی هند",
+            "شمال استرالیا"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "1500-2500",
+            "temperature_range_c": "25-30",
+            "humidity_percent": "70-90",
+            "soil_type": "Laterite, Alluvial",
+            "vegetation": "جنگل مانسونی"
+          }
+        },
+        "Aw": {
+          "name": "Tropical savanna",
+          "name_fa": "ساوانای گرمسیری",
+          "criteria": "بارش خشک‌ترین ماه < 60mm و < 100 - (annual/25)",
+          "examples": [
+            "آفریقای شرقی",
+            "برزیل مرکزی"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "800-1500",
+            "temperature_range_c": "22-30",
+            "humidity_percent": "60-80",
+            "soil_type": "Vertisol, Chernozem",
+            "vegetation": "علفزار با درختان پراکنده"
+          }
+        }
+      }
+    },
+    "B": {
+      "name": "Dry (خشک)",
+      "description": "تبخیر بالقوه > بارش",
+      "subtypes": {
+        "BWh": {
+          "name": "Hot desert",
+          "name_fa": "بیابان گرم",
+          "criteria": "بارش سالانه < 50% آستانه و دمای متوسط سالانه ≥ 18°C",
+          "examples": [
+            "صحرای بزرگ",
+            "ربعالخالی",
+            "آتاکاما"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "0-250",
+            "temperature_range_c": "20-35",
+            "humidity_percent": "10-30",
+            "soil_type": "Aridisol, Entisol",
+            "vegetation": "بیابانی، بوته‌های مقاوم"
+          },
+          "challenges": [
+            "کمبود شدید آب",
+            "شوری خاک",
+            "دمای بالا",
+            "فرسایش بادی"
+          ],
+          "interventions": [
+            "آبیاری قطره‌ای",
+            "جمع‌آوری آب مه",
+            "گیاهان شورپسند",
+            "سایه‌بان‌های خورشیدی"
+          ]
+        },
+        "BWk": {
+          "name": "Cold desert",
+          "name_fa": "بیابان سرد",
+          "criteria": "بارش سالانه < 50% آستانه و دمای متوسط سالانه < 18°C",
+          "examples": [
+            "بیابان گبی",
+            "دشت کویر",
+            "پاتاگونیا"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "50-200",
+            "temperature_range_c": "-5-25",
+            "humidity_percent": "20-40",
+            "soil_type": "Aridisol, Solonchak",
+            "vegetation": "بوته‌های مقاوم به سرما"
+          },
+          "challenges": [
+            "خشکی و سرما",
+            "شوری خاک",
+            "فصل رشد کوتاه"
+          ],
+          "interventions": [
+            "بادشکن‌ها",
+            "آبیاری تکمیلی",
+            "گیاهان مقاوم به سرما"
+          ]
+        },
+        "BSh": {
+          "name": "Hot semi-arid",
+          "name_fa": "نیمه‌خشک گرم",
+          "criteria": "بارش سالانه 50-100% آستانه و دمای متوسط سالانه ≥ 18°C",
+          "examples": [
+            "ساحل، سنگال",
+            "راجستان، هند",
+            "بهبهان، ایران"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "250-500",
+            "temperature_range_c": "18-30",
+            "humidity_percent": "30-50",
+            "soil_type": "Aridisol, Vertisol",
+            "vegetation": "علفزار خشک، بوته"
+          },
+          "challenges": [
+            "خشکسالی دوره‌ای",
+            "شوری خاک",
+            "فرسایش آبی و بادی"
+          ],
+          "interventions": [
+            "SWC-AgMAR",
+            "کشاورزی حفاظتی",
+            "مدیریت شوری"
+          ]
+        },
+        "BSk": {
+          "name": "Cold semi-arid",
+          "name_fa": "نیمه‌خشک سرد",
+          "criteria": "بارش سالانه 50-100% آستانه و دمای متوسط سالانه < 18°C",
+          "examples": [
+            "دیشموک، ایران",
+            "استپ مغولستان",
+            "دشت‌های مرتفع"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "200-400",
+            "temperature_range_c": "-10-25",
+            "humidity_percent": "30-50",
+            "soil_type": "Mollisol, Aridisols",
+            "vegetation": "مرتع، بوته‌های مقاوم"
+          },
+          "challenges": [
+            "فرسایش شدید",
+            "چرای مفرط",
+            "خشکسالی"
+          ],
+          "interventions": [
+            "قرق مرتع",
+            "کشت حفاظتی",
+            "آبخیزداری"
+          ]
+        }
+      }
+    },
+    "C": {
+      "name": "Temperate (معتدل)",
+      "description": "دمای متوسط سردترین ماه بین -3°C و 18°C",
+      "subtypes": {
+        "Cfa": {
+          "name": "Humid subtropical",
+          "name_fa": "نیمه‌گرمسیری مرطوب",
+          "criteria": "گرم‌ترین ماه ≥ 22°C، بدون فصل خشک",
+          "examples": [
+            "جنوب شرقی آمریکا",
+            "شرق چین"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "1000-1500",
+            "temperature_range_c": "5-28",
+            "humidity_percent": "60-80",
+            "soil_type": "Ultisol, Alfisol",
+            "vegetation": "جنگل پهن‌برگ"
+          }
+        },
+        "Cfb": {
+          "name": "Oceanic",
+          "name_fa": "اقیانوسی",
+          "criteria": "گرم‌ترین ماه < 22°C، ≥ 4 ماه ≥ 10°C",
+          "examples": [
+            "رودبار/تالش، ایران",
+            "اروپای غربی"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "800-2000",
+            "temperature_range_c": "2-20",
+            "humidity_percent": "70-90",
+            "soil_type": "Spodosol, Inceptisol",
+            "vegetation": "جنگل هیرکانی، راش"
+          },
+          "challenges": [
+            "رانش زمین",
+            "فرسایش شیب",
+            "آلودگی آب"
+          ],
+          "interventions": [
+            "تثبیت شیب",
+            "حفاظت جنگل",
+            "مدیریت پسماند"
+          ]
+        }
+      }
+    },
+    "D": {
+      "name": "Continental (قاره‌ای)",
+      "description": "دمای متوسط سردترین ماه < -3°C",
+      "subtypes": {
+        "Dfb": {
+          "name": "Warm-summer humid continental",
+          "name_fa": "قاره‌ای مرطوب با تابستان گرم",
+          "criteria": "گرم‌ترین ماه < 22°C، ≥ 4 ماه ≥ 10°C",
+          "examples": [
+            "کوهستان برفی، ایران",
+            "کانادا"
+          ],
+          "characteristics": {
+            "annual_precipitation_mm": "400-800",
+            "temperature_range_c": "-15-25",
+            "humidity_percent": "50-70",
+            "soil_type": "Mollisol, Alfisol",
+            "vegetation": "جنگل مخروطی، مرتع کوهستانی"
+          },
+          "challenges": [
+            "کاهش برف‌پوشش",
+            "سیلاب بهاره",
+            "فصل رشد کوتاه"
+          ],
+          "interventions": [
+            "مدیریت برف و رواناب",
+            "سیلواپاستورال",
+            "تنوع‌بخشی معیشت"
+          ]
+        }
+      }
+    }
+  }
+}

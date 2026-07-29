@@ -1,0 +1,322 @@
+{
+  "metadata": {
+    "project": "Econojin - Hydroma Nojin",
+    "total_zones": 12,
+    "continents": 4,
+    "countries": 9,
+    "standard": "Köppen-Geiger + IPCC AFOLU",
+    "created": "2026-06-15T18:01:57.549388"
+  },
+  "zones": [
+    {
+      "id": "dishmok",
+      "name": "دیشموک",
+      "name_en": "Dishmok",
+      "country": "ایران",
+      "country_en": "Iran",
+      "continent": "آسیا",
+      "koppen": "BSk",
+      "koppen_name": "Cold semi-arid",
+      "ipcc_zone": "Temperate Dry",
+      "coordinates": {
+        "lat": 30.9,
+        "lon": 51.4
+      },
+      "elevation_m": 2200,
+      "area_hectares": 5000,
+      "climate_data": {
+        "annual_precipitation_mm": 350,
+        "temperature_range_c": "-5 to 30",
+        "mean_annual_temp_c": 14,
+        "frost_free_days": 200,
+        "relative_humidity_percent": 40
+      },
+      "soil_data": {
+        "texture": "Loam to Clay Loam",
+        "organic_carbon_percent": 1.2,
+        "ph": 7.5,
+        "depth_cm": 30,
+        "erosion_risk": "High"
+      },
+      "challenges": [
+        "فرسایش شدید شیب‌ها",
+        "چرای مفرط و تخریب مرتع",
+        "خشک‌شدن چشمه‌ها",
+        "مهاجرت جوانان"
+      ],
+      "interventions": [
+        "SWC-AgMAR طبیعت‌محور",
+        "قرق هوشمند مرتع",
+        "کشاورزی حفاظتی دیم",
+        "زنبورداری و گیاهان دارویی"
+      ],
+      "indicators": {
+        "baseline": {
+          "wue_kg_m3": 0.8,
+          "soc_percent": 1.2,
+          "erosion_t_ha_yr": 18.5,
+          "ndvi": 0.25
+        },
+        "target": {
+          "wue_kg_m3": 1.5,
+          "soc_percent": 2.0,
+          "erosion_t_ha_yr": 8,
+          "ndvi": 0.45
+        }
+      }
+    },
+    {
+      "id": "behbahan",
+      "name": "بهبهان",
+      "name_en": "Behbahan",
+      "country": "ایران",
+      "country_en": "Iran",
+      "continent": "آسیا",
+      "koppen": "BSh",
+      "koppen_name": "Hot semi-arid",
+      "ipcc_zone": "Tropical Dry",
+      "coordinates": {
+        "lat": 30.6,
+        "lon": 50.2
+      },
+      "elevation_m": 350,
+      "area_hectares": 8000,
+      "climate_data": {
+        "annual_precipitation_mm": 280,
+        "temperature_range_c": "5 to 45",
+        "mean_annual_temp_c": 24,
+        "frost_free_days": 330,
+        "relative_humidity_percent": 45
+      },
+      "soil_data": {
+        "texture": "Silty Clay",
+        "organic_carbon_percent": 0.9,
+        "ph": 8.2,
+        "depth_cm": 80,
+        "salinity_ds_m": 6.5,
+        "erosion_risk": "Moderate"
+      },
+      "challenges": [
+        "شوری خاک و آب زیرزمینی",
+        "آبیاری ناکارآمد",
+        "بالا آمدن سطح ایستابی",
+        "آلودگی نیترات"
+      ],
+      "interventions": [
+        "IWRM و مدیریت شوری",
+        "اصلاح الگوی کشت CSA",
+        "زهکشی کنترل‌شده",
+        "گونه‌های مقاوم به شوری"
+      ],
+      "indicators": {
+        "baseline": {
+          "wue_kg_m3": 1.1,
+          "soc_percent": 0.9,
+          "salinity_ds_m": 6.5,
+          "groundwater_depth_m": 8.5
+        },
+        "target": {
+          "wue_kg_m3": 2.0,
+          "soc_percent": 1.8,
+          "salinity_ds_m": 3.5,
+          "groundwater_depth_m": 12
+        }
+      }
+    },
+    {
+      "id": "rodbar_talesh",
+      "name": "رودبار/تالش",
+      "name_en": "Rodbar/Talesh",
+      "country": "ایران",
+      "country_en": "Iran",
+      "continent": "آسیا",
+      "koppen": "Cfb",
+      "koppen_name": "Oceanic",
+      "ipcc_zone": "Temperate Humid",
+      "coordinates": {
+        "lat": 37.0,
+        "lon": 49.5
+      },
+      "elevation_m": 600,
+      "area_hectares": 6000,
+      "climate_data": {
+        "annual_precipitation_mm": 1200,
+        "temperature_range_c": "0 to 30",
+        "mean_annual_temp_c": 15,
+        "frost_free_days": 240,
+        "relative_humidity_percent": 75
+      },
+      "soil_data": {
+        "texture": "Sandy Loam",
+        "organic_carbon_percent": 2.1,
+        "ph": 6.5,
+        "depth_cm": 60,
+        "erosion_risk": "High (slopes)"
+      },
+      "challenges": [
+        "رانش و لغزش شیب‌ها",
+        "آلودگی آب ناشی از پسماند",
+        "تکه‌تکه‌شدن جنگل هیرکانی",
+        "تغییر کاربری غیرمجاز"
+      ],
+      "interventions": [
+        "تثبیت شیب با NbS",
+        "مدیریت پسماند مشارکتی",
+        "آگروفارستری جنگلی",
+        "اکوتوریسم خرد"
+      ],
+      "indicators": {
+        "baseline": {
+          "forest_cover_percent": 45,
+          "erosion_t_ha_yr": 22,
+          "water_quality_index": 55,
+          "biodiversity_index": 0.65
+        },
+        "target": {
+          "forest_cover_percent": 65,
+          "erosion_t_ha_yr": 10,
+          "water_quality_index": 80,
+          "biodiversity_index": 0.85
+        }
+      }
+    },
+    {
+      "id": "snow_mountain",
+      "name": "کوهستان برفی",
+      "name_en": "Snow Mountain",
+      "country": "ایران",
+      "country_en": "Iran",
+      "continent": "آسیا",
+      "koppen": "Dfb",
+      "koppen_name": "Warm-summer humid continental",
+      "ipcc_zone": "Boreal/Temperate",
+      "coordinates": {
+        "lat": 30.7,
+        "lon": 51.6
+      },
+      "elevation_m": 2800,
+      "area_hectares": 7000,
+      "climate_data": {
+        "annual_precipitation_mm": 650,
+        "temperature_range_c": "-20 to 25",
+        "mean_annual_temp_c": 8,
+        "frost_free_days": 120,
+        "relative_humidity_percent": 55,
+        "snow_cover_days": 85
+      },
+      "soil_data": {
+        "texture": "Loam",
+        "organic_carbon_percent": 1.8,
+        "ph": 6.8,
+        "depth_cm": 40,
+        "erosion_risk": "Moderate"
+      },
+      "challenges": [
+        "کاهش برف‌پوشش و ذوب زودهنگام",
+        "تخریب مراتع کوهستانی",
+        "سیلاب‌های بهاره",
+        "فصل رشد کوتاه"
+      ],
+      "interventions": [
+        "مدیریت برف و رواناب NbS",
+        "سیلواپاستورال",
+        "تقویم چرا سازگار",
+        "تنوع‌بخشی معیشت"
+      ],
+      "indicators": {
+        "baseline": {
+          "snow_cover_days": 85,
+          "forage_kg_ha": 450,
+          "water_availability_days": 180,
+          "livestock_density": 1.8
+        },
+        "target": {
+          "snow_cover_days": 95,
+          "forage_kg_ha": 750,
+          "water_availability_days": 240,
+          "livestock_density": 1.2
+        }
+      }
+    },
+    {
+      "id": "ouarzazate",
+      "name": "وارزازت",
+      "country": "مراکش",
+      "continent": "آفریقا",
+      "koppen": "BWh",
+      "koppen_name": "Hot desert",
+      "area_hectares": 10000,
+      "annual_precipitation_mm": 120
+    },
+    {
+      "id": "wadi_rum",
+      "name": "وادی رم",
+      "country": "اردن",
+      "continent": "آسیا",
+      "koppen": "BWh",
+      "koppen_name": "Hot desert",
+      "area_hectares": 12000,
+      "annual_precipitation_mm": 60
+    },
+    {
+      "id": "sahel_senegal",
+      "name": "ساحل",
+      "country": "سنگال",
+      "continent": "آفریقا",
+      "koppen": "BSh",
+      "koppen_name": "Hot semi-arid",
+      "area_hectares": 9000,
+      "annual_precipitation_mm": 380
+    },
+    {
+      "id": "ethiopian_highlands",
+      "name": "ارتفاعات",
+      "country": "اتیوپی",
+      "continent": "آفریقا",
+      "koppen": "Cfb",
+      "koppen_name": "Oceanic",
+      "area_hectares": 11000,
+      "annual_precipitation_mm": 900
+    },
+    {
+      "id": "rajasthan",
+      "name": "راجستان",
+      "country": "هند",
+      "continent": "آسیا",
+      "koppen": "BSh",
+      "koppen_name": "Hot semi-arid",
+      "area_hectares": 15000,
+      "annual_precipitation_mm": 250
+    },
+    {
+      "id": "outback_australia",
+      "name": "اوت‌بک",
+      "country": "استرالیا",
+      "continent": "اقیانوسیه",
+      "koppen": "BWh",
+      "koppen_name": "Hot desert",
+      "area_hectares": 25000,
+      "annual_precipitation_mm": 180
+    },
+    {
+      "id": "atacama_chile",
+      "name": "آتاکاما",
+      "country": "شیلی",
+      "continent": "آمریکای جنوبی",
+      "koppen": "BWh",
+      "koppen_name": "Hot desert",
+      "area_hectares": 18000,
+      "annual_precipitation_mm": 15
+    },
+    {
+      "id": "mongolian_steppe",
+      "name": "استپ",
+      "country": "مغولستان",
+      "continent": "آسیا",
+      "koppen": "BSk",
+      "koppen_name": "Cold semi-arid",
+      "area_hectares": 20000,
+      "annual_precipitation_mm": 200
+    }
+  ]
+}

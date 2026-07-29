@@ -1,0 +1,52 @@
+{
+  "pilot_id": "ethiopian_highlands",
+  "name": "ارتفاعات اتیوپی",
+  "country": "اتیوپی",
+  "continent": "آفریقا",
+  "province": "Amhara",
+  "climate_zone": "کوهستانی نیمه‌خشک (Cwb)",
+  "coordinates": {
+    "lat": 11.6,
+    "lon": 37.38
+  },
+  "area_hectares": 11000,
+  "elevation_m": 2800,
+  "annual_precipitation_mm": 900,
+  "avg_temperature_c": 16.0,
+  "soil_type": "نیتریگونی، مستعد فرسایش",
+  "land_use": [
+    "زراعت شیب‌دار",
+    "دامداری",
+    "جنگل‌کاری"
+  ],
+  "main_challenges": [
+    "فرسایش شدید شیب",
+    "کم‌آبی فصلی",
+    "فقر روستایی"
+  ],
+  "interventions": [
+    "تراس‌بندی",
+    "آبخیزداری مشارکتی",
+    "جنگل‌کاری بومی"
+  ],
+  "baseline_indicators": {
+    "erosion_t_ha_year": 35.0,
+    "soc_percent": 1.8,
+    "poverty_rate_percent": 55
+  },
+  "target_indicators": {
+    "erosion_t_ha_year": 12.0,
+    "soc_percent": 3.0,
+    "poverty_rate_percent": 30
+  },
+  "beneficiaries": {
+    "households": 920,
+    "farmers": 750,
+    "women": 380
+  },
+  "global_partnership": [
+    "World Bank",
+    "SLMP",
+    "IFAD"
+  ]
+}

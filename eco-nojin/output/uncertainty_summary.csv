@@ -1,0 +1,3 @@
+Metric,Mean,Std,CI95_Lower,CI95_Upper,Min,Max
+yield,2964.6,822.3,1633.3,4813.6,719.0,5958.6
+soc_change,0.99,0.14,0.75,1.29,0.65,1.58

@@ -1,27 +1,27 @@
-# simulation | ماژول شبیه‌سازی جامع Econojin
+# simulation | Comprehensive Simulation Module for Econojin
 
-> **نکته:** این ماژول **هسته شبیه‌سازی** پلتفرم Econojin است.
-> شامل ۲۸+ شبیه‌ساز تخصصی در حوزه‌های اقلیم، کشاورزی، اقتصاد، انرژی، آب، خاک،
-> تنوع زیستی، کربن، و خدمات اکوسیستمی.
+> **Note:** This module is the **simulation core** of the Econojin platform.
+> It includes 28+ specialized simulators across climate, agriculture, economics, energy,
+> water, soil, biodiversity, carbon, and ecosystem services domains.
 
-## مسئولیت‌ها
+## Responsibilities
 
-این ماژول شش وظیفه‌ی اصلی دارد:
+This module has six main responsibilities:
 
-1. **۲۸+ شبیه‌ساز تخصصی** — مدل‌سازی حوزه‌های مختلف محیط زیستی و اقتصادی
-2. **ثبت و مدیریت شبیه‌سازها** (`registry.py`) — ثبت خودکار شبیه‌سازها با دکوراتور
-3. **زنجیره شبیه‌سازی** (`chain/`) — اجرای زنجیره‌ای شبیه‌سازها با خروجی→ورودی
-4. **گزارش‌گیری** (`reports/`) — تولید گزارش CSV/JSON از نتایج شبیه‌سازی
-5. **اعتبارسنجی** (`validation/`) — اعتبارسنجی داده‌های ورودی و خروجی
-6. **API شبیه‌سازی** (`router.py`) — اجرا، پایش و مدیریت شبیه‌سازی‌ها
+1. **28+ Specialized Simulators** — Modeling across environmental and economic domains
+2. **Simulator Registration** (`registry.py`) — Automatic registration via decorators
+3. **Simulation Chain** (`chain/`) — Chained simulator execution (output→input)
+4. **Report Generation** (`reports/`) — CSV/JSON report generation from simulation results
+5. **Validation** (`validation/`) — Input and output data validation
+6. **Simulation API** (`router.py`) — Run, monitor, and manage simulations
 
-## ساختار
+## Structure
 
 ```
 simulation/
 ├── __init__.py                # Module init
-├── base.py                    # ★ کلاس پایه Simulator
-├── registry.py                # ★ ثبت خودکار شبیه‌سازها
+├── base.py                    # ★ Simulator base class
+├── registry.py                # ★ Automatic simulator registration
 ├── router.py                  # ★ FastAPI router
 ├── schemas.py                 # Pydantic validation models
 ├── service.py                 # Business logic
@@ -29,55 +29,55 @@ simulation/
 ├── models.py                  # ORM models
 ├── dependencies.py            # FastAPI dependencies
 │
-├── climate/                   # ★ شبیه‌سازهای اقلیم
-├── agriculture/               # ★ شبیه‌سازهای کشاورزی
-├── economics/                 # ★ شبیه‌سازهای اقتصادی
-├── energy/                    # ★ شبیه‌سازهای انرژی
-├── hydrology/                 # ★ شبیه‌سازهای آب‌شناسی
-├── soil/                      # ★ شبیه‌سازهای خاک
-├── biodiversity/              # ★ شبیه‌سازهای تنوع زیستی
-├── carbon_cycle/              # ★ شبیه‌سازهای چرخه کربن
-├── ecosystem_services/        # ★ شبیه‌سازهای خدمات اکوسیستمی
-├── water_quality/             # ★ شبیه‌سازهای کیفیت آب
-├── urban/                     # ★ شبیه‌سازهای شهری
-├── earth_engine/              # ★ شبیه‌سازهای مهندسی زمین
+├── climate/                   # ★ Climate simulators
+├── agriculture/               # ★ Agriculture simulators
+├── economics/                 # ★ Economics simulators
+├── energy/                    # ★ Energy simulators
+├── hydrology/                 # ★ Hydrology simulators
+├── soil/                      # ★ Soil simulators
+├── biodiversity/              # ★ Biodiversity simulators
+├── carbon_cycle/              # ★ Carbon cycle simulators
+├── ecosystem_services/        # ★ Ecosystem services simulators
+├── water_quality/             # ★ Water quality simulators
+├── urban/                     # ★ Urban simulators
+├── earth_engine/              # ★ Earth engine simulators
 │
-├── chain/                     # ★ زنجیره شبیه‌سازی
-│   ├── router.py              #   API زنجیره
+├── chain/                     # ★ Simulation chain
+│   ├── router.py              #   Chain API
 │   └── ...
-├── reports/                   # ★ گزارش‌گیری
-│   ├── router.py              #   API گزارش
+├── reports/                   # ★ Report generation
+│   ├── router.py              #   Report API
 │   └── ...
-├── validation/                # ★ اعتبارسنجی
-├── data/                      # ★ داده‌های شبیه‌سازی
-├── runs/                      # ★ نتایج اجراها
-├── advisory/                  # ★ مشاوره هوشمند
+├── validation/                # ★ Validation
+├── data/                      # ★ Simulation data
+├── runs/                      # ★ Run results
+├── advisory/                  # ★ Smart advisory
 └── tests/                     # Pytest tests
 ```
 
-## کلاس پایه Simulator (`base.py`)
+## Simulator Base Class (`base.py`)
 
-تمامی شبیه‌سازها از کلاس پایه `Simulator` ارث می‌برند:
+All simulators inherit from the `Simulator` base class:
 
 ```python
 from simulation.base import Simulator
 
 class MySimulator(Simulator):
-    """شبیه‌ساز سفارشی"""
+    """Custom simulator"""
     
     name = "my_simulator"
-    description = "توضیحات شبیه‌ساز"
+    description = "Simulator description"
     inputs = [{"name": "param1", "type": "float", "description": "..."}]
     outputs = [{"name": "result1", "type": "float", "description": "..."}]
     
     async def run(self, inputs: dict) -> dict:
-        # منطق شبیه‌سازی
+        # Simulation logic
         return {"result1": 42.0}
 ```
 
-## ثبت خودکار شبیه‌سازها (`registry.py`)
+## Automatic Registration (`registry.py`)
 
-شبیه‌سازها با دکوراتور `@register_simulator` به صورت خودکار ثبت می‌شوند:
+Simulators are registered automatically using the `@register_simulator` decorator:
 
 ```python
 from simulation.registry import register_simulator
@@ -88,85 +88,85 @@ class ClimateModel(Simulator):
     ...
 ```
 
-## ۲۸+ شبیه‌ساز تخصصی
+## 28+ Specialized Simulators
 
-### 🌤️ اقلیم (Climate)
-| شبیه‌ساز | توضیح |
+### 🌤️ Climate
+| Simulator | Description |
 |----------|--------|
-| `climate_model` | مدل‌سازی تغییرات اقلیمی |
-| `weather_generator` | تولید داده‌های هواشناسی |
-| `precipitation` | شبیه‌سازی بارش |
-| `temperature` | شبیه‌سازی دما |
+| `climate_model` | Climate change modeling |
+| `weather_generator` | Weather data generation |
+| `precipitation` | Precipitation simulation |
+| `temperature` | Temperature simulation |
 
-### 🌾 کشاورزی (Agriculture)
-| شبیه‌ساز | توضیح |
+### 🌾 Agriculture
+| Simulator | Description |
 |----------|--------|
-| `crop_growth` | رشد محصولات کشاورزی |
-| `irrigation` | مدیریت آبیاری |
-| `yield_prediction` | پیش‌بینی عملکرد محصول |
-| `pest_dynamics` | پویایی آفات |
+| `crop_growth` | Crop growth simulation |
+| `irrigation` | Irrigation management |
+| `yield_prediction` | Crop yield prediction |
+| `pest_dynamics` | Pest population dynamics |
 
-### 💰 اقتصاد (Economics)
-| شبیه‌ساز | توضیح |
+### 💰 Economics
+| Simulator | Description |
 |----------|--------|
-| `market_model` | مدل بازار و قیمت‌ها |
-| `supply_chain` | زنجیره تأمین |
-| `cost_benefit` | تحلیل هزینه-فایده |
+| `market_model` | Market and price modeling |
+| `supply_chain` | Supply chain analysis |
+| `cost_benefit` | Cost-benefit analysis |
 
-### ⚡ انرژی (Energy)
-| شبیه‌ساز | توضیح |
+### ⚡ Energy
+| Simulator | Description |
 |----------|--------|
-| `renewable_potential` | پتانسیل انرژی تجدیدپذیر |
-| `energy_demand` | پیش‌بینی تقاضای انرژی |
-| `grid_optimization` | بهینه‌سازی شبکه برق |
+| `renewable_potential` | Renewable energy potential |
+| `energy_demand` | Energy demand forecasting |
+| `grid_optimization` | Power grid optimization |
 
-### 💧 آب (Hydrology)
-| شبیه‌ساز | توضیح |
+### 💧 Hydrology
+| Simulator | Description |
 |----------|--------|
-| `watershed_model` | مدل حوضه آبریز |
-| `groundwater` | شبیه‌سازی آب زیرزمینی |
-| `reservoir` | مدیریت مخازن |
+| `watershed_model` | Watershed modeling |
+| `groundwater` | Groundwater simulation |
+| `reservoir` | Reservoir management |
 
-### 🌱 خاک (Soil)
-| شبیه‌ساز | توضیح |
+### 🌱 Soil
+| Simulator | Description |
 |----------|--------|
-| `soil_carbon` | کربن آلی خاک |
-| `erosion` | فرسایش خاک |
-| `nutrient_cycle` | چرخه مواد مغذی |
+| `soil_carbon` | Soil organic carbon |
+| `erosion` | Soil erosion |
+| `nutrient_cycle` | Nutrient cycling |
 
-### 🦋 تنوع زیستی (Biodiversity)
-| شبیه‌ساز | توضیح |
+### 🦋 Biodiversity
+| Simulator | Description |
 |----------|--------|
-| `species_distribution` | پراکنش گونه‌ها |
-| `habitat_suitability` | suitability زیستگاه |
-| `population_dynamics` | پویایی جمعیت |
+| `species_distribution` | Species distribution modeling |
+| `habitat_suitability` | Habitat suitability assessment |
+| `population_dynamics` | Population dynamics |
 
-### 🌍 چرخه کربن (Carbon Cycle)
-| شبیه‌ساز | توضیح |
+### 🌍 Carbon Cycle
+| Simulator | Description |
 |----------|--------|
-| `carbon_flux` | شار کربن |
-| `sequestration` | ترسیب کربن |
-| `emissions` | انتشار گازهای گلخانه‌ای |
+| `carbon_flux` | Carbon flux modeling |
+| `sequestration` | Carbon sequestration |
+| `emissions` | Greenhouse gas emissions |
 
-### 🏙️ شهری (Urban)
-| شبیه‌ساز | توضیح |
+### 🏙️ Urban
+| Simulator | Description |
 |----------|--------|
-| `urban_heat` | جزیره حرارتی شهری |
-| `land_use` | تغییر کاربری زمین |
-| `green_infrastructure` | زیرساخت سبز |
+| `urban_heat` | Urban heat island effect |
+| `land_use` | Land use change |
+| `green_infrastructure` | Green infrastructure planning |
 
-## Endpointهای API
+## API Endpoints
 
-### شبیه‌سازی
+### Simulation
 
-| Method | Path | توضیح |
+| Method | Path | Description |
 |--------|------|--------|
-| POST | `/api/v1/simulation/run` | اجرای شبیه‌سازی |
-| GET | `/api/v1/simulation/runs` | لیست اجراهای قبلی |
-| GET | `/api/v1/simulation/runs/{id}` | جزئیات یک اجرا |
-| GET | `/api/v1/simulation/simulators` | لیست شبیه‌سازهای موجود |
+| POST | `/api/v1/simulation/run` | Execute simulation |
+| GET | `/api/v1/simulation/runs` | List previous runs |
+| GET | `/api/v1/simulation/runs/{id}` | Run details |
+| GET | `/api/v1/simulation/simulators` | List available simulators |
 
-**اجرای شبیه‌سازی:**
+**Execute Simulation:**
 ```json
 // POST /api/v1/simulation/run
 {
@@ -180,43 +180,43 @@ class ClimateModel(Simulator):
 }
 ```
 
-### زنجیره شبیه‌سازی (Chain)
+### Simulation Chain
 
-| Method | Path | توضیح |
+| Method | Path | Description |
 |--------|------|--------|
-| POST | `/api/v1/simulation/chain/run` | اجرای زنجیره شبیه‌سازها |
-| GET | `/api/v1/simulation/chain/chains` | لیست زنجیره‌های تعریف‌شده |
+| POST | `/api/v1/simulation/chain/run` | Execute simulator chain |
+| GET | `/api/v1/simulation/chain/chains` | List defined chains |
 
-### گزارش‌گیری (Reports)
+### Reports
 
-| Method | Path | توضیح |
+| Method | Path | Description |
 |--------|------|--------|
-| GET | `/api/v1/simulation/reports/csv` | خروجی CSV |
-| GET | `/api/v1/simulation/reports/json` | خروجی JSON |
+| GET | `/api/v1/simulation/reports/csv` | CSV output |
+| GET | `/api/v1/simulation/reports/json` | JSON output |
 
-## توسعه و تست
+## Development & Testing
 
 ```bash
-# از ریشه‌ی پروژه
+# From project root
 cd d:\econojin.com
 
-# اجرای تست‌ها
+# Run tests
 pytest apps/simulation/tests/ -v
 
-# تست یک شبیه‌ساز خاص
+# Test a specific simulator
 pytest apps/simulation/tests/test_climate.py -v
 
-# اجرای سرور توسعه
+# Run development server
 python apps/main.py
-# یا
+# or
 uvicorn apps.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## تغییرات مهم
+## Changelog
 
-- **فاز ۲:** بازنویسی کامل با معماری شبیه‌ساز پایه (`base.py`)
-- **فاز ۲:** افزودن ۲۸+ شبیه‌ساز تخصصی در ۱۱ حوزه
-- **فاز ۲:** سیستم ثبت خودکار با دکوراتور (`registry.py`)
-- **فاز ۲:** زنجیره شبیه‌سازی (خروجی یک شبیه‌ساز → ورودی شبیه‌ساز بعدی)
-- **فاز ۲:** گزارش‌گیری CSV/JSON
-- **فاز ۲:** اعتبارسنجی ورودی و خروجی
+- **Phase 2:** Full rewrite with base simulator architecture (`base.py`)
+- **Phase 2:** Added 28+ specialized simulators across 11 domains
+- **Phase 2:** Automatic registration system with decorators (`registry.py`)
+- **Phase 2:** Simulation chain (output of one simulator → input of next)
+- **Phase 2:** CSV/JSON report generation
+- **Phase 2:** Input/output validation

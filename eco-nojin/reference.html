@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>خط‌لولهٔ زیبایی — پایتون × وب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#081b20; --panel:#0c252c; --line:rgba(94,210,197,.16);
+  --brand:#3ec9b8; --brand-deep:#14919b; --saffron:#f2a93b; --coral:#ff7a6b;
+  --text:#e9f3f0; --muted:#94b3ae;
+  --display:'Lalezar','Vazirmatn',serif; --body:'Vazirmatn',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.9;
+  background-image:linear-gradient(rgba(62,201,184,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(62,201,184,.045) 1px,transparent 1px);background-size:52px 52px;}
+.glow{position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  background:radial-gradient(42% 38% at 82% 12%,rgba(20,145,155,.32),transparent 70%),
+    radial-gradient(36% 34% at 12% 88%,rgba(242,169,59,.14),transparent 70%);
+  animation:drift 26s ease-in-out infinite alternate;}
+@keyframes drift{to{transform:translate(3%,-2%) scale(1.05)}}
+.grain{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  padding:16px clamp(20px,5vw,64px);border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--muted);}
+.chip{border:1px solid var(--line);padding:3px 10px;border-radius:999px;margin-inline-start:8px;}
+.chip b{color:var(--brand)}
+
+.masthead{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,4vw,64px);
+  align-items:center;padding:clamp(48px,8vh,96px) clamp(20px,5vw,64px) clamp(36px,6vh,64px);
+  position:relative;overflow:hidden;}
+.masthead::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(340px circle at var(--mx,75%) var(--my,25%),rgba(62,201,184,.09),transparent 70%);}
+.kicker{font-family:var(--mono);color:var(--saffron);font-size:.78rem;letter-spacing:.14em;}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.9rem,7.2vw,5.6rem);line-height:1.3;margin:.35em 0 .25em;}
+h1 .mark{background:linear-gradient(transparent 60%,rgba(242,169,59,.38) 60%);padding:0 .12em;}
+.lede{color:var(--muted);max-width:34em;font-size:clamp(1rem,1.4vw,1.15rem);font-weight:300;margin:0;}
+.actions{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap;}
+.btn{font-family:var(--body);font-weight:700;font-size:.95rem;padding:12px 26px;border-radius:8px;
+  border:1px solid transparent;cursor:pointer;text-decoration:none;
+  transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s,background .25s;}
+.btn-solid{background:var(--saffron);color:#20180a;}
+.btn-solid:hover{transform:translateY(-3px);box-shadow:0 12px 28px -10px rgba(242,169,59,.55);}
+.btn-ghost{background:transparent;color:var(--brand);border-color:rgba(62,201,184,.4);}
+.btn-ghost:hover{background:rgba(62,201,184,.08);transform:translateY(-3px);}
+
+.term{direction:ltr;text-align:left;background:#04141a;border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.7);font-family:var(--mono);font-size:.78rem;overflow:hidden;}
+.term-bar{display:flex;gap:7px;padding:11px 14px;border-bottom:1px solid var(--line);align-items:center;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.term-body{padding:16px 18px;min-height:238px;}
+.term-body div{white-space:pre-wrap;min-height:1.55em;}
+.cmd{color:#8fe3d8}.ok{color:#9adf6f}.warn{color:var(--saffron)}.dim{color:#5d7d79}
+.cursor{display:inline-block;width:8px;height:1.05em;background:var(--brand);
+  vertical-align:-2px;animation:blink 1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0}}
+
+.metrics{display:flex;flex-wrap:wrap;border-block:1px solid var(--line);background:rgba(10,32,39,.6);}
+.metric{flex:1 1 210px;padding:24px clamp(18px,3vw,44px);border-inline-start:1px solid var(--line);}
+.metric:first-child{border-inline-start:none}
+.metric .num{font-family:var(--mono);font-size:clamp(1.9rem,3.4vw,2.7rem);font-weight:700;}
+.metric .num small{font-size:.45em;color:var(--muted);font-weight:400}
+.metric .lbl{color:var(--muted);font-size:.8rem;margin-top:2px}
+.metric:nth-child(1) .num{color:var(--brand)}.metric:nth-child(2) .num{color:var(--saffron)}
+.metric:nth-child(3) .num{color:var(--coral)}.metric:nth-child(4) .num{color:var(--text)}
+
+section{padding:clamp(56px,9vh,110px) clamp(20px,5vw,64px);max-width:1240px;margin-inline:auto;}
+.sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:clamp(30px,5vh,54px);}
+.sec-head .no{font-family:var(--mono);color:var(--saffron);font-size:.85rem;}
+.sec-head h2{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,4vw,3rem);margin:0;}
+.sec-head .rule{flex:1;height:1px;background:var(--line);}
+.install{direction:ltr;font-family:var(--mono);font-size:.78rem;color:#8fe3d8;background:#04141a;
+  border:1px solid var(--line);border-radius:8px;padding:12px 18px;display:inline-block;margin-bottom:40px;}
+
+.pipe{position:relative;padding-inline-start:34px;}
+.pipe::before{content:"";position:absolute;inset-inline-start:8px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(var(--brand),var(--saffron),var(--coral));}
+.node{position:relative;max-width:640px;margin-bottom:clamp(28px,5vh,48px);background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:22px 26px;
+  transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s,box-shadow .35s;}
+.node:nth-child(even){margin-inline-start:clamp(0px,6vw,90px);}
+.node::before{content:"";position:absolute;inset-inline-start:-35px;top:28px;width:14px;height:14px;
+  border-radius:50%;background:var(--bg);border:3px solid var(--brand);transition:box-shadow .3s;}
+.node:nth-child(2)::before{border-color:var(--saffron)}
+.node:nth-child(3)::before{border-color:var(--coral)}
+.node:nth-child(4)::before{border-color:#9adf6f}
+.node:hover{transform:translateY(-5px);border-color:rgba(62,201,184,.45);box-shadow:0 24px 48px -28px rgba(0,0,0,.8);}
+.node:hover::before{box-shadow:0 0 0 6px rgba(62,201,184,.18);}
+.node .step{font-family:var(--display);font-size:2rem;line-height:1;color:var(--brand);}
+.node:nth-child(2) .step{color:var(--saffron)}.node:nth-child(3) .step{color:var(--coral)}
+.node:nth-child(4) .step{color:#9adf6f}
+.node h3{margin:.35em 0 .3em;font-size:1.15rem;font-weight:700;}
+.node p{margin:0 0 12px;color:var(--muted);font-size:.95rem;font-weight:300;}
+.node code{direction:ltr;display:inline-block;font-family:var(--mono);font-size:.74rem;
+  background:#04141a;border:1px solid var(--line);border-radius:6px;padding:5px 10px;color:#8fe3d8;}
+
+.board{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(18px,3vw,32px);}
+.panelbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:clamp(20px,3vw,32px);}
+.panelbox h3{margin:0;font-size:1rem;font-weight:700;}
+.panelbox .sub{color:var(--muted);font-size:.82rem;font-weight:300;margin:2px 0 0;}
+.b-colors{grid-column:span 7}.b-type{grid-column:span 5}.b-contrast{grid-column:span 12}
+@media(max-width:900px){.b-colors,.b-type{grid-column:span 12}.masthead{grid-template-columns:1fr}}
+.swatches{display:flex;align-items:flex-end;gap:8px;height:132px;margin-top:26px;}
+.swatch{flex:1;border-radius:6px 6px 2px 2px;cursor:pointer;position:relative;min-height:34px;
+  transition:transform .3s cubic-bezier(.22,1,.36,1),filter .3s;}
+.swatch:hover{transform:translateY(-8px);filter:brightness(1.12);}
+.swatch::after{content:attr(data-hex);position:absolute;bottom:-24px;inset-inline:0;text-align:center;
+  font-family:var(--mono);font-size:.58rem;color:var(--muted);direction:ltr;opacity:0;transition:opacity .25s;}
+.swatch:hover::after{opacity:1}
+.swatch.copied::before{content:"کپی شد ✓";position:absolute;top:-26px;inset-inline:0;text-align:center;
+  font-size:.68rem;color:var(--brand);font-family:var(--body);}
+.trow{display:flex;align-items:baseline;gap:16px;padding:9px 0;border-bottom:1px dashed var(--line);transition:padding .3s;}
+.trow:hover{padding-inline-start:10px}
+.trow .tag{font-family:var(--mono);font-size:.62rem;color:var(--muted);direction:ltr;min-width:62px;
+  text-align:left;transition:color .3s;}
+.trow:hover .tag{color:var(--saffron)}
+.trow .sample{font-family:var(--display);line-height:1.35;}
+.ctable{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:14px;}
+.ctable td,.ctable th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:start;}
+.ctable th{color:var(--muted);font-weight:500;font-size:.76rem;}
+.badge{font-family:var(--mono);font-size:.66rem;padding:3px 10px;border-radius:999px;direction:ltr;}
+.badge.aaa{background:rgba(62,201,184,.15);color:var(--brand);border:1px solid rgba(62,201,184,.4);}
+.badge.aa{background:rgba(242,169,59,.12);color:var(--saffron);border:1px solid rgba(242,169,59,.4);}
+
+.ba-head{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px;}
+.toggle{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-size:.9rem;}
+.toggle input{display:none}
+.track{width:56px;height:30px;border-radius:999px;background:#12333b;border:1px solid var(--line);
+  position:relative;transition:background .3s;flex-shrink:0;}
+.knob{position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;
+  background:var(--muted);transition:all .35s cubic-bezier(.22,1,.36,1);}
+.toggle input:checked + .track{background:var(--brand-deep)}
+.toggle input:checked + .track .knob{inset-inline-start:29px;background:var(--saffron)}
+.mock{direction:rtl;background:#fff;border-radius:10px;overflow:hidden;color:#222;max-width:560px;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.7);transition:all .5s;}
+.mock .ph{height:150px;background:#cfcfcf;transition:background .6s;}
+.mock .inner{padding:16px;}
+.mock h4{margin:0 0 8px;font-size:1.05rem;color:#333;font-family:inherit;transition:all .4s;}
+.mock p{font-size:.85rem;color:#666;margin:0 0 12px;transition:color .4s;}
+.mock .cta{display:inline-block;padding:8px 18px;background:#999;color:#fff;border-radius:4px;
+  font-size:.8rem;cursor:pointer;transition:all .4s;}
+.mock.after .ph{background:linear-gradient(135deg,#14919b,#3ec9b8 55%,#f2a93b);}
+.mock.after h4{font-family:var(--display);font-size:1.6rem;color:#0c3a40;}
+.mock.after p{color:#4a6560;}
+.mock.after .cta{background:#f2a93b;color:#20180a;font-weight:700;border-radius:8px;
+  box-shadow:0 8px 20px -8px rgba(242,169,59,.6);}
+.mock.after .cta:hover{transform:translateY(-2px)}
+
+footer{border-top:1px solid var(--line);padding:24px clamp(20px,5vw,64px);display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:10px;color:var(--muted);font-size:.8rem;}
+footer code{font-family:var(--mono);direction:ltr;color:var(--brand)}
+
+[data-reveal]{opacity:0;transform:translateY(26px);
+  transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s);}
+[data-reveal].is-in{opacity:1;transform:none;}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;}
+  [data-reveal]{opacity:1!important;transform:none!important;}}
+</style>
+</head>
+<body>
+<div class="glow"></div><div class="grain"></div>
+
+<header class="topbar">
+  <span>خط‌لولهٔ زیبایی · v1.0 · پایتون ۳٫۹+</span>
+  <span>
+    <span class="chip"><b>✓</b> WCAG AA</span>
+    <span class="chip"><b>✓</b> LCP &lt; 2.5s</span>
+    <span class="chip"><b>✓</b> 60fps</span>
+  </span>
+</header>
+
+<div class="masthead" id="mast">
+  <div>
+    <div class="kicker">// پایتون × زیبایی‌شناسی وب</div>
+    <h1>زیبایی را <span class="mark">مهندسی</span> کن،<br>نه تزئین.</h1>
+    <p class="lede">چهار اسکریپت، یک خط‌لوله: ممیزی می‌کند، توکن طراحی می‌سازد، دارایی‌ها را سبک می‌کند و به صفحه جان می‌بخشد. استانداردی که وبسایت‌های برنده جایزه رعایت می‌کنند — حالا قابل اجرا با یک دستور.</p>
+    <div class="actions">
+      <a class="btn btn-solid" href="#pipeline">اجرای خط‌لوله ↓</a>
+      <a class="btn btn-ghost" href="#tokens">دیدن توکن‌ها</a>
+    </div>
+  </div>
+  <div class="term" data-reveal style="--d:.15s">
+    <div class="term-bar">
+      <span class="dot" style="background:#ff5f57"></span>
+      <span class="dot" style="background:#febc2e"></span>
+      <span class="dot" style="background:#28c840"></span>
+      <span style="margin-left:auto;color:var(--muted);font-size:.68rem">pipeline — zsh</span>
+    </div>
+    <div class="term-body" id="term-body"></div>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric" data-reveal><div class="num"><span data-count="1.8" data-dec="1">0</span><small> s</small></div><div class="lbl">LCP — بزرگ‌ترین ترسیم محتوایی</div></div>
+  <div class="metric" data-reveal style="--d:.1s"><div class="num"><span data-count="0.02" data-dec="2">0</span></div><div class="lbl">CLS — پایداری چیدمان</div></div>
+  <div class="metric" data-reveal style="--d:.2s"><div class="num"><span data-count="79">0</span><small> ٪</small></div><div class="lbl">کاهش وزن تصاویر با WebP</div></div>
+  <div class="metric" data-reveal style="--d:.3s"><div class="num"><span data-count="12.6" data-dec="1">0</span><small> :1</small></div><div class="lbl">کنتراست متن/زمینه — AAA</div></div>
+</div>
+
+<section id="pipeline">
+  <div class="sec-head" data-reveal>
+    <span class="no">۰۲</span><h2>چهار ایستگاه خط‌لوله</h2><span class="rule"></span>
+  </div>
+  <div class="install">$ pip install playwright pillow beautifulsoup4 && playwright install chromium</div>
+  <div class="pipe">
+    <div class="node" data-reveal><div class="step">۰۱</div><h3>ممیزی — اندازه‌گیری بی‌رحمانه</h3>
+      <p>Core Web Vitals + axe-core: تا ندانید کجا ایستاده‌اید، هیچ بهینه‌سازی‌ای علمی نیست.</p>
+      <code>$ python 01_audit.py https://your-site.com</code></div>
+    <div class="node" data-reveal><div class="step">۰۲</div><h3>توکن‌های طراحی — ریاضیات رنگ</h3>
+      <p>پالت ۱۰ گامی با چرخش فام، مقیاس تایپوگرافی ماژولار، اثبات کنتراست WCAG.</p>
+      <code>$ python 02_design_tokens.py --brand 14919b</code></div>
+    <div class="node" data-reveal><div class="step">۰۳</div><h3>بهینه‌سازی دارایی‌ها</h3>
+      <p>تبدیل به WebP، بازنمونه‌برداری LANCZOS، حذف متادیتا — معمولاً ۶۰ تا ۸۵٪ کاهش حجم.</p>
+      <code>$ python 03_optimize_assets.py ./images</code></div>
+    <div class="node" data-reveal><div class="step">۰۴</div><h3>صیقل نهایی — جان بخشیدن</h3>
+      <p>اسکرول-ریویل با IntersectionObserver، تأخیر پلکانی، احترام به prefers-reduced-motion.</p>
+      <code>$ python 04_inject_polish.py index.html</code></div>
+  </div>
+</section>
+
+<section id="tokens">
+  <div class="sec-head" data-reveal>
+    <span class="no">۰۳</span><h2>خروجی زندهٔ design_tokens.py</h2><span class="rule"></span>
+  </div>
+  <div class="board">
+    <div class="panelbox b-colors" data-reveal>
+      <h3>پالت برند — فیروزهٔ ایرانی</h3>
+      <p class="sub">برای کپی هر رنگ، روی آن کلیک کنید</p>
+      <div class="swatches">
+        <div class="swatch" data-hex="#e6f4f4" style="background:#e6f4f4;height:32%"></div>
+        <div class="swatch" data-hex="#cfe9e9" style="background:#cfe9e9;height:40%"></div>
+        <div class="swatch" data-hex="#a6d6d6" style="background:#a6d6d6;height:48%"></div>
+        <div class="swatch" data-hex="#79bfbe" style="background:#79bfbe;height:56%"></div>
+        <div class="swatch" data-hex="#4fa8a6" style="background:#4fa8a6;height:64%"></div>
+        <div class="swatch" data-hex="#14919b" style="background:#14919b;height:72%"></div>
+        <div class="swatch" data-hex="#11767e" style="background:#11767e;height:80%"></div>
+        <div class="swatch" data-hex="#0e5c62" style="background:#0e5c62;height:88%"></div>
+        <div class="swatch" data-hex="#0b4447" style="background:#0b4447;height:96%"></div>
+        <div class="swatch" data-hex="#082e30" style="background:#082e30;height:100%"></div>
+      </div>
+    </div>
+    <div class="panelbox b-type" data-reveal style="--d:.12s">
+      <h3>مقیاس تایپوگرافی — نسبت ۱٫۲۵</h3>
+      <p class="sub">هر گام، ۲۵٪ بزرگ‌تر از قبلی</p>
+      <div class="trow"><span class="tag">step-6</span><span class="sample" style="font-size:clamp(2.2rem,5vw,3.6rem)">نوشتار</span></div>
+      <div class="trow"><span class="tag">step-4</span><span class="sample" style="font-size:2.3rem">نوشتار</span></div>
+      <div class="trow"><span class="tag">step-2</span><span class="sample" style="font-size:1.6rem">نوشتار</span></div>
+      <div class="trow"><span class="tag">step-0</span><span class="sample" style="font-size:1.1rem">نوشتار</span></div>
+      <div class="trow" style="border:none"><span class="tag">step--1</span><span class="sample" style="font-size:.85rem">نوشتار</span></div>
+    </div>
+    <div class="panelbox b-contrast" data-reveal>
+      <h3>ماتریس کنتراست — محاسبه با فرمول WCAG، نه حدس چشمی</h3>
+      <table class="ctable">
+        <tr><th>زوج رنگی</th><th>نسبت</th><th>حکم</th></tr>
+        <tr><td>مرکب #082e30 روی کاغذ #e6f4f4</td><td style="font-family:var(--mono)" dir="ltr">12.6 : 1</td><td><span class="badge aaa">AAA ✓</span></td></tr>
+        <tr><td>برند #11767e روی کاغذ</td><td style="font-family:var(--mono)" dir="ltr">4.6 : 1</td><td><span class="badge aa">AA ✓</span></td></tr>
+        <tr><td>زعفرانی #e0932a روی مرکب</td><td style="font-family:var(--mono)" dir="ltr">5.8 : 1</td><td><span class="badge aa">AA ✓</span></td></tr>
+        <tr><td>برندِ روشن #79bfbe روی مرکب</td><td style="font-family:var(--mono)" dir="ltr">6.8 : 1</td><td><span class="badge aa">AA ✓</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head" data-reveal>
+    <span class="no">۰۴</span><h2>قبل / بعد — اثر خط‌لوله</h2><span class="rule"></span>
+  </div>
+  <div class="ba-head" data-reveal>
+    <p style="color:var(--muted);margin:0;font-weight:300">همان محتوا، دو سرنوشت متفاوت. سوئیچ را بزنید:</p>
+    <label class="toggle"><span>بدون خط‌لوله</span>
+      <input type="checkbox" id="ba-toggle"><span class="track"><span class="knob"></span></span>
+      <span>با خط‌لوله</span></label>
+  </div>
+  <div class="mock" id="mock" data-reveal>
+    <div class="ph"></div>
+    <div class="inner">
+      <h4>گزارش سالانهٔ آزمایشگاه</h4>
+      <p>داده‌های امسال نشان می‌دهند که بهینه‌سازی سیستماتیک، ۴۰٪ سریع‌تر از اصلاحات موردی به نتیجه می‌رسد.</p>
+      <span class="cta">مطالعهٔ گزارش</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>ساخته‌شده با ۴ اسکریپت پایتون — بدون فریم‌ورک، بدون وابستگی بصری</span>
+  <code>audit → tokens → assets → polish</code>
+</footer>
+
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ریویل اسکرول */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+}), { threshold: .15 });
+document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+/* ترمینال تایپی */
+const LINES = [
+  ['$ python 01_audit.py https://your-site.com', 'cmd'],
+  ['  LCP 1.8s | CLS 0.02 | a11y: 0 violations  [PASS]', 'ok'],
+  ['$ python 02_design_tokens.py --brand 14919b --accent f2a93b', 'cmd'],
+  ['  tokens.css -> 24 tokens | contrast AA/AAA  [PASS]', 'ok'],
+  ['$ python 03_optimize_assets.py ./images', 'cmd'],
+  ['  4.2 MB -> 0.9 MB  (-79%)', 'warn'],
+  ['$ python 04_inject_polish.py index.html', 'cmd'],
+  ['  done. ready to ship.', 'dim'],
+];
+async function runTerm() {
+  const term = document.getElementById('term-body');
+  const cursor = document.createElement('span'); cursor.className = 'cursor';
+  for (const [text, cls] of LINES) {
+    const div = document.createElement('div'); div.className = cls;
+    term.appendChild(div); div.appendChild(cursor);
+    for (const ch of text) { div.insertBefore(document.createTextNode(ch), cursor); await sleep(14); }
+    await sleep(380);
+  }
+}
+new IntersectionObserver((es, o) => es.forEach(e => {
+  if (e.isIntersecting) { runTerm(); o.disconnect(); }
+}), { threshold: .3 }).observe(document.querySelector('.term'));
+
+/* شمارنده‌های متحرک */
+const io2 = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; io2.unobserve(e.target);
+  const el = e.target, end = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0);
+  const t0 = performance.now(), dur = 1400;
+  (function tick(t) {
+    const p = Math.min((t - t0) / dur, 1), ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = (end * ease).toFixed(dec);
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}), { threshold: .5 });
+document.querySelectorAll('[data-count]').forEach(el => io2.observe(el));
+
+/* کپی رنگ با کلیک */
+document.querySelectorAll('.swatch').forEach(s => s.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(s.dataset.hex); } catch (e) {}
+  s.classList.add('copied'); setTimeout(() => s.classList.remove('copied'), 900);
+}));
+
+/* سوئیچ قبل/بعد */
+document.getElementById('ba-toggle').addEventListener('change', e =>
+  document.getElementById('mock').classList.toggle('after', e.target.checked));
+
+/* هالهٔ نور دنبال‌کنندهٔ اشاره‌گر */
+const mast = document.getElementById('mast');
+mast.addEventListener('pointermove', e => {
+  const r = mast.getBoundingClientRect();
+  mast.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+  mast.style.setProperty('--my', (e.clientY - r.top) + 'px');
+});
+</script>
+</body>
+</html>

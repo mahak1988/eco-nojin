@@ -1,0 +1,87 @@
+{
+  "revenue_streams": {
+    "saas_platform": {
+      "description": "اشتراک پلتفرم DSS برای دولت‌ها و سازمان‌ها",
+      "pricing_tier": [
+        "Basic",
+        "Professional",
+        "Enterprise"
+      ],
+      "target_customers": [
+        "وزارتخانه‌ها",
+        "سازمان‌های بین‌المللی",
+        "دانشگاه‌ها"
+      ]
+    },
+    "carbon_credits": {
+      "description": "واسطه‌گری در بازار اعتبارات کربن",
+      "commission_percent": 5,
+      "target_markets": [
+        "Voluntary Carbon Market",
+        "Compliance Market"
+      ]
+    },
+    "knowledge_export": {
+      "description": "فروش بسته‌های دانشی و فنی",
+      "products": [
+        "بسته‌های آموزشی",
+        "گزارش‌های تخصصی",
+        "مشاوره فنی"
+      ]
+    },
+    "data_services": {
+      "description": "خدمات داده و تحلیل",
+      "products": [
+        "تحلیل سنجش‌ازدور",
+        "مدل‌سازی سفارشی",
+        "API دسترسی"
+      ]
+    },
+    "training_certification": {
+      "description": "آموزش و صدور گواهینامه بین‌المللی",
+      "programs": [
+        "FFS Master",
+        "MRV Specialist",
+        "Landscape Manager"
+      ]
+    }
+  },
+  "partnership_model": {
+    "strategic_partners": [
+      "FAO",
+      "UNDP",
+      "World Bank",
+      "GCF",
+      "GEF"
+    ],
+    "technical_partners": [
+      "CGIAR",
+      "ICRISAT",
+      "ICARDA",
+      "Universities"
+    ],
+    "implementation_partners": [
+      "NGOs",
+      "Local Cooperatives",
+      "Government Agencies"
+    ],
+    "funding_partners": [
+      "Impact Investors",
+      "Green Bonds",
+      "Development Banks"
+    ]
+  },
+  "scaling_strategy": {
+    "open_source_core": true,
+    "premium_features": [
+      "Enterprise DSS",
+      "Advanced Analytics",
+      "Priority Support"
+    ],
+    "localization": [
+      "زبان‌های محلی",
+      "بومی‌سازی شاخص‌ها",
+      "تطبیق با قوانین ملی"
+    ]
+  }
+}

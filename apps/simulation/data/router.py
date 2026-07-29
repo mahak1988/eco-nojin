@@ -11,7 +11,6 @@ from fastapi import APIRouter, HTTPException, Query
 from apps.simulation.data import service as data_service
 from apps.simulation.data import world_bank
 from apps.simulation.data.nasa_power import fetch_nasa_power_data
-from apps.simulation.data.satellite import fetch_satellite_agro_data
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +97,24 @@ async def get_real_weather(lat: float, lon: float, days: int = 30) -> dict[str, 
 
 @router.get("/satellite", summary="Synthetic satellite agro series")
 async def get_satellite_data(lat: float, lon: float, days: int = 7) -> dict[str, Any]:
-    data = await fetch_satellite_agro_data(lat, lon, days)
-    if data.get("status") == "error":
-        return {"status": "error", "message": data.get("message")}
-    return data
+    """Return synthetic satellite agro data (no external API key required)."""
+    import random
+    import math
+    base_ndvi = 0.3 + 0.5 * abs(math.sin(lat * 0.1))
+    base_sm = 20 + 15 * abs(math.cos(lon * 0.05))
+    daily = []
+    for i in range(min(days, 30)):
+        daily.append({
+            "day": i + 1,
+            "ndvi": round(base_ndvi + random.uniform(-0.05, 0.05), 3),
+            "soil_moisture_pct": round(base_sm + random.uniform(-3, 3), 1),
+            "lst_c": round(25 + random.uniform(-5, 5), 1),
+        })
+    return {
+        "status": "success",
+        "source": "synthetic",
+        "latitude": lat,
+        "longitude": lon,
+        "days": len(daily),
+        "daily": daily,
+    }

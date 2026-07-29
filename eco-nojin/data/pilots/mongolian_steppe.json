@@ -1,0 +1,51 @@
+{
+  "pilot_id": "mongolian_steppe",
+  "name": "استپ مغولستان",
+  "country": "مغولستان",
+  "continent": "آسیا",
+  "province": "Dundgovi",
+  "climate_zone": "استپ خشک سرد (BSk)",
+  "coordinates": {
+    "lat": 45.75,
+    "lon": 106.25
+  },
+  "area_hectares": 20000,
+  "elevation_m": 1350,
+  "annual_precipitation_mm": 200,
+  "avg_temperature_c": 0.5,
+  "soil_type": "قهوره‌ای، کم‌عمق",
+  "land_use": [
+    "دامداری کوچ‌نشینی",
+    "مرتع طبیعی"
+  ],
+  "main_challenges": [
+    "بیابان‌زایی",
+    "چرای مفرط",
+    "زمستان‌های سخت (dzud)"
+  ],
+  "interventions": [
+    "مدیریت مرتع مشارکتی",
+    "ذخیره علوفه",
+    "انرژی بادی"
+  ],
+  "baseline_indicators": {
+    "rangeland_degradation_percent": 70,
+    "livestock_per_ha": 2.5,
+    "poverty_rate_percent": 35
+  },
+  "target_indicators": {
+    "rangeland_degradation_percent": 35,
+    "livestock_per_ha": 1.2,
+    "poverty_rate_percent": 18
+  },
+  "beneficiaries": {
+    "households": 450,
+    "herder_families": 380,
+    "women": 180
+  },
+  "global_partnership": [
+    "UNDP",
+    "SLM Mongolia",
+    "World Bank"
+  ]
+}
