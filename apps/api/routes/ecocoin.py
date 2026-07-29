@@ -1,30 +1,5 @@
 """
 EcoCoin API — impact-backed utility token for Econojin.
-
-Core contracts (tests must stay green):
-  GET  /balance/{address}
-  GET  /stats
-  POST /transfer
-  GET  /staking/tiers
-  POST /staking/stake
-  GET  /transactions/{address}
-  GET  /mining/recent
-  POST /verify
-
-Extended surface:
-  GET  /wallet/{address}
-  POST /staking/unstake
-  POST /mining/impact-mint
-  GET  /challenges
-  POST /challenges/{id}/join
-  POST /challenges/{id}/claim
-  GET  /rewards/{address}
-  POST /rewards/claim
-  GET  /indicators
-  GET  /economics
-  GET  /economics/sensitivity
-  POST /mrv/quality-score
-  POST /burn
 """
 
 from __future__ import annotations
@@ -34,6 +9,7 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.services.ecocoin_engine import (
     CREDIT_FACTORS,
@@ -52,6 +28,7 @@ from apps.api.services.ecocoin_engine import (
     sensitivity_analysis,
     tx_hash,
 )
+from apps.api.services.oracle_sign import sign_mint_payload
 from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/ecocoin", tags=["ecocoin"])
@@ -81,14 +58,6 @@ class StakeRequest(BaseModel):
     address: str
     amount: float
     tier_id: int
-
-
-class StakingTier(BaseModel):
-    id: int
-    duration: str
-    apy: float
-    multiplier: float
-    min_amount: float
 
 
 class EcoCoinStats(BaseModel):
@@ -217,6 +186,16 @@ _CHALLENGES: list[dict[str, Any]] = [
 _PENDING_REWARDS: dict[str, float] = {
     "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18": 180.0,
 }
+
+
+def _try_db():
+    """Optional DB dependency — tests without session still work."""
+    try:
+        from apps.shared_core.database.session import get_db_session
+
+        return Depends(get_db_session)
+    except Exception:
+        return None
 
 
 @router.get("/balance/{address}", response_model=BalanceResponse)
@@ -406,6 +385,19 @@ async def impact_mint(
         _STATE.co2_sequestered += req.measured_value
 
     h = tx_hash(req.recipient, req.project_id, req.verification_hash, mint_total)
+    oracle = sign_mint_payload(
+        {
+            "tx_hash": h,
+            "recipient": req.recipient,
+            "project_id": req.project_id,
+            "credit_type": req.credit_type,
+            "measured_value": req.measured_value,
+            "quality_score": req.quality_score,
+            "mint_total": mint_total,
+            "verification_hash": req.verification_hash,
+        }
+    )
+
     entry = {
         "block_number": 1_234_567 + len(_MOCK_MINTS),
         "minter": "0xOracle",
@@ -416,12 +408,41 @@ async def impact_mint(
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "credit_type": req.credit_type,
         "distribution": result["distribution"],
+        "oracle_signature": oracle["signature"],
+        "oracle_algorithm": oracle["algorithm"],
     }
     _MOCK_MINTS.insert(0, entry)
     steward_share = result["distribution"]["steward"]
     _MOCK_BALANCES[req.recipient] = _MOCK_BALANCES.get(req.recipient, 100.0) + steward_share
 
-    return {"status": "minted", "tx_hash": h, **result}
+    # Best-effort DB persist (table via create_all / Alembic)
+    try:
+        from apps.shared_core.database.session import async_session_maker
+        from apps.api.services.mint_persistence import persist_mint_event
+
+        async with async_session_maker() as session:
+            await persist_mint_event(
+                session,
+                tx_hash=h,
+                recipient=req.recipient,
+                project_id=req.project_id,
+                credit_type=req.credit_type,
+                credit_name=result["credit_name"],
+                measured_value=req.measured_value,
+                quality_score=result["quality_score"],
+                region_multiplier=result["region_multiplier"],
+                scarcity_factor=result["scarcity_factor"],
+                mint_total=mint_total,
+                distribution=result["distribution"],
+                verification_hash=req.verification_hash,
+            )
+            await session.commit()
+            entry["persisted"] = True
+    except Exception as e:
+        entry["persisted"] = False
+        entry["persist_error"] = type(e).__name__
+
+    return {"status": "minted", "tx_hash": h, "oracle_signature": oracle["signature"], **result, "persisted": entry.get("persisted")}
 
 
 @router.get("/challenges")
@@ -551,7 +572,6 @@ async def get_sensitivity(
     quality_score: float = Query(1.0, ge=0.5, le=1.2),
     region_multiplier: float = Query(1.0, ge=0.8, le=1.3),
 ) -> dict[str, Any]:
-    """One-at-a-time sensitivity of mint to Fc, S, Q, R (±10%)."""
     return sensitivity_analysis(
         credit_type=credit_type,
         measured_value=measured_value,
@@ -563,7 +583,6 @@ async def get_sensitivity(
 
 @router.post("/mrv/quality-score")
 async def post_mrv_quality(req: MrvQualityRequest) -> dict[str, Any]:
-    """Derive Q from NDVI / AquaCrop-style model vs field agreement."""
     return quality_from_mrv(
         ndvi_observed=req.ndvi_observed,
         ndvi_expected=req.ndvi_expected,
