@@ -1,15 +1,14 @@
 """
 EcoCoin economic engine — pure functions, no I/O.
 Impact-backed minting, staking math, distribution, indicators.
+MRV quality from NDVI / model / field agreement + sensitivity analysis.
 """
 
 from __future__ import annotations
 
 import hashlib
-import math
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal
 from typing import Any, Optional
 
 # ---------------------------------------------------------------------------
@@ -22,7 +21,6 @@ IMPACT_MINT_BUDGET = 800_000_000.0
 STAKING_POOL = 100_000_000.0
 COMMUNITY_POOL = 50_000_000.0
 
-# credit_type → (name, unit, base ECO per unit)
 CREDIT_FACTORS: dict[int, tuple[str, str, float]] = {
     0: ("carbon", "tCO2e", 25.0),
     1: ("water", "m3_saved", 0.05),
@@ -45,12 +43,7 @@ STAKING_TIERS: list[dict[str, Any]] = [
 ]
 
 EARLY_UNSTAKE_FEE_RATE = 0.05
-TRANSFER_BURN_RATE = 0.005  # optional protocol burn on transfer
-
-
-# ---------------------------------------------------------------------------
-# Dataclasses
-# ---------------------------------------------------------------------------
+TRANSFER_BURN_RATE = 0.005
 
 
 @dataclass
@@ -77,7 +70,9 @@ class ProtocolState:
     hectares_covered: float = 142_500.0
     co2_sequestered: float = 1_842_000.0
     transfer_volume_30d: float = 4_200_000.0
-    balances_sample: list[float] = field(default_factory=lambda: [12500.0, 3200.0, 890.0, 45000.0, 120.0, 7800.0, 2100.0])
+    balances_sample: list[float] = field(
+        default_factory=lambda: [12500.0, 3200.0, 890.0, 45000.0, 120.0, 7800.0, 2100.0]
+    )
 
     @property
     def total_supply(self) -> float:
@@ -85,13 +80,13 @@ class ProtocolState:
 
     @property
     def circulating_supply(self) -> float:
-        circ = self.total_minted - self.total_burned - self.locked_treasury - self.locked_stake
+        circ = (
+            self.total_minted
+            - self.total_burned
+            - self.locked_treasury
+            - self.locked_stake
+        )
         return max(0.0, min(circ, self.total_supply))
-
-
-# ---------------------------------------------------------------------------
-# Mint curve & impact mining
-# ---------------------------------------------------------------------------
 
 
 def remaining_impact_budget(state: ProtocolState) -> float:
@@ -100,11 +95,81 @@ def remaining_impact_budget(state: ProtocolState) -> float:
 
 
 def mint_scarcity_factor(state: ProtocolState) -> float:
-    """Logistic slowdown as impact budget fills (1.0 → ~0.2)."""
     used = max(0.0, state.total_minted - GENESIS_SUPPLY)
     ratio = min(1.0, used / IMPACT_MINT_BUDGET) if IMPACT_MINT_BUDGET else 1.0
-    # smoothstep inverse
     return max(0.2, 1.0 - 0.8 * (ratio ** 1.5))
+
+
+def scarcity_at_ratio(ratio: float) -> float:
+    """S for a hypothetical fill ratio in [0, 1] (sensitivity helper)."""
+    r = max(0.0, min(1.0, ratio))
+    return max(0.2, 1.0 - 0.8 * (r ** 1.5))
+
+
+def quality_from_mrv(
+    ndvi_observed: Optional[float] = None,
+    ndvi_expected: Optional[float] = None,
+    model_yield_t_ha: Optional[float] = None,
+    field_yield_t_ha: Optional[float] = None,
+    field_data_present: bool = False,
+    satellite_available: bool = False,
+) -> dict[str, Any]:
+    """
+    Derive quality_score Q in [0.5, 1.2] from science signals.
+
+    - NDVI agreement: 1 - relative error between observed and expected canopy proxy
+    - Model vs field yield agreement (AquaCrop-style)
+    - Presence bonuses for multi-source MRV
+    """
+    components: dict[str, float] = {}
+    base = 0.85  # single weak source default
+
+    if (
+        ndvi_observed is not None
+        and ndvi_expected is not None
+        and ndvi_expected != 0
+    ):
+        rel_err = abs(ndvi_observed - ndvi_expected) / max(abs(ndvi_expected), 1e-6)
+        ndvi_score = max(0.0, 1.0 - rel_err)
+        components["ndvi_agreement"] = round(ndvi_score, 4)
+        base = 0.9 + 0.2 * ndvi_score  # 0.9 .. 1.1
+        satellite_available = True
+
+    if (
+        model_yield_t_ha is not None
+        and field_yield_t_ha is not None
+        and model_yield_t_ha > 0
+    ):
+        rel_err = abs(model_yield_t_ha - field_yield_t_ha) / max(model_yield_t_ha, 1e-6)
+        model_score = max(0.0, 1.0 - rel_err)
+        components["model_field_agreement"] = round(model_score, 4)
+        base = (base + (0.9 + 0.25 * model_score)) / 2.0
+        field_data_present = True
+
+    bonus = 0.0
+    if satellite_available:
+        bonus += 0.05
+        components["satellite_bonus"] = 0.05
+    if field_data_present:
+        bonus += 0.08
+        components["field_bonus"] = 0.08
+    if satellite_available and field_data_present and "model_field_agreement" in components:
+        bonus += 0.05
+        components["triple_source_bonus"] = 0.05
+
+    q = max(0.5, min(1.2, base + bonus))
+    return {
+        "quality_score": round(q, 4),
+        "components": components,
+        "inputs": {
+            "ndvi_observed": ndvi_observed,
+            "ndvi_expected": ndvi_expected,
+            "model_yield_t_ha": model_yield_t_ha,
+            "field_yield_t_ha": field_yield_t_ha,
+            "field_data_present": field_data_present,
+            "satellite_available": satellite_available,
+        },
+    }
 
 
 def compute_impact_mint(
@@ -113,8 +178,9 @@ def compute_impact_mint(
     quality_score: float = 1.0,
     region_multiplier: float = 1.0,
     state: Optional[ProtocolState] = None,
+    credit_factor_override: Optional[float] = None,
+    scarcity_override: Optional[float] = None,
 ) -> dict[str, Any]:
-    """Return mint breakdown or error detail."""
     if credit_type not in CREDIT_FACTORS:
         return {"ok": False, "error": "invalid_credit_type", "mint_total": 0.0}
     if measured_value <= 0:
@@ -123,10 +189,17 @@ def compute_impact_mint(
     quality = max(0.5, min(1.2, quality_score))
     region = max(0.8, min(1.3, region_multiplier))
     name, unit, base = CREDIT_FACTORS[credit_type]
+    if credit_factor_override is not None:
+        base = credit_factor_override
     raw = measured_value * base * quality * region
 
     st = state or ProtocolState()
-    scarcity = mint_scarcity_factor(st)
+    scarcity = (
+        scarcity_override
+        if scarcity_override is not None
+        else mint_scarcity_factor(st)
+    )
+    scarcity = max(0.2, min(1.0, scarcity))
     budget = remaining_impact_budget(st)
     mint_total = min(raw * scarcity, budget)
 
@@ -136,17 +209,144 @@ def compute_impact_mint(
         "credit_name": name,
         "unit": unit,
         "measured_value": measured_value,
+        "credit_factor": base,
         "quality_score": quality,
         "region_multiplier": region,
         "scarcity_factor": round(scarcity, 4),
+        "raw_before_scarcity": round(raw, 6),
         "mint_total": round(mint_total, 6),
         "distribution": shares,
     }
 
 
-# ---------------------------------------------------------------------------
-# Staking
-# ---------------------------------------------------------------------------
+def sensitivity_analysis(
+    credit_type: int = 0,
+    measured_value: float = 40.0,
+    quality_score: float = 1.0,
+    region_multiplier: float = 1.0,
+    state: Optional[ProtocolState] = None,
+) -> dict[str, Any]:
+    """
+    One-at-a-time sensitivity of mint_total to Fc, S, Q, R.
+
+    Elasticity ≈ (ΔM/M) / (Δx/x) around baseline.
+    """
+    st = state or ProtocolState()
+    base = compute_impact_mint(
+        credit_type, measured_value, quality_score, region_multiplier, st
+    )
+    if not base["ok"]:
+        return base
+
+    m0 = base["mint_total"] or 1e-12
+    _, _, fc0 = CREDIT_FACTORS[credit_type]
+    s0 = base["scarcity_factor"]
+
+    def elast(m1: float, x0: float, x1: float) -> float:
+        if x0 == 0:
+            return 0.0
+        return round(((m1 - m0) / m0) / ((x1 - x0) / x0), 4)
+
+    # ±10% on Fc
+    fc_hi = compute_impact_mint(
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
+        credit_factor_override=fc0 * 1.1,
+    )
+    fc_lo = compute_impact_mint(
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
+        credit_factor_override=fc0 * 0.9,
+    )
+
+    # S at nearby ratios
+    s_hi = compute_impact_mint(
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
+        scarcity_override=min(1.0, s0 * 1.1),
+    )
+    s_lo = compute_impact_mint(
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
+        scarcity_override=max(0.2, s0 * 0.9),
+    )
+
+    q_hi = compute_impact_mint(
+        credit_type, measured_value, min(1.2, quality_score * 1.1), region_multiplier, st
+    )
+    q_lo = compute_impact_mint(
+        credit_type, measured_value, max(0.5, quality_score * 0.9), region_multiplier, st
+    )
+
+    r_hi = compute_impact_mint(
+        credit_type, measured_value, quality_score, min(1.3, region_multiplier * 1.1), st
+    )
+    r_lo = compute_impact_mint(
+        credit_type, measured_value, quality_score, max(0.8, region_multiplier * 0.9), st
+    )
+
+    # Scarcity curve sample
+    scarcity_curve = [
+        {"ratio": round(r, 2), "S": round(scarcity_at_ratio(r), 4)}
+        for r in [i / 10 for i in range(0, 11)]
+    ]
+
+    return {
+        "baseline": base,
+        "parameters": {
+            "Fc": fc0,
+            "S": s0,
+            "Q": quality_score,
+            "R": region_multiplier,
+            "V": measured_value,
+        },
+        "sensitivity": {
+            "Fc": {
+                "plus_10pct_mint": fc_hi["mint_total"],
+                "minus_10pct_mint": fc_lo["mint_total"],
+                "elasticity_approx": elast(fc_hi["mint_total"], fc0, fc0 * 1.1),
+                "note": "Linear in Fc before budget cap",
+            },
+            "S": {
+                "plus_10pct_mint": s_hi["mint_total"],
+                "minus_10pct_mint": s_lo["mint_total"],
+                "elasticity_approx": elast(s_hi["mint_total"], s0, min(1.0, s0 * 1.1)),
+                "note": "S falls as impact budget fills; floor 0.2",
+            },
+            "Q": {
+                "plus_10pct_mint": q_hi["mint_total"],
+                "minus_10pct_mint": q_lo["mint_total"],
+                "elasticity_approx": elast(
+                    q_hi["mint_total"], quality_score, min(1.2, quality_score * 1.1)
+                ),
+                "note": "Clamped to [0.5, 1.2]",
+            },
+            "R": {
+                "plus_10pct_mint": r_hi["mint_total"],
+                "minus_10pct_mint": r_lo["mint_total"],
+                "elasticity_approx": elast(
+                    r_hi["mint_total"],
+                    region_multiplier,
+                    min(1.3, region_multiplier * 1.1),
+                ),
+                "note": "Clamped to [0.8, 1.3]",
+            },
+        },
+        "scarcity_curve": scarcity_curve,
+        "formula": "M = min(V * Fc * Q * R * S, B)",
+    }
 
 
 def get_tier(tier_id: int) -> Optional[dict[str, Any]]:
@@ -160,11 +360,7 @@ def estimate_stake_reward(amount: float, tier_id: int) -> dict[str, Any]:
     if amount <= 0:
         return {"ok": False, "error": "amount_must_be_positive"}
     if amount < tier["min_amount"]:
-        return {
-            "ok": False,
-            "error": "below_minimum",
-            "min_amount": tier["min_amount"],
-        }
+        return {"ok": False, "error": "below_minimum", "min_amount": tier["min_amount"]}
     estimated = amount * tier["apy"] / 100.0
     unlock = datetime.now(timezone.utc) + timedelta(days=tier["days"])
     return {
@@ -186,21 +382,11 @@ def early_unstake_penalty(principal: float, pending_reward: float) -> dict[str, 
     }
 
 
-# ---------------------------------------------------------------------------
-# Transfer / burn
-# ---------------------------------------------------------------------------
-
-
 def transfer_with_optional_burn(amount: float, apply_burn: bool = False) -> dict[str, float]:
     if amount <= 0:
         raise ValueError("Amount must be positive")
     burn = amount * TRANSFER_BURN_RATE if apply_burn else 0.0
     return {"received": amount - burn, "burned": burn}
-
-
-# ---------------------------------------------------------------------------
-# Challenges
-# ---------------------------------------------------------------------------
 
 
 def challenge_reward(
@@ -213,18 +399,11 @@ def challenge_reward(
         return 0.0
     share = participant_score / total_score
     if curve == "winner_boost":
-        share = share ** 0.7  # slight boost to leaders, still proportional family
-        # renormalize not required for single claim demo
+        share = share ** 0.7
     return round(pool_eco * share, 6)
 
 
-# ---------------------------------------------------------------------------
-# Indicators
-# ---------------------------------------------------------------------------
-
-
 def gini(values: list[float]) -> float:
-    """Gini coefficient in [0, 1]. Empty → 0."""
     xs = sorted(v for v in values if v >= 0)
     n = len(xs)
     if n == 0:
@@ -235,7 +414,6 @@ def gini(values: list[float]) -> float:
     cum = 0.0
     for i, x in enumerate(xs, start=1):
         cum += x * (n - i + 1)
-    # standard formula
     return max(0.0, min(1.0, (n + 1 - 2 * cum / total) / n))
 
 
@@ -261,11 +439,6 @@ def compute_indicators(state: ProtocolState) -> dict[str, Any]:
     }
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-
 def tx_hash(*parts: Any) -> str:
     raw = "|".join(str(p) for p in parts) + "|" + datetime.now(timezone.utc).isoformat()
     return "0x" + hashlib.sha256(raw.encode()).hexdigest()
@@ -281,7 +454,4 @@ def default_wallet(address: str) -> WalletState:
             impact_credits_tco2e=42.5,
         )
     }
-    return seed.get(
-        address,
-        WalletState(address=address, available=100.0),
-    )
+    return seed.get(address, WalletState(address=address, available=100.0))
