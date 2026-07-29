@@ -26,8 +26,6 @@ class BandsRequest(BaseModel):
 
 
 class MrvBridgeRequest(BaseModel):
-    """Offline MRV from bands or NDVI; optional location uses live/synthetic chain."""
-
     red: Optional[float] = Field(None, ge=0, le=1)
     nir: Optional[float] = Field(None, ge=0, le=1)
     green: Optional[float] = Field(None, ge=0, le=1)
@@ -57,12 +55,7 @@ async def availability(
 ) -> dict[str, Any]:
     end = date.today()
     start = end - timedelta(days=days)
-    bbox = BBox(
-        min_lon=lon - 0.05,
-        min_lat=lat - 0.05,
-        max_lon=lon + 0.05,
-        max_lat=lat + 0.05,
-    )
+    bbox = BBox.from_point(lat, lon, delta=0.05)
     svc = get_satellite_service()
     return await svc.check_availability(bbox, start, end)
 
@@ -76,12 +69,7 @@ async def timeseries(
 ) -> dict[str, Any]:
     end = date.today()
     start = end - timedelta(days=days)
-    bbox = BBox(
-        min_lon=lon - 0.05,
-        min_lat=lat - 0.05,
-        max_lon=lon + 0.05,
-        max_lat=lat + 0.05,
-    )
+    bbox = BBox.from_point(lat, lon, delta=0.05)
     svc = get_satellite_service()
     rows = await svc.get_ndvi_timeseries(farm_id, bbox, start, end)
     return {
@@ -98,12 +86,7 @@ async def ndvi_point(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
 ) -> dict[str, Any]:
-    bbox = BBox(
-        min_lon=lon - 0.02,
-        min_lat=lat - 0.02,
-        max_lon=lon + 0.02,
-        max_lat=lat + 0.02,
-    )
+    bbox = BBox.from_point(lat, lon, delta=0.02)
     svc = get_satellite_service()
     row = await svc.get_ndvi_image(bbox, date.today() - timedelta(days=15))
     return row.to_dict()
@@ -141,7 +124,6 @@ async def indices(
 
 @router.post("/indices/from-bands")
 async def indices_from_bands(req: BandsRequest) -> dict[str, Any]:
-    """Offline: mean reflectance → NDVI/EVI/SAVI/NDWI/canopy (no network)."""
     return indices_from_mean_reflectance(
         {
             "red": req.red,
@@ -155,11 +137,6 @@ async def indices_from_bands(req: BandsRequest) -> dict[str, Any]:
 
 @router.post("/mrv-bridge")
 async def mrv_bridge(req: MrvBridgeRequest) -> dict[str, Any]:
-    """
-    Phase A end-to-end:
-      bands | ndvi | lat/lon → quality_score → EcoCoin mint preview
-    Prefer bands for pure offline; lat/lon uses satellite provider chain.
-    """
     if req.red is not None and req.nir is not None:
         return mrv_from_bands(
             req.red,
@@ -213,7 +190,6 @@ async def mrv_bridge_get(
     measured_value: float = Query(40.0, gt=0),
     credit_type: int = Query(0, ge=0, le=3),
 ) -> dict[str, Any]:
-    """GET convenience for PowerShell / curl without JSON body."""
     return await mrv_from_location(
         lat,
         lon,
@@ -232,12 +208,7 @@ async def change_detection(
     end = date.today()
     mid = end - timedelta(days=days // 2)
     start = end - timedelta(days=days)
-    bbox = BBox(
-        min_lon=lon - 0.05,
-        min_lat=lat - 0.05,
-        max_lon=lon + 0.05,
-        max_lat=lat + 0.05,
-    )
+    bbox = BBox.from_point(lat, lon, delta=0.05)
     svc = get_satellite_service()
     a = await svc.get_ndvi_timeseries(0, bbox, start, mid)
     b = await svc.get_ndvi_timeseries(0, bbox, mid, end)
