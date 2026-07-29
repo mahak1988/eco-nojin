@@ -1,288 +1,307 @@
-# گزارش جامع تحلیل و ارتقاء پروژه Econojin
+# گزارش جامع تحلیل، یافته‌های جدید و برنامه اجرایی ۱۰ فازی — Econojin
+
+**تاریخ به‌روزرسانی:** ۱۴۰۵/۰۵/۰۷ (2026-07-29)  
+**مخزن:** [mahak1988/eco-nojin](https://github.com/mahak1988/eco-nojin)  
+**وضعیت پایه:** Phase 0–3 Wave 2 در مخزن؛ Science API فعال؛ JWT hardcoded رفع شده
+
+---
 
 ## ۱. خلاصه اجرایی (Executive Summary)
 
-پروژه **Econojin** در وضعیت فنی جذابی قرار دارد: از نظر **معماری ماژولار** و **الگوهای توسعه**، چهارچوب خوبی دارد (با الگوی Model→Schema→Repository→Service→Router). اما در زمینه **امنیت** و **یکپارچگی کد**، نقاط ضعف جدی وجود دارد که مانع استقرار ایمن در production می‌شوند.
+پروژه **Econojin** (اکو نوژین) یک پلتفرم یکپارچه کشاورزی هوشمند، آب، محیط‌زیست، اقتصاد سبز و جامعه روستایی است. معماری ماژولار Model→Schema→Repository→Service→Router، FastAPI async، React/Vite، Alembic، SpiderGuard، rate-limit و audit middleware، Science API (AquaCrop conceptual + RothC-26.3 + SCS-CN)، و قراردادهای Solidity (EcoCoin + VerificationOracle) در مخزن وجود دارند.
 
-**نقاط بحرانی شناسایی‌شده:**
-- نقص امنیتی **بحرانی**: کلید مخفی JWT دیکدود در کد (در `apps/users/service.py` خط 14)
-- تنازعات امنیتی: دو سیستم مدیریت توکن مجزا و ناسازگار
-- داشبورد GitLab CI بهتر از GitHub Actions فعلی
-- استفاده از bcrypt مستقیم به‌جای Argon2 پیشرفته
-- عدم وجود rate limiting ورودی (Brute Force Protection)
+### یافته‌های جدید نسبت به گزارش قبلی
 
----
+| مورد | وضعیت قبلی (گزارش قدیم) | وضعیت فعلی (2026-07-29) | تأثیر |
+|------|-------------------------|--------------------------|-------|
+| کلید JWT دیکدود در `apps/users/service.py` | **بحرانی** | ✅ **رفع شده** — استفاده از `shared_core.security` + `settings` | امنیت production ممکن شد |
+| Rate limiting | غایب / پیشنهادی | ✅ `apps/shared_core/middleware/rate_limit.py` + SpiderGuard | محافظت Brute-force |
+| Audit log middleware | پیشنهادی | ✅ `apps/shared_core/middleware/audit_log.py` | ردیابی امنیتی |
+| Science API Phase 3 | در حال توسعه | ✅ `/api/v1/science/*` mount شده + تست‌های unit/contract | هسته علمی آماده |
+| FE Science UI | ناقص | ✅ صفحه `/science` متصل | نمایش زنده |
+| Alembic | ناقص / create_all | ✅ زنجیره تا `20260728_0004` | آمادگی Postgres |
+| ماژول‌های Accounting / Education / Library / Community / Games | ناقص | ✅ CRUD کامل + تست | بدهی ماژولی کاهش یافته |
+| Docker / PostGIS روی host | مسدود | ⚠️ هنوز نیاز به نصب Docker Desktop توسط کاربر | بلوکه استقرار محلی کامل |
+| Live GEE NDVI | مسدود | ⚠️ نیاز به service account | داده ماهواره‌ای واقعی |
+| RS256 production | پیشنهادی | ⚠️ کلیدها اختیاری؛ پیش‌فرض HS256 | امنیت بالاتر در prod |
+| پوشش تست اندازه‌گیری‌شده | ادعاهای قدیمی | ❌ `pytest --cov` پروژه-wide اجرا نشده | عدد واقعی نامعلوم |
+| اتصال کامل FE به API | جزئی | ⚠️ بسیاری صفحات هنوز mock یا نیمه‌متصل | UX ناقص |
+| پنل Admin | اسکلت | ⚠️ پیشرفت کم | مدیریت کاربران محدود |
+| i18n متمرکز | پراکنده | ⚠️ در حال تحکیم (TODO.md) | چندزبانه ناقص |
 
-## ۲. جدول مقایسه‌ای جامع (KPI Comparison)
-
-| حوزه (Domain) | شاخص (Metric) | پروژه من (Econojin) | پروژه برتر (Best-in-Class) | فاصله (Gap) | شدت (Criticality) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **معماری (Architecture)** | الگوی معماری | ماژولار Monorepo با الگوی موجود | Clean Architecture / Hexagonal | متوسط | متوسط |
-| | مقیاس‌پذیری | async SQLAlchemy، Docker Compose | Kubernetes + Horizontal Pod Autoscaling | متوسط | متوسط |
-| | ماژولار بودن | ✅ ۱۵ ماژول API، ولی وابقه circular | Clean separation با dependency injection | متوسط | متوسط |
-| **امنیت (Security)** | مدیریت اسرار | کلید دیکدود در کد (بحرانی) | HashiCorp Vault / AWS Secrets Manager | **بحرانی** | **بحرانی** |
-| | اعتبارسنجی ورودی | Pydantic v2، ولی ناقص | Pydantic + Validate سفارشی | کم | کم |
-| | احراز هویت و مجوز | JWT HS256 + OTP | Auth0 / OAuth2 / RBAC مدرن | متوسط | متوسط |
-| | لاگ‌گیری امنیتی | ساده، فقط لاگ سطح API | Audit Trail با Sentry + ELK | متوسط | متوسط |
-| | وابستگی‌های آسیب‌پذیر | ابزارهای اسکن موجود | pip-audit + Dependabot | **بحرانی** | متوسط |
-| **کد (Code)** | کیفیت کد | الگوهای موجود، تنازعات | الگوی یکپارچه بدون تکرار | **بحرانی** | متوسط |
-| | پوشش تست | 70%+ (pytest-asyncio) | >80% coverage با CI gate | متوسط | متوسط |
-| | مدیریت خطا | Exception handler سراسری | Error codes استاندارد + trace IDs | کم | کم |
-| **زیرساخت (DevOps)** | مستندات | خوب، ولی گپ‌ها | مستندات کامل ۱۰۰٪ | متوسط | کم |
-| | CI/CD Pipeline | GitHub Actions پیچیده | GitLab CI یا GitHub Actions بهبود یافته | متوسط | متوسط |
-| | Monitoring & Observability | Prometheus + Sentry | OpenTelemetry + AlertManager | متوسط | متوسط |
+**نتیجه:** نقص امنیتی بحرانی JWT رفع شده و هسته علمی + middlewareهای امنیتی اضافه شده‌اند. بدهی فنی باقی‌مانده عمدتاً در استقرار (Docker/PostGIS/GEE)، اتصال کامل فرانت، اندازه‌گیری پوشش تست، RBAC سراسری روی writeها، و polish production است.
 
 ---
 
-## ۳. لیست فایل‌های برتر استخراج‌شده
+## ۲. وضعیت صادقانه فعلی (SSOT هم‌راستا با docs/PHASE_1_2_SSOT.md و docs/REMAINING.md)
 
-### ۳.۱ FastAPI Best Practices Repository
-**مرجع:** https://github.com/zhanymkanov/fastapi-best-practices
+### انجام‌شده در مخزن
+- FastAPI entry `apps/main.py`، CORS محدود، rate-limit و SpiderGuard
+- Alembic تا revision اخیر
+- RBAC models + `require_permission`
+- Auth cookies path؛ JWT HS256 پیش‌فرض، RS256 اختیاری
+- Celery + Redis config
+- Docker compose: postgres(postgis) + redis + api + worker + beat
+- Science: AquaCrop advanced، RothC، SCS-CN، NDVI→canopy، simulation_runs
+- ماژول‌های accounting، education، library، community، games با الگوی کامل
+- PWA skeleton (manifest + SW)
+- Solidity EcoCoin + VerificationOracle
 
-- **نام فایل برتر**: `src/auth/config.py`
-- **دلیل برتری**: استفاده از Pydantic Settings جداگانه برای تنظیمات auth (`JWT_ALG`، `JWT_SECRET`، `JWT_EXP`) باعث می‌شود تنظیمات به‌صورت ماژولار و ایمن مدیریت شوند
-- **کمبود در پروژه من**: تنظیمات auth در هر ماژول تکراری است و در `apps/users/service.py` کلید دیکدود شده
-
-### ۳.۲ Full-Stack FastAPI Template
-**مرجع:** https://github.com/fastapi/full-stack-fastapi-postgresql
-
-- **نام فایل برتر**: `backend/app/core/security.py`
-- **دلیل برتری**: استفاده از Argon2 به‌عنوان رمزنگاری پیش‌فرض با fallback به bcrypt، و توابع ایمنی type-safe با docstringهای کامل
-- **کمبود در پروژه من**: در `apps/shared_core/security.py` Argon2 استفاده شده، اما در `apps/users/service.py` از bcrypt مستقیم استفاده می‌شود (ناهمگونی)
-
-### ۳.۳ Shadcn-UI Monorepo
-**مرجع:** https://github.com/shadcn-ui/ui
-
-- **نام فایل برتر**: `packages/ui/src/button.tsx`
-- **دلیل برتری**: Design System کامل با TypeScript strict mode، variants، و className merging با `tailwind-merge`
-- **کمبود در پروژه من**: Design System در `packages/ui` وجود دارد، اما کامپوننت‌های کشاورزی اختصاصی کم‌است
-
----
-
-## ۴. لیست ماژول‌ها و قابلیت‌های گم‌شده
-
-| ماژول/فایل گم‌شده | دلیل نیاز | اولویت |
-| :--- | :--- | :--- |
-| **auth/config.py** | جداسازی تنظیمات JWT به‌صورت ماژولار (JWT_SECRET از .env بخوانده نشود) | **بحرانی** |
-| **auth/exceptions.py** | تعریف استاندارد خطاهای auth (`InvalidCredentials`، `TokenExpired`، `AccountLocked`) | متوسط |
-| **middleware/rate_limit.py** | جلوگیری از حملات Brute Force در ورود (مثلاً ۵ تلاش در دقیقه) | **بحرانی** |
-| **middleware/audit_log.py** | لاگ‌گیری همه درخواست‌های auth برای ردیابی نفوذ | متوسط |
-| **tests/conftest.py** | Fixtureهای آماده برای تست integration (override dependencies) | متوسط |
-| **alembic migrations** | migrations داینامیک به‌جای `create_all` — ضروری برای production | **بحرانی** |
-| **scripts/check_god_files.py** | اسکریپت گفت‌وگو شده در CI ولی وجود ندارد | متوسط |
+### مسدود / نیازمند اقدام کاربر یا credential
+| آیتم | دلیل |
+|------|------|
+| Docker + PostGIS روی host | Docker Desktop نصب نشده |
+| Real GEE NDVI | Google Earth Engine service account |
+| RS256 در production | تولید جفت کلید openssl + env |
+| measured coverage % | اجرای `pytest --cov` محلی |
+| Locust p95 | load test روی API deployشده |
+| Official FAO/SWAT binaries | نصب خارجی + مجوز (طراحی عمدی: proxy)
 
 ---
 
-## ۵. نقشه‌راه اصلاحی دقیق و گام‌به‌گام
+## ۳. جدول KPI به‌روز (Gap Analysis)
 
-### گام ۰. (P0 - امنیت) رفع نقص امنیتی بحرانی
-```diff
---- a/apps/users/service.py
-+++ b/apps/users/service.py
-@@ -11,11 +11,4 @@
- # JWT Token Management
--# ==========================================
--SECRET_KEY = "your-secret-key-change-in-production-min-32-chars"  # TODO: Move to .env
--ALGORITHM = "HS256"
--ACCESS_TOKEN_EXPIRE_MINUTES = 30
-+# تمام توابع از apps.shared_core.security و settings استفاده می‌کنند
-```
-
-**راه‌حل:** حذف کامل این توابع و استفاده از `apps/shared_core/security.py` + `apps/shared_core/config.py`
-
-### گام ۱. ایجاد فایل auth/config.py
-```python
-# apps/users/config.py
-"""User module configuration with proper secret management."""
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import model_validator
-from typing import Literal
-import warnings
-
-class UserSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_ignore_empty=True,
-        extra="ignore",
-    )
-    
-    JWT_ALGORITHM: Literal["HS256", "RS256"] = "HS256"
-    JWT_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    PASSWORD_MIN_LENGTH: int = 8
-    
-    @model_validator(mode="after")
-    def _validate_secrets(self):
-        if self.JWT_ALGORITHM == "HS256":
-            warnings.warn(
-                "HS256 is not recommended for production. Consider RS256.",
-                stacklevel=1,
-            )
-        return self
-
-user_settings = UserSettings()
-```
-
-### گام ۲. ایجاد rate limiting middleware
-```python
-# apps/shared_core/middleware/rate_limit.py
-"""Rate limiting middleware to prevent brute force attacks."""
-from time import time
-from collections import defaultdict
-from fastapi import Request, HTTPException, status
-from starlette.middleware.base import BaseHTTPMiddleware
-
-# In-memory store (برای production از Redis استفاده کنید)
-_failed_attempts: dict[str, list[float]] = defaultdict(list)
-_RATE_LIMIT_WINDOW = 60  # ثانیه
-_MAX_ATTEMPTS = 5
-
-class RateLimitMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        client_ip = request.client.host
-        path = request.url.path
-        
-        # فقط برای endpointهای auth
-        if path.startswith("/api/v1/auth"):
-            now = time()
-            attempts = _failed_attempts[f"{client_ip}:{path}"]
-            
-            # حذف تلاش‌های قدیمی
-            _failed_attempts[f"{client_ip}:{path}"] = [
-                t for t in attempts if now - t < _RATE_LIMIT_WINDOW
-            ]
-            
-            if len(_failed_attempts[f"{client_ip}:{path}"]) >= _MAX_ATTEMPTS:
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="Too many attempts. Please try again later.",
-                )
-        
-        response = await call_next(request)
-        
-        # ثبت تلاش‌های ناموفق
-        if response.status_code == 401:
-            _failed_attempts[f"{client_ip}:{path}"].append(time())
-        
-        return response
-```
-
-### گام ۳. نوشتن Alembic migrations
-```python
-# alembic/versions/20240501_create_users_table.py
-"""Create users table with proper constraints."""
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-
-revision = "20240501_create_users"
-down_revision = None
-branch_labels = None
-depends_on = None
-
-def upgrade() -> None:
-    op.create_table(
-        "users",
-        sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("email", sa.String(255), nullable=False, unique=True),
-        sa.Column("hashed_password", sa.String(255), nullable=False),
-        sa.Column("full_name", sa.String(255), nullable=True),
-        sa.Column("is_active", sa.Boolean, default=True, nullable=False),
-        sa.Column("is_superuser", sa.Boolean, default=False, nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now()),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("email"),
-    )
-    op.create_index("ix_users_email", "users", ["email"])
-```
-
-### گام ۴. بهبود CI/CD - افزودن Security Gate
-```yaml
-# .github/workflows/07-pre-commit.yml (جدید)
-name: Pre-commit Checks
-on: [push, pull_request]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      - uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: --all-files
-```
-
-### گام ۵. رفع تنازعات security
-باید از یک منبع تنظیمات واحد استفاده شود. فایل `apps/users/service.py` را با استفاده از `apps.shared_core.security` جایگزین کنید:
-
-```python
-# apps/users/service.py (بخش اصلاح‌شده)
-from apps.shared_core.security import (
-    create_access_token,
-    verify_password,
-    get_password_hash,
-    decode_token,
-)
-from apps.shared_core.config import settings
-
-# حذف تمام تعریف‌های دیگر SECRET_KEY، ALGORITHM و ...
-# استفاده مستقیم از settings.ALGORITHM و settings.SECRET_KEY
-```
-
-### گام ۶. بهبود Dockerfile
-```dockerfile
-# docker/Dockerfile.api (بهبود یافته)
-FROM python:3.12-slim AS builder
-WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev && rm -rf /var/lib/apt/lists/*
-COPY pyproject.toml .
-RUN pip install --upgrade pip && pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
-
-FROM python:3.12-slim AS runtime
-WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends libpq5 && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /wheels /wheels
-COPY . .
-RUN pip install --no-cache /wheels/*
-ENV PYTHONUNBUFFERED=1
-USER 1000
-CMD ["uvicorn", "apps.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
+| حوزه | شاخص | وضعیت فعلی | هدف Best-in-Class | فاصله | اولویت |
+|------|-------|------------|-------------------|-------|--------|
+| امنیت | JWT secret management | centralized settings | Vault / KMS | کم | متوسط |
+| امنیت | Rate limit + anti-bot | in-memory + SpiderGuard | Redis shared + WAF | متوسط | بالا |
+| امنیت | RS256 | اختیاری | اجباری در prod | متوسط | بالا |
+| داده | PostGIS live | compose آماده | همیشه-on در prod | متوسط | بالا |
+| داده | GEE live | synthetic/fallback | service account | بالا | بالا |
+| FE | اتصال API واقعی | جزئی (~۴۰–۶۰٪) | ۱۰۰٪ صفحات اصلی | متوسط | بالا |
+| تست | coverage اندازه‌گیری‌شده | نامعلوم | ≥۸۰٪ با gate CI | بالا | بالا |
+| Observability | Sentry + metrics | پایه | OpenTelemetry + alerts | متوسط | متوسط |
+| Admin | پنل مدیریت | اسکلت | CRUD کاربران/نقش‌ها/لاگ | بالا | متوسط |
+| i18n | fa/en کامل | در حال تحکیم | next-intl یا dict متمرکز | متوسط | متوسط |
+| Deploy | multi-stage + secrets | Dockerfile موجود | multi-stage + non-root + vault | متوسط | بالا |
 
 ---
 
-## ۶. دستورات اجرایی برای رفع فوری
+## ۴. برنامه اجرایی ۱۰ فاز برای تکمیل کامل پروژه
+
+هر فاز شامل **هدف**، **تحویل‌پذیرها**، **معیار پذیرش**، **ابزار/کتابخانه**، و **تخمین** است. فازها قابل موازی‌سازی جزئی هستند اما ترتیب پیشنهادی وابستگی‌ها را رعایت می‌کند.
+
+### فاز ۱ — تثبیت امنیت و Hardening نهایی (۳–۵ روز)
+**هدف:** حذف هرگونه secret در کد، فعال‌سازی rate-limit/audit در entrypoint، آماده‌سازی RS256.
+
+**تحویل‌پذیرها:**
+1. تأیید عدم وجود hardcoded secret (`git grep -n SECRET_KEY apps/` فقط در config/settings).
+2. ثبت `RateLimitMiddleware` + `SpiderGuardMiddleware` + `AuditLogMiddleware` در `apps/main.py` با config از env.
+3. اسکریپت `scripts/gen_jwt_keys.sh` + مستند KEY_ROTATION به‌روز.
+4. `REQUIRE_AUTH_FOR_WRITES=true` به‌عنوان پیش‌فرض در `.env.docker` و production compose.
+5. bandit + pip-audit در CI gate.
+
+**معیار پذیرش:** `bandit -r apps/ -ll` بدون critical؛ login با >۵ تلاش → ۴۲۹؛ write بدون token → ۴۰۱.
+
+**ابزار:** slowapi یا middleware موجود، bandit، pip-audit، openssl.
+
+---
+
+### فاز ۲ — دیتابیس و Migrations production-ready (۴–۶ روز)
+**هدف:** Alembic کامل، PostGIS فعال، seed داده‌های پایه.
+
+**تحویل‌پذیرها:**
+1. همه مدل‌های فعال در `alembic/env.py` و revisionهای متوالی بدون `create_all` در prod.
+2. `docker compose up postgres redis` با healthcheck و volume.
+3. migration برای `farms.geom` (GIST) و جداول science/simulation_runs.
+4. اسکریپت seed (کاربر admin اولیه، نقش‌های RBAC، داده نمونه مزارع).
+5. مستند `docs/POSTGRES_MIGRATE.md` و `docs/DB_VERSIONING.md` به‌روز.
+
+**معیار پذیرش:** `alembic upgrade head` روی Postgres خالی موفق؛ PostGIS extension فعال؛ تست CRUD روی Postgres.
+
+**ابزار:** Alembic، asyncpg، geoalchemy2، docker compose.
+
+---
+
+### فاز ۳ — تکمیل و یکپارچه‌سازی API (۵–۸ روز)
+**هدف:** همه روترهای موجود از الگوی یکسان پیروی کنند؛ endpointهای تجمیعی؛ OpenAPI تمیز.
+
+**تحویل‌پذیرها:**
+1. Audit هر روتر برای استفاده از `shared_core` security/deps.
+2. `/api/v1/dashboard/stats` با داده زنده (health + modules + counts).
+3. Pagination استاندارد + error schema یکنواخت (trace_id).
+4. Swagger tags و نسخه‌گذاری ثابت `/api/v1`.
+5. تست‌های contract برای science + auth + accounting + education.
+
+**معیار پذیرش:** `curl /api/v1/debug/routers` بدون 404؛ OpenAPI بدون schema ناقص؛ تست‌های contract سبز.
+
+**ابزار:** pytest، httpx، pydantic v2.
+
+---
+
+### فاز ۴ — اتصال کامل فرانت‌اند به API (۷–۱۰ روز)
+**هدف:** حذف mockهای استاتیک از صفحات اصلی؛ React Query؛ login JWT.
+
+**تحویل‌پذیرها:**
+1. اتصال صفحات: dashboard، weather، accounting، calendar، farmers، science، education، library، community، games، settings.
+2. `/login` و `/register` با JWT (cookie HttpOnly + interceptor axios).
+3. React Query برای cache/invalidation.
+4. مدیریت خطای ۴۰۱ → redirect login.
+5. TypeScript types از OpenAPI (اختیاری: openapi-typescript).
+
+**معیار پذیرش:** همه صفحات اصلی داده زنده از API می‌گیرند؛ refresh token کار می‌کند؛ بدون console error بحرانی.
+
+**ابزار:** @tanstack/react-query، axios، zustand (در صورت نیاز).
+
+---
+
+### فاز ۵ — داده علمی و EO زنده (۵–۸ روز)
+**هدف:** GEE service account + providerهای واقعی؛ Celery jobهای دوره‌ای.
+
+**تحویل‌پذیرها:**
+1. پیروی از `docs/GEE_SETUP.md`؛ env `GEE_SERVICE_ACCOUNT_JSON`.
+2. endpointهای NDVI واقعی با fallback synthetic.
+3. Celery beat: weekly vegetation check + climate ETL.
+4. ذخیره simulation_runs و export PDF/CSV.
+5. مستند محدودیت‌ها (بدون binary رسمی FAO/SWAT).
+
+**معیار پذیرش:** `science/status` → `gee_live: true` وقتی credential موجود؛ jobهای Celery بدون error در log.
+
+**ابزار:** earthengine-api، Celery، Redis، rasterio (در صورت نیاز).
+
+---
+
+### فاز ۶ — تست، پوشش و Observability (۵–۷ روز)
+**هدف:** پوشش اندازه‌گیری‌شده ≥۷۰٪ (هدف ۸۰٪)؛ Sentry + metrics پایه.
+
+**تحویل‌پذیرها:**
+1. `pytest --cov=apps --cov-report=xml` در CI؛ gate روی threshold.
+2. تست‌های integration با Postgres testcontainer یا sqlite.
+3. init Sentry در `apps/main.py` + capture در exception handlers.
+4. Prometheus metrics endpoint (اختیاری: prometheus-fastapi-instrumentator).
+5. تست‌های E2E پایه Playwright برای login + science page.
+
+**معیار پذیرش:** coverage report در CI؛ Sentry event در صورت exception مصنوعی؛ Playwright سبز.
+
+**ابزار:** pytest-cov، sentry-sdk، playwright، testcontainers (اختیاری).
+
+---
+
+### فاز ۷ — CI/CD و DevOps (۴–۶ روز)
+**هدف:** pipeline قابل اعتماد؛ multi-stage image؛ deploy خودکار.
+
+**تحویل‌پذیرها:**
+1. GitHub Actions: lint (ruff) → test → security (bandit/pip-audit) → build image.
+2. Dockerfile multi-stage (builder + runtime non-root).
+3. `docker-compose.prod.yml` با secrets mount.
+4. مستند deploy: Vercel (FE) + Render/Liara/Neon (API/DB) یا pure Docker.
+5. pre-commit hooks فعال.
+
+**معیار پذیرش:** PR بدون سبز شدن CI merge نمی‌شود؛ image بدون secret؛ healthcheck پس از deploy موفق.
+
+**ابزار:** GitHub Actions، Docker، ruff، pre-commit.
+
+---
+
+### فاز ۸ — پنل Admin و RBAC سراسری (۵–۷ روز)
+**هدف:** مدیریت کاربران/نقش‌ها/لاگ؛ enforce permission روی همه writeها.
+
+**تحویل‌پذیرها:**
+1. صفحات admin: users، roles، modules، system health، audit logs.
+2. `require_permission` روی تمام POST/PUT/DELETE حساس.
+3. UI برای تخصیص نقش و مشاهده audit trail.
+4. تست‌های RBAC (forbidden vs allowed).
+
+**معیار پذیرش:** کاربر بدون نقش نمی‌تواند write کند؛ admin می‌تواند نقش تغییر دهد؛ audit log قابل مشاهده.
+
+**ابزار:** FastAPI Depends، React admin UI (یا گسترش apps/web).
+
+---
+
+### فاز ۹ — PWA، i18n و polish UX (۴–۶ روز)
+**هدف:** نصب‌پذیر، چندزبانه کامل fa/en، دسترسی‌پذیری پایه.
+
+**تحویل‌پذیرها:**
+1. تکمیل dict متمرکز i18n (طبق TODO.md) و حذف پراکندگی.
+2. Service worker cache استراتژی برای offline science/dashboard.
+3. RTL کامل برای fa؛ LTR برای en.
+4. Lighthouse پایه (performance/accessibility) و رفع critical.
+5. manifest + icons نهایی.
+
+**معیار پذیرش:** `tsc --noEmit` سبز؛ نصب PWA روی Android/Chrome؛ تغییر زبان بدون reload سخت.
+
+**ابزار:** i18next یا dict موجود، workbox (اختیاری)، lighthouse CI.
+
+---
+
+### فاز ۱۰ — استقرار production، بارگذاری و مستندات نهایی (۵–۸ روز)
+**هدف:** محیط production پایدار؛ load test؛ SSOT مستندات.
+
+**تحویل‌پذیرها:**
+1. Deploy API + DB + Redis + worker روی هدف انتخابی (Render/Liara/VPS).
+2. FE روی Vercel با `VITE_API_BASE_URL` production.
+3. Locust یا k6 برای p95 latency و throughput.
+4. به‌روزرسانی README، REMAINING، PHASE_SSOT، DEPLOYMENT، ARCHITECTURE.
+5. Runbook عملیات (restart، backup، key rotation).
+6. چک‌لیست نهایی OPS_CHECKLIST + DEPLOY_CHECKLIST تیک‌خورده.
+
+**معیار پذیرش:** health و science/status در production سبز؛ p95 قابل قبول (<۵۰۰ms برای endpointهای سبک)؛ مستندات بدون ادعای اندازه‌گیری‌نشده.
+
+**ابزار:** Locust/k6، platform CLI (vercel/render)، Sentry production DSN.
+
+---
+
+## ۵. اولویت‌بندی فوری (هفته جاری)
+
+1. **فاز ۱** — تأیید نهایی امنیت و فعال‌سازی middlewareها در entrypoint.
+2. **فاز ۲** — بالا آوردن Postgres/PostGIS با Docker (در صورت نصب Docker).
+3. **فاز ۴ شروع** — اتصال ۳–۴ صفحه پرترافیک (dashboard, science, accounting, login).
+4. اجرای `pytest --cov` و ثبت عدد واقعی در REMAINING.
+5. آماده‌سازی GEE service account (مستندات موجود).
+
+---
+
+## ۶. دستورات اجرایی سریع (مرجع)
 
 ```bash
-# ۱. حذف کلید دیکدود از کد
-$ git grep -n "SECRET_KEY.*=.*your-secret\|changethis" apps/users/service.py
-# خروجی را حذف کنید و از settings استفاده کنید
+# امنیت
+git grep -n "SECRET_KEY.*=.*[\"']" apps/ || true
+bandit -r apps/ -ll --skip B101
+pip-audit -r requirements.txt
 
-# ۲. اضافه کردن rate limiting
-$ pip install slowapi
-# یا استفاده از redis برای production
+# تست
+pytest tests/unit/test_real_science.py tests/contract/test_science_endpoints.py -q
+pytest --cov=apps --cov-report=term-missing -q
 
-# ۳. اجرای security scan
-$ pip install bandit safety pip-audit
-$ bandit -r apps/ -ll --skip B101
-$ pip-audit -r requirements.txt
+# محلی
+pip install -r requirements.txt
+uvicorn apps.main:app --reload --host 0.0.0.0 --port 8000
+# در ترمینال دیگر:
+cd apps/web && pnpm install && pnpm dev
+
+# Docker (پس از نصب Docker Desktop)
+docker compose up --build -d
+alembic upgrade head
 ```
 
 ---
 
-## ۷. توصیه‌های نهایی
+## ۷. نقشه‌راه زمانی پیشنهادی (تقریبی)
 
-| اولویت | عمل | زمان تخمین |
-|-------|-----|------------|
-| 🔴 بحرانی | حذف کلید دیکدود از `apps/users/service.py` | ۱ ساعت |
-| 🔴 بحرانی | یکپارچه‌سازی security بین دو فایل | ۲ ساعت |
-| 🟠 متوسط | افزودن rate limiting middleware | ۳ ساعت |
-| 🟠 متوسط | نوشتن Alembic migrations | ۴ ساعت |
-| 🟢 کم | بهبود Dockerfile با multi-stage | ۲ ساعت |
-| 🟢 کم | افزودن pre-commit hooks | ۱ ساعت |
+| فاز | مدت | وابستگی |
+|-----|------|----------|
+| ۱ امنیت | ۳–۵ روز | — |
+| ۲ دیتابیس | ۴–۶ روز | ۱ |
+| ۳ API | ۵–۸ روز | ۲ |
+| ۴ FE | ۷–۱۰ روز | ۳ |
+| ۵ Science/EO | ۵–۸ روز | ۲، credential |
+| ۶ تست/Obs | ۵–۷ روز | ۳، ۴ |
+| ۷ CI/CD | ۴–۶ روز | ۱، ۶ |
+| ۸ Admin/RBAC | ۵–۷ روز | ۳ |
+| ۹ PWA/i18n | ۴–۶ روز | ۴ |
+| ۱۰ Deploy | ۵–۸ روز | همه |
+
+**جمع تخمینی:** ۸–۱۲ هفته کار متمرکز (با موازی‌سازی قابل کاهش به ۶–۹ هفته).
 
 ---
 
-*این گزارش بر اساس تحلیل کد و مقایسه با استانداردهای FastAPI/React در گیت‌هاب تهیه شده است.*
+## ۸. توصیه‌های نهایی
+
+- هیچ ادعای «درصد تکمیل» بدون اندازه‌گیری (coverage، Lighthouse، Locust) در مستندات باقی نماند.
+- تمام secrets فقط از env / secret manager؛ هرگز در image یا repo.
+- برای GEE و Docker اقدام کاربر لازم است؛ کد آماده fallback است.
+- پس از هر فاز، `docs/REMAINING.md` و `docs/PHASE_*_SSOT.md` را به‌روز کنید.
+
+---
+
+*این گزارش بر اساس اسکن مخزن در 2026-07-29، فایل‌های IMPROVEMENT_REPORT قبلی، PLAN.md، REMAINING.md، PHASE_1_2_SSOT.md، GAP_ANALYSIS.md، ROADMAP_FA.md و وضعیت واقعی کد (شامل رفع JWT و وجود middlewareها) تهیه شده است.*
