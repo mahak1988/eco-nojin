@@ -1,7 +1,7 @@
 """
 Community System Tests
 =======================
-Tests for Post, Comment, Like CRUD operations.
+Tests for Post, Comment, Like CRUD — aligned with Integer PKs and is_published.
 """
 
 import pytest
@@ -9,10 +9,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models.community import Post, Comment, Like
-try:
-    from apps.api.models.community import PostStatus
-except ImportError:
-    PostStatus = None
 
 
 @pytest.fixture
@@ -35,30 +31,28 @@ async def community_db_session():
 
 @pytest.mark.asyncio
 async def test_post_crud(community_db_session: AsyncSession):
-    """Test post CRUD operations."""
-    # Create
+    """Test post CRUD operations with integer autoincrement id."""
     post = Post(
-        id="post-1",
         title="My First Post",
         content="This is test content for the community post",
-        author_id="user-1",
-        status=PostStatus.PUBLISHED,
+        author_id=1,
+        category="general",
+        is_published=True,
     )
     community_db_session.add(post)
     await community_db_session.flush()
 
-    # Read
-    result = await community_db_session.execute(select(Post).where(Post.id == "post-1"))
+    assert post.id is not None
+    result = await community_db_session.execute(select(Post).where(Post.id == post.id))
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.title == "My First Post"
-    assert fetched.status == PostStatus.PUBLISHED
+    assert fetched.is_published is True
 
-    # Update
     fetched.title = "Updated Post Title"
     await community_db_session.flush()
 
-    result = await community_db_session.execute(select(Post).where(Post.id == "post-1"))
+    result = await community_db_session.execute(select(Post).where(Post.id == post.id))
     updated = result.scalar_one()
     assert updated.title == "Updated Post Title"
 
@@ -66,72 +60,72 @@ async def test_post_crud(community_db_session: AsyncSession):
 @pytest.mark.asyncio
 async def test_comment_crud(community_db_session: AsyncSession):
     """Test comment CRUD operations."""
-    # Create post first
     post = Post(
-        id="post-2",
         title="Test Post",
         content="Test content",
-        author_id="user-1",
+        author_id=1,
+        category="general",
     )
     community_db_session.add(post)
     await community_db_session.flush()
 
-    # Create comment
     comment = Comment(
-        id="comment-1",
         content="This is a test comment",
-        author_id="user-2",
-        post_id="post-2",
+        author_id=2,
+        post_id=post.id,
     )
     community_db_session.add(comment)
     await community_db_session.flush()
 
-    # Read
-    result = await community_db_session.execute(select(Comment).where(Comment.id == "comment-1"))
+    result = await community_db_session.execute(
+        select(Comment).where(Comment.id == comment.id)
+    )
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.content == "This is a test comment"
-    assert fetched.post_id == "post-2"
+    assert fetched.post_id == post.id
 
 
 @pytest.mark.asyncio
 async def test_like_crud(community_db_session: AsyncSession):
     """Test like CRUD operations."""
-    # Create post and user
     post = Post(
-        id="post-3",
         title="Liked Post",
         content="Test content",
-        author_id="user-1",
+        author_id=1,
+        category="general",
     )
     community_db_session.add(post)
     await community_db_session.flush()
 
-    # Create like
     like = Like(
-        id="like-1",
-        user_id="user-2",
-        post_id="post-3",
+        user_id=2,
+        post_id=post.id,
     )
     community_db_session.add(like)
     await community_db_session.flush()
 
-    # Read
-    result = await community_db_session.execute(select(Like).where(Like.id == "like-1"))
+    result = await community_db_session.execute(select(Like).where(Like.id == like.id))
     fetched = result.scalar_one_or_none()
     assert fetched is not None
 
-    # Delete like
     await community_db_session.delete(fetched)
     await community_db_session.flush()
 
-    result = await community_db_session.execute(select(Like).where(Like.id == "like-1"))
+    result = await community_db_session.execute(select(Like).where(Like.id == like.id))
     assert result.scalar_one_or_none() is None
 
 
 @pytest.mark.asyncio
-async def test_post_status_enum():
-    """Test post status enum values."""
-    assert PostStatus.DRAFT == "draft"
-    assert PostStatus.PUBLISHED == "published"
-    assert PostStatus.ARCHIVED == "archived"
+async def test_post_published_flag():
+    """is_published is the publication flag (no PostStatus enum in model)."""
+    post = Post(
+        title="Draft-like",
+        content="x",
+        author_id=1,
+        category="general",
+        is_published=False,
+    )
+    assert post.is_published is False
+    post.is_published = True
+    assert post.is_published is True
