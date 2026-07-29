@@ -1,284 +1,50 @@
-﻿
-# Environment Variables
-.env
-.env.local
-.env.production
-*.env
-
-# Large Model Files
-*.safetensors
-*.bin
-*.pt
-*.pth
-models/all-MiniLM-L6-v2/
-
-# Package Manager Cache
-.pnpm-store/
-node_modules/
-__pycache__/
-*.pyc
-
-# IDE and OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# Build and Dist
-.next/
-dist/
-build/
-*.log
-
-# Backup Files
-*_backup_*/
-*.bak
-*.tmp
-m o d e l s / a l l - M i n i L M - L 6 - v 2 /  
- 
-# === Econojin Security & Optimization ===
-
-# Environment Variables
-.env
-.env.local
-.env.production
-*.env
-
-# Large Model Files
-*.safetensors
-*.bin
-*.pt
-*.pth
-models/all-MiniLM-L6-v2/
-
-# Package Manager Cache
-.pnpm-store/
-node_modules/
-__pycache__/
-*.pyc
-
-# IDE and OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# Build and Dist
-.next/
-dist/
-build/
-*.log
-
-# Backup Files
-*_backup_*/
-*.bak
-*.tmp
-
-
-# Security - Secrets
-*.pem
+﻿# --- Security & Secrets ---
+login.json
+cookies.txt
+body.json
+auth-session.xml
 *.key
-secrets.json
-# ==========================================
-# محیط‌های مجازی پایتون (بسیار مهم)
-# ==========================================
-.venv/
-.venv.backup/
-venv/
-env/
-ENV/
+*.pem
+.env.local
+.env.production
 
-# ==========================================
-# فایل‌های محیطی و متغیرهای حساس
-# ==========================================
-.env.*.local
-!.env.example
-!env.example
-
-# ==========================================
-# Node.js و Next.js
-# ==========================================
-out/
-
-# ==========================================
-# فایل‌های موقت، کش و لاگ
-# ==========================================
-*.py[cod]
-*$py.class
-.pytest_cache/
+# --- Build Artifacts & Cache ---
+*.tsbuildinfo
+solidity-files-cache.json
+.coverage
 coverage/
-npm-debug.log*
-
-# ==========================================
-# تنظیمات IDE و سیستم‌عامل
-# ==========================================
-* . d b  
- * . s q l i t e  
- * . s q l i t e 3  
- m o d e l s /  
- 
-# Added by cleanup_v2.py
-*.db
-*.sqlite
-*.sqlite3
-
-# ============================================================
-# Eco Nojin - Phase 1 Cleanup (Added by phase1_cleanup.py)
-# ============================================================
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Python
+dist/
+build/
+node_modules/
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
+*.pyc
+*.pyo
 .venv/
-ENV/
+venv/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
+# --- Editor & OS ---
+.vscode/settings.json
 .DS_Store
 Thumbs.db
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Reports
-analysis_report_*.json
-analysis_report_*.html
-
-# Backups
-.backups/
-
-# Logs
-*.log
-phase1_cleanup.log
-* . d b 
-# Database files (نفت باید در git نباشند)
+# --- Backups & Temp ---
+*.bak.*
+*.tmp
+*.swp
+# --- Local Database & Artifacts ---
 *.db
 *.sqlite
 *.sqlite3
+project-analysis.*
+project_analysis_report.*
+local_extra_files.txt
 
-# Backup files
+# --- Backups & Temp Files ---
 *.backup
-*.backup_*
 *.bak
-
-# Environment
-.env
-.env.local
-.env.production
-!*.env.example
-
-# Python
-*.pyc
-__pycache__/
-.venv/
-venv/
-*.egg-info/
-
-# Node
-node_modules/
-.next/
-.turbo/
-dist/
-build/ 
- a p p s / e c o n o j i n . d b  
- m o d e l s /  
- 
-# Sensitive
-.env
-.env.local
-apps/web/.env
-
-# ── Added by secure_fix.py ──
-# ── Secrets & environment ──
-.env.*
-*.p12
-*.pfx
-# ── Backups & temp ──
-.sync_backup_*/
-__repo_sync_tmp__/
-# ── Dependencies & stores ──
-# ── Reports with potential secrets ──
-reports/guardian_*.md
-# ── Logs ──
-
-# Analyzer outputs (prevent self-referential findings)
-project-analysis.json
-project-analysis.html
-project-analysis.sha256
-.security_backup/
-
-# Analysis reports & temp files (may contain secrets)
-project_analysis_report.json
-project_analysis_report.md
-project-analysis.json
-project-analysis.html
-project-analysis.sha256
-current_snapshot.json
-previous_snapshot.json
-sync_report_*.json
-contracts/artifacts/
-
-# Token files (هرگز commit نشوند)
-.gh_token
-*.token
-.gh_*
-.github_token
-
-# Token files (هرگز commit نشوند)
-.gh_token
-*.token
-.gh_*
-.github_token
-
-# Token files (هرگز commit نشوند)
-.gh_token
-*.token
-.gh_*
-.github_token
-
-# Token files (هرگز commit نشوند)
-.gh_token
-*.token
-.gh_*
-.github_token
-
-# Security-sensitive (هرگز commit نشوند)
-.gh_token
-.env
-.env.*
-!.env.example
-
-# i18n audit reports (temporary)
-i18n_report/
-i18n_audit.py
-
-advanced_i18n_analyzer.py
-
-check_env.py
-
-# Temp analysis outputs
-apps-analysis.json
-clean_i18n_output/
-i18n_clean_output/
-orphaned_keys_*.txt
-master_*.json
-master_*.txt
-*_snapshot.json
+*.tmp
+# Local Artifacts
+*.db
+*.backup
+project-analysis.*
+local_extra_files.txt
