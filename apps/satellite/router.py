@@ -1,4 +1,4 @@
-"""Satellite API routes."""
+"""Satellite API routes — EO chain + Phase A MRV → EcoCoin bridge."""
 
 from __future__ import annotations
 
@@ -6,12 +6,42 @@ from datetime import date, timedelta
 from typing import Any, Optional
 
 from fastapi import APIRouter, Query
+from pydantic import BaseModel, Field
 
 from apps.satellite.gee_status import probe_gee
+from apps.satellite.mrv_bridge import mrv_from_bands, mrv_from_location, mrv_from_ndvi
+from apps.satellite.processors.indices import indices_from_mean_reflectance
 from apps.satellite.providers.base import BBox
 from apps.satellite.service import get_satellite_service
 
 router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
+
+
+class BandsRequest(BaseModel):
+    red: float = Field(..., ge=0, le=1, description="Sentinel-2 B04 reflectance")
+    nir: float = Field(..., ge=0, le=1, description="Sentinel-2 B08 reflectance")
+    green: Optional[float] = Field(None, ge=0, le=1)
+    blue: Optional[float] = Field(None, ge=0, le=1)
+    swir1: Optional[float] = Field(None, ge=0, le=1)
+
+
+class MrvBridgeRequest(BaseModel):
+    """Offline MRV from bands or NDVI; optional location uses live/synthetic chain."""
+
+    red: Optional[float] = Field(None, ge=0, le=1)
+    nir: Optional[float] = Field(None, ge=0, le=1)
+    green: Optional[float] = Field(None, ge=0, le=1)
+    blue: Optional[float] = Field(None, ge=0, le=1)
+    ndvi_observed: Optional[float] = Field(None, ge=-1, le=1)
+    ndvi_expected: Optional[float] = Field(None, ge=-1, le=1)
+    lat: Optional[float] = Field(None, ge=-90, le=90)
+    lon: Optional[float] = Field(None, ge=-180, le=180)
+    days: int = Field(30, ge=7, le=365)
+    model_yield_t_ha: Optional[float] = Field(None, ge=0)
+    field_yield_t_ha: Optional[float] = Field(None, ge=0)
+    credit_type: int = Field(0, ge=0, le=3)
+    measured_value: float = Field(40.0, gt=0)
+    region_multiplier: float = Field(1.0, ge=0.8, le=1.3)
 
 
 @router.get("/gee/status")
@@ -27,7 +57,12 @@ async def availability(
 ) -> dict[str, Any]:
     end = date.today()
     start = end - timedelta(days=days)
-    bbox = BBox(min_lon=lon - 0.05, min_lat=lat - 0.05, max_lon=lon + 0.05, max_lat=lat + 0.05)
+    bbox = BBox(
+        min_lon=lon - 0.05,
+        min_lat=lat - 0.05,
+        max_lon=lon + 0.05,
+        max_lat=lat + 0.05,
+    )
     svc = get_satellite_service()
     return await svc.check_availability(bbox, start, end)
 
@@ -41,7 +76,12 @@ async def timeseries(
 ) -> dict[str, Any]:
     end = date.today()
     start = end - timedelta(days=days)
-    bbox = BBox(min_lon=lon - 0.05, min_lat=lat - 0.05, max_lon=lon + 0.05, max_lat=lat + 0.05)
+    bbox = BBox(
+        min_lon=lon - 0.05,
+        min_lat=lat - 0.05,
+        max_lon=lon + 0.05,
+        max_lat=lat + 0.05,
+    )
     svc = get_satellite_service()
     rows = await svc.get_ndvi_timeseries(farm_id, bbox, start, end)
     return {
@@ -58,7 +98,12 @@ async def ndvi_point(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
 ) -> dict[str, Any]:
-    bbox = BBox(min_lon=lon - 0.02, min_lat=lat - 0.02, max_lon=lon + 0.02, max_lat=lat + 0.02)
+    bbox = BBox(
+        min_lon=lon - 0.02,
+        min_lat=lat - 0.02,
+        max_lon=lon + 0.02,
+        max_lat=lat + 0.02,
+    )
     svc = get_satellite_service()
     row = await svc.get_ndvi_image(bbox, date.today() - timedelta(days=15))
     return row.to_dict()
@@ -85,7 +130,97 @@ async def indices(
             "data": [r.__dict__ if hasattr(r, "__dict__") else r for r in rows],
         }
     except Exception as e:
-        return {"lat": lat, "lon": lon, "count": 0, "error": str(e)[:200], "data": []}
+        return {
+            "lat": lat,
+            "lon": lon,
+            "count": 0,
+            "error": str(e)[:200],
+            "data": [],
+        }
+
+
+@router.post("/indices/from-bands")
+async def indices_from_bands(req: BandsRequest) -> dict[str, Any]:
+    """Offline: mean reflectance → NDVI/EVI/SAVI/NDWI/canopy (no network)."""
+    return indices_from_mean_reflectance(
+        {
+            "red": req.red,
+            "nir": req.nir,
+            "green": req.green,
+            "blue": req.blue,
+            "swir1": req.swir1,
+        }
+    )
+
+
+@router.post("/mrv-bridge")
+async def mrv_bridge(req: MrvBridgeRequest) -> dict[str, Any]:
+    """
+    Phase A end-to-end:
+      bands | ndvi | lat/lon → quality_score → EcoCoin mint preview
+    Prefer bands for pure offline; lat/lon uses satellite provider chain.
+    """
+    if req.red is not None and req.nir is not None:
+        return mrv_from_bands(
+            req.red,
+            req.nir,
+            green=req.green,
+            blue=req.blue,
+            ndvi_expected=req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha,
+            field_yield_t_ha=req.field_yield_t_ha,
+            credit_type=req.credit_type,
+            measured_value=req.measured_value,
+            region_multiplier=req.region_multiplier,
+        )
+    if req.ndvi_observed is not None:
+        return mrv_from_ndvi(
+            req.ndvi_observed,
+            req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha,
+            field_yield_t_ha=req.field_yield_t_ha,
+            credit_type=req.credit_type,
+            measured_value=req.measured_value,
+            region_multiplier=req.region_multiplier,
+        )
+    if req.lat is not None and req.lon is not None:
+        return await mrv_from_location(
+            req.lat,
+            req.lon,
+            days=req.days,
+            ndvi_expected=req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha,
+            field_yield_t_ha=req.field_yield_t_ha,
+            credit_type=req.credit_type,
+            measured_value=req.measured_value,
+            region_multiplier=req.region_multiplier,
+        )
+    return {
+        "error": "provide red+nir, or ndvi_observed, or lat+lon",
+        "examples": {
+            "bands": {"red": 0.08, "nir": 0.35},
+            "ndvi": {"ndvi_observed": 0.72, "ndvi_expected": 0.75},
+            "location": {"lat": 32.65, "lon": 51.67, "days": 30},
+        },
+    }
+
+
+@router.get("/mrv-bridge")
+async def mrv_bridge_get(
+    lat: float = Query(32.65),
+    lon: float = Query(51.67),
+    days: int = Query(30, ge=7, le=365),
+    measured_value: float = Query(40.0, gt=0),
+    credit_type: int = Query(0, ge=0, le=3),
+) -> dict[str, Any]:
+    """GET convenience for PowerShell / curl without JSON body."""
+    return await mrv_from_location(
+        lat,
+        lon,
+        days=days,
+        measured_value=measured_value,
+        credit_type=credit_type,
+    )
 
 
 @router.post("/change-detection")
@@ -97,7 +232,12 @@ async def change_detection(
     end = date.today()
     mid = end - timedelta(days=days // 2)
     start = end - timedelta(days=days)
-    bbox = BBox(min_lon=lon - 0.05, min_lat=lat - 0.05, max_lon=lon + 0.05, max_lat=lat + 0.05)
+    bbox = BBox(
+        min_lon=lon - 0.05,
+        min_lat=lat - 0.05,
+        max_lon=lon + 0.05,
+        max_lat=lat + 0.05,
+    )
     svc = get_satellite_service()
     a = await svc.get_ndvi_timeseries(0, bbox, start, mid)
     b = await svc.get_ndvi_timeseries(0, bbox, mid, end)
@@ -105,13 +245,29 @@ async def change_detection(
     mb = sum(r.mean_ndvi for r in b) / max(len(b), 1) if b else 0.0
     delta = mb - ma
     return {
-        "period_a": {"start": start.isoformat(), "end": mid.isoformat(), "mean_ndvi": round(ma, 4)},
-        "period_b": {"start": mid.isoformat(), "end": end.isoformat(), "mean_ndvi": round(mb, 4)},
+        "period_a": {
+            "start": start.isoformat(),
+            "end": mid.isoformat(),
+            "mean_ndvi": round(ma, 4),
+        },
+        "period_b": {
+            "start": mid.isoformat(),
+            "end": end.isoformat(),
+            "mean_ndvi": round(mb, 4),
+        },
         "delta_ndvi": round(delta, 4),
-        "signal": "greening" if delta > 0.05 else ("browning" if delta < -0.05 else "stable"),
+        "signal": (
+            "greening"
+            if delta > 0.05
+            else ("browning" if delta < -0.05 else "stable")
+        ),
     }
 
 
 @router.get("/fields")
 async def fields_stub(farm_id: Optional[int] = None) -> dict[str, Any]:
-    return {"data": [], "farm_id": farm_id, "message": "Link farm GeoJSON via /api/v1/farms/:id/geojson"}
+    return {
+        "data": [],
+        "farm_id": farm_id,
+        "message": "Link farm GeoJSON via /api/v1/farms/:id/geojson",
+    }
