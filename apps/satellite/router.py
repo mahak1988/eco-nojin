@@ -1,4 +1,4 @@
-"""Satellite API routes — EO chain + Phase A/B MRV → EcoCoin bridge."""
+"""Satellite API routes — EO + AquaCrop + RothC → EcoCoin MRV."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from apps.satellite.processors.indices import indices_from_mean_reflectance
 from apps.satellite.providers.base import BBox
 from apps.satellite.service import get_satellite_service
 from apps.simulation.aquacrop_mrv import aquacrop_mrv_from_location, aquacrop_to_mrv
+from apps.simulation.rothc_mrv import rothc_to_mrv
 
 router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
 
@@ -57,6 +58,19 @@ class AquaCropMrvRequest(BaseModel):
     lon: Optional[float] = Field(None, ge=-180, le=180)
     credit_type: int = Field(0, ge=0, le=3)
     measured_value: float = Field(40.0, gt=0)
+    region_multiplier: float = Field(1.0, ge=0.8, le=1.3)
+
+
+class RothcMrvRequest(BaseModel):
+    years: int = Field(10, ge=1, le=100)
+    clay_pct: float = Field(25.0, ge=0, le=80)
+    temp_c: float = Field(15.0, ge=-10, le=40)
+    rain_mm_year: float = Field(500.0, ge=0, le=3000)
+    et_mm_year: float = Field(700.0, ge=0, le=3000)
+    c_input_t_ha_y: float = Field(1.5, ge=0, le=20)
+    soc_t_ha: float = Field(40.0, ge=1, le=200)
+    plant_cover: bool = True
+    lab_soc_final_t_ha: Optional[float] = Field(None, ge=0)
     region_multiplier: float = Field(1.0, ge=0.8, le=1.3)
 
 
@@ -219,7 +233,6 @@ async def mrv_bridge_get(
 
 @router.post("/aquacrop-mrv")
 async def aquacrop_mrv_post(req: AquaCropMrvRequest) -> dict[str, Any]:
-    """Phase B: AquaCrop process model → MRV quality → EcoCoin mint preview."""
     if req.lat is not None and req.lon is not None:
         return await aquacrop_mrv_from_location(
             req.lat,
@@ -270,6 +283,38 @@ async def aquacrop_mrv_get(
         days=days,
         measured_value=measured_value,
         credit_type=credit_type,
+    )
+
+
+@router.post("/rothc-mrv")
+async def rothc_mrv_post(req: RothcMrvRequest) -> dict[str, Any]:
+    """Phase C: RothC ΔSOC → soil_soc (credit_type=2) mint preview."""
+    return rothc_to_mrv(
+        years=req.years,
+        clay_pct=req.clay_pct,
+        temp_c=req.temp_c,
+        rain_mm_year=req.rain_mm_year,
+        et_mm_year=req.et_mm_year,
+        c_input_t_ha_y=req.c_input_t_ha_y,
+        soc_t_ha=req.soc_t_ha,
+        plant_cover=req.plant_cover,
+        lab_soc_final_t_ha=req.lab_soc_final_t_ha,
+        region_multiplier=req.region_multiplier,
+    )
+
+
+@router.get("/rothc-mrv")
+async def rothc_mrv_get(
+    years: int = Query(10, ge=1, le=100),
+    c_input_t_ha_y: float = Query(1.5, ge=0, le=20),
+    clay_pct: float = Query(25.0, ge=0, le=80),
+    soc_t_ha: float = Query(40.0, ge=1, le=200),
+) -> dict[str, Any]:
+    return rothc_to_mrv(
+        years=years,
+        c_input_t_ha_y=c_input_t_ha_y,
+        clay_pct=clay_pct,
+        soc_t_ha=soc_t_ha,
     )
 
 
