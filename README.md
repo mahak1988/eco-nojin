@@ -4,81 +4,260 @@
 
 پلتفرم یکپارچه کشاورزی هوشمند، آب، محیط‌زیست، اقتصاد سبز و جامعه روستایی.
 
-## Governance
-
-- **Hard rules:** [docs/CONSTITUTION.md](docs/CONSTITUTION.md) (R1–R23)
-- **Glossary fa/en:** [docs/GLOSSARY_FA_EN.md](docs/GLOSSARY_FA_EN.md)
-- **Science formulas:** [docs/SCIENCE_FORMULAS.md](docs/SCIENCE_FORMULAS.md)
-- **Honest backlog:** [docs/REMAINING.md](docs/REMAINING.md)
-- **SSOT status:** [docs/PHASE_1_2_SSOT.md](docs/PHASE_1_2_SSOT.md)
-
-UI languages: **fa / en**. Code & API identifiers: **English**.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](License)
+[![Status](https://img.shields.io/badge/status-active-success.svg)](.)
+[![Phase](https://img.shields.io/badge/phase-0--2-blue.svg)](docs/PHASE_1_2_SSOT.md)
 
 ---
 
-## Status (2026-07-28)
+## 📋 فهرست مطالب / Table of Contents
 
-| Area | Status |
-|------|--------|
-| Phase 0–2 core | ✅ in repo (local SQLite OK) |
-| Phase 3 science API | ✅ `/api/v1/science/*` |
-| Process models | ✅ FAO Ky AquaCrop *conceptual*, RothC-26.3, SCS-CN |
-| FE Science UI | ✅ `/science` |
-| Docker / PostGIS on host | ⚠️ optional — install Docker |
-| Live GEE | ⚠️ needs service account |
-| Official FAO/SWAT binaries | ❌ not bundled (by design) |
+- [معرفی پروژه](#-معرفی-پروژه)
+- [ویژگی‌های کلیدی](#-ویژگی‌های-کلیدی)
+- [معماری سیستم](#-معماری-سیستم)
+- [ساختار ماژول‌ها](#-ساختار-ماژول‌ها)
+- [وضعیت فعلی](#-وضعیت-فعلی)
+- [نصب و راه‌اندازی سریع](#-نصب-و-راه‌اندازی-سریع)
+- [مستندات API](#-مستندات-api)
+- [توسعه و مشارکت](#-توسعه-و-مشارکت)
+- [امنیت](#-امنیت)
+- [مجوز](#-مجوز)
+- [تماس](#-تماس)
 
 ---
 
-## Quickstart
+## 🌱 معرفی پروژه
+
+**Econojin** یک پلتفرم جامع و یکپارچه برای مدیریت هوشمند کشاورزی، منابع آب، محیط‌زیست، اقتصاد سبز و توسعه جوامع روستایی است. این پلتفرم با بهره‌گیری از مدل‌های علمی پیشرفته، هوش مصنوعی و داده‌های ماهواره‌ای، به کشاورزان، پژوهشگران و سیاست‌گذاران کمک می‌کند تا تصمیمات بهینه‌تری در زمینه‌های مختلف کشاورزی و زیست‌محیطی اتخاذ کنند.
+
+### اهداف اصلی
+
+- 🌾 **کشاورزی هوشمند**: ارائه مدل‌های شبیه‌سازی رشد گیاهان (AquaCrop، RothC) و مدیریت بهینه آبیاری
+- 💧 **مدیریت آب**: پایش مصرف آب، پیش‌بینی نیازهای آبی و بهینه‌سازی توزیع منابع
+- 🌍 **محیط‌زیست**: پایش کربن خاک، ارزیابی اثرات زیست‌محیطی و پشتیبانی از پروژه‌های اعتبار کربن
+- 📊 **اقتصاد سبز**: تحلیل هزینه-فایده، پشتیبانی از توکن‌های اکوسیستم (EcoCoin) و شفافیت زنجیره تأمین
+- 👥 **جامعه روستایی**: آموزش، اشتراک دانش و تقویت همکاری‌های محلی
+
+### زبان‌های پشتیبانی‌شده
+
+رابط کاربری به دو زبان **فارسی (fa)** و **انگلیسی (en)** در دسترس است. تمام شناسه‌های کد و API به زبان انگلیسی هستند.
+
+---
+
+## ✨ ویژگی‌های کلیدی
+
+- 🤖 **عامل‌های هوشمند (AI Agents)**: سیستم چندعاملی برای تحلیل داده‌ها، پیش‌بینی و توصیه‌های هوشمند
+- 🛰️ **ادغام داده‌های ماهواره‌ای**: اتصال به Google Earth Engine برای دریافت داده‌های EO (NDVI، LAI، رطوبت خاک)
+- 🧪 **مدل‌های علمی**: پیاده‌سازی مدل‌های FAO AquaCrop، RothC-26.3، SCS-CN و SWAT (مفهومی)
+- 📈 **داشبورد تحلیلی**: نمایش بصری داده‌ها، نمودارهای تعاملی و گزارش‌های سفارشی
+- 🔐 **امنیت پیشرفته**: ماژول SpiderGuard برای تشخیص و مقابله با ترافیک خودکار/ربات‌ها
+- 🌐 **مقیاس‌پذیری جهانی**: پشتیبانی از پیاده‌سازی منطقه‌ای (خاورمیانه، افغانستان، عراق، اردن)
+- 📱 **CMS یکپارچه**: مدیریت محتوا، کتابخانه آموزشی و اعلان‌ها
+- 🎯 **سیستم هشدار sớm**: پایش شرایط بحرانی و اطلاع‌رسانی به موقع
+
+---
+
+## 🏗️ معماری سیستم
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Frontend (React/Next.js)               │
+│                    apps/web + packages/ui                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      API Gateway (FastAPI)                  │
+│                        apps/main.py                         │
+│  ┌──────────────┬──────────────┬──────────────┬──────────┐ │
+│  │   Science    │   Farms      │   Crops      │  Water   │ │
+│  │   Module     │   Module     │   Module     │  Module  │ │
+│  └──────────────┴──────────────┴──────────────┴──────────┘ │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Data & Knowledge Layer                  │
+│  ┌──────────────┬──────────────┬──────────────┬──────────┐ │
+│  │  PostgreSQL  │   Redis      │  GEE/EO API  │  Agents  │ │
+│  │  + PostGIS   │   (Cache)    │  (Satellite) │  Memory  │ │
+│  └──────────────┴──────────────┴──────────────┴──────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### لایه‌های اصلی
+
+1. **Frontend**: React/Next.js با پشتیبانی از i18n و طراحی واکنش‌گرا
+2. **API Layer**: FastAPI با مستندات Swagger/OpenAPI خودکار
+3. **Business Logic**: ماژول‌های تخصصی (کشاورزی، آب، ریسک، ماهواره)
+4. **Data Layer**: PostgreSQL + PostGIS برای داده‌های مکانی، Redis برای کش
+5. **External Services**: Google Earth Engine، سرویس‌های هواشناسی
+
+---
+
+## 📦 ساختار ماژول‌ها
+
+```
+eco-nojin/
+├── apps/                      # ماژول‌های اصلی برنامه
+│   ├── ai_agents/            # عامل‌های هوشمند و حافظه
+│   ├── farms/                # مدیریت مزارع و زمین‌ها
+│   ├── crops/                # مدیریت محصولات و چرخه رشد
+│   ├── water/                # مدیریت منابع آب و آبیاری
+│   ├── risks/                # ارزیابی ریسک و بیمه
+│   ├── satellite/            # ادغام داده‌های ماهواره‌ای
+│   ├── monitoring/           # پایش و هشدارها
+│   ├── dashboard/            # داشبورد تحلیلی
+│   ├── cms/                  # مدیریت محتوا
+│   ├── library/              # کتابخانه آموزشی
+│   ├── notifications/        # سیستم اعلان
+│   ├── users/                # مدیریت کاربران و احراز هویت
+│   ├── admin_panel/          # پنل مدیریت
+│   ├── spider_security/      # ماژول امنیت SpiderGuard
+│   ├── ml/                   # مدل‌های یادگیری ماشین
+│   ├── simulation/           # شبیه‌سازها
+│   └── web/                  # فرانت‌اند React
+├── packages/                  # بسته‌های مشترک
+│   ├── ui/                   # کامپوننت‌های UI
+│   ├── hooks/                # هوک‌های React
+│   ├── api-client/           # کلاینت API
+│   └── types/                # تعاریف TypeScript
+├── docs/                      # مستندات کامل
+├── contracts/                 # قراردادهای هوشمند (Solidity)
+├── infrastructure/            # زیرساخت Docker/K8s
+├── scripts/                   # اسکریپت‌های کمکی
+└── tests/                     # تست‌های واحد و یکپارچگی
+```
+
+---
+
+## 📊 وضعیت فعلی
+
+**آخرین به‌روزرسانی:** 2026-07-28
+
+| حوزه | وضعیت | توضیحات |
+|------|-------|---------|
+| Phase 0–2 Core | ✅ تکمیل‌شده | هسته اصلی در مخزن موجود است (SQLite محلی) |
+| Phase 3 Science API | ✅ فعال | `/api/v1/science/*` در دسترس |
+| مدل‌های فرآیندی | ✅ مفهومی | FAO AquaCrop، RothC-26.3، SCS-CN |
+| رابط کاربری Science | ✅ تکمیل‌شده | `/science` در فرانت‌اند |
+| Docker / PostGIS | ⚠️ اختیاری | نیاز به نصب Docker دارد |
+| اتصال Live GEE | ⚠️ نیازمند تنظیمات | نیاز به حساب سرویس Google Earth Engine |
+| باینری‌های FAO/SWAT | ❌ بسته‌نشده | طبق طراحی (نیاز به مجوز) |
+
+برای اطلاعات دقیق‌تر درباره وضعیت پروژه، به [Single Source of Truth](docs/PHASE_1_2_SSOT.md) مراجعه کنید.
+
+---
+
+## 🚀 نصب و راه‌اندازی سریع
+
+### پیش‌نیازها
+
+- Python 3.9+ 
+- Node.js 18+ و pnpm
+- PostgreSQL 14+ (اختیاری برای توسعه - SQLite پیش‌فرض است)
+- Docker (اختیاری برای استقرار)
+
+### راه‌اندازی سریع (Development)
 
 ```bash
+# کلون کردن مخزن
 git clone https://github.com/mahak1988/eco-nojin.git
 cd eco-nojin
+
+# نصب وابستگی‌های Python
 pip install -r requirements.txt
+
+# اجرای سرور API
 uvicorn apps.main:app --reload --host 0.0.0.0 --port 8000
 
+# در ترمینال دیگر - نصب و اجرای فرانت‌اند
 cd apps/web && pnpm install && pnpm dev
 ```
 
-| Service | URL |
-|---------|-----|
-| API docs | http://localhost:8000/docs |
-| Health | http://localhost:8000/health |
-| Science status | http://localhost:8000/api/v1/science/status |
-| Debug routers | http://localhost:8000/api/v1/debug/routers |
-| Web | http://localhost:5173 |
-| Science UI | http://localhost:5173/science |
-
-### Science curls
+### استفاده از Docker (Production)
 
 ```bash
-curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/api/v1/science/status
-curl.exe -X POST -H "User-Agent: Mozilla/5.0" -H "Content-Type: application/json" ^
-  -d "{\"days\":40,\"rain_mm_day\":0.4,\"crop\":\"wheat\"}" ^
+# اجرای کامل با Docker Compose
+docker-compose up -d
+
+# یا برای توسعه
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+### دسترسی به سرویس‌ها
+
+| سرویس | URL | توضیحات |
+|-------|-----|---------|
+| مستندات API | http://localhost:8000/docs | Swagger UI |
+| سلامت سیستم | http://localhost:8000/health | بررسی وضعیت |
+| وضعیت Science | http://localhost:8000/api/v1/science/status | وضعیت ماژول‌های علمی |
+| دیباگ Routerها | http://localhost:8000/api/v1/debug/routers | لیست endpointها |
+| وب‌سایت | http://localhost:5173 | فرانت‌اند اصلی |
+| رابط Science | http://localhost:5173/science | داشبورد علمی |
+
+---
+
+## 📡 مستندات API
+
+### نمونه درخواست‌ها
+
+#### بررسی وضعیت Science
+
+```bash
+curl -H "User-Agent: Mozilla/5.0" \
+  http://localhost:8000/api/v1/science/status
+```
+
+#### اجرای مدل AquaCrop پیشرفته
+
+```bash
+curl -X POST \
+  -H "User-Agent: Mozilla/5.0" \
+  -H "Content-Type: application/json" \
+  -d '{"days":40,"rain_mm_day":0.4,"crop":"wheat"}' \
   http://localhost:8000/api/v1/science/aquacrop-advanced
 ```
 
-### Tests
+### Endpointهای اصلی
+
+- `GET /api/v1/science/status` - وضعیت کلی ماژول‌های علمی
+- `POST /api/v1/science/aquacrop-advanced` - شبیه‌سازی AquaCrop
+- `POST /api/v1/science/rothc` - مدل کربن خاک RothC
+- `GET /api/v1/farms/` - لیست مزارع
+- `GET /api/v1/satellite/ndvi` - داده‌های NDVI
+
+برای مستندات کامل API به [docs/API.md](docs/API.md) و Swagger UI مراجعه کنید.
+
+---
+
+## 🧪 اجرای تست‌ها
 
 ```bash
+# تست‌های علمی
 pytest tests/unit/test_real_science.py tests/contract/test_science_endpoints.py -q
+
+# همه تست‌ها
+pytest tests/ -v
+
+# تست با پوشش کد
+pytest --cov=apps tests/
 ```
 
 ---
 
-## Security / سیستم امنیتی
+## 🛡️ امنیت
 
-We added a new lightweight "SpiderGuard" module to help detect and mitigate automated/scanner traffic (عنکبوت‌ها/ربات‌ها). It's intentionally minimal and designed as a starting point you can extend.
+ماژول **SpiderGuard** برای تشخیص و مقابله با ترافیک خودکار/ربات‌ها اضافه شده است:
 
-- Location: `apps/spider_security/`
-- Features included now:
-  - User-agent based bot heuristics (detect common crawler UA substrings)
-  - Simple in-memory rate limiter per IP (configurable window and threshold)
-  - FastAPI/Starlette middleware implementation (plug-and-play)
-  - Basic unit tests and README for the module
+- **موقعیت**: `apps/spider_security/`
+- **ویژگی‌ها**:
+  - تشخیص ربات بر اساس User-Agent
+  - محدودکننده نرخ درخواست بر اساس IP
+  - Middleware سبک برای FastAPI
+  - تست‌های واحد
 
-Usage (example, add into your FastAPI app):
+### نحوه استفاده
 
 ```python
 from fastapi import FastAPI
@@ -89,19 +268,58 @@ app.add_middleware(SpiderGuardMiddleware,
     max_requests=60, window_seconds=60, block_after=True)
 ```
 
-Notes / Next steps:
-- In-memory rate-limiter is fine for development and single-instance deployment. For production/clustered deployments use Redis or another shared store.
-- Consider integrating with existing authentication, WAF, or reverse-proxy rules and adding richer heuristics (behavioral scoring, JS-challenges, CAPTCHA).
-- Add automated IP blocklists, logging to central ELK/Datadog, and observability metrics.
+### نکات امنیتی
+
+- برای محیط Production از Redis برای Rate Limiting استفاده کنید
+- امکان ادغام با WAF و سیستم‌های احراز هویت وجود دارد
+- لاگ‌ها را به ELK/Datadog ارسال کنید
+- برای اطلاعات بیشتر: [security/SECURITY_POLICY.md](security/SECURITY_POLICY.md)
 
 ---
 
-## Quick links
+## 🤝 توسعه و مشارکت
 
-- Spider security module: `apps/spider_security/README.md`
+ما از مشارکت جامعه متن‌باز استقبال می‌کنیم! برای راهنمای کامل مشارکت به موارد زیر مراجعه کنید:
+
+- **راهنمای مشارکت**: [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
+- **استانداردهای مهندسی**: [docs/ENGINEERING_STANDARDS.md](docs/ENGINEERING_STANDARDS.md)
+- **قانون اساسی پروژه**: [docs/CONSTITUTION.md](docs/CONSTITUTION.md)
+- **نقشه راه**: [docs/ROADMAP_FA.md](docs/ROADMAP_FA.md)
+
+### گردش کار توسعه
+
+1. Fork کردن مخزن
+2. ایجاد شاخه جدید (`git checkout -b feature/amazing-feature`)
+3. Commit تغییرات (`git commit -m 'Add amazing feature'`)
+4. Push به شاخه (`git push origin feature/amazing-feature`)
+5. ایجاد Pull Request
 
 ---
 
-## License
+## 📄 مجوز
 
-MIT — see [License](License).
+این پروژه تحت مجوز **MIT** منتشر شده است. برای اطلاعات بیشتر به فایل [License](License) مراجعه کنید.
+
+---
+
+## 📞 تماس
+
+- **مخزن GitHub**: [github.com/mahak1988/eco-nojin](https://github.com/mahak1988/eco-nojin)
+- **مستندات کامل**: پوشه `docs/`
+- **گزارش‌ها**: پوشه `reports/`
+
+---
+
+## 🙏 قدردانی
+
+از تمامcontributors، پژوهشگران و سازمان‌هایی که در توسعه این پلتفرم مشارکت کرده‌اند، سپاسگزاریم.
+
+---
+
+<div align="center">
+
+**ساخته شده با ❤️ برای کشاورزی پایدار و آینده‌ای سبزتر**
+
+[بالا ↑](#-فهرست-مطالب--table-of-contents)
+
+</div>
