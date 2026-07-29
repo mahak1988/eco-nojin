@@ -22,12 +22,14 @@ Extended surface:
   POST /rewards/claim
   GET  /indicators
   GET  /economics
+  GET  /economics/sensitivity
+  POST /mrv/quality-score
   POST /burn
 """
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -46,16 +48,13 @@ from apps.api.services.ecocoin_engine import (
     early_unstake_penalty,
     estimate_stake_reward,
     get_tier,
-    transfer_with_optional_burn,
+    quality_from_mrv,
+    sensitivity_analysis,
     tx_hash,
 )
 from apps.shared_core.deps import require_write_auth
 
 router = APIRouter(prefix="/api/v1/ecocoin", tags=["ecocoin"])
-
-# ---------------------------------------------------------------------------
-# Models exported for unit tests
-# ---------------------------------------------------------------------------
 
 
 class BalanceResponse(BaseModel):
@@ -137,12 +136,17 @@ class ChallengeClaimRequest(BaseModel):
 
 class RewardClaimRequest(BaseModel):
     address: str
-    amount: Optional[float] = None  # None = claim all pending
+    amount: Optional[float] = None
 
 
-# ---------------------------------------------------------------------------
-# In-memory protocol state (MVP; DB persistence next phase)
-# ---------------------------------------------------------------------------
+class MrvQualityRequest(BaseModel):
+    ndvi_observed: Optional[float] = Field(None, ge=0, le=1)
+    ndvi_expected: Optional[float] = Field(None, ge=0, le=1)
+    model_yield_t_ha: Optional[float] = Field(None, ge=0)
+    field_yield_t_ha: Optional[float] = Field(None, ge=0)
+    field_data_present: bool = False
+    satellite_available: bool = False
+
 
 _STATE = ProtocolState()
 
@@ -213,11 +217,6 @@ _CHALLENGES: list[dict[str, Any]] = [
 _PENDING_REWARDS: dict[str, float] = {
     "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18": 180.0,
 }
-
-
-# ---------------------------------------------------------------------------
-# Existing contract endpoints
-# ---------------------------------------------------------------------------
 
 
 @router.get("/balance/{address}", response_model=BalanceResponse)
@@ -333,7 +332,6 @@ async def verify(
     measured_value: float = Query(...),
     _: None = Depends(require_write_auth),
 ) -> dict[str, Any]:
-    # Contract: success shape when auth allows; engine validates strictly on impact-mint
     return {
         "verified": True,
         "project_id": project_id,
@@ -341,11 +339,6 @@ async def verify(
         "credit_type": credit_type,
         "measured_value": measured_value,
     }
-
-
-# ---------------------------------------------------------------------------
-# Wallet
-# ---------------------------------------------------------------------------
 
 
 @router.get("/wallet/{address}")
@@ -363,11 +356,6 @@ async def get_wallet(address: str) -> dict[str, Any]:
         "impact_credits_tco2e": w.impact_credits_tco2e,
         "total_equity": w.total_equity,
     }
-
-
-# ---------------------------------------------------------------------------
-# Unstake
-# ---------------------------------------------------------------------------
 
 
 @router.post("/staking/unstake")
@@ -395,11 +383,6 @@ async def unstake(
         "reward_paid": req.pending_reward,
         "tx_hash": tx_hash("unstake", req.address, req.amount),
     }
-
-
-# ---------------------------------------------------------------------------
-# Impact mining (strict)
-# ---------------------------------------------------------------------------
 
 
 @router.post("/mining/impact-mint")
@@ -438,22 +421,11 @@ async def impact_mint(
     steward_share = result["distribution"]["steward"]
     _MOCK_BALANCES[req.recipient] = _MOCK_BALANCES.get(req.recipient, 100.0) + steward_share
 
-    return {
-        "status": "minted",
-        "tx_hash": h,
-        **result,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Challenges
-# ---------------------------------------------------------------------------
+    return {"status": "minted", "tx_hash": h, **result}
 
 
 @router.get("/challenges")
-async def list_challenges(
-    status: Optional[str] = Query(None),
-) -> dict[str, Any]:
+async def list_challenges(status: Optional[str] = Query(None)) -> dict[str, Any]:
     items = _CHALLENGES
     if status:
         items = [c for c in items if c["status"] == status]
@@ -501,11 +473,6 @@ async def claim_challenge(
     }
 
 
-# ---------------------------------------------------------------------------
-# Rewards
-# ---------------------------------------------------------------------------
-
-
 @router.get("/rewards/{address}")
 async def get_rewards(address: str) -> dict[str, Any]:
     pending = _PENDING_REWARDS.get(address, 0.0)
@@ -539,11 +506,6 @@ async def claim_rewards(
     }
 
 
-# ---------------------------------------------------------------------------
-# Indicators & economics
-# ---------------------------------------------------------------------------
-
-
 @router.get("/indicators")
 async def get_indicators() -> dict[str, Any]:
     return compute_indicators(_STATE)
@@ -571,15 +533,45 @@ async def get_economics() -> dict[str, Any]:
                 "ECO is minted against verified environmental outcomes; "
                 "70% to stewards, 15% verifiers, 10% treasury, 5% community."
             ),
-            "anchors": ["tCO2e", "m3_water_saved", "soil_organic_carbon", "biodiversity_index"],
+            "anchors": [
+                "tCO2e",
+                "m3_water_saved",
+                "soil_organic_carbon",
+                "biodiversity_index",
+            ],
         },
         "indicators": compute_indicators(_STATE),
     }
 
 
-# ---------------------------------------------------------------------------
-# Burn
-# ---------------------------------------------------------------------------
+@router.get("/economics/sensitivity")
+async def get_sensitivity(
+    credit_type: int = Query(0, ge=0, le=3),
+    measured_value: float = Query(40.0, gt=0),
+    quality_score: float = Query(1.0, ge=0.5, le=1.2),
+    region_multiplier: float = Query(1.0, ge=0.8, le=1.3),
+) -> dict[str, Any]:
+    """One-at-a-time sensitivity of mint to Fc, S, Q, R (±10%)."""
+    return sensitivity_analysis(
+        credit_type=credit_type,
+        measured_value=measured_value,
+        quality_score=quality_score,
+        region_multiplier=region_multiplier,
+        state=_STATE,
+    )
+
+
+@router.post("/mrv/quality-score")
+async def post_mrv_quality(req: MrvQualityRequest) -> dict[str, Any]:
+    """Derive Q from NDVI / AquaCrop-style model vs field agreement."""
+    return quality_from_mrv(
+        ndvi_observed=req.ndvi_observed,
+        ndvi_expected=req.ndvi_expected,
+        model_yield_t_ha=req.model_yield_t_ha,
+        field_yield_t_ha=req.field_yield_t_ha,
+        field_data_present=req.field_data_present,
+        satellite_available=req.satellite_available,
+    )
 
 
 @router.post("/burn")
@@ -590,10 +582,7 @@ async def burn(
     if req.amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be positive")
     bal = _MOCK_BALANCES.get(req.address, 0.0)
-    if bal < req.amount:
-        # soft: still record burn intent for demo wallets without full ledger
-        pass
-    else:
+    if bal >= req.amount:
         _MOCK_BALANCES[req.address] = bal - req.amount
     _STATE.total_burned += req.amount
     h = tx_hash("burn", req.address, req.amount, req.reason)
