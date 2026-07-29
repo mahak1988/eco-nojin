@@ -5,36 +5,51 @@ Business logic layer — orchestrates repositories and enforces rules.
 Controllers (routers) call services; services call repositories.
 """
 
-import logging
+from __future__ import annotations
 
-logger = logging.getLogger(__name__)
-from typing import Optional, List
-from datetime import datetime, date
+import logging
 from decimal import Decimal
+from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.models.accounting import Account, JournalEntry
 from apps.api.repositories.accounting import (
-    AccountRepository, JournalEntryRepository, InvoiceRepository,
-    PaymentRepository, BudgetRepository
+    AccountRepository,
+    BudgetRepository,
+    InvoiceRepository,
+    JournalEntryRepository,
+    PaymentRepository,
 )
 from apps.api.schemas.accounting import (
-    AccountCreate, AccountUpdate,
+    AccountCreate,
+    AccountUpdate,
+    BudgetCreate,
+    BudgetUpdate,
+    InvoiceCreate,
+    InvoiceUpdate,
     JournalEntryCreate,
-    InvoiceCreate, InvoiceUpdate,
     PaymentCreate,
-    BudgetCreate, BudgetUpdate,
-    DashboardSummaryResponse,
-    BalanceSheetResponse, IncomeStatementResponse
 )
-from apps.api.models.accounting import Account, AccountType, JournalEntry, JournalItem
+
+logger = logging.getLogger(__name__)
+
+
+def _attach_balance(account: Account, balance: Decimal) -> Account:
+    """Store computed balance without fighting the read-only @property."""
+    # Pydantic from_attributes reads instance attributes first via getattr;
+    # putting the value in __dict__ overrides the property for that instance.
+    object.__setattr__(account, "_computed_balance", balance)
+    # Make getattr(account, 'balance') prefer the computed value via a temp override
+    type(account).balance  # ensure property exists
+    account.__dict__["balance"] = balance
+    return account
 
 
 class AccountingService:
     """Main service for accounting operations."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.accounts = AccountRepository(session)
         self.journal_entries = JournalEntryRepository(session)
         self.invoices = InvoiceRepository(session)
@@ -47,46 +62,38 @@ class AccountService:
     """Service for account operations."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.repo = AccountRepository(session)
 
     async def get(self, account_id: str) -> Account:
-        """Handle get (account_id)."""
         obj = await self.repo.get_by_id(account_id)
         if not obj:
             raise ValueError(f"Account with id={account_id} not found")
-        # Calculate and attach balance
-        obj.balance = await self.repo.calculate_balance(account_id)
-        return obj
+        bal = await self.repo.calculate_balance(account_id)
+        return _attach_balance(obj, bal)
 
     async def list(
         self, skip: int = 0, limit: int = 100, account_type: Optional[str] = None
     ) -> tuple[List[Account], int]:
-        """Handle list (skip, limit, account_type)."""
         limit = min(limit, 1000)
         accounts, total = await self.repo.list(skip, limit, account_type)
-        # Calculate balances for all accounts
         for account in accounts:
-            account.balance = await self.repo.calculate_balance(account.id)
+            bal = await self.repo.calculate_balance(account.id)
+            _attach_balance(account, bal)
         return accounts, total
 
     async def create(self, data: AccountCreate) -> Account:
-        # Check code uniqueness
-        """Handle create (data)."""
         existing = await self.repo.get_by_code(data.code)
         if existing:
             raise ValueError(f"Account with code={data.code} already exists")
         return await self.repo.create(data)
 
     async def update(self, account_id: str, data: AccountUpdate) -> Account:
-        """Handle update (account_id, data)."""
         obj = await self.repo.get_by_id(account_id)
         if not obj:
             raise ValueError(f"Account with id={account_id} not found")
         return await self.repo.update(account_id, data)
 
     async def delete(self, account_id: str) -> None:
-        """Handle delete (account_id)."""
         obj = await self.repo.get_by_id(account_id)
         if not obj:
             raise ValueError(f"Account with id={account_id} not found")
@@ -99,11 +106,9 @@ class JournalEntryService:
     """Service for journal entry operations."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.repo = JournalEntryRepository(session)
 
     async def get(self, entry_id: str) -> JournalEntry:
-        """Handle get (entry_id)."""
         obj = await self.repo.get_by_id(entry_id)
         if not obj:
             raise ValueError(f"Journal entry with id={entry_id} not found")
@@ -112,35 +117,27 @@ class JournalEntryService:
     async def list(
         self, skip: int = 0, limit: int = 100, is_posted: Optional[bool] = None
     ) -> tuple[List[JournalEntry], int]:
-        """Handle list (skip, limit, is_posted)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit, is_posted)
 
     async def create(self, data: JournalEntryCreate) -> JournalEntry:
-        # Validate double-entry balance
-        """Handle create (data)."""
         total_debits = sum(
-            item.amount for item in data.items
-            if item.entry_type == "debit"
+            item.amount for item in data.items if item.entry_type == "debit"
         )
         total_credits = sum(
-            item.amount for item in data.items
-            if item.entry_type == "credit"
+            item.amount for item in data.items if item.entry_type == "credit"
         )
         if total_debits != total_credits:
             raise ValueError("Journal entry must be balanced (debits = credits)")
-        
-        # Generate ID if not provided
+
         entry = await self.repo.create(data)
-        
-        # Auto-post if balanced
+
         if total_debits > 0:
             await self.repo.post_entry(entry.id)
-        
+
         return entry
 
     async def post_entry(self, entry_id: str) -> JournalEntry:
-        """Handle post_entry (entry_id)."""
         obj = await self.repo.post_entry(entry_id)
         if not obj:
             raise ValueError(f"Journal entry with id={entry_id} not found")
@@ -151,12 +148,10 @@ class InvoiceService:
     """Service for invoice operations."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.repo = InvoiceRepository(session)
+        self.session = session
 
-    async def get(self, invoice_id: str) -> "Invoice":
-        """Handle get (invoice_id)."""
-        from apps.api.models.accounting import Invoice as InvoiceModel
+    async def get(self, invoice_id: str):
         obj = await self.repo.get_by_id(invoice_id)
         if not obj:
             raise ValueError(f"Invoice with id={invoice_id} not found")
@@ -165,28 +160,22 @@ class InvoiceService:
     async def list(
         self, skip: int = 0, limit: int = 100, status: Optional[str] = None
     ) -> tuple[list, int]:
-        """Handle list (skip, limit, status)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit, status)
 
-    async def create(self, data: InvoiceCreate) -> "Invoice":
-        """Handle create (data)."""
+    async def create(self, data: InvoiceCreate):
         return await self.repo.create(data)
 
-    async def update(self, invoice_id: str, data: InvoiceUpdate) -> "Invoice":
-        """Handle update (invoice_id, data)."""
+    async def update(self, invoice_id: str, data: InvoiceUpdate):
         obj = await self.repo.update(invoice_id, data)
         if not obj:
             raise ValueError(f"Invoice with id={invoice_id} not found")
         return obj
 
     async def delete(self, invoice_id: str) -> None:
-        # Will need to add delete method to repository
-        """Handle delete (invoice_id)."""
         obj = await self.repo.get_by_id(invoice_id)
         if not obj:
             raise ValueError(f"Invoice with id={invoice_id} not found")
-        # Add delete logic
         await self.session.delete(obj)
 
 
@@ -194,17 +183,13 @@ class PaymentService:
     """Service for payment operations."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.repo = PaymentRepository(session)
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list, int]:
-        """Handle list (skip, limit)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit)
 
-    async def create(self, data: PaymentCreate) -> "Payment":
-        """Handle create (data)."""
-        from apps.api.models.accounting import Payment as PaymentModel
+    async def create(self, data: PaymentCreate):
         return await self.repo.create(data)
 
 
@@ -212,34 +197,23 @@ class BudgetService:
     """Service for budget operations."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.repo = BudgetRepository(session)
 
-    async def get(self, budget_id: str) -> "Budget":
-        """Handle get (budget_id)."""
-        from apps.api.models.accounting import Budget as BudgetModel
+    async def get(self, budget_id: str):
         obj = await self.repo.get_by_id(budget_id)
         if not obj:
             raise ValueError(f"Budget with id={budget_id} not found")
         return obj
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list, int]:
-        """Handle list (skip, limit)."""
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit)
 
-    async def create(self, data: BudgetCreate) -> "Budget":
-        """Handle create (data)."""
+    async def create(self, data: BudgetCreate):
         return await self.repo.create(data)
 
-    async def update(self, budget_id: str, data: BudgetUpdate) -> "Budget":
-        """Handle update (budget_id, data)."""
+    async def update(self, budget_id: str, data: BudgetUpdate):
         obj = await self.repo.update(budget_id, data)
         if not obj:
             raise ValueError(f"Budget with id={budget_id} not found")
         return obj
-
-
-# TODO: Add delete methods to repository if needed
-# Import for Invoice and Payment
-from apps.api.models.accounting import Invoice, Payment, Budget
