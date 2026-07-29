@@ -1,0 +1,28 @@
+{
+  "name": "Eco-Nojin Development",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "20" },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "charliermarsh.ruff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspaces/eco-nojin/.venv/bin/python",
+        "editor.formatOnSave": true,
+        "[python]": { "editor.defaultFormatter": "charliermarsh.ruff" }
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "forwardPorts": [8000, 5173, 5432],
+  "remoteUser": "vscode"
+}
