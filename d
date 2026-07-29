@@ -1,276 +1,252 @@
-/**
- * ============================================================================
- *  Header — top navigation bar (responsive, i18n, RTL/LTR aware)
- *  Updated with typographic logo support
- * ============================================================================
- */
+# admin_panel | Admin Panel for Econojin
 
-import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+> **Note:** This module is the **admin panel** for the Econojin platform.
+> Includes system settings management, audit log viewing, system reports, and admin dashboard.
+> All endpoints in this module are **superuser-only**.
 
-import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/hooks/useLanguage";
-import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { cn } from "@/lib/utils";
-import type { User, ReactNode } from "@/types";
+## Responsibilities
 
-export interface NavItem {
-  to: string;
-  labelKey: string;
-  icon: string;
+This module has four main responsibilities:
+
+1. **Admin Dashboard** (`GET /admin/`)
+   - Display system status summary (user count, settings, logs, reports)
+
+2. **System Settings Management** (`GET /admin/settings`, `PUT /admin/settings/{key}`)
+   - View and update system key-value settings
+   - Set `value`, `description`, `is_active`
+
+3. **Audit Log Viewing** (`GET /admin/audit-logs`)
+   - View system events
+   - Filter by event type
+
+4. **System Report Viewing** (`GET /admin/reports`)
+   - View system-generated reports
+
+## Structure
+
+```
+admin_panel/
+├── __init__.py                # Module init
+├── router.py                  # ★ Admin panel router (all /admin prefixed)
+├── schemas.py                 # Pydantic validation models
+├── service.py                 # Business logic
+├── repository.py              # ★ Specialized repositories
+├── frontend/                  # ★ Admin panel frontend (Vite + React)
+└── tests/                     # Pytest tests
+    └── test_router.py         #   Router tests
+```
+
+## Specialized Repositories (`repository.py`)
+
+| Repository | Model | Description |
+|------------|-------|-------------|
+| `AdminSettingRepository` | `AdminSetting` | Search settings by key (`get_by_key`) |
+| `AuditLogRepository` | `AuditLog` | Filter logs by event type (`filter_by_event_type`) |
+| `SystemReportRepository` | `SystemReport` | System report management (basic CRUD) |
+
+## API Endpoints
+
+> **Note:** All endpoints in this module require **superuser authentication**.
+
+| Method | Path | Description | Requires |
+|--------|------|-------------|----------|
+| GET | `/admin/` | Admin dashboard | superuser |
+| GET | `/admin/settings` | List system settings | superuser |
+| PUT | `/admin/settings/{key}` | Update/create setting | superuser |
+| GET | `/admin/audit-logs` | Audit logs | superuser |
+| GET | `/admin/reports` | System reports | superuser |
+
+### 1. Admin Dashboard
+
+```json
+// GET /admin/
+// Response 200
+{
+    "total_users": 42,
+    "total_settings": 15,
+    "total_audit_logs": 1280,
+    "total_reports": 7
 }
+```
 
-export const NAV_ITEMS: readonly NavItem[] = [
-  { to: "/dashboard", labelKey: "nav.dashboard", icon: "LayoutDashboard" },
-  { to: "/documents", labelKey: "nav.documents", icon: "FileText" },
-  { to: "/carbon", labelKey: "nav.carbon", icon: "Leaf" },
-  { to: "/hydrology/watersheds", labelKey: "nav.watersheds", icon: "Waves" },
-  { to: "/soil", labelKey: "nav.soil", icon: "Sprout" },
-] as const;
+### 2. System Settings
 
-interface AvatarProps {
-  user: User;
-  size?: "sm" | "md" | "lg";
-}
-
-function Avatar({ user, size = "md" }: AvatarProps): JSX.Element {
-  const sizeClass =
-    size === "sm" ? "h-8 w-8 text-xs" : size === "lg" ? "h-12 w-12 text-base" : "h-10 w-10 text-sm";
-
-  if (user.avatarUrl) {
-    return (
-      <img
-        src={user.avatarUrl}
-        alt={user.displayName}
-        className={cn("rounded-full object-cover ring-2 ring-white", sizeClass)}
-        loading="lazy"
-      />
-    );
-  }
-
-  const initials = (user.displayName || user.username)
-    .split(" ")
-    .map((part) => part.charAt(0))
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
-  return (
-    <span
-      className={cn(
-        "flex items-center justify-center rounded-full bg-gradient-emerald font-semibold text-white ring-2 ring-white/80",
-        sizeClass,
-      )}
-      aria-hidden="true"
-    >
-      {initials}
-    </span>
-  );
-}
-
-function UserMenu(): JSX.Element {
-  const { user, logout } = useAuth();
-  const { t, dir } = useLanguage();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(event: globalThis.MouseEvent): void {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
+```json
+// GET /admin/settings?limit=10&offset=0
+// Response 200
+[
+    {
+        "id": 1,
+        "key": "site_name",
+        "value": "Econojin",
+        "description": "Site name",
+        "is_active": true,
+        "created_at": "2025-01-15T10:00:00Z",
+        "updated_at": "2025-01-15T10:00:00Z"
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+]
+```
 
-  useEffect(() => {
-    if (!open) return;
-    function handleKey(event: KeyboardEvent): void {
-      if (event.key === "Escape") setOpen(false);
+**Update Setting:**
+```json
+// PUT /admin/settings/site_name
+{
+    "value": "Econojin Platform",
+    "description": "Official platform name",
+    "is_active": true
+}
+// Response 200
+{
+    "id": 1,
+    "key": "site_name",
+    "value": "Econojin Platform",
+    ...
+}
+```
+
+### 3. Audit Logs
+
+```json
+// GET /admin/audit-logs?event_type=login&limit=10
+// Response 200
+[
+    {
+        "id": 100,
+        "actor": "user@example.com",
+        "event_type": "login",
+        "description": "User login to system",
+        "ip_address": "192.168.1.1",
+        "created_at": "2025-01-15T10:30:00Z"
     }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [open]);
+]
+```
 
-  if (!user) return <></>;
+### 4. System Reports
 
-  const handleLogout = async (): Promise<void> => {
-    await logout();
-    navigate("/login", { replace: true });
-  };
+```json
+// GET /admin/reports?limit=10&offset=0
+// Response 200
+[
+    {
+        "id": 1,
+        "title": "Weekly Performance Report",
+        "report_type": "performance",
+        "status": "completed",
+        "payload": {},
+        "created_at": "2025-01-15T10:00:00Z"
+    }
+]
+```
 
-  return (
-    <div ref={menuRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        className="flex items-center gap-2 rounded-full p-1 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:hover:bg-gray-800"
-      >
-        <Avatar user={user} size="sm" />
-        <span className="hidden text-sm font-medium text-gray-700 sm:inline dark:text-gray-200">
-          {user.displayName || user.username}
-        </span>
-      </button>
+## Data Models
 
-      {open && (
-        <div
-          role="menu"
-          dir={dir}
-          className="absolute end-0 mt-2 w-56 overflow-hidden rounded-xl border border-gray-100 bg-white/95 shadow-xl backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/95"
-        >
-          <div className="border-b border-gray-100 p-3 dark:border-gray-800">
-            <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {user.displayName}
-            </p>
-            <p className="truncate text-xs text-gray-500 dark:text-gray-400" dir="ltr">
-              @{user.username}
-            </p>
-          </div>
-          <div className="py-1">
-            <Link
-              to="/profile"
-              role="menuitem"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800"
-            >
-              {t("user.myProfile")}
-            </Link>
-            <Link
-              to="/accounting"
-              role="menuitem"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800"
-            >
-              {t("nav.accounting")}
-            </Link>
-          </div>
-          <div className="border-t border-gray-100 py-1 dark:border-gray-800">
-            <button
-              type="button"
-              role="menuitem"
-              onClick={handleLogout}
-              className="block w-full px-4 py-2 text-start text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
-            >
-              {t("user.logout")}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+### AdminSetting
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | int | Unique identifier |
+| `key` | str | Setting key (unique) |
+| `value` | str | Setting value |
+| `description` | str | Description |
+| `is_active` | bool | Active status |
+| `created_at` | datetime | Creation date |
+| `updated_at` | datetime | Last update date |
 
-function useScrolled(threshold = 8): boolean {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = (): void => {
-      setScrolled(window.scrollY > threshold);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [threshold]);
-  return scrolled;
-}
+### AuditLog
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | int | Unique identifier |
+| `actor` | str | Event actor (user email) |
+| `event_type` | str | Event type (login, logout, setting_change, ...) |
+| `description` | str | Event description |
+| `ip_address` | str | IP address |
+| `created_at` | datetime | Event date |
 
-export interface HeaderProps {
-  onToggleSidebar?: () => void;
-  showDesktopNav?: boolean;
-  logo?: ReactNode;
-}
+### SystemReport
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | int | Unique identifier |
+| `title` | str | Report title |
+| `report_type` | str | Report type (performance, error, usage, ...) |
+| `status` | str | Status (pending, running, completed, failed) |
+| `payload` | dict | Report content |
+| `created_at` | datetime | Creation date |
 
-export function Header({ onToggleSidebar, showDesktopNav = true, logo }: HeaderProps): JSX.Element {
-  const { user } = useAuth();
-  const { t, dir } = useLanguage();
-  const scrolled = useScrolled(8);
+## Sample curl Requests
 
-  const navItems = user?.is_superuser
-    ? [...NAV_ITEMS, { to: "/admin", labelKey: "nav.admin", icon: "Users" }]
-    : NAV_ITEMS;
+```bash
+# Get superuser token
+TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@econojin.com", "password": "*****"}' \
+  | python -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
 
-  return (
-    <header
-      dir={dir}
-      className={cn(
-        "sticky top-0 z-30 flex items-center justify-between px-4 transition-all duration-300",
-        scrolled ? "h-14" : "h-16",
-        scrolled
-          ? "border-b border-white/30 bg-white/85 shadow-[0_8px_24px_-12px_rgb(0_0_0/0.15)] backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/85"
-          : "border-b border-gray-200/60 bg-white/70 backdrop-blur-xl dark:border-gray-800/60 dark:bg-gray-950/70",
-      )}
-    >
-      <div
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent transition-opacity duration-300",
-          scrolled ? "opacity-100" : "opacity-0"
-        )}
-      />
+# Dashboard
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/admin/
 
-      <div className="flex items-center gap-3">
-        {onToggleSidebar && (
-          <button
-            type="button"
-            onClick={onToggleSidebar}
-            aria-label={t("common.close")}
-            className="rounded-md p-2 text-gray-600 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 md:hidden dark:text-gray-300 dark:hover:bg-gray-800"
-          >
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        )}
+# Settings
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/settings?limit=20"
 
-        {logo || (
-          <Link to="/dashboard" className="group/brand flex items-center gap-2">
-            <span className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-emerald text-white shadow-[0_4px_12px_-2px_rgb(16_185_129/0.5)] transition-transform duration-300 group-hover/brand:scale-105">
-              <span
-                aria-hidden
-                className="absolute inset-0 rounded-lg bg-gradient-emerald opacity-0 blur-md transition-opacity duration-300 group-hover/brand:opacity-60"
-              />
-              <svg className="relative h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2L3 7v6c0 4.4 3.1 8.3 7 9 3.9-.7 7-4.6 7-9V7l-7-5z" />
-              </svg>
-            </span>
-            <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-              {t("common.appName")}
-            </span>
-          </Link>
-        )}
-      </div>
+# Update setting
+curl -X PUT http://localhost:8000/admin/settings/site_name \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"value": "Econojin Platform", "description": "Official name", "is_active": true}'
 
-      {showDesktopNav && (
-        <nav className="hidden items-center gap-1 md:flex" aria-label={t("navGroups.main")}>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                cn(
-                  "relative rounded-full px-4 py-2 text-sm font-medium transition",
-                  isActive
-                    ? "bg-emerald-100/80 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-                    : "text-gray-700 hover:text-emerald-600 dark:text-gray-300 dark:hover:text-emerald-400",
-                )
-              }
-            >
-              {t(item.labelKey)}
-            </NavLink>
-          ))}
-        </nav>
-      )}
+# Logs
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/audit-logs?event_type=login&limit=50"
 
-      <div className="flex items-center gap-2">
-        <ThemeToggle compact />
-        <LanguageSwitcher compact />
-        <UserMenu />
-      </div>
-    </header>
-  );
-}
+# Reports
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/reports?limit=10"
+```
+
+## Usage in Python Code
+
+```python
+import httpx
+
+# Superuser authentication
+response = httpx.post("http://localhost:8000/api/v1/auth/login",
+    json={"email": "admin@econojin.com", "password": "*****"})
+token = response.json()["access_token"]
+headers = {"Authorization": f"Bearer {token}"}
+
+# Get dashboard
+dashboard = httpx.get("http://localhost:8000/admin/", headers=headers).json()
+print(f"Users: {dashboard['total_users']}")
+print(f"Settings: {dashboard['total_settings']}")
+
+# Update setting
+httpx.put("http://localhost:8000/admin/settings/site_name",
+    headers=headers,
+    json={"value": "New Site Name"})
+```
+
+## Development & Testing
+
+```bash
+# From project root
+cd d:\econojin.com
+
+# Run tests
+pytest apps/admin_panel/tests/ -v
+
+# Run development server
+python apps/main.py
+# or
+uvicorn apps.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+## Related Environment Variables (`.env`)
+
+```ini
+# Default superuser account
+FIRST_SUPERUSER=admin@econojin.com
+FIRST_SUPERUSER_PASSWORD=changethis    # Change in production
+```
+
+## Changelog
+
+- **Phase 2:** Created admin panel with 4 main sections (Dashboard, Settings, Logs, Reports)
+- **Phase 2:** Implemented specialized repositories for AdminSetting, AuditLog, SystemReport
+- **Phase 2:** Applied superuser access restriction to all endpoints
+- **Phase 2:** Server-side validation for settings updates

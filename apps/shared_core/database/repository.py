@@ -12,9 +12,9 @@ T = TypeVar('T')
 
 class BaseRepository(Generic[T]):
     """
-    پیاده‌سازی Generic الگوی Repository برای SQLAlchemy 2.0 Async.
+    Generic Repository pattern implementation for SQLAlchemy 2.0 Async.
     
-    استفاده:
+    Usage:
         class UserRepository(BaseRepository[User]):
             def __init__(self, session: AsyncSession):
                 super().__init__(session, User)
