@@ -248,6 +248,7 @@ _include(
 )
 _include("ecocoin", lambda: __import__("apps.api.routes.ecocoin", fromlist=["router"]).router)
 _include("monitoring", lambda: __import__("apps.api.routes.monitoring", fromlist=["router"]).router)
+_include("alerts", lambda: __import__("apps.api.routes.alerts", fromlist=["router"]).router)
 _include("simulator", lambda: __import__("apps.api.routes.simulator", fromlist=["router"]).router)
 _include(
     "admin_panel",
