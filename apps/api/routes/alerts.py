@@ -1,14 +1,18 @@
 """
 ماژول هشدارهای زیست‌محیطی Econojin — API endpoints
 """
+from __future__ import annotations
+
 import logging
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
+
+from apps.shared_core.deps import require_write_auth
 
 logger = logging.getLogger(__name__)
-from fastapi import APIRouter, Query
-from typing import Optional
-from datetime import datetime, timezone
 
-router = APIRouter(prefix="/api/v1/alerts", tags=["🚨 Alerts"])
+router = APIRouter(prefix="/api/v1/alerts", tags=["Alerts"])
 
 _alerts = [
     {
@@ -81,8 +85,7 @@ async def list_alerts(
     category: Optional[str] = Query(None),
     limit: int = Query(50, le=200),
 ):
-    """Handle list_alerts (severity, acknowledged, category, limit)."""
-    result = _alerts
+    result = list(_alerts)
     if severity:
         result = [a for a in result if a["severity"] == severity]
     if acknowledged is not None:
@@ -93,22 +96,22 @@ async def list_alerts(
 
 
 @router.get("/active")
-async def get_active_alerts() -> None:
-    """Handle get_active_alerts."""
+async def get_active_alerts():
     active = [a for a in _alerts if not a["acknowledged"]]
     return {"alerts": active, "count": len(active)}
 
 
 @router.get("/critical")
-async def get_critical_alerts() -> None:
-    """Handle get_critical_alerts."""
+async def get_critical_alerts():
     critical = [a for a in _alerts if a["severity"] == "critical" and not a["acknowledged"]]
     return {"alerts": critical, "count": len(critical)}
 
 
 @router.post("/{alert_id}/acknowledge")
-async def acknowledge_alert(alert_id: str, require_write_auth: None = Depends(require_write_auth)) -> None:
-    """Handle acknowledge_alert (alert_id)."""
+async def acknowledge_alert(
+    alert_id: str,
+    _: None = Depends(require_write_auth),
+):
     for a in _alerts:
         if a["id"] == alert_id:
             a["acknowledged"] = True
