@@ -19,7 +19,6 @@ from apps.api.services.ecocoin_engine import (
 from apps.satellite.processors.indices import (
     canopy_cover_from_ndvi,
     compute_all_indices,
-    indices_from_mean_reflectance,
 )
 
 
@@ -122,12 +121,8 @@ async def mrv_from_location(
 
     end = date.today()
     start = end - timedelta(days=max(7, days))
-    bbox = BBox(
-        min_lon=lon - 0.02,
-        min_lat=lat - 0.02,
-        max_lon=lon + 0.02,
-        max_lat=lat + 0.02,
-    )
+    # BBox fields are min_lng / max_lng (not min_lon)
+    bbox = BBox.from_point(lat, lon, delta=0.02)
     svc = get_satellite_service()
     rows = await svc.get_ndvi_timeseries(0, bbox, start, end)
 
@@ -136,7 +131,6 @@ async def mrv_from_location(
         provider = rows[0].provider
         source = "timeseries_mean"
     else:
-        # last image fallback
         try:
             img = await svc.get_ndvi_image(bbox, end - timedelta(days=10))
             mean_ndvi = float(img.mean_ndvi)
