@@ -1,0 +1,201 @@
+// apps/web/src/components/finance/financeI18n.ts
+// متن‌های سه‌زبانهٔ ماژول مالی + helperهای type-safe.
+import type { Period, TxStatus, CategoryKey, AccountKey } from "./financeData";
+
+export type FinLang = "fa" | "en" | "ar";
+
+const FA = {
+  title: "داشبورد مالی",
+  subtitle: "حسابداری، فاکتورها و مدیریت مالی",
+  revenue: "درآمد",
+  expenses: "هزینه‌ها",
+  profit: "سود",
+  balance: "موجودی",
+  accounts: "نمای حساب‌ها",
+  quickActions: "دسترسی سریع",
+  newInvoice: "فاکتور جدید",
+  processPayment: "ثبت پرداخت",
+  viewReports: "مشاهدهٔ گزارش‌ها",
+  exportCsv: "خروجی CSV",
+  cashflow: "جریان نقدینگی",
+  income: "درآمد",
+  expense: "هزینه",
+  transactions: "تراکنش‌های اخیر",
+  filterAll: "همه",
+  colDate: "تاریخ",
+  colDesc: "شرح",
+  colCategory: "دسته",
+  colAmount: "مبلغ",
+  colStatus: "وضعیت",
+  empty: "تراکنشی برای این فیلتر یافت نشد.",
+  status_completed: "تکمیل‌شده",
+  status_pending: "در انتظار",
+  status_failed: "ناموفق",
+  cat_operations: "عملیاتی",
+  cat_payroll: "حقوق و دستمزد",
+  cat_sales: "فروش",
+  cat_services: "خدمات",
+  cat_equipment: "تجهیزات",
+  cat_grant: "کمک‌هزینه",
+  acc_operating: "حساب عملیاتی",
+  acc_reserve: "صندوق ذخیره",
+  acc_investment: "استخر سرمایه‌گذاری",
+  accActive: "فعال",
+  accPending: "در انتظار",
+  period_7d: "۷ روز",
+  period_30d: "۳۰ روز",
+  period_90d: "۹۰ روز",
+  period_1y: "یک سال",
+  weekdays: ["ش", "ی", "د", "س", "چ", "پ", "ج"],
+  weeks4: ["ه۱", "ه۲", "ه۳", "ه۴"],
+  months3: ["مهر", "آبا", "آذر"],
+  months12: ["فرو", "ارد", "خرد", "تیر", "مرد", "شهر", "مهر", "آبا", "آذر", "دی", "بهم", "اسف"],
+  tx1: "فروش اشتراک سازمانی",
+  tx2: "حقوق تیم مهندسی",
+  tx3: "خدمات مشاورهٔ اقلیمی",
+  tx4: "خرید سنسور IoT",
+  tx5: "کمک‌هزینهٔ پژوهش سبز",
+  tx6: "هزینهٔ میزبانی ابری",
+  tx7: "فروش دادهٔ ماهواره‌ای",
+  tx8: "نگهداری سامانهٔ GIS",
+};
+
+export type FinStrings = typeof FA;
+
+export const FIN_STR: Record<FinLang, FinStrings> = {
+  fa: FA,
+  en: {
+    title: "Financial Dashboard",
+    subtitle: "Accounting, invoices, and financial management",
+    revenue: "Revenue",
+    expenses: "Expenses",
+    profit: "Profit",
+    balance: "Balance",
+    accounts: "Accounts Overview",
+    quickActions: "Quick Actions",
+    newInvoice: "New Invoice",
+    processPayment: "Process Payment",
+    viewReports: "View Reports",
+    exportCsv: "Export CSV",
+    cashflow: "Cash Flow",
+    income: "Income",
+    expense: "Expense",
+    transactions: "Recent Transactions",
+    filterAll: "All",
+    colDate: "Date",
+    colDesc: "Description",
+    colCategory: "Category",
+    colAmount: "Amount",
+    colStatus: "Status",
+    empty: "No transactions match this filter.",
+    status_completed: "Completed",
+    status_pending: "Pending",
+    status_failed: "Failed",
+    cat_operations: "Operations",
+    cat_payroll: "Payroll",
+    cat_sales: "Sales",
+    cat_services: "Services",
+    cat_equipment: "Equipment",
+    cat_grant: "Grant",
+    acc_operating: "Operating Account",
+    acc_reserve: "Reserve Fund",
+    acc_investment: "Investment Pool",
+    accActive: "Active",
+    accPending: "Pending",
+    period_7d: "7 Days",
+    period_30d: "30 Days",
+    period_90d: "90 Days",
+    period_1y: "1 Year",
+    weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+    weeks4: ["W1", "W2", "W3", "W4"],
+    months3: ["Oct", "Nov", "Dec"],
+    months12: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    tx1: "Enterprise subscription sale",
+    tx2: "Engineering team payroll",
+    tx3: "Climate consulting services",
+    tx4: "IoT sensor purchase",
+    tx5: "Green research grant",
+    tx6: "Cloud hosting cost",
+    tx7: "Satellite data sale",
+    tx8: "GIS platform maintenance",
+  },
+  ar: {
+    title: "لوحة المالية",
+    subtitle: "المحاسبة والفواتير والإدارة المالية",
+    revenue: "الإيرادات",
+    expenses: "المصروفات",
+    profit: "الربح",
+    balance: "الرصيد",
+    accounts: "نظرة على الحسابات",
+    quickActions: "إجراءات سريعة",
+    newInvoice: "فاتورة جديدة",
+    processPayment: "تسجيل دفعة",
+    viewReports: "عرض التقارير",
+    exportCsv: "تصدير CSV",
+    cashflow: "التدفق النقدي",
+    income: "دخل",
+    expense: "مصروف",
+    transactions: "آخر المعاملات",
+    filterAll: "الكل",
+    colDate: "التاريخ",
+    colDesc: "الوصف",
+    colCategory: "الفئة",
+    colAmount: "المبلغ",
+    colStatus: "الحالة",
+    empty: "لا توجد معاملات مطابقة لهذا المرشح.",
+    status_completed: "مكتمل",
+    status_pending: "قيد الانتظار",
+    status_failed: "فاشل",
+    cat_operations: "تشغيلية",
+    cat_payroll: "رواتب",
+    cat_sales: "مبيعات",
+    cat_services: "خدمات",
+    cat_equipment: "معدات",
+    cat_grant: "منحة",
+    acc_operating: "الحساب التشغيلي",
+    acc_reserve: "صندوق الاحتياطي",
+    acc_investment: "محفظة الاستثمار",
+    accActive: "نشط",
+    accPending: "معلّق",
+    period_7d: "٧ أيام",
+    period_30d: "٣٠ يوماً",
+    period_90d: "٩٠ يوماً",
+    period_1y: "سنة",
+    weekdays: ["ح", "ن", "ث", "ر", "خ", "ج", "س"],
+    weeks4: ["أ١", "أ٢", "أ٣", "أ٤"],
+    months3: ["أكت", "نوف", "دسم"],
+    months12: ["ينا", "فبر", "مار", "أبر", "ماي", "يون", "يول", "أغس", "سبت", "أكت", "نوف", "دسم"],
+    tx1: "بيع اشتراك مؤسسي",
+    tx2: "رواتب فريق الهندسة",
+    tx3: "خدمات استشارات مناخية",
+    tx4: "شراء حساس IoT",
+    tx5: "منحة بحث أخضر",
+    tx6: "تكلفة استضافة سحابية",
+    tx7: "بيع بيانات أقمار",
+    tx8: "صيانة منصة GIS",
+  },
+};
+
+// ── helperهای type-safe برای نگاشت کلیدها به متن ──
+export function periodText(s: FinStrings, p: Period): string {
+  return p === "7d" ? s.period_7d : p === "30d" ? s.period_30d : p === "90d" ? s.period_90d : s.period_1y;
+}
+export function statusText(s: FinStrings, st: TxStatus): string {
+  return st === "completed" ? s.status_completed : st === "pending" ? s.status_pending : s.status_failed;
+}
+export function categoryText(s: FinStrings, c: CategoryKey): string {
+  return s[`cat_${c}` as keyof FinStrings] as string;
+}
+export function accountText(s: FinStrings, k: AccountKey): string {
+  return s[`acc_${k}` as keyof FinStrings] as string;
+}
+export function descText(s: FinStrings, key: string): string {
+  return (s[key as keyof FinStrings] as string) ?? key;
+}
+export function periodLabel(s: FinStrings, p: Period, i: number): string {
+  const arr = p === "7d" ? s.weekdays : p === "30d" ? s.weeks4 : p === "90d" ? s.months3 : s.months12;
+  return arr[i] ?? "";
+}
+export function localeOf(lang: FinLang): string {
+  return lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
+}

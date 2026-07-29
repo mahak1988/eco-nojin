@@ -1,0 +1,14 @@
+{
+  "model": "SWAT+",
+  "basin_id": "pilot_001",
+  "area_ha": 1000,
+  "water_balance": {
+    "precip_mm": 340,
+    "et_mm": 290,
+    "runoff_mm": 266.9,
+    "deep_percolation_mm": -216.9
+  },
+  "streamflow_m3_s": 0.085,
+  "sediment_load_tons": 24.0,
+  "simulation_date": "2026-05-27T02:15:51.438048"
+}

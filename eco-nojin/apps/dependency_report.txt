@@ -1,0 +1,62 @@
+================================================================================
+📊 گزارش تحلیل وابستگی‌ها
+================================================================================
+
+📈 آمار کلی:
+   • تعداد ماژول‌ها: 367
+   • تعداد لایه‌ها: 1
+   • تعداد وابستگی‌های چرخشی: 1
+   • تعداد فایل‌های یتیم: 311
+
+📚 آمار لایه‌ها:
+   • other: 367 ماژول
+
+🔄 وابستگی‌های چرخشی:
+   1. hechms → hechms
+
+👻 فایل‌های یتیم (import نشده):
+   • 1730 (other)
+   • 2555 (other)
+   • 8745 (other)
+   • 9722 (other)
+   • AccessibilitySettings (other)
+   • Accordion (other)
+   • AppShell (other)
+   • BackButton (other)
+   • Badge (other)
+   • Button (other)
+   • CallToAction (other)
+   • Card (other)
+   • Certifications (other)
+   • CompareButton (other)
+   • ComparisonContext (other)
+   • DataSourceBadge (other)
+   • ExpertDashboard (other)
+   • ExportButton (other)
+   • FarmerDashboard (other)
+   • Features (other)
+   ... و 291 مورد دیگر
+
+🔗 ماژول‌های با بیشترین وابستگی:
+   • registry: 10 import
+   • coupled_orchestrator: 9 import
+   • energy_orchestrator: 8 import
+   • biodiversity_orchestrator: 8 import
+   • engine: 8 import
+   • optimizer: 8 import
+   • iot_router: 8 import
+   • water_quality_orchestrator: 7 import
+   • soil_orchestrator: 7 import
+   • orchestrator: 7 import
+
+🎯 ماژول‌های با بیشترین استفاده:
+   • models: 19 بار استفاده شده
+   • base: 16 بار استفاده شده
+   • services: 10 بار استفاده شده
+   • schemas: 7 بار استفاده شده
+   • wrapper: 3 بار استفاده شده
+   • spectral_indices: 3 بار استفاده شده
+   • swat: 3 بار استفاده شده
+   • pollutant_bridge: 1 بار استفاده شده
+   • soil_health_bridge: 1 بار استفاده شده
+   • data_transformer: 1 بار استفاده شده

@@ -1,0 +1,278 @@
+"""
+🔧 تشخیص و رفع خودکار مشکلات Import در بک‌اند
+"""
+from pathlib import Path
+import re
+import ast
+
+print("=" * 100)
+print("🔧 SMART IMPORT FIX - Auto-detecting exported names")
+print("=" * 100)
+
+ROOT = Path('.')
+BACKEND = ROOT / 'api'
+
+# ============================================================
+# 1. ANALYZE ORPHAN SERVICES
+# ============================================================
+print("\n🔍 1. Analyzing Orphan Services...")
+
+orphan_services = [
+    'api/services/early_warning_engine.py',
+    'api/services/rothc_full.py',
+    'api/services/soil_water_calculator.py',
+]
+
+def get_exported_names(file_path: Path) -> list:
+    """استخراج نام‌های export شده از فایل پایتون"""
+    try:
+        content = file_path.read_text(encoding='utf-8')
+        tree = ast.parse(content)
+        
+        exported = []
+        
+        for node in ast.walk(tree):
+            # class definitions
+            if isinstance(node, ast.ClassDef):
+                exported.append(node.name)
+            # function definitions (not private)
+            elif isinstance(node, ast.FunctionDef):
+                if not node.name.startswith('_'):
+                    exported.append(node.name)
+            # variable assignments at module level
+            elif isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        exported.append(target.id)
+        
+        # Also check __all__ if defined
+        if '__all__' in content:
+            match = re.search(r'__all__\s*=\s*\[(.*?)\]', content, re.DOTALL)
+            if match:
+                all_names = re.findall(r'["\'](\w+)["\']', match.group(1))
+                return all_names
+        
+        return list(set(exported))
+    except Exception as e:
+        print(f"   ⚠️  Error parsing {file_path}: {e}")
+        return []
+
+service_exports = {}
+for service_path in orphan_services:
+    full_path = ROOT / service_path
+    if full_path.exists():
+        exports = get_exported_names(full_path)
+        service_exports[service_path] = exports
+        print(f"\n📄 {service_path}")
+        print(f"   Exported names: {exports[:10]}")  # Show first 10
+    else:
+        print(f"\n❌ {service_path} [NOT FOUND]")
+
+# ============================================================
+# 2. FIX MAINTENANCE ROUTER
+# ============================================================
+print("\n\n🔧 2. Fixing Maintenance Router...")
+
+maintenance_router = BACKEND / 'modules' / 'maintenance' / 'router.py'
+if maintenance_router.exists():
+    content = maintenance_router.read_text(encoding='utf-8-sig')
+    
+    # Remove incorrect import
+    content = re.sub(
+        r'from api\.services\.early_warning_engine import early_warning_engine\n',
+        '',
+        content
+    )
+    
+    # Add correct import based on actual exports
+    if 'early_warning_engine.py' in service_exports:
+        exports = service_exports['early_warning_engine.py']
+        
+        # Find the best name to import (prefer instance/class)
+        import_name = None
+        for exp in exports:
+            if 'engine' in exp.lower() or 'warning' in exp.lower():
+                import_name = exp
+                break
+        
+        if not import_name and exports:
+            # Use first class or non-private name
+            for exp in exports:
+                if exp[0].isupper() or not exp.startswith('_'):
+                    import_name = exp
+                    break
+        
+        if import_name:
+            content = f'from api.services.early_warning_engine import {import_name}\n' + content
+            print(f"   ✅ Imported: {import_name}")
+        else:
+            print(f"   ⚠️  No suitable export found")
+    
+    maintenance_router.write_text(content, encoding='utf-8')
+    print("   ✅ Fixed maintenance router")
+
+# ============================================================
+# 3. FIX SOIL_WATER ROUTER
+# ============================================================
+print("\n🔧 3. Fixing Soil-Water Router...")
+
+soil_water_router = BACKEND / 'modules' / 'soil_water' / 'router.py'
+if soil_water_router.exists():
+    content = soil_water_router.read_text(encoding='utf-8-sig')
+    
+    # Remove incorrect imports
+    content = re.sub(r'from api\.services\.rothc_full import rothc_model\n', '', content)
+    content = re.sub(r'from api\.services\.soil_water_calculator import soil_water_calc\n', '', content)
+    
+    # Add correct imports
+    imports_to_add = []
+    
+    if 'rothc_full.py' in service_exports:
+        exports = service_exports['rothc_full.py']
+        import_name = None
+        for exp in exports:
+            if 'rothc' in exp.lower() or 'model' in exp.lower():
+                import_name = exp
+                break
+        if not import_name and exports:
+            import_name = exports[0]
+        if import_name:
+            imports_to_add.append(f'from api.services.rothc_full import {import_name}')
+            print(f"   ✅ rothc_full: {import_name}")
+    
+    if 'soil_water_calculator.py' in service_exports:
+        exports = service_exports['soil_water_calculator.py']
+        import_name = None
+        for exp in exports:
+            if 'calc' in exp.lower() or 'soil' in exp.lower():
+                import_name = exp
+                break
+        if not import_name and exports:
+            import_name = exports[0]
+        if import_name:
+            imports_to_add.append(f'from api.services.soil_water_calculator import {import_name}')
+            print(f"   ✅ soil_water_calculator: {import_name}")
+    
+    if imports_to_add:
+        content = '\n'.join(imports_to_add) + '\n' + content
+    
+    soil_water_router.write_text(content, encoding='utf-8')
+    print("   ✅ Fixed soil_water router")
+
+# ============================================================
+# 4. VERIFY AI ROUTER
+# ============================================================
+print("\n🔧 4. Verifying AI Router...")
+
+ai_service_path = ROOT / 'api/services/ai/ai_service.py'
+if ai_service_path.exists():
+    exports = get_exported_names(ai_service_path)
+    print(f"   AI service exports: {exports}")
+    
+    ai_router = BACKEND / 'modules' / 'ai' / 'router.py'
+    if ai_router.exists():
+        content = ai_router.read_text(encoding='utf-8-sig')
+        
+        # Check if import is correct
+        if 'from api.services.ai.ai_service import' in content:
+            # Find what's being imported
+            match = re.search(r'from api\.services\.ai\.ai_service import (\w+)', content)
+            if match:
+                imported_name = match.group(1)
+                if imported_name in exports:
+                    print(f"   ✅ AI import correct: {imported_name}")
+                else:
+                    # Fix import
+                    import_name = None
+                    for exp in exports:
+                        if 'service' in exp.lower() or 'ai' in exp.lower():
+                            import_name = exp
+                            break
+                    if not import_name and exports:
+                        import_name = exports[0]
+                    
+                    if import_name:
+                        content = content.replace(
+                            f'from api.services.ai.ai_service import {imported_name}',
+                            f'from api.services.ai.ai_service import {import_name}'
+                        )
+                        ai_router.write_text(content, encoding='utf-8')
+                        print(f"   ✅ Fixed AI import: {import_name}")
+        else:
+            # Add import
+            import_name = None
+            for exp in exports:
+                if 'service' in exp.lower() or 'ai' in exp.lower():
+                    import_name = exp
+                    break
+            if not import_name and exports:
+                import_name = exports[0]
+            
+            if import_name:
+                content = f'from api.services.ai.ai_service import {import_name}\n' + content
+                ai_router.write_text(content, encoding='utf-8')
+                print(f"   ✅ Added AI import: {import_name}")
+
+# ============================================================
+# 5. VERIFY MAIN.PY
+# ============================================================
+print("\n🔧 5. Verifying main.py...")
+
+main_path = BACKEND / 'main.py'
+if main_path.exists():
+    content = main_path.read_text(encoding='utf-8-sig')
+    
+    # Check for duplicate imports
+    lines = content.split('\n')
+    seen_imports = set()
+    clean_lines = []
+    
+    for line in lines:
+        if line.strip().startswith('from api.modules') and 'router' in line:
+            if line in seen_imports:
+                continue  # Skip duplicate
+            seen_imports.add(line)
+        clean_lines.append(line)
+    
+    content = '\n'.join(clean_lines)
+    main_path.write_text(content, encoding='utf-8')
+    print("   ✅ Cleaned main.py")
+
+# ============================================================
+# 6. TEST IMPORT
+# ============================================================
+print("\n🧪 6. Testing imports...")
+
+import sys
+sys.path.insert(0, str(ROOT))
+
+try:
+    # Try importing main
+    import importlib
+    import api.main
+    print("   ✅ api.main imports successfully!")
+except Exception as e:
+    print(f"   ❌ Import error: {e}")
+    print("\n💡 Please check the error above and fix manually if needed.")
+
+# ============================================================
+# SUMMARY
+# ============================================================
+print("\n" + "=" * 100)
+print("✅ IMPORT FIX COMPLETE")
+print("=" * 100)
+
+print("""
+🚀 Next Steps:
+
+1. Restart backend:
+   uvicorn api.main:app --reload --port 8000
+
+2. If still errors, check:
+   - The exact export names in each service file
+   - Router import statements
+
+3. Then restart frontend:
+   cd apps/web
+   npx next dev -p 3001
+""")

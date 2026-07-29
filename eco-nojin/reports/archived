@@ -1,0 +1,1614 @@
+{
+  "apps\\admin_panel\\frontend": [
+    {
+      "file": "src/pages/accounting/PaymentsPage.tsx",
+      "line": 57,
+      "col": 92,
+      "code": "TS2339",
+      "message": "Property 'currency' does not exist on type 'Payment'."
+    }
+  ],
+  "apps\\web": [
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 3,
+      "col": 1,
+      "code": "TS2582",
+      "message": "Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 4,
+      "col": 3,
+      "code": "TS2582",
+      "message": "Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 5,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 8,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 11,
+      "col": 3,
+      "code": "TS2582",
+      "message": "Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 13,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 14,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 17,
+      "col": 3,
+      "code": "TS2582",
+      "message": "Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 19,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 20,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 21,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 24,
+      "col": 3,
+      "code": "TS2582",
+      "message": "Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 26,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/__tests__/security.test.ts",
+      "line": 27,
+      "col": 5,
+      "code": "TS2304",
+      "message": "Cannot find name 'expect'."
+    },
+    {
+      "file": "src/i18n/index.ts",
+      "line": 130,
+      "col": 22,
+      "code": "TS2339",
+      "message": "Property 'split' does not exist on type 'never'."
+    },
+    {
+      "file": "../../packages/lib/src/api/client.ts",
+      "line": 9,
+      "col": 22,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/api/client.ts",
+      "line": 10,
+      "col": 30,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/api/client.ts",
+      "line": 11,
+      "col": 33,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/api/errors/api.errors.ts",
+      "line": 16,
+      "col": 15,
+      "code": "TS2339",
+      "message": "Property 'captureStackTrace' does not exist on type 'ErrorConstructor'."
+    },
+    {
+      "file": "../../packages/lib/src/api/errors/api.errors.ts",
+      "line": 17,
+      "col": 13,
+      "code": "TS2339",
+      "message": "Property 'captureStackTrace' does not exist on type 'ErrorConstructor'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 4,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/utils/storage' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 5,
+      "col": 30,
+      "code": "TS2307",
+      "message": "Cannot find module '@/store/useAuthStore' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 6,
+      "col": 23,
+      "code": "TS2307",
+      "message": "Cannot find module 'react-hot-toast' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 15,
+      "col": 48,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/validation/auth.schema' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 32,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 59,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useAuth.ts",
+      "line": 95,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 4,
+      "col": 23,
+      "code": "TS2307",
+      "message": "Cannot find module 'react-hot-toast' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 6,
+      "col": 3,
+      "code": "TS2305",
+      "message": "Module '\"../types/ecocoin.types\"' has no exported member 'EcoCoinBalance'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 7,
+      "col": 3,
+      "code": "TS2724",
+      "message": "'\"../types/ecocoin.types\"' has no exported member named 'EcoCoinTransaction'. Did you mean 'EcoTransaction'?"
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 8,
+      "col": 3,
+      "code": "TS2724",
+      "message": "'\"../types/ecocoin.types\"' has no exported member named 'EcoCoinTransferRequest'. Did you mean 'TransferRequest'?"
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 9,
+      "col": 3,
+      "code": "TS2724",
+      "message": "'\"../types/ecocoin.types\"' has no exported member named 'EcoCoinTransferResponse'. Did you mean 'TransferResponse'?"
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 10,
+      "col": 3,
+      "code": "TS2305",
+      "message": "Module '\"../types/ecocoin.types\"' has no exported member 'EcoCoinReward'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 11,
+      "col": 3,
+      "code": "TS2305",
+      "message": "Module '\"../types/ecocoin.types\"' has no exported member 'EcoCoinHistory'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 24,
+      "col": 27,
+      "code": "TS2339",
+      "message": "Property 'BALANCE' does not exist on type '{ readonly BASE: \"/ecocoin\"; readonly TOKENS: \"/ecocoin/tokens\"; readonly STATS: \"/ecocoin/stats\"; readonly WALLETS: { readonly BY_ID: (id: number) => string; readonly ME: \"/ecocoin/wallets/me\"; }; readonly TRANSFER: \"/ecocoin/transfer\"; readonly STAKE: \"/ecocoin/stake\"; }'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 43,
+      "col": 27,
+      "code": "TS2339",
+      "message": "Property 'TRANSACTIONS' does not exist on type '{ readonly BASE: \"/ecocoin\"; readonly TOKENS: \"/ecocoin/tokens\"; readonly STATS: \"/ecocoin/stats\"; readonly WALLETS: { readonly BY_ID: (id: number) => string; readonly ME: \"/ecocoin/wallets/me\"; }; readonly TRANSFER: \"/ecocoin/transfer\"; readonly STAKE: \"/ecocoin/stake\"; }'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 68,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useEcoCoin.ts",
+      "line": 91,
+      "col": 27,
+      "code": "TS2339",
+      "message": "Property 'REWARDS' does not exist on type '{ readonly BASE: \"/ecocoin\"; readonly TOKENS: \"/ecocoin/tokens\"; readonly STATS: \"/ecocoin/stats\"; readonly WALLETS: { readonly BY_ID: (id: number) => string; readonly ME: \"/ecocoin/wallets/me\"; }; readonly TRANSFER: \"/ecocoin/transfer\"; readonly STAKE: \"/ecocoin/stake\"; }'."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useSoilWater.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/hooks/useSoilWater.ts",
+      "line": 4,
+      "col": 23,
+      "code": "TS2307",
+      "message": "Cannot find module 'react-hot-toast' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 2,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/utils/storage' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 4,
+      "col": 25,
+      "code": "TS2305",
+      "message": "Module '\"./types/auth.types\"' has no exported member 'RefreshTokenResponse'."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 20,
+      "col": 14,
+      "code": "TS2339",
+      "message": "Property 'metadata' does not exist on type 'InternalAxiosRequestConfig<any>'."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 23,
+      "col": 11,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 46,
+      "col": 11,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 46,
+      "col": 69,
+      "code": "TS2339",
+      "message": "Property 'metadata' does not exist on type 'InternalAxiosRequestConfig<any>'."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 47,
+      "col": 55,
+      "code": "TS2339",
+      "message": "Property 'metadata' does not exist on type 'InternalAxiosRequestConfig<any>'."
+    },
+    {
+      "file": "../../packages/lib/src/api/interceptors.ts",
+      "line": 63,
+      "col": 11,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/academy/useAcademy.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/academy/useAcademy.ts",
+      "line": 2,
+      "col": 28,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/academy/api' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/ai/useAI.ts",
+      "line": 1,
+      "col": 39,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/ai/useAI.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 3,
+      "col": 35,
+      "code": "TS2307",
+      "message": "Cannot find module 'react' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 4,
+      "col": 34,
+      "code": "TS2307",
+      "message": "Cannot find module '@/store/analysis' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 5,
+      "col": 51,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/types/analysis' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 8,
+      "col": 39,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 9,
+      "col": 38,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 10,
+      "col": 43,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 11,
+      "col": 40,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 12,
+      "col": 42,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 13,
+      "col": 41,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 16,
+      "col": 38,
+      "code": "TS2503",
+      "message": "Cannot find namespace 'NodeJS'."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 24,
+      "col": 23,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/blockchain/useBlockchain.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/blockchain/useBlockchain.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/drought/useDrought.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/drought/useDrought.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/forest/useForest.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/forest/useForest.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 12,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './analysis' has already exported a member named 'useAnalysisWebSocket'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 13,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './academy' has already exported a member named 'useAcademyStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 13,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './academy' has already exported a member named 'useCourses'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './academy' has already exported a member named 'useAcademyStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './useApi' has already exported a member named 'useDashboardStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './useApi' has already exported a member named 'useIoTStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './useApi' has already exported a member named 'useMyWallet'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/iot/useIoT.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/iot/useIoT.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/satellite/useSatellite.ts",
+      "line": 1,
+      "col": 39,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/satellite/useSatellite.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/soil/useSoil.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/soil/useSoil.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useAnalysisWebSocket.ts",
+      "line": 1,
+      "col": 58,
+      "code": "TS2307",
+      "message": "Cannot find module 'react' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useAnalysisWebSocket.ts",
+      "line": 2,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/store/useAppStore' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useAnalysisWebSocket.ts",
+      "line": 42,
+      "col": 20,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useApi.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useApi.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useApiHooks.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useApiHooks.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useCalendar.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useCalendar.ts",
+      "line": 2,
+      "col": 33,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useModuleData.ts",
+      "line": 3,
+      "col": 50,
+      "code": "TS2307",
+      "message": "Cannot find module 'react' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/useTranslation.ts",
+      "line": 1,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/contexts/LanguageContext' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/weather/useWeather.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/hooks/weather/useWeather.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "../../packages/lib/src/index.ts",
+      "line": 3,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './api' has already exported a member named 'useDashboardStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "../../packages/lib/src/index.ts",
+      "line": 3,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './api' has already exported a member named 'useEcoCoinStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    }
+  ],
+  "packages\\api-client": [
+    {
+      "file": "../config-typescript/base.json",
+      "line": 2,
+      "col": 3,
+      "code": "TS1005",
+      "message": "'{' expected."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+prop-types@15.7.15/node_modules/@types/prop-types/index.d.ts",
+      "line": 16,
+      "col": 38,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 440,
+      "col": 26,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 478,
+      "col": 10,
+      "code": "TS2456",
+      "message": "Type alias 'ReactNode' circularly references itself."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 482,
+      "col": 11,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/axios@1.17.0_debug@4.3.4/node_modules/axios/index.d.ts",
+      "line": 94,
+      "col": 3,
+      "code": "TS1165",
+      "message": "A computed property name in an ambient context must refer to an expression whose type is a literal type or a 'unique symbol' type."
+    },
+    {
+      "file": "../../node_modules/.pnpm/axios@1.17.0_debug@4.3.4/node_modules/axios/index.d.ts",
+      "line": 94,
+      "col": 4,
+      "code": "TS2585",
+      "message": "'Symbol' only refers to a type, but is being used as a value here. Do you need to change your target library? Try changing the 'lib' compiler option to es2015 or later."
+    },
+    {
+      "file": "../../node_modules/.pnpm/axios@1.17.0_debug@4.3.4/node_modules/axios/index.d.ts",
+      "line": 94,
+      "col": 24,
+      "code": "TS2304",
+      "message": "Cannot find name 'IterableIterator'."
+    },
+    {
+      "file": "src/core/instance.ts",
+      "line": 4,
+      "col": 12,
+      "code": "TS2580",
+      "message": "Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`."
+    },
+    {
+      "file": "src/modules/eco_tourism.api.ts",
+      "line": 2,
+      "col": 38,
+      "code": "TS2307",
+      "message": "Cannot find module '@econojin/types' or its corresponding type declarations."
+    },
+    {
+      "file": "src/modules/mapping.api.ts",
+      "line": 2,
+      "col": 31,
+      "code": "TS2307",
+      "message": "Cannot find module '@econojin/types' or its corresponding type declarations."
+    }
+  ],
+  "packages\\features": [
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 68,
+      "col": 45,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 69,
+      "col": 46,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 73,
+      "col": 42,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 74,
+      "col": 43,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 87,
+      "col": 22,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 108,
+      "col": 22,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/ChartsPanel.tsx",
+      "line": 115,
+      "col": 22,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/MapPanel.tsx",
+      "line": 74,
+      "col": 25,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/MapPanel.tsx",
+      "line": 75,
+      "col": 25,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/MapPanel.tsx",
+      "line": 76,
+      "col": 25,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/analysis/MapPanel.tsx",
+      "line": 77,
+      "col": 25,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/gis/gis/AdvancedGISMap.tsx",
+      "line": 6,
+      "col": 1,
+      "code": "TS1003",
+      "message": "Identifier expected."
+    },
+    {
+      "file": "src/gis/gis/AdvancedGISMap.tsx",
+      "line": 6,
+      "col": 8,
+      "code": "TS1005",
+      "message": "',' expected."
+    },
+    {
+      "file": "src/gis/gis/AdvancedGISMap.tsx",
+      "line": 6,
+      "col": 18,
+      "code": "TS1005",
+      "message": "';' expected."
+    },
+    {
+      "file": "src/gis/gis/AdvancedGISMap.tsx",
+      "line": 10,
+      "col": 1,
+      "code": "TS1128",
+      "message": "Declaration or statement expected."
+    },
+    {
+      "file": "src/gis/gis/AdvancedGISMap.tsx",
+      "line": 10,
+      "col": 3,
+      "code": "TS1434",
+      "message": "Unexpected keyword or identifier."
+    },
+    {
+      "file": "src/gis/gis/InteractiveMap.tsx",
+      "line": 294,
+      "col": 57,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/gis/gis/InteractiveMap.tsx",
+      "line": 297,
+      "col": 56,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 10,
+      "col": 1,
+      "code": "TS1003",
+      "message": "Identifier expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 10,
+      "col": 8,
+      "code": "TS1005",
+      "message": "',' expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 10,
+      "col": 23,
+      "code": "TS1005",
+      "message": "';' expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 18,
+      "col": 8,
+      "code": "TS1005",
+      "message": "';' expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 19,
+      "col": 8,
+      "code": "TS1005",
+      "message": "';' expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 20,
+      "col": 1,
+      "code": "TS1128",
+      "message": "Declaration or statement expected."
+    },
+    {
+      "file": "src/gis/gis/SpectralIndices.tsx",
+      "line": 20,
+      "col": 3,
+      "code": "TS1434",
+      "message": "Unexpected keyword or identifier."
+    },
+    {
+      "file": "tsconfig.json",
+      "line": 2,
+      "col": 3,
+      "code": "TS1005",
+      "message": "'{' expected."
+    }
+  ],
+  "packages\\hooks": [
+    {
+      "file": "../config-typescript/base.json",
+      "line": 2,
+      "col": 3,
+      "code": "TS1005",
+      "message": "'{' expected."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+prop-types@15.7.15/node_modules/@types/prop-types/index.d.ts",
+      "line": 16,
+      "col": 38,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 440,
+      "col": 26,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 478,
+      "col": 10,
+      "code": "TS2456",
+      "message": "Type alias 'ReactNode' circularly references itself."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 482,
+      "col": 11,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    }
+  ],
+  "packages\\lib": [
+    {
+      "file": "src/api/analysis.ts",
+      "line": 7,
+      "col": 8,
+      "code": "TS2307",
+      "message": "Cannot find module '../types/analysis' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 4,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/utils/storage' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 5,
+      "col": 30,
+      "code": "TS2307",
+      "message": "Cannot find module '@/store/useAuthStore' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 6,
+      "col": 23,
+      "code": "TS2307",
+      "message": "Cannot find module 'react-hot-toast' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 15,
+      "col": 48,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/validation/auth.schema' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 32,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 59,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/api/hooks/useAuth.ts",
+      "line": 95,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 4,
+      "col": 23,
+      "code": "TS2307",
+      "message": "Cannot find module 'react-hot-toast' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 6,
+      "col": 3,
+      "code": "TS2305",
+      "message": "Module '\"../types/ecocoin.types\"' has no exported member 'EcoCoinBalance'."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 7,
+      "col": 3,
+      "code": "TS2724",
+      "message": "'\"../types/ecocoin.types\"' has no exported member named 'EcoCoinTransaction'. Did you mean 'EcoTransaction'?"
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 8,
+      "col": 3,
+      "code": "TS2724",
+      "message": "'\"../types/ecocoin.types\"' has no exported member named 'EcoCoinTransferRequest'. Did you mean 'TransferRequest'?"
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 9,
+      "col": 3,
+      "code": "TS2724",
+      "message": "'\"../types/ecocoin.types\"' has no exported member named 'EcoCoinTransferResponse'. Did you mean 'TransferResponse'?"
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 10,
+      "col": 3,
+      "code": "TS2305",
+      "message": "Module '\"../types/ecocoin.types\"' has no exported member 'EcoCoinReward'."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 11,
+      "col": 3,
+      "code": "TS2305",
+      "message": "Module '\"../types/ecocoin.types\"' has no exported member 'EcoCoinHistory'."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 24,
+      "col": 27,
+      "code": "TS2339",
+      "message": "Property 'BALANCE' does not exist on type '{ readonly BASE: \"/ecocoin\"; readonly TOKENS: \"/ecocoin/tokens\"; readonly STATS: \"/ecocoin/stats\"; readonly WALLETS: { readonly BY_ID: (id: number) => string; readonly ME: \"/ecocoin/wallets/me\"; }; readonly TRANSFER: \"/ecocoin/transfer\"; readonly STAKE: \"/ecocoin/stake\"; }'."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 43,
+      "col": 27,
+      "code": "TS2339",
+      "message": "Property 'TRANSACTIONS' does not exist on type '{ readonly BASE: \"/ecocoin\"; readonly TOKENS: \"/ecocoin/tokens\"; readonly STATS: \"/ecocoin/stats\"; readonly WALLETS: { readonly BY_ID: (id: number) => string; readonly ME: \"/ecocoin/wallets/me\"; }; readonly TRANSFER: \"/ecocoin/transfer\"; readonly STAKE: \"/ecocoin/stake\"; }'."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 68,
+      "col": 17,
+      "code": "TS7006",
+      "message": "Parameter 'data' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/api/hooks/useEcoCoin.ts",
+      "line": 91,
+      "col": 27,
+      "code": "TS2339",
+      "message": "Property 'REWARDS' does not exist on type '{ readonly BASE: \"/ecocoin\"; readonly TOKENS: \"/ecocoin/tokens\"; readonly STATS: \"/ecocoin/stats\"; readonly WALLETS: { readonly BY_ID: (id: number) => string; readonly ME: \"/ecocoin/wallets/me\"; }; readonly TRANSFER: \"/ecocoin/transfer\"; readonly STAKE: \"/ecocoin/stake\"; }'."
+    },
+    {
+      "file": "src/api/hooks/useSoilWater.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/hooks/useSoilWater.ts",
+      "line": 4,
+      "col": 23,
+      "code": "TS2307",
+      "message": "Cannot find module 'react-hot-toast' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/interceptors.ts",
+      "line": 2,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/utils/storage' or its corresponding type declarations."
+    },
+    {
+      "file": "src/api/interceptors.ts",
+      "line": 4,
+      "col": 25,
+      "code": "TS2305",
+      "message": "Module '\"./types/auth.types\"' has no exported member 'RefreshTokenResponse'."
+    },
+    {
+      "file": "src/api/interceptors.ts",
+      "line": 20,
+      "col": 14,
+      "code": "TS2339",
+      "message": "Property 'metadata' does not exist on type 'InternalAxiosRequestConfig<any>'."
+    },
+    {
+      "file": "src/api/interceptors.ts",
+      "line": 46,
+      "col": 69,
+      "code": "TS2339",
+      "message": "Property 'metadata' does not exist on type 'InternalAxiosRequestConfig<any>'."
+    },
+    {
+      "file": "src/api/interceptors.ts",
+      "line": 47,
+      "col": 55,
+      "code": "TS2339",
+      "message": "Property 'metadata' does not exist on type 'InternalAxiosRequestConfig<any>'."
+    },
+    {
+      "file": "src/api/landSoilWaterClient.ts",
+      "line": 13,
+      "col": 8,
+      "code": "TS2307",
+      "message": "Cannot find module '../types/landSoilWater' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/academy/useAcademy.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/academy/useAcademy.ts",
+      "line": 2,
+      "col": 28,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/academy/api' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/ai/useAI.ts",
+      "line": 1,
+      "col": 39,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/ai/useAI.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 3,
+      "col": 35,
+      "code": "TS2307",
+      "message": "Cannot find module 'react' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 4,
+      "col": 34,
+      "code": "TS2307",
+      "message": "Cannot find module '@/store/analysis' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 5,
+      "col": 51,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/types/analysis' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 8,
+      "col": 39,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 9,
+      "col": 38,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 10,
+      "col": 43,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 11,
+      "col": 40,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 12,
+      "col": 42,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/hooks/analysis/useAnalysisWebSocket.ts",
+      "line": 13,
+      "col": 41,
+      "code": "TS7006",
+      "message": "Parameter 'state' implicitly has an 'any' type."
+    },
+    {
+      "file": "src/hooks/blockchain/useBlockchain.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/blockchain/useBlockchain.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/drought/useDrought.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/drought/useDrought.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/forest/useForest.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/forest/useForest.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 12,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './analysis' has already exported a member named 'useAnalysisWebSocket'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 13,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './academy' has already exported a member named 'useAcademyStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 13,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './academy' has already exported a member named 'useCourses'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './academy' has already exported a member named 'useAcademyStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './useApi' has already exported a member named 'useDashboardStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './useApi' has already exported a member named 'useIoTStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/index.ts",
+      "line": 14,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './useApi' has already exported a member named 'useMyWallet'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/hooks/iot/useIoT.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/iot/useIoT.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/satellite/useSatellite.ts",
+      "line": 1,
+      "col": 39,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/satellite/useSatellite.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/soil/useSoil.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/soil/useSoil.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useAnalysisWebSocket.ts",
+      "line": 1,
+      "col": 58,
+      "code": "TS2307",
+      "message": "Cannot find module 'react' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useAnalysisWebSocket.ts",
+      "line": 2,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/store/useAppStore' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useApi.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useApi.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useApiHooks.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useApiHooks.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useCalendar.ts",
+      "line": 1,
+      "col": 55,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useCalendar.ts",
+      "line": 2,
+      "col": 33,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useModuleData.ts",
+      "line": 3,
+      "col": 50,
+      "code": "TS2307",
+      "message": "Cannot find module 'react' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/useTranslation.ts",
+      "line": 1,
+      "col": 29,
+      "code": "TS2307",
+      "message": "Cannot find module '@/contexts/LanguageContext' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/weather/useWeather.ts",
+      "line": 1,
+      "col": 26,
+      "code": "TS2307",
+      "message": "Cannot find module '@tanstack/react-query' or its corresponding type declarations."
+    },
+    {
+      "file": "src/hooks/weather/useWeather.ts",
+      "line": 2,
+      "col": 17,
+      "code": "TS2307",
+      "message": "Cannot find module '@/lib/api-client' or its corresponding type declarations."
+    },
+    {
+      "file": "src/index.ts",
+      "line": 3,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './api' has already exported a member named 'useDashboardStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "src/index.ts",
+      "line": 3,
+      "col": 1,
+      "code": "TS2308",
+      "message": "Module './api' has already exported a member named 'useEcoCoinStats'. Consider explicitly re-exporting to resolve the ambiguity."
+    },
+    {
+      "file": "tsconfig.json",
+      "line": 2,
+      "col": 3,
+      "code": "TS1005",
+      "message": "'{' expected."
+    }
+  ],
+  "packages\\types": [
+    {
+      "file": "../config-typescript/base.json",
+      "line": 2,
+      "col": 3,
+      "code": "TS1005",
+      "message": "'{' expected."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+prop-types@15.7.15/node_modules/@types/prop-types/index.d.ts",
+      "line": 16,
+      "col": 38,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 440,
+      "col": 26,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 478,
+      "col": 10,
+      "code": "TS2456",
+      "message": "Type alias 'ReactNode' circularly references itself."
+    },
+    {
+      "file": "../../node_modules/.pnpm/@types+react@18.3.3/node_modules/@types/react/index.d.ts",
+      "line": 482,
+      "col": 11,
+      "code": "TS2304",
+      "message": "Cannot find name 'Iterable'."
+    },
+    {
+      "file": "src/index.ts",
+      "line": 3,
+      "col": 15,
+      "code": "TS2307",
+      "message": "Cannot find module './iot.types' or its corresponding type declarations."
+    }
+  ],
+  "packages\\ui": [
+    {
+      "file": "../config-typescript/base.json",
+      "line": 2,
+      "col": 3,
+      "code": "TS1005",
+      "message": "'{' expected."
+    },
+    {
+      "file": "src/components/ChartCard.tsx",
+      "line": 12,
+      "col": 49,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/components/ChartCard.tsx",
+      "line": 12,
+      "col": 125,
+      "code": "TS1005",
+      "message": "'...' expected."
+    },
+    {
+      "file": "src/components/ChartCard.tsx",
+      "line": 18,
+      "col": 275,
+      "code": "TS1005",
+      "message": "'...' expected."
+    }
+  ]
+}

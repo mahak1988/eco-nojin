@@ -1,0 +1,12 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"],
+      "@econojin/ui": ["../ui/src"],
+      "@econojin/types": ["../types/src"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules"]
+}

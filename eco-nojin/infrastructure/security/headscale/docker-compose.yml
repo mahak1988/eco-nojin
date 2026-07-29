@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: headscale-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${HEADSCALE_DB_USER:-headscale}
+      POSTGRES_PASSWORD: ${HEADSCALE_DB_PASSWORD}
+      POSTGRES_DB: ${HEADSCALE_DB_NAME:-headscale}
+    volumes:
+      - headscale_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  headscale:
+    image: headscale/headscale:v1.4.0
+    container_name: headscale
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./data:/var/lib/headscale
+      - ./config.yaml:/etc/headscale/config.yaml:ro
+    command: ["serve", "--config", "/etc/headscale/config.yaml"]
+    environment:
+      - HEADSCALE_SECRET_KEY=${HEADSCALE_SECRET_KEY}
+      - HEADSCALE_SERVER_URL=${HEADSCALE_SERVER_URL}
+      - HEADSCALE_PRIVATE_KEY_PATH=/var/lib/headscale/keys/private.key
+
+volumes:
+  headscale_postgres_data:

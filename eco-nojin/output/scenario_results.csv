@@ -1,0 +1,5 @@
+Scenario,Yield_Change_pct,SOC_Change_t_ha_10yr,Water_Efficiency
+Baseline,0,0,0
+Conservation Agriculture,8.5,0.8,1.9
+Irrigation Optimization,15.2,0.3,2.4
+Integrated,22.1,1.4,2.8

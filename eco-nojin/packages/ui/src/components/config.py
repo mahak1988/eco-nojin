@@ -1,0 +1,15 @@
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings): REDACTED_BY_TRIAGE_TOOL
+    APP_NAME: str =REDACTED_BY_TRIAGE_TOOL
+    APP_VERSION: str =REDACTED_BY_TRIAGE_TOOL
+    DEBUG: bool =REDACTED_BY_TRIAGE_TOOL
+    HOST: str =REDACTED_BY_TRIAGE_TOOL
+    PORT: int =REDACTED_BY_TRIAGE_TOOL
+
+    class Config: REDACTED_BY_TRIAGE_TOOL
+        env_file =REDACTED_BY_TRIAGE_TOOL
+
+
+settings =REDACTED_BY_TRIAGE_TOOL

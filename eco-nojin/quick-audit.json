@@ -1,0 +1,9 @@
+{
+  "logging": 100,
+  "docstring": 98,
+  "type_hints": 74,
+  "test_ratio": 0,
+  "todo": 16,
+  "complex_funcs": 7,
+  "long_funcs": 36
+}

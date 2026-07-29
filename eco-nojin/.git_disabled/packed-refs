@@ -1,0 +1,24 @@
+# pack-refs with: peeled fully-peeled sorted 
+75e490a1444a0131f774ff6f0f9e5c451d30ca7b refs/remotes/origin/dependabot/docker/python-3.14-slim
+50df9a87183ae103ba813a58c47d034dafa0ba98 refs/remotes/origin/dependabot/pip/langchain-community-gte-0.4.2
+60ed3a8249966b85dfca42ea1cdbff913e6c3664 refs/remotes/origin/dependabot/pip/langchain-gte-0.3.30
+d39431666118773ede3e5641df099955c3fdb990 refs/remotes/origin/dependabot/pip/langchain-openai-gte-0.3.35
+e79c5c34dfab4d3b4d727e14b1d54b0f8ac15855 refs/remotes/origin/dependabot/pip/onnx-gte-1.22.0
+2d15f88143eda66d3cc098bb0744d92d9522cd8e refs/remotes/origin/dependabot/pip/onnxruntime-gte-1.24.3
+b0d645f23bc90dffe374eb6f108e35be7b5347b7 refs/remotes/origin/dependabot/pip/pydantic-gte-2.13.4
+287dd9d8db01842d19ac16fc16d7a87d43f0a8f8 refs/remotes/origin/dependabot/pip/qdrant-client-gte-1.18.0
+390fa484fda7101f3c1ca51c68f24e26577493ac refs/remotes/origin/dependabot/pip/redis-gte-4.6.0
+b97724a839a0ffdb6d107d799a75bf1cb6c52511 refs/remotes/origin/dependabot/pip/sentence-transformers-gte-2.7.0
+024dfed125daa8e1aefd4d0194f5944e1a877fb7 refs/remotes/origin/dependabot/pip/structlog-gte-23.3.0
+44800104261abc5e20961773647be6e32bd2ee71 refs/remotes/origin/fix/ecocoin-typescript-errors
+5fcf6405b5d840c41678293c0a1d5f8d68538fde refs/remotes/origin/frontend-backend-integration-1160c
+6385f336f38f288709c5e8acfad74d8380ff2b12 refs/remotes/origin/main
+44800104261abc5e20961773647be6e32bd2ee71 refs/remotes/origin/qwen-code-03013929-f0ab-4804-8998-dce58ff9e22e
+54552d1cc86d9f3a03aba0482c2ef1fa89a165ce refs/remotes/origin/revert-16-تولید-فایل-readme-d1613
+2a35d40761185661ffcd5218a5c3737a3462165a refs/remotes/origin/ادغام-شاخه‌های-گیت-هاب-fa8b7
+0d3166dcd2504ec591a0069c1c4f38ca9f8139c9 refs/remotes/origin/امنیت-چندلایه-عنکبوتی-f5b8c
+8978e64c8451b648ec871c49611c154e18e956a4 refs/remotes/origin/بهبود-پیشنهادات-d20e0
+f74f2de3c029a7e5ff824148ef0a9d4f92b12772 refs/remotes/origin/بهره‌برداری-از-پروژه‌های-گیت‌هاب-موفق-b1669
+bd44157f0b7835f72d7114fb1b998fcc111e0a3d refs/remotes/origin/بهینه‌سازی-عملکرد-9e22e
+b7748c693ab29c297d2ee37e7e2662deccbdf7c2 refs/remotes/origin/تولید-فایل-readme-d1613
+fcc6118993405c0fa360bcebac79f4583995ae6d refs/remotes/origin/یافتن-آسیب‌پذیری‌ها-a5e15

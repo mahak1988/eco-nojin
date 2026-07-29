@@ -1,27 +1,27 @@
-# ai_agents | ماژول ایجنت‌های هوش مصنوعی Econojin
+# ai_agents | AI Agents Module for Econojin
 
-> **نکته:** این ماژول **۶ ایجنت تخصصی هوش مصنوعی** را برای پلتفرم Econojin فراهم می‌کند.
-> هر ایجنت قابلیت‌های منحصربه‌فردی دارد و از طریق LLMهای مختلف (Groq, xAI, Gemini, OpenRouter, Ollama) پشتیبانی می‌شود.
+> **Note:** This module provides **6 specialized AI agents** for the Econojin platform.
+> Each agent has unique capabilities and supports multiple LLM providers (Groq, xAI, Gemini, OpenRouter, Ollama).
 
-## مسئولیت‌ها
+## Responsibilities
 
-این ماژول سه وظیفه‌ی اصلی دارد:
+This module has three main responsibilities:
 
-1. **ارائه ۶ ایجنت تخصصی** (`agents/`)
-   - **تحلیلگر مالی (Financial)** — تحلیل داده‌های مالی، شبیه‌سازی مونت کارلو، بهینه‌سازی پورتفوی
-   - **پشتیبانی (Support)** — پاسخ به سوالات و راهنمایی کاربران
-   - **کمک ادمین (Admin)** — گزارش‌گیری، تحلیل KPI، اولویت‌بندی تسک‌ها
-   - **محقق (Research)** — جستجوی وب، خلاصه‌سازی مقالات، تولید گزارش تحقیقاتی
-   - **تحلیلگر داده (Data Analyst)** — آمار، همبستگی، آزمون فرضیه، ML
-   - **دستیار کدنویسی (Code Assistant)** — تحلیل کد با AST، شناسایی باگ، تولید تست
+1. **6 Specialized Agents** (`agents/`)
+   - **Financial** — Financial data analysis, Monte Carlo simulation, portfolio optimization
+   - **Support** — Answering questions and user guidance
+   - **Admin** — Reporting, KPI analysis, task prioritization
+   - **Research** — Web search, article summarization, research report generation
+   - **Data Analyst** — Statistics, correlation, hypothesis testing, ML
+   - **Code Assistant** — AST code analysis, bug detection, test generation
 
 2. **Chat Streaming** (`router.py`)
-   - پشتیبانی از Streaming (SSE) برای پاسخ‌های real-time
-   - پشتیبانی از Non-Streaming برای درخواست‌های ساده
+   - SSE streaming support for real-time responses
+   - Non-streaming support for simple requests
 
-3. **مدیریت مکالمات** (`service.py`, `repository.py`)
-   - ایجاد و نگهداری مکالمات (Conversations)
-   - ذخیره و بازیابی تاریخچه پیام‌ها
+3. **Conversation Management** (`service.py`, `repository.py`)
+   - Create and maintain conversations
+   - Store and retrieve message history
 
 ## ساختار
 

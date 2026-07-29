@@ -1,0 +1,100 @@
+
+name: Security Pipeline (DevSecOps 2026)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Bandit SAST
+        run: |
+          pip install bandit
+          bandit -r apps/ security/ -f json -o bandit-report.json || true
+      - name: Upload SAST
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit --format json --output audit-report.json || true
+      - name: Upload Audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: audit-report.json
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: detect-secrets
+        run: |
+          pip install detect-secrets
+          detect-secrets scan --baseline .secrets.baseline || true
+
+  project-analyzer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Secure Project Analyzer
+        run: |
+          python project_analyzer.py . --no-network \
+            --exclude ".pnpm-store/*" --exclude "node_modules/*" \
+            --exclude "reports/*" --exclude ".security_backup/*" \
+            --exclude "project-analysis.*" --exclude "*/tests/*" \
+            --exclude "*/test_*" --fail-on critical
+      - name: Upload Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: |
+            project-analysis.json
+            project-analysis.html
+
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate SBOM
+        run: python security/supply_chain.py
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: security/sbom.json

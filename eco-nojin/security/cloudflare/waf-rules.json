@@ -1,0 +1,11 @@
+
+{
+  "rules": [
+    {"name":"Block SQLi","action":"block","expression":"(http.request.uri.query contains \"union select\") or (http.request.uri.query contains \"drop table\")"},
+    {"name":"Block XSS","action":"block","expression":"(http.request.uri.query contains \"<script\")"},
+    {"name":"Block Traversal","action":"block","expression":"(http.request.uri contains \"../\")"},
+    {"name":"Rate Limit Login","action":"rate_limit","expression":"(http.request.uri.path contains \"/login\")"},
+    {"name":"Block Bots","action":"block","expression":"(http.user_agent contains \"sqlmap\") or (http.user_agent contains \"nikto\")"},
+    {"name":"Block Sensitive","action":"block","expression":"(http.request.uri.path ends_with \".env\") or (http.request.uri.path contains \"/.git/\")"}
+  ]
+}

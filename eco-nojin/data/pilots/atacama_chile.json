@@ -1,0 +1,52 @@
+{
+  "pilot_id": "atacama_chile",
+  "name": "بیابان آتاکاما",
+  "country": "شیلی",
+  "continent": "آمریکای جنوبی",
+  "province": "Antofagasta",
+  "climate_zone": "فوق‌خشک (BWn)",
+  "coordinates": {
+    "lat": -24.5,
+    "lon": -69.25
+  },
+  "area_hectares": 18000,
+  "elevation_m": 2400,
+  "annual_precipitation_mm": 15,
+  "avg_temperature_c": 18.5,
+  "soil_type": "بسیار شور، سنگی",
+  "land_use": [
+    "معدن",
+    "اکوتوریسم",
+    "کشاورزی oasis محدود"
+  ],
+  "main_challenges": [
+    "فوق‌خشکسالی مطلق",
+    "شوری شدید",
+    "محدودیت شدید آب"
+  ],
+  "interventions": [
+    "مه‌چین (Fog harvesting)",
+    "گلخانه‌های خورشیدی",
+    "کشاورزی های‌تک کم‌آب"
+  ],
+  "baseline_indicators": {
+    "water_availability_liters_per_day": 8,
+    "soc_percent": 0.2,
+    "agricultural_productivity": 0.1
+  },
+  "target_indicators": {
+    "water_availability_liters_per_day": 30,
+    "soc_percent": 0.8,
+    "agricultural_productivity": 0.6
+  },
+  "beneficiaries": {
+    "households": 120,
+    "mining_communities": 35,
+    "women": 55
+  },
+  "global_partnership": [
+    "CONICYT",
+    "University of Antofagasta",
+    "NASA"
+  ]
+}
