@@ -32,12 +32,7 @@ async def fetch_ndvi_canopy_async(lat: float, lon: float, days: int = 90) -> dic
 
     end = date.today()
     start = end - timedelta(days=days)
-    bbox = BBox(
-        min_lon=lon - 0.05,
-        min_lat=lat - 0.05,
-        max_lon=lon + 0.05,
-        max_lat=lat + 0.05,
-    )
+    bbox = BBox.from_point(lat, lon, delta=0.05)
     rows = []
     try:
         rows = await get_satellite_service().get_ndvi_timeseries(0, bbox, start, end)
@@ -72,7 +67,6 @@ def fetch_ndvi_series_sync(lat: float, lon: float, days: int = 90) -> dict[str, 
     try:
         return asyncio.run(_run())
     except RuntimeError:
-        # nested loop — use thread
         import concurrent.futures
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
