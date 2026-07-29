@@ -11,10 +11,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
-# ---------------------------------------------------------------------------
-# Constants (SSOT with docs/ECOCOIN_ECONOMIC_DESIGN.md)
-# ---------------------------------------------------------------------------
-
 MAX_SUPPLY = 1_000_000_000.0
 GENESIS_SUPPLY = 50_000_000.0
 IMPACT_MINT_BUDGET = 800_000_000.0
@@ -101,7 +97,6 @@ def mint_scarcity_factor(state: ProtocolState) -> float:
 
 
 def scarcity_at_ratio(ratio: float) -> float:
-    """S for a hypothetical fill ratio in [0, 1] (sensitivity helper)."""
     r = max(0.0, min(1.0, ratio))
     return max(0.2, 1.0 - 0.8 * (r ** 1.5))
 
@@ -114,15 +109,8 @@ def quality_from_mrv(
     field_data_present: bool = False,
     satellite_available: bool = False,
 ) -> dict[str, Any]:
-    """
-    Derive quality_score Q in [0.5, 1.2] from science signals.
-
-    - NDVI agreement: 1 - relative error between observed and expected canopy proxy
-    - Model vs field yield agreement (AquaCrop-style)
-    - Presence bonuses for multi-source MRV
-    """
     components: dict[str, float] = {}
-    base = 0.85  # single weak source default
+    base = 0.85
 
     if (
         ndvi_observed is not None
@@ -132,7 +120,7 @@ def quality_from_mrv(
         rel_err = abs(ndvi_observed - ndvi_expected) / max(abs(ndvi_expected), 1e-6)
         ndvi_score = max(0.0, 1.0 - rel_err)
         components["ndvi_agreement"] = round(ndvi_score, 4)
-        base = 0.9 + 0.2 * ndvi_score  # 0.9 .. 1.1
+        base = 0.9 + 0.2 * ndvi_score
         satellite_available = True
 
     if (
@@ -219,6 +207,13 @@ def compute_impact_mint(
     }
 
 
+def _elasticity(m0: float, m1: float, x0: float, x1: float) -> float:
+    """(ΔM/M) / (Δx/x); 0 if x is at a clamp (no movement)."""
+    if abs(x0) < 1e-15 or abs(x1 - x0) < 1e-15 or abs(m0) < 1e-15:
+        return 0.0
+    return round(((m1 - m0) / m0) / ((x1 - x0) / x0), 4)
+
+
 def sensitivity_analysis(
     credit_type: int = 0,
     measured_value: float = 40.0,
@@ -226,11 +221,6 @@ def sensitivity_analysis(
     region_multiplier: float = 1.0,
     state: Optional[ProtocolState] = None,
 ) -> dict[str, Any]:
-    """
-    One-at-a-time sensitivity of mint_total to Fc, S, Q, R.
-
-    Elasticity ≈ (ΔM/M) / (Δx/x) around baseline.
-    """
     st = state or ProtocolState()
     base = compute_impact_mint(
         credit_type, measured_value, quality_score, region_multiplier, st
@@ -238,66 +228,55 @@ def sensitivity_analysis(
     if not base["ok"]:
         return base
 
-    m0 = base["mint_total"] or 1e-12
+    m0 = base["mint_total"] if base["mint_total"] else 1e-12
     _, _, fc0 = CREDIT_FACTORS[credit_type]
-    s0 = base["scarcity_factor"]
+    s0 = float(base["scarcity_factor"])
 
-    def elast(m1: float, x0: float, x1: float) -> float:
-        if x0 == 0:
-            return 0.0
-        return round(((m1 - m0) / m0) / ((x1 - x0) / x0), 4)
+    fc_hi_x = fc0 * 1.1
+    fc_lo_x = fc0 * 0.9
+    s_hi_x = min(1.0, s0 * 1.1)
+    s_lo_x = max(0.2, s0 * 0.9)
+    # If S is already at ceiling, step down from baseline for a measurable Δ
+    if abs(s_hi_x - s0) < 1e-12:
+        s_hi_x = max(0.2, s0 - 0.1)
+    q_hi_x = min(1.2, quality_score * 1.1)
+    q_lo_x = max(0.5, quality_score * 0.9)
+    if abs(q_hi_x - quality_score) < 1e-12:
+        q_hi_x = max(0.5, quality_score - 0.1)
+    r_hi_x = min(1.3, region_multiplier * 1.1)
+    r_lo_x = max(0.8, region_multiplier * 0.9)
+    if abs(r_hi_x - region_multiplier) < 1e-12:
+        r_hi_x = max(0.8, region_multiplier - 0.1)
 
-    # ±10% on Fc
     fc_hi = compute_impact_mint(
-        credit_type,
-        measured_value,
-        quality_score,
-        region_multiplier,
-        st,
-        credit_factor_override=fc0 * 1.1,
+        credit_type, measured_value, quality_score, region_multiplier, st,
+        credit_factor_override=fc_hi_x,
     )
     fc_lo = compute_impact_mint(
-        credit_type,
-        measured_value,
-        quality_score,
-        region_multiplier,
-        st,
-        credit_factor_override=fc0 * 0.9,
+        credit_type, measured_value, quality_score, region_multiplier, st,
+        credit_factor_override=fc_lo_x,
     )
-
-    # S at nearby ratios
     s_hi = compute_impact_mint(
-        credit_type,
-        measured_value,
-        quality_score,
-        region_multiplier,
-        st,
-        scarcity_override=min(1.0, s0 * 1.1),
+        credit_type, measured_value, quality_score, region_multiplier, st,
+        scarcity_override=s_hi_x,
     )
     s_lo = compute_impact_mint(
-        credit_type,
-        measured_value,
-        quality_score,
-        region_multiplier,
-        st,
-        scarcity_override=max(0.2, s0 * 0.9),
+        credit_type, measured_value, quality_score, region_multiplier, st,
+        scarcity_override=s_lo_x,
     )
-
     q_hi = compute_impact_mint(
-        credit_type, measured_value, min(1.2, quality_score * 1.1), region_multiplier, st
+        credit_type, measured_value, q_hi_x, region_multiplier, st
     )
     q_lo = compute_impact_mint(
-        credit_type, measured_value, max(0.5, quality_score * 0.9), region_multiplier, st
+        credit_type, measured_value, q_lo_x, region_multiplier, st
     )
-
     r_hi = compute_impact_mint(
-        credit_type, measured_value, quality_score, min(1.3, region_multiplier * 1.1), st
+        credit_type, measured_value, quality_score, r_hi_x, st
     )
     r_lo = compute_impact_mint(
-        credit_type, measured_value, quality_score, max(0.8, region_multiplier * 0.9), st
+        credit_type, measured_value, quality_score, r_lo_x, st
     )
 
-    # Scarcity curve sample
     scarcity_curve = [
         {"ratio": round(r, 2), "S": round(scarcity_at_ratio(r), 4)}
         for r in [i / 10 for i in range(0, 11)]
@@ -316,30 +295,28 @@ def sensitivity_analysis(
             "Fc": {
                 "plus_10pct_mint": fc_hi["mint_total"],
                 "minus_10pct_mint": fc_lo["mint_total"],
-                "elasticity_approx": elast(fc_hi["mint_total"], fc0, fc0 * 1.1),
+                "elasticity_approx": _elasticity(m0, fc_hi["mint_total"], fc0, fc_hi_x),
                 "note": "Linear in Fc before budget cap",
             },
             "S": {
                 "plus_10pct_mint": s_hi["mint_total"],
                 "minus_10pct_mint": s_lo["mint_total"],
-                "elasticity_approx": elast(s_hi["mint_total"], s0, min(1.0, s0 * 1.1)),
-                "note": "S falls as impact budget fills; floor 0.2",
+                "elasticity_approx": _elasticity(m0, s_hi["mint_total"], s0, s_hi_x),
+                "note": "S falls as impact budget fills; floor 0.2, ceiling 1.0",
             },
             "Q": {
                 "plus_10pct_mint": q_hi["mint_total"],
                 "minus_10pct_mint": q_lo["mint_total"],
-                "elasticity_approx": elast(
-                    q_hi["mint_total"], quality_score, min(1.2, quality_score * 1.1)
+                "elasticity_approx": _elasticity(
+                    m0, q_hi["mint_total"], quality_score, q_hi_x
                 ),
                 "note": "Clamped to [0.5, 1.2]",
             },
             "R": {
                 "plus_10pct_mint": r_hi["mint_total"],
                 "minus_10pct_mint": r_lo["mint_total"],
-                "elasticity_approx": elast(
-                    r_hi["mint_total"],
-                    region_multiplier,
-                    min(1.3, region_multiplier * 1.1),
+                "elasticity_approx": _elasticity(
+                    m0, r_hi["mint_total"], region_multiplier, r_hi_x
                 ),
                 "note": "Clamped to [0.8, 1.3]",
             },
