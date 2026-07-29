@@ -5,48 +5,59 @@ Data access layer — all database queries live here.
 Services call repositories; repositories never call services.
 """
 
-import logging
+from __future__ import annotations
 
-logger = logging.getLogger(__name__)
-from typing import Optional, List
+import logging
 from datetime import datetime
 from decimal import Decimal
+from typing import List, Optional
 
-from sqlalchemy import select, func, and_, desc
+from sqlalchemy import and_, case, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from apps.api.models.accounting import (
-    Account, JournalEntry, JournalItem, Invoice, InvoiceItem,
-    Payment, Budget, TaxRate, FixedAsset
+    Account,
+    Budget,
+    FixedAsset,
+    Invoice,
+    InvoiceItem,
+    JournalEntry,
+    JournalItem,
+    Payment,
+    TaxRate,
 )
 from apps.api.schemas.accounting import (
-    AccountCreate, AccountUpdate,
-    JournalEntryCreate,
+    AccountCreate,
+    AccountUpdate,
+    BudgetCreate,
+    BudgetUpdate,
+    FixedAssetCreate,
+    FixedAssetUpdate,
     InvoiceCreate,
-    PaymentCreate,
-    BudgetCreate, BudgetUpdate,
-    TaxRateCreate, TaxRateUpdate,
-    FixedAssetCreate, FixedAssetUpdate,
     InvoiceUpdate,
+    JournalEntryCreate,
+    PaymentCreate,
+    TaxRateCreate,
+    TaxRateUpdate,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AccountRepository:
     """Repository for Account entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, account_id: str) -> Optional[Account]:
-        """Handle get_by_id (account_id)."""
         result = await self.session.execute(
             select(Account).where(Account.id == account_id)
         )
         return result.scalar_one_or_none()
 
     async def get_by_code(self, code: str) -> Optional[Account]:
-        """Handle get_by_code (code)."""
         result = await self.session.execute(
             select(Account).where(Account.code == code)
         )
@@ -57,15 +68,14 @@ class AccountRepository:
         skip: int = 0,
         limit: int = 100,
         account_type: Optional[str] = None,
-        is_active: Optional[bool] = None
+        is_active: Optional[bool] = None,
     ) -> tuple[List[Account], int]:
-        """Handle list (skip, limit, account_type, is_active)."""
         query = select(Account)
         if account_type:
             query = query.where(Account.account_type == account_type)
         if is_active is not None:
             query = query.where(Account.is_active == is_active)
-        
+
         query = query.order_by(Account.code).offset(skip).limit(limit)
         result = await self.session.execute(query)
         items = list(result.scalars().all())
@@ -75,13 +85,12 @@ class AccountRepository:
             count_query = count_query.where(Account.account_type == account_type)
         if is_active is not None:
             count_query = count_query.where(Account.is_active == is_active)
-        
+
         count_result = await self.session.execute(count_query)
         total = count_result.scalar_one()
         return items, total
 
     async def create(self, data: AccountCreate) -> Account:
-        """Handle create (data)."""
         obj = Account(**data.model_dump())
         self.session.add(obj)
         await self.session.flush()
@@ -89,7 +98,6 @@ class AccountRepository:
         return obj
 
     async def update(self, account_id: str, data: AccountUpdate) -> Optional[Account]:
-        """Handle update (account_id, data)."""
         obj = await self.get_by_id(account_id)
         if not obj:
             return None
@@ -101,7 +109,6 @@ class AccountRepository:
         return obj
 
     async def delete(self, account_id: str) -> bool:
-        """Handle delete (account_id)."""
         obj = await self.get_by_id(account_id)
         if not obj:
             return False
@@ -110,32 +117,31 @@ class AccountRepository:
         return True
 
     async def calculate_balance(self, account_id: str) -> Decimal:
-        """Calculate account balance from journal items."""
+        """Calculate account balance from journal items (debit positive)."""
+        balance_expr = case(
+            (JournalItem.entry_type == "debit", JournalItem.amount),
+            else_=-JournalItem.amount,
+        )
         result = await self.session.execute(
-            select(
-                func.sum(
-                    func.case(
-                        (JournalItem.entry_type == 'debit', JournalItem.amount),
-                        else_=-JournalItem.amount
-                    )
-                )
-            ).join(JournalItem).where(JournalItem.account_id == account_id)
+            select(func.coalesce(func.sum(balance_expr), 0)).where(
+                JournalItem.account_id == account_id
+            )
         )
         balance = result.scalar_one()
-        return Decimal(str(balance)) if balance else Decimal("0.00")
+        return Decimal(str(balance)) if balance is not None else Decimal("0.00")
 
 
 class JournalEntryRepository:
     """Repository for JournalEntry entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, entry_id: str) -> Optional[JournalEntry]:
-        """Handle get_by_id (entry_id)."""
         result = await self.session.execute(
-            select(JournalEntry).where(JournalEntry.id == entry_id)
+            select(JournalEntry)
+            .options(selectinload(JournalEntry.items))
+            .where(JournalEntry.id == entry_id)
         )
         return result.scalar_one_or_none()
 
@@ -143,43 +149,40 @@ class JournalEntryRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        is_posted: Optional[bool] = None
+        is_posted: Optional[bool] = None,
     ) -> tuple[List[JournalEntry], int]:
-        """Handle list (skip, limit, is_posted)."""
-        query = select(JournalEntry)
+        query = select(JournalEntry).options(selectinload(JournalEntry.items))
         if is_posted is not None:
             query = query.where(JournalEntry.is_posted == is_posted)
-        
+
         query = query.order_by(desc(JournalEntry.date)).offset(skip).limit(limit)
         result = await self.session.execute(query)
-        items = list(result.scalars().all())
+        items = list(result.scalars().unique().all())
 
         count_query = select(func.count()).select_from(JournalEntry)
         if is_posted is not None:
             count_query = count_query.where(JournalEntry.is_posted == is_posted)
-        
+
         count_result = await self.session.execute(count_query)
         total = count_result.scalar_one()
         return items, total
 
     async def create(self, data: JournalEntryCreate) -> JournalEntry:
-        """Handle create (data)."""
         obj = JournalEntry(
             date=data.date,
             description=data.description,
             reference=data.reference,
-            is_posted=data.is_posted
+            is_posted=data.is_posted,
         )
         for item_data in data.items:
             item = JournalItem(**item_data.model_dump())
             obj.items.append(item)
         self.session.add(obj)
         await self.session.flush()
-        await self.session.refresh(obj)
+        await self.session.refresh(obj, attribute_names=["items"])
         return obj
 
     async def post_entry(self, entry_id: str) -> Optional[JournalEntry]:
-        """Handle post_entry (entry_id)."""
         obj = await self.get_by_id(entry_id)
         if not obj:
             return None
@@ -193,18 +196,17 @@ class InvoiceRepository:
     """Repository for Invoice entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, invoice_id: str) -> Optional[Invoice]:
-        """Handle get_by_id (invoice_id)."""
         result = await self.session.execute(
-            select(Invoice).where(Invoice.id == invoice_id)
+            select(Invoice)
+            .options(selectinload(Invoice.items))
+            .where(Invoice.id == invoice_id)
         )
         return result.scalar_one_or_none()
 
     async def get_by_number(self, number: str) -> Optional[Invoice]:
-        """Handle get_by_number (number)."""
         result = await self.session.execute(
             select(Invoice).where(Invoice.number == number)
         )
@@ -214,31 +216,26 @@ class InvoiceRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> tuple[List[Invoice], int]:
-        """Handle list (skip, limit, status)."""
-        query = select(Invoice)
+        query = select(Invoice).options(selectinload(Invoice.items))
         if status:
             query = query.where(Invoice.status == status)
-        
+
         query = query.order_by(desc(Invoice.issue_date)).offset(skip).limit(limit)
         result = await self.session.execute(query)
-        items = list(result.scalars().all())
+        items = list(result.scalars().unique().all())
 
         count_query = select(func.count()).select_from(Invoice)
         if status:
             count_query = count_query.where(Invoice.status == status)
-        
+
         count_result = await self.session.execute(count_query)
         total = count_result.scalar_one()
         return items, total
 
     async def create(self, data: InvoiceCreate) -> Invoice:
-        # Calculate totals
-        """Handle create (data)."""
-        subtotal = sum(
-            (item.quantity * item.unit_price) for item in data.items
-        )
+        subtotal = sum((item.quantity * item.unit_price) for item in data.items)
         tax_amount = sum(
             (item.quantity * item.unit_price * item.tax_rate / 100) for item in data.items
         )
@@ -252,19 +249,18 @@ class InvoiceRepository:
             notes=data.notes,
             subtotal=subtotal,
             tax_amount=tax_amount,
-            total=total
+            total=total,
         )
         for item_data in data.items:
             item = InvoiceItem(**item_data.model_dump())
             obj.items.append(item)
-        
+
         self.session.add(obj)
         await self.session.flush()
-        await self.session.refresh(obj)
+        await self.session.refresh(obj, attribute_names=["items"])
         return obj
 
     async def update(self, invoice_id: str, data: InvoiceUpdate) -> Optional[Invoice]:
-        """Handle update (invoice_id, data)."""
         obj = await self.get_by_id(invoice_id)
         if not obj:
             return None
@@ -280,22 +276,17 @@ class PaymentRepository:
     """Repository for Payment entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, payment_id: str) -> Optional[Payment]:
-        """Handle get_by_id (payment_id)."""
         result = await self.session.execute(
             select(Payment).where(Payment.id == payment_id)
         )
         return result.scalar_one_or_none()
 
     async def list(
-        self,
-        skip: int = 0,
-        limit: int = 100
+        self, skip: int = 0, limit: int = 100
     ) -> tuple[List[Payment], int]:
-        """Handle list (skip, limit)."""
         query = select(Payment).order_by(desc(Payment.paid_at))
         query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -308,7 +299,6 @@ class PaymentRepository:
         return items, total
 
     async def create(self, data: PaymentCreate) -> Payment:
-        """Handle create (data)."""
         obj = Payment(**data.model_dump())
         self.session.add(obj)
         await self.session.flush()
@@ -320,22 +310,17 @@ class BudgetRepository:
     """Repository for Budget entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, budget_id: str) -> Optional[Budget]:
-        """Handle get_by_id (budget_id)."""
         result = await self.session.execute(
             select(Budget).where(Budget.id == budget_id)
         )
         return result.scalar_one_or_none()
 
     async def list(
-        self,
-        skip: int = 0,
-        limit: int = 100
+        self, skip: int = 0, limit: int = 100
     ) -> tuple[List[Budget], int]:
-        """Handle list (skip, limit)."""
         query = select(Budget).order_by(Budget.period_start)
         query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -348,7 +333,6 @@ class BudgetRepository:
         return items, total
 
     async def create(self, data: BudgetCreate) -> Budget:
-        """Handle create (data)."""
         obj = Budget(**data.model_dump())
         self.session.add(obj)
         await self.session.flush()
@@ -356,7 +340,6 @@ class BudgetRepository:
         return obj
 
     async def update(self, budget_id: str, data: BudgetUpdate) -> Optional[Budget]:
-        """Handle update (budget_id, data)."""
         obj = await self.get_by_id(budget_id)
         if not obj:
             return None
@@ -372,20 +355,17 @@ class TaxRateRepository:
     """Repository for TaxRate entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, tax_id: str) -> Optional[TaxRate]:
-        """Handle get_by_id (tax_id)."""
         result = await self.session.execute(
             select(TaxRate).where(TaxRate.id == tax_id)
         )
         return result.scalar_one_or_none()
 
     async def list_active(self) -> List[TaxRate]:
-        """Handle list_active."""
         result = await self.session.execute(
-            select(TaxRate).where(TaxRate.is_active == True)
+            select(TaxRate).where(TaxRate.is_active == True)  # noqa: E712
         )
         return list(result.scalars().all())
 
@@ -394,22 +374,17 @@ class FixedAssetRepository:
     """Repository for FixedAsset entities."""
 
     def __init__(self, session: AsyncSession) -> None:
-        """Handle __init__ (session)."""
         self.session = session
 
     async def get_by_id(self, asset_id: str) -> Optional[FixedAsset]:
-        """Handle get_by_id (asset_id)."""
         result = await self.session.execute(
             select(FixedAsset).where(FixedAsset.id == asset_id)
         )
         return result.scalar_one_or_none()
 
     async def list(
-        self,
-        skip: int = 0,
-        limit: int = 100
+        self, skip: int = 0, limit: int = 100
     ) -> tuple[List[FixedAsset], int]:
-        """Handle list (skip, limit)."""
         query = select(FixedAsset).order_by(FixedAsset.purchase_date)
         query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -422,14 +397,12 @@ class FixedAssetRepository:
         return items, total
 
     async def create(self, data: FixedAssetCreate) -> FixedAsset:
-        # Calculate initial values
-        """Handle create (data)."""
         net_book_value = data.purchase_cost - Decimal("0.00")
-        
+
         obj = FixedAsset(
             **data.model_dump(),
             accumulated_depreciation=Decimal("0.00"),
-            net_book_value=net_book_value
+            net_book_value=net_book_value,
         )
         self.session.add(obj)
         await self.session.flush()
