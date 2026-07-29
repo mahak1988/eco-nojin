@@ -6,7 +6,6 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
     Boolean,
@@ -14,7 +13,6 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
-    Integer,
     JSON,
     String,
     Text,
@@ -22,7 +20,16 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from apps.shared_core.database.base import Base
+try:
+    from apps.shared_core.database.session import Base
+except Exception:
+    try:
+        from apps.shared_core.database.base import Base
+    except Exception:
+        from sqlalchemy.orm import DeclarativeBase
+
+        class Base(DeclarativeBase):
+            pass
 
 logger = logging.getLogger(__name__)
 
