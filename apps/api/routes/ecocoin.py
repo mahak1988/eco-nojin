@@ -9,7 +9,6 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.services.ecocoin_engine import (
     CREDIT_FACTORS,
@@ -58,6 +57,16 @@ class StakeRequest(BaseModel):
     address: str
     amount: float
     tier_id: int
+
+
+class StakingTier(BaseModel):
+    """Pydantic model used by unit tests and OpenAPI docs."""
+
+    id: int
+    duration: str
+    apy: float
+    multiplier: float
+    min_amount: float
 
 
 class EcoCoinStats(BaseModel):
@@ -188,16 +197,6 @@ _PENDING_REWARDS: dict[str, float] = {
 }
 
 
-def _try_db():
-    """Optional DB dependency — tests without session still work."""
-    try:
-        from apps.shared_core.database.session import get_db_session
-
-        return Depends(get_db_session)
-    except Exception:
-        return None
-
-
 @router.get("/balance/{address}", response_model=BalanceResponse)
 async def get_balance(address: str) -> BalanceResponse:
     w = default_wallet(address)
@@ -301,6 +300,31 @@ async def get_recent_mints(
     limit: int = Query(20, ge=1, le=100),
 ) -> list[dict[str, Any]]:
     return _MOCK_MINTS[:limit]
+
+
+@router.get("/mining/events")
+async def get_mint_events_from_db(
+    limit: int = Query(20, ge=1, le=100),
+    recipient: Optional[str] = Query(None),
+) -> dict[str, Any]:
+    """List persisted mint events (SQLite/Postgres). Falls back to in-memory."""
+    try:
+        from apps.api.services.mint_persistence import list_mint_events
+        from apps.shared_core.database.session import async_session_maker
+
+        async with async_session_maker() as session:
+            rows = await list_mint_events(session, limit=limit, recipient=recipient)
+            return {"source": "database", "count": len(rows), "items": rows}
+    except Exception as e:
+        items = _MOCK_MINTS[:limit]
+        if recipient:
+            items = [m for m in items if m.get("recipient") == recipient]
+        return {
+            "source": "memory",
+            "count": len(items),
+            "items": items,
+            "note": type(e).__name__,
+        }
 
 
 @router.post("/verify")
@@ -415,10 +439,9 @@ async def impact_mint(
     steward_share = result["distribution"]["steward"]
     _MOCK_BALANCES[req.recipient] = _MOCK_BALANCES.get(req.recipient, 100.0) + steward_share
 
-    # Best-effort DB persist (table via create_all / Alembic)
     try:
-        from apps.shared_core.database.session import async_session_maker
         from apps.api.services.mint_persistence import persist_mint_event
+        from apps.shared_core.database.session import async_session_maker
 
         async with async_session_maker() as session:
             await persist_mint_event(
@@ -442,7 +465,14 @@ async def impact_mint(
         entry["persisted"] = False
         entry["persist_error"] = type(e).__name__
 
-    return {"status": "minted", "tx_hash": h, "oracle_signature": oracle["signature"], **result, "persisted": entry.get("persisted")}
+    return {
+        "status": "minted",
+        "tx_hash": h,
+        "oracle_signature": oracle["signature"],
+        "oracle_algorithm": oracle["algorithm"],
+        **result,
+        "persisted": entry.get("persisted"),
+    }
 
 
 @router.get("/challenges")
