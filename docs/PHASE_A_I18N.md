@@ -1,54 +1,36 @@
 # Phase A — i18n unification
 
-**Status:** started  
-**Decision:** keep **custom `useLang` + `CONTENT` + `I18N_EXTRAS`** as the single runtime source of truth.
+**Status:** pages wired (Login / Register / Farms); Simulators hub already on `useLang` + `SIM_STR`
 
-## What is active
+## Runtime source of truth
 
 | Piece | Role |
 |-------|------|
-| `apps/web/src/components/eco/i18n.tsx` | `LanguageProvider`, `CONTENT` (fa/en/ar), `useLang` |
-| `apps/web/src/components/eco/i18n_extras.ts` | Extra keys + `tr()` / `tExtra()` |
-| `LanguageSwitcher` | Switches lang; sets `dir` / `lang` on `<html>` |
-| `locale/source_en.json` | English catalog for MT pipeline |
-| `scripts/i18n_auto_translate.py` | MT draft → `generated_fa.json` / `generated_ar.json` |
-| `scripts/i18n_merge_extras.py` | Lists **missing** keys only (no overwrite) |
+| `components/eco/i18n.tsx` | `LanguageProvider`, `CONTENT`, `useLang` (storage key `econojin.lang`) |
+| `components/eco/i18n_extras.ts` | Extra keys + `tr` / `tExtra` |
+| `components/simulators/simulatorsI18n.ts` | Simulator UI packs (fa/en/ar), driven by `useLang` |
+| `src/i18n/index.ts` + JSON locales | **Legacy** — do not use for new pages (`t()` + `econojin_locale` diverges from switcher) |
+| i18next packages | Installed but **not initialized** |
 
-## What is NOT active
+## Wired in this slice
 
-- **`i18next` / `react-i18next`** are listed in `package.json` but **not initialized** in the app.
-  - Do not call `useTranslation` until a dedicated migration PR.
-  - Optional later: migrate `CONTENT` → JSON namespaces under i18next; until then treat packages as unused deps.
+- `LoginPage` + `LoginForm` → `useLang` + `tExtra` / `tr`
+- `RegisterPage` → roles, fields, errors, hero in fa/en/ar
+- `FarmsPage` → stopped using `../i18n` `t()`; same switcher as header
+- `SimulatorsPage` → already used `SIM_STR[useLang()]` (no change required)
 
-## Rules (non-negotiable)
+## Rules
 
-1. User-visible copy goes through `CONTENT[lang]` or `tr(CONTENT[lang], lang, key)` / `tExtra(lang, key)`.
-2. Machine translations never overwrite existing keys in `i18n_extras.ts` or `CONTENT`.
-3. Code identifiers and comments stay English.
-4. Product languages: **fa**, **en**, **ar** only for now.
+1. New UI strings: add to `CONTENT` or `I18N_EXTRAS`, never hardcoded mixed language.
+2. Prefer `useLang` from `eco/i18n` over `getStoredLocale` from `src/i18n`.
+3. Machine translate → review → merge missing keys only (`i18n_merge_extras.py`).
 
-## Developer workflow
+## Verify
 
 ```powershell
-# 1) Optional: refresh MT drafts
-pip install deep-translator
-python scripts\i18n_auto_translate.py --apply
-
-# 2) See what is still missing from extras
-python scripts\i18n_merge_extras.py
-python scripts\i18n_merge_extras.py --print-ts
-
-# 3) Manually paste reviewed lines into i18n_extras.ts
+git pull origin main
+cd apps\web
+pnpm dev
 ```
 
-## Done in this phase slice
-
-- Expanded `I18N_EXTRAS` (nav groups, auth fields, simulator UI, empty/loading states) for fa/en/ar.
-- Added `tExtra()` helper.
-- Added `scripts/i18n_merge_extras.py` + this doc.
-
-## Next (Phase A remaining / Phase B)
-
-- Wire Login/Register/Farms pages to `tr` / `tExtra` (remove hardcoded mixed language).
-- Same for Simulators hub labels.
-- Coverage test: every key in `source_en.json` exists in extras or CONTENT for all three langs.
+Open `/login`, `/register`, `/farms`, `/simulators` and switch fa / en / ar — chrome and body should stay in sync.

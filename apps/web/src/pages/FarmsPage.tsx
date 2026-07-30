@@ -12,9 +12,17 @@ import {
 } from "lucide-react";
 import { farmsApi, type FarmDto } from "../lib/farmsApi";
 import { apiFetch, v1 } from "../api/http";
-import { t } from "../i18n";
+import { useLang, CONTENT } from "../components/eco/i18n";
+import { tr, tExtra } from "../components/eco/i18n_extras";
 
 export default function FarmsPage() {
+  const { lang } = useLang();
+  const c = CONTENT[lang] as unknown as Record<string, unknown>;
+  const tx = (key: string) => {
+    const a = tr(c, lang, key);
+    return a !== key ? a : tExtra(lang, key);
+  };
+
   const [farms, setFarms] = useState<FarmDto[]>([]);
   const [total, setTotal] = useState(0);
   const [q, setQ] = useState("");
@@ -37,12 +45,13 @@ export default function FarmsPage() {
       setFarms(res.data || []);
       setTotal(res.meta?.total ?? res.data?.length ?? 0);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("common.error"));
+      setError(e instanceof Error ? e.message : tx("state_error"));
       setFarms([]);
     } finally {
       setLoading(false);
     }
-  }, [q]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, lang]);
 
   useEffect(() => {
     void load();
@@ -56,8 +65,10 @@ export default function FarmsPage() {
             <Wheat className="h-5 w-5 text-emerald-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">{t("common.nav.farms")}</h1>
-            <p className="text-sm text-stone-500">{total} registered · manage boundaries & area</p>
+            <h1 className="font-display text-3xl text-stone-800">{tx("nav_farms")}</h1>
+            <p className="text-sm text-stone-500">
+              {total} {tx("farms_subtitle")}
+            </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -67,21 +78,21 @@ export default function FarmsPage() {
             className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-600 hover:bg-stone-50"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            {t("common.retry")}
+            {tx("state_retry")}
           </button>
           <Link
             to="/farms/wizard"
             className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-800 hover:bg-emerald-100"
           >
             <Map className="h-4 w-4" />
-            Map wizard
+            {tx("farms_map_wizard")}
           </Link>
           <Link
             to="/farms/new"
             className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
           >
             <Plus className="h-4 w-4" />
-            Quick add
+            {tx("farms_quick_add")}
           </Link>
         </div>
       </div>
@@ -91,7 +102,7 @@ export default function FarmsPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={t("common.search")}
+          placeholder={tx("search_placeholder")}
           className="w-full rounded-xl border border-stone-200 bg-white py-2.5 ps-9 pe-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
         />
       </div>
@@ -111,7 +122,7 @@ export default function FarmsPage() {
             onClick={() => void load()}
             className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white"
           >
-            {t("common.retry")}
+            {tx("state_retry")}
           </button>
         </div>
       )}
@@ -119,12 +130,12 @@ export default function FarmsPage() {
       {!loading && !error && farms.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center">
           <MapPin className="h-10 w-10 text-stone-300" />
-          <p className="text-stone-500">{t("common.empty")}</p>
+          <p className="text-stone-500">{tx("state_empty")}</p>
           <Link
             to="/farms/wizard"
             className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
           >
-            Create with map wizard
+            {tx("farms_empty_cta")}
           </Link>
         </div>
       )}
