@@ -1,4 +1,7 @@
-"""Dashboard aggregate — health + science + recent runs (no Docker required)."""
+"""Legacy path — redirects shape to science-focused overview (avoid duplicate /overview).
+
+Canonical dashboard lives in apps.dashboard.router.
+"""
 
 from __future__ import annotations
 
@@ -12,11 +15,12 @@ from apps.shared_core.database.session import get_db_session
 router = APIRouter(prefix="/api/v1/dashboard", tags=["Dashboard"])
 
 
-@router.get("/overview")
-async def dashboard_overview(
+@router.get("/science-overview")
+async def science_dashboard_overview(
     limit_runs: int = Query(8, ge=1, le=30),
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
+    """Science-centric view (runs + soil). Prefer /api/v1/dashboard/overview for FE."""
     science: dict[str, Any] = {"ok": False}
     try:
         from apps.api.routes.science import science_status
@@ -32,35 +36,12 @@ async def dashboard_overview(
         rows = await list_runs(session, limit=limit_runs)
         runs = [run_to_dict(r) for r in rows]
     except Exception as e:
-        runs = []
         science["runs_error"] = str(e)[:120]
-
-    # last RothC / soil metrics if present in run result JSON
-    soil_snapshot: dict[str, Any] = {}
-    for r in runs:
-        model = str(r.get("model") or "")
-        res = r.get("result") or r.get("outputs") or {}
-        if isinstance(res, str):
-            continue
-        if "rothc" in model and not soil_snapshot.get("rothc"):
-            soil_snapshot["rothc"] = {
-                "soc_final": res.get("soc_final"),
-                "delta": res.get("delta"),
-                "run_id": r.get("id"),
-            }
-        if "rusle" in model or "scs" in model:
-            soil_snapshot.setdefault("last_hydro_soil", {"model": model, "id": r.get("id")})
 
     return {
         "ok": True,
-        "environment": "local",
         "science": science,
         "runs": runs,
         "runs_count": len(runs),
-        "soil_snapshot": soil_snapshot,
-        "links": {
-            "science": "/science",
-            "simulators": "/simulators",
-            "rothc": "/simulators/rothc",
-        },
+        "canonical": "/api/v1/dashboard/overview",
     }
