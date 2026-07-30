@@ -1,8 +1,8 @@
-/** Saved simulation runs dashboard. */
+/** Saved simulation runs. */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bookmark, Trash2, FlaskConical, Lightbulb, GitBranch, Inbox } from "lucide-react";
-import { API_BASE, API_V1 } from "../api/http";
+import { API_BASE, API_V1 } from "../lib/simulationApi";
 
 interface SavedRun {
   id: string;
@@ -44,7 +44,10 @@ export default function MySimulationsPage() {
 
   const remove = async (id: string) => {
     try {
-      await fetch(url(`${API_V1}/simulation/runs/${id}`), { method: "DELETE", credentials: "include" });
+      await fetch(url(`${API_V1}/simulation/runs/${id}`), {
+        method: "DELETE",
+        credentials: "include",
+      });
       setRuns((prev) => prev.filter((r) => r.id !== id));
     } catch {
       /* ignore */
@@ -59,7 +62,7 @@ export default function MySimulationsPage() {
         </div>
         <div>
           <h1 className="font-display text-3xl text-stone-800">My simulations</h1>
-          <p className="mt-0.5 text-stone-600">Saved runs, recommendations, and scenarios</p>
+          <p className="mt-0.5 text-stone-600">Saved runs and recommendations</p>
         </div>
       </div>
 
@@ -110,7 +113,6 @@ export default function MySimulationsPage() {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-
               {run.metrics && Object.keys(run.metrics).length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {Object.entries(run.metrics)
@@ -119,26 +121,26 @@ export default function MySimulationsPage() {
                       <span key={k} className="rounded-lg bg-stone-100 px-2.5 py-1 text-xs font-bold text-stone-700">
                         {k}:{" "}
                         <span className="tabular-nums text-green-700">
-                          {typeof v === "number" ? v.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(v)}
+                          {typeof v === "number"
+                            ? v.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                            : String(v)}
                         </span>
                       </span>
                     ))}
                 </div>
               )}
-
               {(run.advisory?.recommendations?.length ?? 0) > 0 && (
                 <div className="mt-3 space-y-1.5">
                   <p className="flex items-center gap-1.5 text-xs font-bold text-stone-500">
                     <Lightbulb className="h-3.5 w-3.5 text-amber-500" /> Recommendations
                   </p>
                   {run.advisory!.recommendations!.slice(0, 3).map((rec, i) => (
-                    <p key={i} className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+                    <p key={i} className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
                       {rec.text}
                     </p>
                   ))}
                 </div>
               )}
-
               {run.note && <p className="mt-3 rounded-lg bg-stone-50 px-3 py-2 text-sm text-stone-600">{run.note}</p>}
             </div>
           ))}

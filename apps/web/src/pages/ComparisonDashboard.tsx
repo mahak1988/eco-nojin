@@ -1,7 +1,7 @@
-/** Side-by-side simulation comparison (English UI strings for Phase 4 i18n later). */
+/** Scenario comparison dashboard. */
 import { useEffect, useState } from "react";
 import { Scale, TrendingUp, Droplets } from "lucide-react";
-import { API_BASE, API_V1 } from "../api/http";
+import { API_BASE, API_V1 } from "../lib/simulationApi";
 
 interface Run {
   id: string;
