@@ -1,13 +1,13 @@
 # فاز بعدی
 
-**الان:** فاز ۱ از برنامه ۱۰فازی (`docs/AUDIT_PROGRESS_10_PHASES.md`) — امنیت/Hardening روی Zero-Install.
+**فاز ۱ (امنیت):** انجام‌شده در مخزن — `docs/PHASE1_SECURITY.md`
 
-**کلیدها:** بعد از فاز ۱۰ — نقشه در `docs/ENV_KEYS_MAP.md`.
+**فاز ۲ بعدی:** دیتابیس local-first — merge Alembic heads، seed پایدار SQLite.
 
 ```powershell
 cd D:\econojin.com
 git pull origin main
 Copy-Item .env.example .env -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force secrets | Out-Null
 .\scripts\run_local.ps1
+curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/health
 ```
