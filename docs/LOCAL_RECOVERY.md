@@ -1,41 +1,50 @@
-# بازیابی local (git pull + venv + celery)
+# Local recovery (Windows)
 
-## ۱. git pull گیر کرده روی `.devcontainer`
+## A) git pull OK but API not running
+
+Port 8000 closed means uvicorn is not started. Start it first.
+
+## B) run_local.ps1 ParseException (MissingEndCurlyBrace)
+
+Pull latest (ASCII-only script):
 
 ```powershell
 cd D:\econojin.com
-.\scripts\recover_git_pull.ps1
-# یا دستی:
-# Move-Item .devcontainer\devcontainer.json .devcontainer\devcontainer.json.localbak -Force
-# git pull origin main
+git pull origin main
 ```
 
-## ۲. `.venv` خراب (`Activate.ps1` پیدا نشد)
+## C) Python 3.14 venv error
+
+```
+Unable to copy ... venvlauncher.exe ... python.exe
+```
+
+Known Windows + Python 3.14 issue. Script falls back to system Python.
+
+Prefer 3.11/3.12:
 
 ```powershell
-cd D:\econojin.com
-Remove-Item -Recurse -Force .venv -ErrorAction SilentlyContinue
-python -m venv .venv
+py -0p
+py -3.12 -m pip install -r requirements.txt
+$env:PYTHONPATH = "D:\econojin.com"
+$env:ENVIRONMENT = "local"
+$env:DATABASE_URL = "sqlite+aiosqlite:///./apps/econojin.db"
+$env:ENABLE_RATE_LIMIT = "true"
+$env:ENABLE_AUDIT_LOG = "true"
+$env:ENABLE_SPIDERGUARD = "false"
+py -3.12 -m uvicorn apps.main:app --reload --reload-dir apps --host 0.0.0.0 --port 8000
+```
+
+Or:
+
+```powershell
 .\scripts\run_local.ps1
+# or
+.\scripts\start_api_simple.ps1
 ```
 
-`run_local.ps1` بدون Activate هم با `Scripts\python.exe` کار می‌کند.
-
-## ۳. `No module named 'celery'`
-
-از commit اخیر، celery **اختیاری** است (stub sync). بعد از pull:
-
-- `science_phase3` و `simulation_jobs` باید load شوند حتی بدون pip install celery
-- در صورت تمایل: `.\.venv\Scripts\python.exe -m pip install "celery[redis]>=5.4.0"`
-
-## ۴. reload بی‌دلیل از `node_modules`
-
-uvicorn فقط `--reload-dir apps` — دیگر فایل‌های pnpm را رصد نمی‌کند.
-
-## ۵. تأیید فاز ۱
+## D) Verify
 
 ```powershell
-curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/health
+curl.exe -H "User-Agent: Mozilla/5.0" http://127.0.0.1:8000/health
 ```
-
-`security.rate_limit` باید `true` باشد و `failed_routers` خالی یا بدون celery error.
