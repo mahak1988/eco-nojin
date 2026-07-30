@@ -1,18 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Leaf, Loader2, AlertCircle, RefreshCw, Sprout, Search } from "lucide-react";
-
-interface Crop {
-  id: number;
-  name: string;
-  name_fa?: string | null;
-  scientific_name?: string | null;
-  category: string;
-  season?: string | null;
-  water_need_mm?: number | null;
-  growth_days?: number | null;
-  description?: string | null;
-}
+import { fetchCrops, type Crop } from "../api/resources";
+import { apiFetch, v1 } from "../api/http";
+import { t } from "../i18n";
 
 export default function CropsPage() {
   const [crops, setCrops] = useState<Crop[]>([]);
@@ -26,24 +17,31 @@ export default function CropsPage() {
     setLoading(true);
     setError(null);
     try {
-      await fetch("/api/v1/crops/seed-demo?force=true", {
-        method: "POST",
-        credentials: "include",
-        headers: { Accept: "application/json" },
-      });
-      const params = new URLSearchParams({ page: "1", size: "200" });
-      if (q.trim()) params.set("search", q.trim());
-      if (category) params.set("category", category);
-      const res = await fetch(`/api/v1/crops?${params}`, {
-        credentials: "include",
-        headers: { Accept: "application/json" },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const j = await res.json();
-      setCrops(j.data || []);
-      setTotal(j.meta?.total ?? j.data?.length ?? 0);
+      let res = await fetchCrops(1, 200);
+      if ((res.meta?.total ?? 0) === 0 && (res.data?.length ?? 0) === 0) {
+        try {
+          await apiFetch(v1("/crops/seed-demo?force=true"), { method: "POST" });
+          res = await fetchCrops(1, 200);
+        } catch {
+          /* seed may fail offline; still show empty */
+        }
+      }
+      let list = res.data || [];
+      if (q.trim()) {
+        const qq = q.trim().toLowerCase();
+        list = list.filter(
+          (c) =>
+            c.name.toLowerCase().includes(qq) ||
+            (c.name_fa || "").toLowerCase().includes(qq),
+        );
+      }
+      if (category) {
+        list = list.filter((c) => c.category === category);
+      }
+      setCrops(list);
+      setTotal(res.meta?.total ?? list.length);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
+      setError(e instanceof Error ? e.message : t("common.error"));
     } finally {
       setLoading(false);
     }
@@ -66,12 +64,18 @@ export default function CropsPage() {
             <Sprout className="h-5 w-5 text-lime-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">Crop catalog</h1>
-            <p className="text-sm text-stone-500">{total}+ entries · water · season · growth</p>
+            <h1 className="font-display text-3xl text-stone-800">{t("common.nav.crops")}</h1>
+            <p className="text-sm text-stone-500">
+              {total} entries · water · season · growth
+            </p>
           </div>
         </div>
-        <button type="button" onClick={() => void load()} className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold">
-          <RefreshCw className="h-3.5 w-3.5" /> Refresh
+        <button
+          type="button"
+          onClick={() => void load()}
+          className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> {t("common.retry")}
         </button>
       </div>
 
@@ -81,7 +85,7 @@ export default function CropsPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search name…"
+            placeholder={t("common.search")}
             className="w-full rounded-xl border border-stone-200 py-2.5 ps-9 pe-3 text-sm"
           />
         </div>
@@ -110,7 +114,10 @@ export default function CropsPage() {
           <p className="mt-2">{error}</p>
         </div>
       )}
-      {!loading && !error && (
+      {!loading && !error && crops.length === 0 && (
+        <p className="py-12 text-center text-stone-500">{t("common.empty")}</p>
+      )}
+      {!loading && !error && crops.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {crops.map((c) => (
             <Link
@@ -125,7 +132,6 @@ export default function CropsPage() {
                 {c.name}
                 {c.name_fa ? <span className="ms-1 text-xs text-stone-400">{c.name_fa}</span> : null}
               </h3>
-              <p className="text-[11px] italic text-stone-400">{c.scientific_name}</p>
               <p className="mt-1 text-xs font-bold uppercase tracking-wide text-lime-700">{c.category}</p>
               <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-bold text-stone-500">
                 {c.season && <span className="rounded-full bg-stone-100 px-2 py-0.5">{c.season}</span>}
@@ -136,7 +142,6 @@ export default function CropsPage() {
                   <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-800">{c.growth_days}d</span>
                 )}
               </div>
-              {c.description && <p className="mt-2 line-clamp-2 text-xs text-stone-500">{c.description}</p>}
             </Link>
           ))}
         </div>
