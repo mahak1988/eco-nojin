@@ -53,6 +53,16 @@ class Settings(BaseSettings):
 
     REQUIRE_AUTH_FOR_WRITES: bool = Field(default=False)
 
+    # Phase 1 security toggles (local-friendly defaults)
+    ENABLE_RATE_LIMIT: bool = Field(default=True)
+    ENABLE_AUDIT_LOG: bool = Field(default=True)
+    # SpiderGuard blocks aggressive bots; off by default in local (curl/dev tools)
+    ENABLE_SPIDERGUARD: bool = Field(default=False)
+    SPIDERGUARD_MAX_REQUESTS: int = Field(default=120)
+    SPIDERGUARD_WINDOW_SECONDS: int = Field(default=60)
+    AUTH_RATE_LIMIT_MAX: int = Field(default=10)
+    AUTH_RATE_LIMIT_WINDOW_SECONDS: int = Field(default=60)
+
     REDIS_URL: str = Field(default="redis://localhost:6379/0")
     CELERY_BROKER_URL: Optional[str] = Field(default=None)
 
@@ -77,6 +87,8 @@ class Settings(BaseSettings):
 
     OPEN_METEO_URL: str = Field(default="https://api.open-meteo.com/v1")
     FAO_API_KEY: Optional[str] = Field(default=None)
+    OPENWEATHER_API_KEY: Optional[str] = Field(default=None)
+    SENTRY_DSN: Optional[str] = Field(default=None)
 
     @property
     def jwt_secret(self) -> str:
@@ -91,6 +103,8 @@ class Settings(BaseSettings):
                 logger.warning("Production still on HS* — prefer RS256 with mounted keys")
             if self.REQUIRE_AUTH_FOR_WRITES is False:
                 logger.warning("REQUIRE_AUTH_FOR_WRITES is False in production")
+            if not self.ENABLE_RATE_LIMIT:
+                logger.warning("ENABLE_RATE_LIMIT is False in production")
         return self
 
 
