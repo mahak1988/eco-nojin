@@ -1,8 +1,6 @@
 #Requires -Version 5.1
-<#
-.SYNOPSIS
-  Run Econojin API locally WITHOUT Docker (SQLite).
-#>
+# Run Econojin API locally WITHOUT Docker (SQLite).
+# ASCII-only script for Windows PowerShell 5.1 compatibility.
 $ErrorActionPreference = "Stop"
 
 function Find-RepoRoot {
@@ -20,16 +18,26 @@ function Find-RepoRoot {
 }
 
 function Find-Python {
-  foreach ($c in @("python", "py", "python3")) {
+  # Prefer 3.11/3.12 over bleeding-edge 3.14 when available
+  $candidates = @(
+    @{ Cmd = "py"; Args = @("-3.12", "-c", "import sys; print(sys.executable)") },
+    @{ Cmd = "py"; Args = @("-3.11", "-c", "import sys; print(sys.executable)") },
+    @{ Cmd = "py"; Args = @("-3.13", "-c", "import sys; print(sys.executable)") },
+    @{ Cmd = "python"; Args = @("-c", "import sys; print(sys.executable)") },
+    @{ Cmd = "py"; Args = @("-3", "-c", "import sys; print(sys.executable)") }
+  )
+  foreach ($item in $candidates) {
     try {
-      $p = Get-Command $c -ErrorAction SilentlyContinue
-      if ($p) {
-        $ver = & $c -c "import sys; print(sys.executable)" 2>$null
-        if ($ver) { return $ver.Trim() }
+      $cmd = Get-Command $item.Cmd -ErrorAction SilentlyContinue
+      if (-not $cmd) { continue }
+      $out = & $item.Cmd @($item.Args) 2>$null
+      if ($out) {
+        $path = ($out | Select-Object -First 1).ToString().Trim()
+        if ($path -and (Test-Path $path)) { return $path }
       }
     } catch {}
   }
-  throw "Python 3.11+ not found on PATH."
+  throw "Python not found. Install Python 3.11 or 3.12 from python.org"
 }
 
 $Root = Find-RepoRoot
@@ -37,40 +45,49 @@ Set-Location $Root
 Write-Host "==> Repo root: $Root"
 
 if ($env:VIRTUAL_ENV) {
-  Write-Host "==> Clearing VIRTUAL_ENV=$($env:VIRTUAL_ENV)"
-  Remove-Item Env:\VIRTUAL_ENV -ErrorAction SilentlyContinue
+  Write-Host "==> Clearing VIRTUAL_ENV"
+  Remove-Item Env:VIRTUAL_ENV -ErrorAction SilentlyContinue
 }
 
 $py = Find-Python
-Write-Host "==> Python: $py"
+Write-Host "==> System Python: $py"
 
 $venvPath = Join-Path $Root ".venv"
 $venvPy = Join-Path $venvPath "Scripts\python.exe"
-$activate = Join-Path $venvPath "Scripts\Activate.ps1"
+$useVenv = $false
 
-# Recreate venv if broken (no python.exe OR no Activate.ps1)
-if (-not (Test-Path $venvPy)) {
-  Write-Host "==> Creating/repairing .venv at $venvPath"
-  if (Test-Path $venvPath) {
-    Remove-Item -Recurse -Force $venvPath
-  }
-  & $py -m venv $venvPath
-  if (-not (Test-Path $venvPy)) {
-    throw "Failed to create venv at $venvPath"
-  }
-}
-
-if (Test-Path $activate) {
-  Write-Host "==> Activating .venv"
-  try { & $activate } catch { Write-Host "    Activate.ps1 skip (using venv python directly)" }
+if (Test-Path $venvPy) {
+  $useVenv = $true
+  Write-Host "==> Using existing venv: $venvPy"
 } else {
-  Write-Host "==> No Activate.ps1 — using $venvPy directly"
+  Write-Host "==> Trying to create .venv ..."
+  if (Test-Path $venvPath) {
+    Remove-Item -Recurse -Force $venvPath -ErrorAction SilentlyContinue
+  }
+  try {
+    & $py -m venv $venvPath
+    if (Test-Path $venvPy) {
+      $useVenv = $true
+      Write-Host "==> venv OK"
+    } else {
+      Write-Host "==> venv incomplete (common on Python 3.14 Windows). Using system Python."
+    }
+  } catch {
+    Write-Host "==> venv failed: $_. Using system Python."
+  }
 }
 
-Write-Host "==> Installing dependencies"
-& $venvPy -m pip install -U pip setuptools wheel
+if ($useVenv) {
+  $runPy = $venvPy
+} else {
+  $runPy = $py
+}
+
+Write-Host "==> Runtime Python: $runPy"
+Write-Host "==> Installing dependencies (may take a few minutes)"
+& $runPy -m pip install -U pip setuptools wheel
 if (Test-Path (Join-Path $Root "requirements.txt")) {
-  & $venvPy -m pip install -r (Join-Path $Root "requirements.txt")
+  & $runPy -m pip install -r (Join-Path $Root "requirements.txt")
 }
 
 $env:ENVIRONMENT = "local"
@@ -86,12 +103,11 @@ $env:PYTHONPATH = $Root
 Write-Host "==> DATABASE_URL=$($env:DATABASE_URL)"
 Write-Host "==> alembic upgrade head (best-effort)"
 try {
-  & $venvPy -m alembic upgrade head 2>&1 | Out-Host
+  & $runPy -m alembic upgrade head
 } catch {
-  Write-Host "    alembic warning: $_ (continuing)"
+  Write-Host "    alembic warning (continuing with create_all on startup)"
 }
 
-Write-Host "==> API http://0.0.0.0:8000  (Ctrl+C to stop)"
+Write-Host "==> API http://127.0.0.1:8000  (Ctrl+C to stop)"
 Write-Host "    FE: cd apps\web; pnpm install; pnpm dev"
-# Reload only apps/ — avoid node_modules noise under eco-nojin/
-& $venvPy -m uvicorn apps.main:app --reload --reload-dir apps --host 0.0.0.0 --port 8000
+& $runPy -m uvicorn apps.main:app --reload --reload-dir apps --host 0.0.0.0 --port 8000
