@@ -1,7 +1,8 @@
 /**
- * i18n extras — CONTENT first, then extras (A+B+B2+B3).
+ * i18n extras — CONTENT first, then A+B+B2+B3 packs.
  */
 import type { Lang } from "./i18n";
+import { PHASE_A_EXTRAS } from "./i18n_phase_a";
 import { PHASE_B_EXTRAS } from "./i18n_phase_b";
 import { PHASE_B2_EXTRAS } from "./i18n_phase_b2";
 import { PHASE_B3_EXTRAS } from "./i18n_phase_b3";
@@ -66,6 +67,7 @@ const BASE: Record<Lang, Record<string, string>> = {
 function mergeLang(lang: Lang): Record<string, string> {
   return {
     ...BASE[lang],
+    ...PHASE_A_EXTRAS[lang],
     ...PHASE_B_EXTRAS[lang],
     ...PHASE_B2_EXTRAS[lang],
     ...PHASE_B3_EXTRAS[lang],
