@@ -1,4 +1,4 @@
-/** Main navigation — all labels from CONTENT via useLang (fa / en / ar). */
+/** Main navigation — labels from CONTENT + i18n_extras (fa / en / ar). */
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -29,6 +29,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useLang, CONTENT } from "../eco/i18n";
+import { tr } from "../eco/i18n_extras";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -91,13 +92,10 @@ const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
   },
 ];
 
-function label(t: Record<string, string>, key: string): string {
-  return t[key] || key;
-}
-
 export function Header() {
   const { lang } = useLang();
-  const t = (CONTENT[lang] ?? CONTENT.fa) as unknown as Record<string, string>;
+  const pack = (CONTENT[lang] ?? CONTENT.fa) as unknown as Record<string, unknown>;
+  const t = (key: string) => tr(pack, lang, key);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
@@ -128,7 +126,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              aria-label={label(t, "back_home")}
+              aria-label={t("back_home")}
               className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100"
             >
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
@@ -139,7 +137,7 @@ export function Header() {
               <Leaf className="h-5 w-5" />
             </div>
             <span className="font-display hidden text-xl font-bold text-slate-800 sm:block">
-              {t.appName}
+              {t("appName")}
             </span>
           </Link>
         </div>
@@ -148,7 +146,7 @@ export function Header() {
           {MAIN_NAV.map((item) => (
             <Link key={item.key} to={item.to} className={navLinkCls(item.to)}>
               <item.icon className="h-4 w-4" />
-              <span>{label(t, item.key)}</span>
+              <span>{t(item.key)}</span>
             </Link>
           ))}
 
@@ -157,14 +155,14 @@ export function Header() {
               type="button"
               className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700"
             >
-              {label(t, "menu")}
+              {t("menu")}
               <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
             </button>
             <div className="invisible absolute end-0 top-full z-50 mt-2 grid w-[520px] grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-slate-200 bg-white p-5 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
               {MORE_GROUPS.map((group) => (
                 <div key={group.labelKey}>
                   <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                    {label(t, group.labelKey)}
+                    {t(group.labelKey)}
                   </p>
                   <div className="space-y-0.5">
                     {group.items.map((item) => (
@@ -178,7 +176,7 @@ export function Header() {
                         }`}
                       >
                         <item.icon className="h-4 w-4 opacity-70" />
-                        {label(t, item.key)}
+                        {t(item.key)}
                       </Link>
                     ))}
                   </div>
@@ -197,7 +195,7 @@ export function Header() {
                 className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
                 <UserRound className="h-3.5 w-3.5" />
-                <span className="max-w-[120px] truncate">{user?.email || t.profile}</span>
+                <span className="max-w-[120px] truncate">{user?.email || t("profile")}</span>
               </Link>
               <button
                 type="button"
@@ -205,7 +203,7 @@ export function Header() {
                 className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                {t.logout}
+                {t("logout")}
               </button>
             </div>
           ) : (
@@ -215,13 +213,13 @@ export function Header() {
                 className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
                 <LogIn className="h-3.5 w-3.5" />
-                {label(t, "auth_signin")}
+                {t("auth_signin")}
               </Link>
               <Link
                 to="/register"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700"
               >
-                {label(t, "auth_register")}
+                {t("auth_register")}
               </Link>
             </div>
           )}
@@ -229,7 +227,7 @@ export function Header() {
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
             className="grid h-9 w-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden"
-            aria-label={label(t, "menu")}
+            aria-label={t("menu")}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -251,7 +249,7 @@ export function Header() {
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
-                  {label(t, item.key)}
+                  {t(item.key)}
                 </Link>
               ))}
             </div>
@@ -259,26 +257,26 @@ export function Header() {
               {isAuthenticated ? (
                 <>
                   <Link to="/account" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
-                    {t.profile}
+                    {t("profile")}
                   </Link>
                   <button
                     type="button"
                     onClick={() => void onLogout()}
                     className="flex-1 rounded-xl bg-slate-900 py-2 text-sm font-bold text-white"
                   >
-                    {t.logout}
+                    {t("logout")}
                   </button>
                 </>
               ) : (
                 <>
                   <Link to="/login" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
-                    {label(t, "auth_signin")}
+                    {t("auth_signin")}
                   </Link>
                   <Link
                     to="/register"
                     className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white"
                   >
-                    {label(t, "auth_register")}
+                    {t("auth_register")}
                   </Link>
                 </>
               )}
