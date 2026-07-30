@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { CloudSun, Loader2 } from "lucide-react";
+import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 
 export default function WeatherPage() {
+  const { lang } = useLang();
+  const tx = (k: string) => tExtra(lang, k);
   const [data, setData] = useState<{
     provider: string;
     daily?: Array<Record<string, unknown>>;
@@ -33,8 +37,10 @@ export default function WeatherPage() {
           <CloudSun className="h-5 w-5 text-sky-700" />
         </div>
         <div>
-          <h1 className="font-display text-3xl text-stone-800">Weather</h1>
-          <p className="text-sm text-stone-500">Provider: {data.provider} · 7-day · ET0 included</p>
+          <h1 className="font-display text-3xl text-stone-800">{tx("weather_title")}</h1>
+          <p className="text-sm text-stone-500">
+            {tx("weather_sub")}: {data.provider} · {tx("weather_days")}
+          </p>
         </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
