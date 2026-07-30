@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.farms.schemas import FarmCreate, FarmListResponse, FarmResponse, FarmUpdate
 from apps.farms.service import FarmService
+from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db_session
 from apps.shared_core.rbac import require_permission
 from apps.shared_core.schemas.pagination import ListMeta
@@ -26,6 +27,50 @@ async def list_farms(
     service = FarmService(session)
     items, meta = await service.list_farms(page=page, size=size, search=search)
     return FarmListResponse(data=items, meta=ListMeta(**meta))
+
+
+@router.post("/seed-demo", status_code=status.HTTP_200_OK)
+async def seed_farms(
+    session: AsyncSession = Depends(get_db_session),
+):
+    """Insert a few demo farms (local/dev only)."""
+    if settings.ENVIRONMENT == "production":
+        raise HTTPException(status_code=403, detail="Seed disabled in production")
+    service = FarmService(session)
+    existing, total = await service.list_farms(page=1, size=1)
+    if total > 0:
+        return {"seeded": 0, "message": "already has farms", "total": total}
+    demos = [
+        FarmCreate(
+            name="Isfahan Demo Farm",
+            description="Pilot plot near Zayandeh-Rud",
+            region="Isfahan",
+            area_ha=12.5,
+            latitude=32.65,
+            longitude=51.67,
+        ),
+        FarmCreate(
+            name="Khuzestan Water Pilot",
+            description="Irrigation efficiency demo",
+            region="Khuzestan",
+            area_ha=40.0,
+            latitude=31.32,
+            longitude=48.67,
+        ),
+        FarmCreate(
+            name="Fars Dryland Trial",
+            description="Drought-resilient cereals",
+            region="Fars",
+            area_ha=8.0,
+            latitude=29.59,
+            longitude=52.58,
+        ),
+    ]
+    n = 0
+    for d in demos:
+        await service.create_farm(d)
+        n += 1
+    return {"seeded": n, "message": "ok"}
 
 
 @router.post("", response_model=FarmResponse, status_code=status.HTTP_201_CREATED)
