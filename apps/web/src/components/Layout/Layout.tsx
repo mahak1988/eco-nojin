@@ -1,24 +1,23 @@
-// apps/web/src/components/Layout/Layout.tsx
+/** App shell: Header + main + Footer. Direction follows active language. */
 import { Outlet } from "react-router-dom";
-import Header from "../Header";
-import Footer from "../Footer";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
+import { useLang, getLanguageDir } from "../eco/i18n";
 
 export default function Layout() {
+  const { lang } = useLang();
+  const dir = getLanguageDir(lang);
+
   return (
-    <div className="flex min-h-screen flex-col bg-stone-50 text-stone-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300" dir="rtl">
-      
-      {/* هدر شیشه‌ای ثابت در بالا */}
+    <div
+      className="flex min-h-screen flex-col bg-stone-50 text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100"
+      dir={dir}
+    >
       <Header />
-      
-      {/* محتوای اصلی با فاصله از بالا (pt-24 برای جلوگیری از هم‌پوشانی با هدر ثابت) */}
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 pt-24 pb-12 md:px-8">
-        {/* Outlet محل رندر شدن صفحات مختلف (مثل HomePage, DashboardPage و ...) است */}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-20 md:px-8">
         <Outlet />
       </main>
-
-      {/* فوتر در پایین صفحه */}
       <Footer />
-      
     </div>
   );
 }
