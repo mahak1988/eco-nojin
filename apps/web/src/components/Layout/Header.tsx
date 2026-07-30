@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+/** Main navigation — all labels from CONTENT via useLang (fa / en / ar). */
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -25,21 +26,24 @@ import {
   LogOut,
   UserRound,
   Wheat,
+  type LucideIcon,
 } from "lucide-react";
 import { useLang, CONTENT } from "../eco/i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../../hooks/useAuth";
 
-const MAIN_NAV = [
+type NavItem = { key: string; to: string; icon: LucideIcon };
+
+const MAIN_NAV: NavItem[] = [
   { key: "nav_dashboard", to: "/dashboard", icon: LayoutDashboard },
-  { key: "nav_farms", to: "/farms", icon: Wheat, label: "Farms" },
+  { key: "nav_farms", to: "/farms", icon: Wheat },
   { key: "nav_education", to: "/education", icon: BookOpen },
   { key: "nav_satellite", to: "/satellite", icon: Satellite },
   { key: "nav_simulators", to: "/simulators", icon: FlaskConical },
   { key: "nav_mrv", to: "/mrv", icon: ShieldCheck },
 ];
 
-const MORE_GROUPS_KEYS = [
+const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
   {
     labelKey: "nav_group_monitoring",
     items: [
@@ -56,13 +60,13 @@ const MORE_GROUPS_KEYS = [
       { key: "nav_invoices", to: "/invoices", icon: FileText },
       { key: "nav_journal", to: "/journal", icon: FileText },
       { key: "nav_payments", to: "/payments", icon: Coins },
+      { key: "nav_ecocoin", to: "/ecocoin", icon: Coins },
     ],
   },
   {
     labelKey: "nav_group_community",
     items: [
       { key: "nav_community", to: "/community", icon: Users },
-      { key: "nav_ecocoin", to: "/ecocoin", icon: Coins },
       { key: "nav_games", to: "/games", icon: Gamepad2 },
       { key: "nav_news", to: "/news", icon: FileText },
       { key: "nav_library", to: "/library", icon: BookOpen },
@@ -87,16 +91,17 @@ const MORE_GROUPS_KEYS = [
   },
 ];
 
+function label(t: Record<string, string>, key: string): string {
+  return t[key] || key;
+}
+
 export function Header() {
   const { lang } = useLang();
-  const t = CONTENT[lang] ?? CONTENT.fa;
+  const t = (CONTENT[lang] ?? CONTENT.fa) as unknown as Record<string, string>;
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
-
   const [mobileOpen, setMobileOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
-
   const canGoBack = location.pathname !== "/";
 
   useEffect(() => {
@@ -105,9 +110,9 @@ export function Header() {
 
   const navLinkCls = (to: string) =>
     `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-      location.pathname === to || location.pathname.startsWith(to + "/")
-        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-        : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/50"
+      location.pathname === to || location.pathname.startsWith(`${to}/`)
+        ? "bg-emerald-50 text-emerald-700"
+        : "text-slate-600 hover:bg-slate-100"
     }`;
 
   const onLogout = async () => {
@@ -115,29 +120,26 @@ export function Header() {
     navigate("/");
   };
 
-  const labelOf = (item: { key: string; label?: string }) =>
-    item.label || (t as Record<string, string>)[item.key] || item.key;
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
         <div className="flex items-center gap-2">
           {canGoBack && (
             <button
               type="button"
               onClick={() => navigate(-1)}
-              aria-label="back"
-              className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100"
+              aria-label={label(t, "back_home")}
+              className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100"
             >
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             </button>
           )}
           <Link to="/" className="group flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 transition-transform group-hover:scale-105">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
               <Leaf className="h-5 w-5" />
             </div>
-            <span className="font-display hidden text-xl font-bold text-slate-800 dark:text-white sm:block">
-              {t.appName || "EcoNojin"}
+            <span className="font-display hidden text-xl font-bold text-slate-800 sm:block">
+              {t.appName}
             </span>
           </Link>
         </div>
@@ -146,23 +148,23 @@ export function Header() {
           {MAIN_NAV.map((item) => (
             <Link key={item.key} to={item.to} className={navLinkCls(item.to)}>
               <item.icon className="h-4 w-4" />
-              <span>{labelOf(item)}</span>
+              <span>{label(t, item.key)}</span>
             </Link>
           ))}
 
-          <div className="group relative" ref={moreRef}>
+          <div className="group relative">
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-700"
+              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700"
             >
-              {(t as Record<string, string>).menu || "More"}
-              <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+              {label(t, "menu")}
+              <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
             </button>
-            <div className="invisible absolute end-0 top-full z-50 mt-2 grid w-[520px] grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-slate-200 bg-white p-5 opacity-0 shadow-xl transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
-              {MORE_GROUPS_KEYS.map((group) => (
+            <div className="invisible absolute end-0 top-full z-50 mt-2 grid w-[520px] grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-slate-200 bg-white p-5 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+              {MORE_GROUPS.map((group) => (
                 <div key={group.labelKey}>
                   <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                    {(t as Record<string, string>)[group.labelKey] || group.labelKey}
+                    {label(t, group.labelKey)}
                   </p>
                   <div className="space-y-0.5">
                     {group.items.map((item) => (
@@ -176,7 +178,7 @@ export function Header() {
                         }`}
                       >
                         <item.icon className="h-4 w-4 opacity-70" />
-                        {(t as Record<string, string>)[item.key] || item.key}
+                        {label(t, item.key)}
                       </Link>
                     ))}
                   </div>
@@ -213,13 +215,13 @@ export function Header() {
                 className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
               >
                 <LogIn className="h-3.5 w-3.5" />
-                Sign in
+                {label(t, "auth_signin")}
               </Link>
               <Link
                 to="/register"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700"
               >
-                Register
+                {label(t, "auth_register")}
               </Link>
             </div>
           )}
@@ -227,6 +229,7 @@ export function Header() {
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
             className="grid h-9 w-9 place-items-center rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden"
+            aria-label={label(t, "menu")}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -248,7 +251,7 @@ export function Header() {
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
-                  {labelOf(item)}
+                  {label(t, item.key)}
                 </Link>
               ))}
             </div>
@@ -269,13 +272,13 @@ export function Header() {
               ) : (
                 <>
                   <Link to="/login" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
-                    Sign in
+                    {label(t, "auth_signin")}
                   </Link>
                   <Link
                     to="/register"
                     className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white"
                   >
-                    Register
+                    {label(t, "auth_register")}
                   </Link>
                 </>
               )}
@@ -286,3 +289,5 @@ export function Header() {
     </header>
   );
 }
+
+export default Header;
