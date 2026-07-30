@@ -1,24 +1,73 @@
-/** Extra UI strings merged at runtime so Header/Footer never show raw keys. */
+/**
+ * Phase A i18n extras — keys not yet in CONTENT (or shared UI).
+ * Resolution order in tr(): CONTENT[lang][key] → I18N_EXTRAS[lang][key] → I18N_EXTRAS.en[key] → key
+ *
+ * Policy: human-curated strings only in this file for product UI.
+ * Machine output from locale/generated_*.json is merged ONLY for missing keys
+ * via scripts/i18n_merge_extras.py (never overwrites existing entries).
+ */
 import type { Lang } from "./i18n";
 
-export const I18N_EXTRAS: Record<
-  Lang,
-  Record<string, string>
-> = {
+export const I18N_EXTRAS: Record<Lang, Record<string, string>> = {
   fa: {
+    // Nav / groups
     nav_farms: "مزارع",
     nav_group_monitoring: "پایش و تحلیل",
     nav_group_finance: "مالی و اکوکوین",
     nav_group_community: "آموزش و جامعه",
     nav_group_regional: "پروژه‌ها و منطقه",
     nav_group_system: "سیستم",
-    footer_rights: "تمامی حقوق محفوظ است.",
+    // Auth
     auth_signin: "ورود",
     auth_register: "ثبت‌نام",
+    auth_email: "ایمیل",
+    auth_password: "رمز عبور",
+    auth_full_name: "نام کامل",
+    auth_role: "نقش",
+    auth_accept_terms: "قوانین و حریم خصوصی را می‌پذیرم",
+    // Footer
+    footer_rights: "تمامی حقوق محفوظ است.",
+    // Panels
     panel_ndvi_title: "شاخص NDVI",
     panel_ndvi_sub: "Sentinel-2 · تهران",
     panel_weather_title: "هواشناسی",
     panel_weather_sub: "نیمه‌ابری · تهران",
+    // Simulators UI
+    sim_title: "شبیه‌سازها",
+    sim_subtitle: "مدل‌های اقلیم، آب، کشاورزی و انرژی",
+    sim_search: "جست‌وجوی شبیه‌ساز…",
+    sim_run: "اجرا",
+    sim_stop: "توقف",
+    sim_reset: "بازنشانی",
+    sim_params: "پارامترها",
+    sim_export: "خروجی CSV",
+    sim_backend_online: "شبیه‌سازها (سرور)",
+    sim_backend_offline: "حالت محلی",
+    sim_backend_loading: "در حال اتصال…",
+    sim_filter_all: "همه",
+    sim_filter_idle: "آماده",
+    sim_filter_running: "در حال اجرا",
+    sim_filter_done: "تمام‌شده",
+    sim_climate_name: "مدل اقلیم",
+    sim_climate_desc:
+      "دما، بارش، حد نهایی و NDVI بر اساس CO₂ و حساسیت اقلیمی.",
+    sim_aquacrop_name: "AquaCrop",
+    sim_aquacrop_desc: "مدل بهره‌وری آب-محصول FAO (تقریب فرآیندی).",
+    sim_rothc_name: "RothC",
+    sim_rothc_desc: "چرخش کربن آلی خاک (سبک RothC-26.3).",
+    sim_swat_name: "SWAT+",
+    sim_swat_desc: "هیدرولوژی حوضه و رسوب (پروکسی؛ نه باینری رسمی SWAT).",
+    sim_dssat_name: "DSSAT",
+    sim_dssat_desc: "پشتیبانی تصمیم رشد محصول (ساده‌شده).",
+    sim_apsim_name: "APSIM",
+    sim_apsim_desc: "شبیه‌سازی سامانه‌های تولید کشاورزی (ساده‌شده).",
+    sim_wofost_name: "WOFOST",
+    sim_wofost_desc: "مدل محصول World Food Studies (ساده‌شده).",
+    // Common states
+    state_loading: "در حال بارگذاری…",
+    state_empty: "موردی یافت نشد",
+    state_error: "خطا در دریافت داده",
+    state_retry: "تلاش مجدد",
   },
   en: {
     nav_farms: "Farms",
@@ -27,13 +76,52 @@ export const I18N_EXTRAS: Record<
     nav_group_community: "Education & community",
     nav_group_regional: "Projects & regions",
     nav_group_system: "System",
-    footer_rights: "All rights reserved.",
     auth_signin: "Sign in",
     auth_register: "Register",
+    auth_email: "Email",
+    auth_password: "Password",
+    auth_full_name: "Full name",
+    auth_role: "Role",
+    auth_accept_terms: "I accept the terms and privacy policy",
+    footer_rights: "All rights reserved.",
     panel_ndvi_title: "NDVI",
     panel_ndvi_sub: "Sentinel-2 · Tehran",
     panel_weather_title: "Weather",
     panel_weather_sub: "Partly cloudy · Tehran",
+    sim_title: "Simulators",
+    sim_subtitle: "Climate, water, agriculture and energy models",
+    sim_search: "Search simulators…",
+    sim_run: "Run",
+    sim_stop: "Stop",
+    sim_reset: "Reset",
+    sim_params: "Parameters",
+    sim_export: "Export CSV",
+    sim_backend_online: "simulators (server)",
+    sim_backend_offline: "Local mode",
+    sim_backend_loading: "Connecting…",
+    sim_filter_all: "All",
+    sim_filter_idle: "Ready",
+    sim_filter_running: "Running",
+    sim_filter_done: "Completed",
+    sim_climate_name: "Climate Model",
+    sim_climate_desc:
+      "Temperature, precipitation, extremes and NDVI from CO2 and climate sensitivity.",
+    sim_aquacrop_name: "AquaCrop",
+    sim_aquacrop_desc: "FAO crop-water productivity model (process approximation).",
+    sim_rothc_name: "RothC",
+    sim_rothc_desc: "Soil organic carbon turnover (RothC-26.3 style).",
+    sim_swat_name: "SWAT+",
+    sim_swat_desc: "Basin hydrology and sediment proxy (not official SWAT binary).",
+    sim_dssat_name: "DSSAT",
+    sim_dssat_desc: "Crop growth decision support (simplified).",
+    sim_apsim_name: "APSIM",
+    sim_apsim_desc: "Agricultural production systems simulation (simplified).",
+    sim_wofost_name: "WOFOST",
+    sim_wofost_desc: "World Food Studies crop model (simplified).",
+    state_loading: "Loading…",
+    state_empty: "Nothing found",
+    state_error: "Failed to load data",
+    state_retry: "Retry",
   },
   ar: {
     nav_farms: "المزارع",
@@ -42,24 +130,68 @@ export const I18N_EXTRAS: Record<
     nav_group_community: "التعليم والمجتمع",
     nav_group_regional: "المشاريع والمناطق",
     nav_group_system: "النظام",
-    footer_rights: "جميع الحقوق محفوظة.",
     auth_signin: "تسجيل الدخول",
     auth_register: "إنشاء حساب",
+    auth_email: "البريد الإلكتروني",
+    auth_password: "كلمة المرور",
+    auth_full_name: "الاسم الكامل",
+    auth_role: "الدور",
+    auth_accept_terms: "أوافق على الشروط وسياسة الخصوصية",
+    footer_rights: "جميع الحقوق محفوظة.",
     panel_ndvi_title: "مؤشر NDVI",
     panel_ndvi_sub: "Sentinel-2 · طهران",
     panel_weather_title: "الطقس",
     panel_weather_sub: "غائم جزئياً · طهران",
+    sim_title: "المحاكيات",
+    sim_subtitle: "نماذج المناخ والمياه والزراعة والطاقة",
+    sim_search: "البحث في المحاكيات…",
+    sim_run: "تشغيل",
+    sim_stop: "إيقاف",
+    sim_reset: "إعادة ضبط",
+    sim_params: "المعاملات",
+    sim_export: "تصدير CSV",
+    sim_backend_online: "المحاكيات (الخادم)",
+    sim_backend_offline: "الوضع المحلي",
+    sim_backend_loading: "جارٍ الاتصال…",
+    sim_filter_all: "الكل",
+    sim_filter_idle: "جاهز",
+    sim_filter_running: "قيد التشغيل",
+    sim_filter_done: "مكتمل",
+    sim_climate_name: "نموذج المناخ",
+    sim_climate_desc:
+      "درجة الحرارة والهطول والظواهر المتطرفة وNDVI من ثاني أكسيد الكربون وحساسية المناخ.",
+    sim_aquacrop_name: "AquaCrop",
+    sim_aquacrop_desc: "نموذج إنتاجية المحصول والماء لمنظمة الفاو (تقريب عملي).",
+    sim_rothc_name: "RothC",
+    sim_rothc_desc: "دورة كربون التربة العضوي (أسلوب RothC-26.3).",
+    sim_swat_name: "SWAT+",
+    sim_swat_desc: "هيدرولوجيا الحوض والرواسب (تقريبي؛ ليس ثنائي SWAT الرسمي).",
+    sim_dssat_name: "DSSAT",
+    sim_dssat_desc: "دعم قرار نمو المحاصيل (مبسط).",
+    sim_apsim_name: "APSIM",
+    sim_apsim_desc: "محاكاة نظم الإنتاج الزراعي (مبسط).",
+    sim_wofost_name: "WOFOST",
+    sim_wofost_desc: "نموذج محاصيل دراسات الغذاء العالمية (مبسط).",
+    state_loading: "جارٍ التحميل…",
+    state_empty: "لا توجد عناصر",
+    state_error: "فشل تحميل البيانات",
+    state_retry: "إعادة المحاولة",
   },
 };
 
-/** Resolve string: CONTENT first, then extras, then key. */
+/** Resolve string: CONTENT first, then extras, then English extras, then raw key. */
 export function tr(
   content: Record<string, unknown>,
   lang: Lang,
   key: string,
 ): string {
   const fromContent = content[key];
-  if (typeof fromContent === "string") return fromContent;
+  if (typeof fromContent === "string" && fromContent.length > 0) return fromContent;
   const fromExtra = I18N_EXTRAS[lang]?.[key] ?? I18N_EXTRAS.en[key];
   return fromExtra ?? key;
+}
+
+/** Shortcut when caller already has lang and only needs extras (no CONTENT row). */
+export function tExtra(lang: Lang, key: string): string {
+  return I18N_EXTRAS[lang]?.[key] ?? I18N_EXTRAS.en[key] ?? key;
 }
