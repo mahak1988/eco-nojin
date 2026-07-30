@@ -37,7 +37,8 @@ async def seed_farms(
     if settings.ENVIRONMENT == "production":
         raise HTTPException(status_code=403, detail="Seed disabled in production")
     service = FarmService(session)
-    existing, total = await service.list_farms(page=1, size=1)
+    _items, meta = await service.list_farms(page=1, size=1)
+    total = int(meta.get("total", 0) if isinstance(meta, dict) else 0)
     if total > 0:
         return {"seeded": 0, "message": "already has farms", "total": total}
     demos = [
