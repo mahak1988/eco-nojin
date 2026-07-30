@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Activity, Loader2, Radio } from "lucide-react";
+import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 
 export default function MonitoringHubPage() {
+  const { lang } = useLang();
+  const tx = (k: string) => tExtra(lang, k);
   const [overview, setOverview] = useState<Record<string, unknown> | null>(null);
   const [sensors, setSensors] = useState<Array<Record<string, unknown>>>([]);
   const [alerts, setAlerts] = useState<Array<Record<string, unknown>>>([]);
@@ -35,16 +39,16 @@ export default function MonitoringHubPage() {
           <Activity className="h-5 w-5 text-cyan-700" />
         </div>
         <div>
-          <h1 className="font-display text-3xl text-stone-800">Monitoring hub</h1>
-          <p className="text-sm text-stone-500">Sensors · alerts · live readings</p>
+          <h1 className="font-display text-3xl text-stone-800">{tx("mon_title")}</h1>
+          <p className="text-sm text-stone-500">{tx("mon_sub")}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          ["Sensors", overview.sensors_count],
-          ["Open alerts", overview.open_alerts],
-          ["Rules", overview.rules_count],
+          [tx("mon_sensors"), overview.sensors_count],
+          [tx("mon_open_alerts"), overview.open_alerts],
+          [tx("mon_rules"), overview.rules_count],
         ].map(([l, v]) => (
           <div key={String(l)} className="rounded-2xl border bg-white p-4">
             <p className="text-xs text-stone-400">{l}</p>
@@ -56,7 +60,7 @@ export default function MonitoringHubPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-2xl border bg-white p-4">
           <h2 className="mb-3 flex items-center gap-1 font-bold">
-            <Radio className="h-4 w-4" /> Sensors
+            <Radio className="h-4 w-4" /> {tx("mon_sensors")}
           </h2>
           <ul className="space-y-2 text-sm">
             {sensors.map((s) => (
@@ -67,13 +71,13 @@ export default function MonitoringHubPage() {
             ))}
           </ul>
           <Link to="/monitoring/alerts" className="mt-3 inline-block text-xs font-bold text-cyan-700">
-            View alerts →
+            {tx("mon_view_alerts")}
           </Link>
         </section>
         <section className="rounded-2xl border bg-white p-4">
-          <h2 className="mb-3 font-bold">Recent alerts</h2>
+          <h2 className="mb-3 font-bold">{tx("mon_recent_alerts")}</h2>
           {alerts.length === 0 ? (
-            <p className="text-sm text-stone-400">No alerts</p>
+            <p className="text-sm text-stone-400">{tx("mon_no_alerts")}</p>
           ) : (
             <ul className="space-y-2 text-sm">
               {alerts.slice(0, 8).map((a) => (

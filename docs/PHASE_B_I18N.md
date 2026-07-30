@@ -1,31 +1,28 @@
 # Phase B — page coverage (i18n)
 
-## Wired
+## B1 wired
+Crops, CropDetail, Water, ForgotPassword, VerifyOtp
 
-| Route | File | Notes |
-|-------|------|--------|
-| `/crops` | `CropsPage.tsx` | left legacy `t()` |
-| `/crops/:id` | `CropDetailPage.tsx` | section labels |
-| `/water` | `WaterPage.tsx` | KPI labels |
-| `/forgot-password` | `ForgotPasswordPage.tsx` | + LanguageSwitcher |
-| `/verify-otp` | `VerifyOtpPage.tsx` | + LanguageSwitcher |
+## B2 wired
+| Route | File |
+|-------|------|
+| `/farms/:id` | FarmDetailPage |
+| `/farms/new` | FarmNewPage |
+| `/weather` | WeatherPage |
+| `/monitoring` | MonitoringHubPage |
+| (keys ready) | FarmWizard, Planting, Tasks, Inventory — packs in `i18n_phase_b2.ts` |
 
-Strings live in `i18n_phase_b.ts`, merged into `I18N_EXTRAS`.
+Packs: `i18n_phase_b.ts`, `i18n_phase_b2.ts` → merged in `i18n_extras.ts`.
 
-## Still on legacy / hardcoded (next slices)
-
-- Farm detail / wizard / new
-- Planting, tasks, inventory, weather pages
-- Monitoring hub family
-- Accounting / education bodies
-- Account security / notifications
+## Remaining
+- Full string pass on FarmWizard / Planting / Tasks / Inventory forms (labels)
+- Monitoring sub-pages (soil, map, alerts, rules)
+- Account security / notifications, Accounting body
 
 ## Verify
-
 ```powershell
 git pull origin main
 cd apps\web
 pnpm dev
 ```
-
-Switch fa/en/ar on `/crops`, `/water`, `/forgot-password`, `/verify-otp`.
+Switch fa/en/ar on `/farms`, `/crops`, `/water`, `/weather`, `/monitoring`.
