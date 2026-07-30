@@ -2,10 +2,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Leaf, ShieldCheck } from "lucide-react";
 import { LoginForm } from "../features/auth/LoginForm";
 import { LanguageSwitcher } from "../components/Layout/LanguageSwitcher";
+import { useLang, CONTENT } from "../components/eco/i18n";
+import { tr, tExtra } from "../components/eco/i18n_extras";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { lang } = useLang();
+  const c = CONTENT[lang] as unknown as Record<string, unknown>;
+  const tx = (key: string) => tr(c, lang, key) || tExtra(lang, key);
   const from = (location.state as { from?: string } | null)?.from || "/farms";
 
   return (
@@ -23,7 +28,7 @@ export default function LoginPage() {
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25">
               <Leaf className="h-5 w-5" />
             </span>
-            EcoNojin
+            {tx("appName")}
           </Link>
           <LanguageSwitcher />
         </div>
@@ -32,21 +37,19 @@ export default function LoginPage() {
           <div className="hidden lg:block">
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/80 px-3 py-1 text-xs font-bold text-emerald-700">
               <ShieldCheck className="h-3.5 w-3.5" />
-              HttpOnly session · RS-ready JWT
+              {tx("auth_login_hero_badge")}
             </p>
             <h1 className="font-display text-4xl leading-tight text-slate-900">
-              Your fields,
-              <span className="block text-emerald-600">one secure dashboard.</span>
+              {tx("auth_login_hero_t1")}
+              <span className="block text-emerald-600">{tx("auth_login_hero_t2")}</span>
             </h1>
-            <p className="mt-4 max-w-md text-slate-600">
-              Access farms, education, and accounting with cookie-based auth designed for the browser.
-            </p>
+            <p className="mt-4 max-w-md text-slate-600">{tx("auth_login_hero_lede")}</p>
           </div>
           <div className="mx-auto w-full max-w-md">
             <LoginForm onSuccess={() => navigate(from, { replace: true })} />
             <p className="mt-4 text-center">
               <Link to="/" className="text-xs font-medium text-stone-500 hover:text-stone-800">
-                ← Back to home
+                ← {tx("auth_back_home")}
               </Link>
             </p>
           </div>
