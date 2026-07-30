@@ -1,5 +1,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { CalendarDays, Loader2, Plus, RefreshCw } from "lucide-react";
+import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 
 interface Plan {
   id: number;
@@ -17,6 +19,8 @@ interface Plan {
 }
 
 export default function PlantingCalendarPage() {
+  const { lang } = useLang();
+  const tx = (k: string) => tExtra(lang, k);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,11 +51,12 @@ export default function PlantingCalendarPage() {
       const j = await res.json();
       setPlans(j.data || []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
+      setError(e instanceof Error ? e.message : tx("state_error"));
     } finally {
       setLoading(false);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   useEffect(() => {
     void load();
@@ -84,7 +89,7 @@ export default function PlantingCalendarPage() {
       setShowForm(false);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
+      setError(err instanceof Error ? err.message : tx("state_error"));
     } finally {
       setSaving(false);
     }
@@ -98,20 +103,20 @@ export default function PlantingCalendarPage() {
             <CalendarDays className="h-5 w-5 text-amber-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">Planting calendar</h1>
-            <p className="text-sm text-stone-500">Plans · seed rate · yield · irrigation</p>
+            <h1 className="font-display text-3xl text-stone-800">{tx("planting_title")}</h1>
+            <p className="text-sm text-stone-500">{tx("planting_sub")}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button type="button" onClick={() => void load()} className="rounded-xl border px-3 py-2 text-xs font-bold">
-            <RefreshCw className="inline h-3.5 w-3.5" /> Refresh
+            <RefreshCw className="inline h-3.5 w-3.5" /> {tx("planting_refresh")}
           </button>
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
             className="inline-flex items-center gap-1 rounded-xl bg-amber-600 px-3 py-2 text-sm font-bold text-white"
           >
-            <Plus className="h-4 w-4" /> New plan
+            <Plus className="h-4 w-4" /> {tx("planting_new")}
           </button>
         </div>
       </div>
@@ -122,19 +127,19 @@ export default function PlantingCalendarPage() {
         <form onSubmit={onCreate} className="grid gap-3 rounded-2xl border bg-white p-5 shadow-sm sm:grid-cols-2">
           {(
             [
-              ["title", "Plan title *", "text"],
-              ["crop_name", "Crop name *", "text"],
-              ["season", "Season", "text"],
-              ["planned_start", "Start date", "date"],
-              ["planned_end", "End date", "date"],
-              ["area_ha", "Area (ha)", "number"],
-              ["seed_rate_kg_ha", "Seed rate (kg/ha)", "number"],
-              ["expected_yield_t_ha", "Expected yield (t/ha)", "number"],
-              ["irrigation_method", "Irrigation", "text"],
+              ["title", "title", "text"],
+              ["crop_name", "crop_name", "text"],
+              ["season", "season", "text"],
+              ["planned_start", "planned_start", "date"],
+              ["planned_end", "planned_end", "date"],
+              ["area_ha", "area_ha", "number"],
+              ["seed_rate_kg_ha", "seed_rate", "number"],
+              ["expected_yield_t_ha", "yield", "number"],
+              ["irrigation_method", "irrigation", "text"],
             ] as const
-          ).map(([key, label, type]) => (
+          ).map(([key, , type]) => (
             <label key={key} className="block text-sm">
-              <span className="font-medium text-stone-600">{label}</span>
+              <span className="font-medium text-stone-600">{key}</span>
               <input
                 required={key === "title" || key === "crop_name"}
                 type={type}
@@ -145,7 +150,7 @@ export default function PlantingCalendarPage() {
             </label>
           ))}
           <label className="block text-sm sm:col-span-2">
-            <span className="font-medium text-stone-600">Notes</span>
+            <span className="font-medium text-stone-600">{tx("planting_notes")}</span>
             <textarea
               value={form.notes}
               onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
@@ -158,7 +163,7 @@ export default function PlantingCalendarPage() {
             disabled={saving}
             className="sm:col-span-2 rounded-xl bg-amber-600 py-2.5 text-sm font-bold text-white disabled:opacity-60"
           >
-            {saving ? "Saving…" : "Save plan"}
+            {saving ? tx("planting_saving") : tx("planting_save")}
           </button>
         </form>
       )}
@@ -168,7 +173,7 @@ export default function PlantingCalendarPage() {
           <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
         </div>
       ) : plans.length === 0 ? (
-        <p className="py-12 text-center text-stone-500">No planting plans yet</p>
+        <p className="py-12 text-center text-stone-500">{tx("planting_empty")}</p>
       ) : (
         <div className="space-y-3">
           {plans.map((p) => (
@@ -176,29 +181,29 @@ export default function PlantingCalendarPage() {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <h3 className="font-display text-lg text-stone-800">{p.title}</h3>
-                  <p className="text-sm text-amber-800 font-bold">{p.crop_name}</p>
+                  <p className="text-sm font-bold text-amber-800">{p.crop_name}</p>
                 </div>
                 <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] font-bold uppercase">{p.status}</span>
               </div>
               <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-stone-600 sm:grid-cols-4">
                 <div>
-                  <dt className="text-stone-400">Season</dt>
+                  <dt className="text-stone-400">{tx("planting_season")}</dt>
                   <dd className="font-bold">{p.season || "—"}</dd>
                 </div>
                 <div>
-                  <dt className="text-stone-400">Window</dt>
+                  <dt className="text-stone-400">{tx("planting_window")}</dt>
                   <dd className="font-bold">
                     {p.planned_start || "?"} → {p.planned_end || "?"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-stone-400">Area / seed</dt>
+                  <dt className="text-stone-400">{tx("planting_area_seed")}</dt>
                   <dd className="font-bold">
                     {p.area_ha ?? "—"} ha · {p.seed_rate_kg_ha ?? "—"} kg/ha
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-stone-400">Yield / irrig.</dt>
+                  <dt className="text-stone-400">{tx("planting_yield_irr")}</dt>
                   <dd className="font-bold">
                     {p.expected_yield_t_ha ?? "—"} t/ha · {p.irrigation_method || "—"}
                   </dd>

@@ -11,11 +11,14 @@ import {
 } from "lucide-react";
 import { farmsApi } from "../lib/farmsApi";
 import { LeafletPicker } from "../components/maps/LeafletPicker";
-
-const STEPS = ["Basics", "Map", "Confirm"] as const;
+import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 
 export default function FarmWizardPage() {
   const navigate = useNavigate();
+  const { lang } = useLang();
+  const tx = (k: string) => tExtra(lang, k);
+  const STEPS = [tx("farm_step_basics"), tx("farm_step_map"), tx("farm_step_confirm")] as const;
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -29,7 +32,7 @@ export default function FarmWizardPage() {
 
   const useMyLocation = () => {
     if (!navigator.geolocation) {
-      setError("Geolocation not supported");
+      setError(tx("farm_geo_unsupported"));
       return;
     }
     setGeoLoading(true);
@@ -40,7 +43,7 @@ export default function FarmWizardPage() {
         setGeoLoading(false);
       },
       () => {
-        setError("Could not read GPS — pick on map");
+        setError(tx("farm_geo_fail"));
         setGeoLoading(false);
       },
       { enableHighAccuracy: true, timeout: 12000 },
@@ -64,7 +67,7 @@ export default function FarmWizardPage() {
       });
       navigate(`/farms/${farm.id}`, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
+      setError(err instanceof Error ? err.message : tx("farm_create_failed"));
     } finally {
       setLoading(false);
     }
@@ -74,15 +77,15 @@ export default function FarmWizardPage() {
     <div className="mx-auto max-w-2xl space-y-6 p-5 sm:p-8">
       <Link to="/farms" className="inline-flex items-center gap-1 text-sm font-bold text-stone-500">
         <ArrowLeft className="h-4 w-4" />
-        Farms
+        {tx("nav_farms")}
       </Link>
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-50">
           <Wheat className="h-5 w-5 text-emerald-700" />
         </div>
         <div>
-          <h1 className="font-display text-2xl text-stone-800">Farm map wizard</h1>
-          <p className="text-sm text-stone-500">OpenStreetMap · click to pin · GPS optional</p>
+          <h1 className="font-display text-2xl text-stone-800">{tx("farm_wizard_title")}</h1>
+          <p className="text-sm text-stone-500">{tx("farm_wizard_sub")}</p>
         </div>
       </div>
 
@@ -111,7 +114,7 @@ export default function FarmWizardPage() {
       {step === 0 && (
         <div className="space-y-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
           <label className="block text-sm">
-            <span className="font-medium text-stone-600">Farm name *</span>
+            <span className="font-medium text-stone-600">{tx("farm_name_req")}</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -119,7 +122,7 @@ export default function FarmWizardPage() {
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium text-stone-600">Region</span>
+            <span className="font-medium text-stone-600">{tx("farm_region")}</span>
             <input
               value={region}
               onChange={(e) => setRegion(e.target.value)}
@@ -127,7 +130,7 @@ export default function FarmWizardPage() {
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium text-stone-600">Area (ha)</span>
+            <span className="font-medium text-stone-600">{tx("farm_area_ha")}</span>
             <input
               type="number"
               min={0}
@@ -138,7 +141,7 @@ export default function FarmWizardPage() {
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium text-stone-600">Description</span>
+            <span className="font-medium text-stone-600">{tx("farm_description")}</span>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -171,7 +174,7 @@ export default function FarmWizardPage() {
           </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="text-sm">
-              Lat
+              {tx("farm_lat")}
               <input
                 type="number"
                 step="any"
@@ -181,7 +184,7 @@ export default function FarmWizardPage() {
               />
             </label>
             <label className="text-sm">
-              Lng
+              {tx("farm_lng")}
               <input
                 type="number"
                 step="any"
@@ -197,16 +200,17 @@ export default function FarmWizardPage() {
       {step === 2 && (
         <div className="space-y-2 rounded-2xl border border-stone-200 bg-white p-5 text-sm shadow-sm">
           <p>
-            <span className="text-stone-400">Name</span> <span className="font-bold">{name}</span>
+            <span className="text-stone-400">{tx("farm_name")}</span>{" "}
+            <span className="font-bold">{name}</span>
           </p>
           <p>
-            <span className="text-stone-400">Region</span> {region || "—"}
+            <span className="text-stone-400">{tx("farm_region")}</span> {region || "—"}
           </p>
           <p>
-            <span className="text-stone-400">Area</span> {areaHa ? `${areaHa} ha` : "—"}
+            <span className="text-stone-400">{tx("farm_area")}</span> {areaHa ? `${areaHa} ha` : "—"}
           </p>
           <p>
-            <span className="text-stone-400">Pin</span>{" "}
+            <span className="text-stone-400">{tx("farm_pin")}</span>{" "}
             {lat != null && lng != null ? `${lat}, ${lng}` : "—"}
           </p>
         </div>
@@ -219,7 +223,7 @@ export default function FarmWizardPage() {
           onClick={() => setStep((s) => s - 1)}
           className="inline-flex items-center gap-1 rounded-xl border px-4 py-2.5 text-sm font-bold disabled:opacity-40"
         >
-          <ArrowLeft className="h-4 w-4" /> Back
+          <ArrowLeft className="h-4 w-4" /> {tx("farm_back")}
         </button>
         {step < 2 ? (
           <button
@@ -228,7 +232,7 @@ export default function FarmWizardPage() {
             onClick={() => setStep((s) => s + 1)}
             className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40"
           >
-            Next <ArrowRight className="h-4 w-4" />
+            {tx("farm_next")} <ArrowRight className="h-4 w-4" />
           </button>
         ) : (
           <button
@@ -238,7 +242,7 @@ export default function FarmWizardPage() {
             className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Create farm
+            {tx("farm_create")}
           </button>
         )}
       </div>
