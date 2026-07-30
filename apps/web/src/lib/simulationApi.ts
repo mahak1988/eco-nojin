@@ -1,8 +1,7 @@
-/** Simulation API client. Always exports API_BASE and API_V1 (Vite-safe). */
+/** Simulation API client. Always exports API_BASE and API_V1. */
 
 import type { Series } from "../components/simulators/simulatorsData";
 
-// --- Stable exports (do not rename; many pages import these) ---
 export const API_BASE: string = "";
 export const API_V1: string = "/api/v1";
 
@@ -13,8 +12,10 @@ export interface ApiSimulator {
   id: string;
   name: string;
   category: string;
+  category_label?: string;
   description: string;
   version: string;
+  lang?: string;
 }
 
 export interface ApiParam {
@@ -55,9 +56,14 @@ export async function pingBackend(): Promise<boolean> {
   }
 }
 
-export async function fetchSimulators(): Promise<ApiSimulator[] | null> {
+/** lang: en | fa | ar — passed as query so backend localizes names. */
+export async function fetchSimulators(lang: string = "en"): Promise<ApiSimulator[] | null> {
   try {
-    const r = await fetchWithTimeout(joinUrl(`${API_V1}/simulation/simulators`), {}, LIST_TIMEOUT);
+    const r = await fetchWithTimeout(
+      joinUrl(`${API_V1}/simulation/simulators?lang=${encodeURIComponent(lang)}`),
+      { headers: { "Accept-Language": lang } },
+      LIST_TIMEOUT,
+    );
     if (!r.ok) return null;
     const d = await r.json();
     return Array.isArray(d.simulators) ? d.simulators : null;
@@ -66,11 +72,13 @@ export async function fetchSimulators(): Promise<ApiSimulator[] | null> {
   }
 }
 
-export async function fetchParameters(id: string): Promise<ApiParam[] | null> {
+export async function fetchParameters(id: string, lang: string = "en"): Promise<ApiParam[] | null> {
   try {
     const r = await fetchWithTimeout(
-      joinUrl(`${API_V1}/simulation/simulators/${encodeURIComponent(id)}`),
-      {},
+      joinUrl(
+        `${API_V1}/simulation/simulators/${encodeURIComponent(id)}?lang=${encodeURIComponent(lang)}`,
+      ),
+      { headers: { "Accept-Language": lang } },
       LIST_TIMEOUT,
     );
     if (!r.ok) return null;
