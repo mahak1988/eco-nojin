@@ -1,5 +1,5 @@
 /**
- * i18n extras — CONTENT first, then A+B+B2+B3+B4 packs.
+ * i18n extras — packs A through B5.
  */
 import type { Lang } from "./i18n";
 import { PHASE_A_EXTRAS } from "./i18n_phase_a";
@@ -7,6 +7,7 @@ import { PHASE_B_EXTRAS } from "./i18n_phase_b";
 import { PHASE_B2_EXTRAS } from "./i18n_phase_b2";
 import { PHASE_B3_EXTRAS } from "./i18n_phase_b3";
 import { PHASE_B4_EXTRAS } from "./i18n_phase_b4";
+import { PHASE_B5_EXTRAS } from "./i18n_phase_b5";
 
 const BASE: Record<Lang, Record<string, string>> = {
   fa: {
@@ -49,7 +50,7 @@ const BASE: Record<Lang, Record<string, string>> = {
     nav_farms: "المزارع",
     nav_group_monitoring: "المراقبة والتحليل",
     nav_group_finance: "المالية وإيكو كوين",
-    nav_group_community: "التعليم والمجتمع",
+    nav_group_community: "العلم والمجتمع",
     nav_group_regional: "المشاريع والمناطق",
     nav_group_system: "النظام",
     auth_signin: "تسجيل الدخول",
@@ -73,6 +74,7 @@ function mergeLang(lang: Lang): Record<string, string> {
     ...PHASE_B2_EXTRAS[lang],
     ...PHASE_B3_EXTRAS[lang],
     ...PHASE_B4_EXTRAS[lang],
+    ...PHASE_B5_EXTRAS[lang],
   };
 }
 
