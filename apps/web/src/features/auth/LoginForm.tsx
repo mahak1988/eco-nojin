@@ -2,9 +2,13 @@ import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { useLang } from "../../components/eco/i18n";
+import { tExtra } from "../../components/eco/i18n_extras";
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
   const { login } = useAuth();
+  const { lang } = useLang();
+  const tx = (key: string) => tExtra(lang, key);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -19,7 +23,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
       await login(email, password);
       onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : tx("auth_login_failed"));
     } finally {
       setLoading(false);
     }
@@ -31,8 +35,8 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
       className="w-full space-y-5 rounded-3xl border border-stone-200/80 bg-white/95 p-7 shadow-xl shadow-emerald-900/5 backdrop-blur"
     >
       <div>
-        <h1 className="font-display text-2xl text-slate-900">Welcome back</h1>
-        <p className="mt-1 text-sm text-slate-500">Sign in to manage farms, courses, and insights.</p>
+        <h1 className="font-display text-2xl text-slate-900">{tx("auth_welcome")}</h1>
+        <p className="mt-1 text-sm text-slate-500">{tx("auth_login_sub")}</p>
       </div>
 
       {error && (
@@ -40,7 +44,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
       )}
 
       <label className="block text-sm">
-        <span className="font-medium text-slate-600">Email</span>
+        <span className="font-medium text-slate-600">{tx("auth_email")}</span>
         <div className="relative mt-1">
           <Mail className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
           <input
@@ -56,7 +60,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
       </label>
 
       <label className="block text-sm">
-        <span className="font-medium text-slate-600">Password</span>
+        <span className="font-medium text-slate-600">{tx("auth_password")}</span>
         <div className="relative mt-1">
           <Lock className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
           <input
@@ -71,7 +75,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
             type="button"
             onClick={() => setShowPw((v) => !v)}
             className="absolute end-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-            aria-label={showPw ? "Hide password" : "Show password"}
+            aria-label={tx("auth_password")}
           >
             {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
@@ -84,13 +88,13 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
         className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-60"
       >
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-        {loading ? "Signing in…" : "Sign in"}
+        {loading ? tx("auth_signing_in") : tx("auth_signin")}
       </button>
 
       <p className="text-center text-sm text-slate-600">
-        New here?{" "}
+        {tx("auth_new_here")}{" "}
         <Link to="/register" className="font-bold text-emerald-700 hover:underline">
-          Create an account
+          {tx("auth_create_account")}
         </Link>
       </p>
     </form>
