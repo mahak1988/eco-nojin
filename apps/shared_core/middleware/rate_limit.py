@@ -1,96 +1,83 @@
-"""
-Rate Limiting Middleware
-=========================
-Prevents brute force attacks on authentication endpoints.
-Uses in-memory store by default, Redis for production.
-"""
+"""Auth-focused rate limiting (in-memory; Redis later for multi-instance)."""
+
+from __future__ import annotations
 
 import logging
-
-logger = logging.getLogger(__name__)
-from time import time
 from collections import defaultdict
+from time import time
 from typing import Callable
 
-from fastapi import Request, HTTPException, status
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
 
-# In-memory store (for production use Redis)
+logger = logging.getLogger(__name__)
+
 _failed_attempts: dict[str, list[float]] = defaultdict(list)
 
-# Configuration
-RATE_LIMIT_WINDOW_SECONDS = 60  # Time window in seconds
-MAX_FAILED_ATTEMPTS = 5  # Max failed attempts before rate limiting
-RATE_LIMIT_PATHS = ["/api/v1/auth/login", "/api/v1/auth/otp/request"]
+# Paths that count failures toward the limit
+_AUTH_PREFIX = "/api/v1/auth"
+
+
+def _limits() -> tuple[int, int]:
+    try:
+        from apps.shared_core.config import settings
+
+        return (
+            int(settings.AUTH_RATE_LIMIT_MAX),
+            int(settings.AUTH_RATE_LIMIT_WINDOW_SECONDS),
+        )
+    except Exception:
+        return 10, 60
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """
-    Rate limiting middleware to prevent brute force attacks.
-    
-    Tracks failed authentication attempts and blocks IPs that exceed
-    the maximum number of attempts within the time window.
-    """
-    
+    """Limit failed auth attempts per IP; always allow health/docs."""
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        """Handle dispatch (request, call_next)."""
-        client_ip = request.client.host if request.client else "unknown"
         path = request.url.path
-        
-        # Only apply to authentication endpoints
-        if path in RATE_LIMIT_PATHS or path.startswith("/api/v1/auth"):
+        if path in ("/health", "/", "/docs", "/redoc", "/openapi.json"):
+            return await call_next(request)
+
+        client_ip = request.client.host if request.client else "unknown"
+        max_attempts, window = _limits()
+
+        if path.startswith(_AUTH_PREFIX):
             now = time()
-            key = f"{client_ip}:{path}"
-            attempts = _failed_attempts[key]
-            
-            # Clean up old attempts outside the window
-            _failed_attempts[key] = [
-                attempt_time for attempt_time in attempts 
-                if now - attempt_time < RATE_LIMIT_WINDOW_SECONDS
-            ]
-            
-            # Check if rate limited
-            if len(_failed_attempts[key]) >= MAX_FAILED_ATTEMPTS:
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="Too many failed attempts. Please try again later.",
-                    headers={"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
+            key = f"{client_ip}:auth"
+            _failed_attempts[key] = [t for t in _failed_attempts[key] if now - t < window]
+            if len(_failed_attempts[key]) >= max_attempts:
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "error": {
+                            "code": "RATE_LIMITED",
+                            "message": "Too many auth attempts. Retry later.",
+                            "details": [],
+                        }
+                    },
+                    headers={"Retry-After": str(window)},
                 )
-        
+
         response = await call_next(request)
-        
-        # Record failed authentication attempts
-        if path in RATE_LIMIT_PATHS and response.status_code == 401:
-            key = f"{client_ip}:{path}"
-            _failed_attempts[key].append(time())
-        
+
+        # Count failures on login/register/refresh
+        if path.startswith(_AUTH_PREFIX) and response.status_code in (401, 403, 422):
+            if path.rstrip("/").endswith(("login", "register", "refresh", "verify-otp")):
+                key = f"{client_ip}:auth"
+                _failed_attempts[key].append(time())
+
         return response
 
 
-def get_rate_limit_status(client_ip: str, path: str) -> dict:
-    """
-    Get current rate limit status for debugging.
-    
-    Args:
-        client_ip: Client IP address
-        path: Request path
-        
-    Returns:
-        Dictionary with remaining attempts and reset time
-    """
+def get_rate_limit_status(client_ip: str, path: str = "auth") -> dict:
+    max_attempts, window = _limits()
     key = f"{client_ip}:{path}"
-    attempts = _failed_attempts.get(key, [])
     now = time()
-    
-    # Clean up
-    _failed_attempts[key] = [
-        t for t in attempts if now - t < RATE_LIMIT_WINDOW_SECONDS
-    ]
-    
+    attempts = [t for t in _failed_attempts.get(key, []) if now - t < window]
+    _failed_attempts[key] = attempts
     return {
-        "remaining_attempts": max(0, MAX_FAILED_ATTEMPTS - len(attempts)),
-        "limit": MAX_FAILED_ATTEMPTS,
-        "window_seconds": RATE_LIMIT_WINDOW_SECONDS,
-        "reset_in_seconds": RATE_LIMIT_WINDOW_SECONDS - (now - min(attempts)) if attempts else RATE_LIMIT_WINDOW_SECONDS,
+        "remaining_attempts": max(0, max_attempts - len(attempts)),
+        "limit": max_attempts,
+        "window_seconds": window,
     }

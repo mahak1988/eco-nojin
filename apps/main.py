@@ -34,15 +34,17 @@ logger = logging.getLogger("econojin")
 from apps.shared_core.config import settings
 
 _db_status = {"ok": False, "detail": "not_initialized"}
-_OPTIONAL_MODULE_HINTS = ("numba", "psycopg2")
+_OPTIONAL_MODULE_HINTS = ("numba", "psycopg2", "langchain")
 _loaded_routers: list[str] = []
 _failed_routers: list[dict[str, str]] = []
+_security_stack: list[str] = []
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Econojin API v%s starting (%s)", settings.VERSION, settings.ENVIRONMENT)
     logger.info("PROJECT_ROOT=%s", PROJECT_ROOT)
+    logger.info("Security stack: %s", _security_stack)
     start_time = time.time()
     try:
         from apps.shared_core.database.session import init_db
@@ -113,18 +115,44 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# --- Phase 1 security middleware (order: last added = outermost on request) ---
 app.add_middleware(SecurityMiddleware)
 app.add_middleware(RequestIDMiddleware)
+_security_stack.extend(["SecurityMiddleware", "RequestIDMiddleware"])
 
-if settings.ENVIRONMENT != "local":
+if settings.ENABLE_RATE_LIMIT:
     try:
         from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
-        from apps.shared_core.middleware.audit_log import AuditLogMiddleware
 
         app.add_middleware(RateLimitMiddleware)
-        app.add_middleware(AuditLogMiddleware)
+        _security_stack.append("RateLimitMiddleware")
+        logger.info("RateLimitMiddleware enabled")
     except Exception as e:
-        logger.warning("Security middleware failed: %s", e)
+        logger.warning("RateLimitMiddleware failed: %s", e)
+
+if settings.ENABLE_AUDIT_LOG:
+    try:
+        from apps.shared_core.middleware.audit_log import AuditLogMiddleware
+
+        app.add_middleware(AuditLogMiddleware)
+        _security_stack.append("AuditLogMiddleware")
+        logger.info("AuditLogMiddleware enabled")
+    except Exception as e:
+        logger.warning("AuditLogMiddleware failed: %s", e)
+
+if settings.ENABLE_SPIDERGUARD or settings.ENVIRONMENT == "production":
+    try:
+        from apps.spider_security.middleware import SpiderGuardMiddleware
+
+        app.add_middleware(
+            SpiderGuardMiddleware,
+            max_requests=settings.SPIDERGUARD_MAX_REQUESTS,
+            window_seconds=settings.SPIDERGUARD_WINDOW_SECONDS,
+        )
+        _security_stack.append("SpiderGuardMiddleware")
+        logger.info("SpiderGuardMiddleware enabled")
+    except Exception as e:
+        logger.warning("SpiderGuardMiddleware failed: %s", e)
 
 _cors_origins = list(settings.all_cors_origins)
 for extra in (
@@ -354,6 +382,14 @@ async def health() -> dict[str, Any]:
         "environment": settings.ENVIRONMENT,
         "database": "ok" if db_live else "fail",
         "database_detail": db_detail,
+        "security": {
+            "stack": list(_security_stack),
+            "rate_limit": settings.ENABLE_RATE_LIMIT,
+            "audit_log": settings.ENABLE_AUDIT_LOG,
+            "spiderguard": settings.ENABLE_SPIDERGUARD or settings.ENVIRONMENT == "production",
+            "require_auth_writes": settings.REQUIRE_AUTH_FOR_WRITES,
+            "algorithm": settings.ALGORITHM,
+        },
         "science_loaded": "science" in _loaded_routers,
         "monitors_loaded": "science_monitors" in _loaded_routers,
         "ml_loaded": "ml" in _loaded_routers,
@@ -370,6 +406,7 @@ async def debug_routers() -> dict[str, Any]:
         "project_root": str(PROJECT_ROOT),
         "loaded": _loaded_routers,
         "failed": _failed_routers,
+        "security_stack": _security_stack,
         "science_paths": science,
         "path_count": len(paths),
     }
