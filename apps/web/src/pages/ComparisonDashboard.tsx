@@ -1,7 +1,7 @@
-// ComparisonDashboard.tsx — Side-by-side simulation comparison
+/** Side-by-side simulation comparison (English UI strings for Phase 4 i18n later). */
 import { useEffect, useState } from "react";
-import { API_BASE, API_V1 } from "../lib/simulationApi";
 import { Scale, TrendingUp, Droplets } from "lucide-react";
+import { API_BASE, API_V1 } from "../api/http";
 
 interface Run {
   id: string;
@@ -10,49 +10,73 @@ interface Run {
   created_at: string;
 }
 
+function runsUrl(): string {
+  const path = `${API_V1}/simulation/runs?limit=2`;
+  return API_BASE ? `${API_BASE.replace(/\/$/, "")}${path}` : path;
+}
+
 export default function ComparisonDashboard() {
   const [runs, setRuns] = useState<Run[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}${API_V1}/simulation/runs?limit=2`)
-      .then(r => r.json())
-      .then(d => { setRuns(d.runs || []); setLoading(false); })
+    fetch(runsUrl(), { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => {
+        setRuns(d.runs || []);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-8 text-center">در حال بارگذاری...</div>;
-  if (runs.length < 2) return <div className="p-8 text-center text-stone-500">حداقل ۲ شبیه‌سازی ذخیره‌شده برای مقایسه نیاز است.</div>;
+  if (loading) return <div className="p-8 text-center">Loading…</div>;
+  if (runs.length < 2) {
+    return (
+      <div className="p-8 text-center text-stone-500">
+        Need at least 2 saved simulations to compare.
+      </div>
+    );
+  }
 
   const [run1, run2] = runs;
 
   return (
-    <div className="mx-auto max-w-5xl p-8 space-y-6">
-      <h1 className="text-3xl font-bold text-stone-800">📊 داشبورد مقایسهٔ سناریوها</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-8">
+      <h1 className="text-3xl font-bold text-stone-800">Scenario comparison</h1>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {[run1, run2].map((run, idx) => (
-          <div key={run.id} className={`rounded-2xl border p-6 ${idx === 0 ? "border-blue-200 bg-blue-50/30" : "border-purple-200 bg-purple-50/30"}`}>
-            <h2 className="text-xl font-bold mb-4">{run.simulator_name} <span className="text-sm font-normal text-stone-500">({new Date(run.created_at).toLocaleDateString("fa-IR")})</span></h2>
+          <div
+            key={run.id}
+            className={`rounded-2xl border p-6 ${
+              idx === 0 ? "border-blue-200 bg-blue-50/30" : "border-purple-200 bg-purple-50/30"
+            }`}
+          >
+            <h2 className="mb-4 text-xl font-bold">
+              {run.simulator_name}{" "}
+              <span className="text-sm font-normal text-stone-500">
+                ({new Date(run.created_at).toLocaleDateString()})
+              </span>
+            </h2>
             <div className="space-y-3">
-              <div className="flex items-center gap-2 p-3 bg-white rounded-xl shadow-sm">
+              <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <Scale className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-xs text-stone-500">عملکرد (t/ha)</p>
-                  <p className="text-lg font-bold">{run.metrics?.yield_t_ha || "N/A"}</p>
+                  <p className="text-xs text-stone-500">Yield (t/ha)</p>
+                  <p className="text-lg font-bold">{run.metrics?.yield_t_ha ?? "N/A"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-3 bg-white rounded-xl shadow-sm">
+              <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <Droplets className="h-5 w-5 text-cyan-600" />
                 <div>
-                  <p className="text-xs text-stone-500">بهره‌وری آب (kg/m³)</p>
-                  <p className="text-lg font-bold">{run.metrics?.water_use_efficiency_kg_m3 || "N/A"}</p>
+                  <p className="text-xs text-stone-500">Water productivity (kg/m³)</p>
+                  <p className="text-lg font-bold">{run.metrics?.water_use_efficiency_kg_m3 ?? "N/A"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 p-3 bg-white rounded-xl shadow-sm">
+              <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
                 <TrendingUp className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="text-xs text-stone-500">ارزش خالص (NPV)</p>
-                  <p className="text-lg font-bold">{run.metrics?.npv_m_usd || "N/A"}</p>
+                  <p className="text-xs text-stone-500">NPV</p>
+                  <p className="text-lg font-bold">{run.metrics?.npv_m_usd ?? "N/A"}</p>
                 </div>
               </div>
             </div>
