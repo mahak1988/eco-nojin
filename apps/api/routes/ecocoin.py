@@ -10,6 +10,12 @@ from typing import Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from apps.api.services.ecocoin_chain import (
+    chain_config,
+    ledger_append,
+    ledger_recent,
+    try_evm_mint_stub,
+)
 from apps.api.services.ecocoin_engine import (
     CREDIT_FACTORS,
     DISTRIBUTION,
@@ -60,8 +66,6 @@ class StakeRequest(BaseModel):
 
 
 class StakingTier(BaseModel):
-    """Pydantic model used by unit tests and OpenAPI docs."""
-
     id: int
     duration: str
     apy: float
@@ -190,11 +194,34 @@ _CHALLENGES: list[dict[str, Any]] = [
         "participants": 0,
         "total_score": 0.0,
     },
+    {
+        "id": "ch-soil-organic",
+        "title": "Raise soil organic carbon on 20 ha",
+        "metric": "soc_ha",
+        "target": 20.0,
+        "pool_eco": 25_000.0,
+        "starts_at": "2026-07-01T00:00:00Z",
+        "ends_at": "2026-10-31T23:59:59Z",
+        "status": "active",
+        "participants": 0,
+        "total_score": 0.0,
+    },
 ]
+
+# address -> set of joined challenge ids
+_JOINED: dict[str, set[str]] = {}
+# address -> challenge_id -> claimed bool
+_CLAIMED: dict[str, dict[str, bool]] = {}
 
 _PENDING_REWARDS: dict[str, float] = {
     "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18": 180.0,
 }
+
+
+@router.get("/chain/status")
+async def get_chain_status(limit: int = Query(10, ge=1, le=50)) -> dict[str, Any]:
+    cfg = chain_config()
+    return {**cfg, "recent": ledger_recent(limit)}
 
 
 @router.get("/balance/{address}", response_model=BalanceResponse)
@@ -224,7 +251,13 @@ async def transfer(
 ) -> TransferResponse:
     if req.amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be positive")
-    h = tx_hash(req.from_address, req.to_address, req.amount, req.project_id)
+    from_bal = _MOCK_BALANCES.get(req.from_address, 0.0)
+    if from_bal < req.amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+    _MOCK_BALANCES[req.from_address] = from_bal - req.amount
+    _MOCK_BALANCES[req.to_address] = _MOCK_BALANCES.get(req.to_address, 0.0) + req.amount
+    entry = ledger_append("transfer", req.from_address, req.to_address, req.amount)
+    h = entry["tx_hash"]
     _MOCK_TXS.insert(
         0,
         {
@@ -234,14 +267,14 @@ async def transfer(
             "from": req.from_address,
             "to": req.to_address,
             "project_id": req.project_id,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": entry["timestamp"],
         },
     )
     return TransferResponse(
         tx_hash=h,
-        status="pending",
+        status="confirmed",
         amount=req.amount,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=entry["timestamp"],
     )
 
 
@@ -277,13 +310,20 @@ async def stake(
                 detail=f"Minimum amount for tier {req.tier_id} is {result['min_amount']}",
             )
         raise HTTPException(status_code=400, detail=err)
+    bal = _MOCK_BALANCES.get(req.address, 0.0)
+    if bal < req.amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+    _MOCK_BALANCES[req.address] = bal - req.amount
     _STATE.locked_stake += req.amount
+    entry = ledger_append("stake", req.address, req.amount, req.tier_id)
     return {
         "status": "staked",
         "amount": req.amount,
         "tier_id": req.tier_id,
         "estimated_reward": result["estimated_reward"],
         "unlock_date": result["unlock_date"],
+        "tx_hash": entry["tx_hash"],
+        "chain": entry,
     }
 
 
@@ -307,7 +347,6 @@ async def get_mint_events_from_db(
     limit: int = Query(20, ge=1, le=100),
     recipient: Optional[str] = Query(None),
 ) -> dict[str, Any]:
-    """List persisted mint events (SQLite/Postgres). Falls back to in-memory."""
     try:
         from apps.api.services.mint_persistence import list_mint_events
         from apps.shared_core.database.session import async_session_maker
@@ -358,6 +397,7 @@ async def get_wallet(address: str) -> dict[str, Any]:
         "pending_rewards": w.pending_rewards,
         "impact_credits_tco2e": w.impact_credits_tco2e,
         "total_equity": w.total_equity,
+        "chain": chain_config(),
     }
 
 
@@ -374,17 +414,20 @@ async def unstake(
         penalty = early_unstake_penalty(req.amount, req.pending_reward)
         _STATE.total_burned += penalty["fee_burned"]
         _STATE.locked_stake = max(0.0, _STATE.locked_stake - req.amount)
+        entry = ledger_append("unstake_early", req.address, req.amount)
         return {
             "status": "unstaked_early",
             **penalty,
-            "tx_hash": tx_hash("unstake", req.address, req.amount),
+            "tx_hash": entry["tx_hash"],
         }
     _STATE.locked_stake = max(0.0, _STATE.locked_stake - req.amount)
+    _MOCK_BALANCES[req.address] = _MOCK_BALANCES.get(req.address, 0.0) + req.amount + req.pending_reward
+    entry = ledger_append("unstake", req.address, req.amount, req.pending_reward)
     return {
         "status": "unstaked",
         "principal_returned": req.amount,
         "reward_paid": req.pending_reward,
-        "tx_hash": tx_hash("unstake", req.address, req.amount),
+        "tx_hash": entry["tx_hash"],
     }
 
 
@@ -408,7 +451,14 @@ async def impact_mint(
     if req.credit_type == 0:
         _STATE.co2_sequestered += req.measured_value
 
-    h = tx_hash(req.recipient, req.project_id, req.verification_hash, mint_total)
+    entry = ledger_append(
+        "impact_mint",
+        req.recipient,
+        req.project_id,
+        mint_total,
+        meta={"credit_type": req.credit_type},
+    )
+    h = entry["tx_hash"]
     oracle = sign_mint_payload(
         {
             "tx_hash": h,
@@ -421,21 +471,23 @@ async def impact_mint(
             "verification_hash": req.verification_hash,
         }
     )
+    evm = try_evm_mint_stub(req.recipient, mint_total)
 
-    entry = {
+    mint_entry = {
         "block_number": 1_234_567 + len(_MOCK_MINTS),
         "minter": "0xOracle",
         "recipient": req.recipient,
         "amount": mint_total,
         "project_id": req.project_id,
         "tx_hash": h,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": entry["timestamp"],
         "credit_type": req.credit_type,
         "distribution": result["distribution"],
         "oracle_signature": oracle["signature"],
         "oracle_algorithm": oracle["algorithm"],
+        "evm": evm,
     }
-    _MOCK_MINTS.insert(0, entry)
+    _MOCK_MINTS.insert(0, mint_entry)
     steward_share = result["distribution"]["steward"]
     _MOCK_BALANCES[req.recipient] = _MOCK_BALANCES.get(req.recipient, 100.0) + steward_share
 
@@ -460,27 +512,41 @@ async def impact_mint(
                 verification_hash=req.verification_hash,
             )
             await session.commit()
-            entry["persisted"] = True
+            mint_entry["persisted"] = True
     except Exception as e:
-        entry["persisted"] = False
-        entry["persist_error"] = type(e).__name__
+        mint_entry["persisted"] = False
+        mint_entry["persist_error"] = type(e).__name__
 
     return {
         "status": "minted",
         "tx_hash": h,
         "oracle_signature": oracle["signature"],
         "oracle_algorithm": oracle["algorithm"],
+        "chain": entry,
+        "evm": evm,
         **result,
-        "persisted": entry.get("persisted"),
+        "persisted": mint_entry.get("persisted"),
     }
 
 
 @router.get("/challenges")
-async def list_challenges(status: Optional[str] = Query(None)) -> dict[str, Any]:
-    items = _CHALLENGES
+async def list_challenges(
+    status: Optional[str] = Query(None),
+    address: Optional[str] = Query(None),
+) -> dict[str, Any]:
+    items = list(_CHALLENGES)
     if status:
         items = [c for c in items if c["status"] == status]
-    return {"challenges": items, "total": len(items)}
+    joined = _JOINED.get(address or "", set())
+    claimed_map = _CLAIMED.get(address or "", {})
+    enriched = []
+    for c in items:
+        row = dict(c)
+        if address:
+            row["joined"] = c["id"] in joined
+            row["claimed"] = bool(claimed_map.get(c["id"]))
+        enriched.append(row)
+    return {"challenges": enriched, "total": len(enriched)}
 
 
 @router.post("/challenges/{challenge_id}/join")
@@ -494,7 +560,11 @@ async def join_challenge(
         raise HTTPException(status_code=404, detail="Challenge not found")
     if ch["status"] != "active":
         raise HTTPException(status_code=400, detail="Challenge not active")
-    ch["participants"] += 1
+    bag = _JOINED.setdefault(req.address, set())
+    if challenge_id not in bag:
+        bag.add(challenge_id)
+        ch["participants"] += 1
+        ledger_append("challenge_join", req.address, challenge_id)
     return {
         "status": "joined",
         "challenge_id": challenge_id,
@@ -512,15 +582,29 @@ async def claim_challenge(
     ch = next((c for c in _CHALLENGES if c["id"] == challenge_id), None)
     if ch is None:
         raise HTTPException(status_code=404, detail="Challenge not found")
+    claimed = _CLAIMED.setdefault(req.address, {})
+    if claimed.get(challenge_id):
+        raise HTTPException(status_code=400, detail="Already claimed")
+    _JOINED.setdefault(req.address, set()).add(challenge_id)
     ch["total_score"] += req.score
     reward = challenge_reward(ch["pool_eco"], req.score, max(ch["total_score"], req.score))
     _PENDING_REWARDS[req.address] = _PENDING_REWARDS.get(req.address, 0.0) + reward
+    claimed[challenge_id] = True
+    entry = ledger_append(
+        "challenge_claim",
+        req.address,
+        challenge_id,
+        reward,
+        meta={"score": req.score},
+    )
     return {
         "status": "claimed",
         "challenge_id": challenge_id,
         "score": req.score,
         "reward_eco": reward,
         "pending_rewards": _PENDING_REWARDS[req.address],
+        "tx_hash": entry["tx_hash"],
+        "chain": entry,
     }
 
 
@@ -548,12 +632,24 @@ async def claim_rewards(
         raise HTTPException(status_code=400, detail="Amount must be positive")
     _PENDING_REWARDS[req.address] = pending - amount
     _MOCK_BALANCES[req.address] = _MOCK_BALANCES.get(req.address, 100.0) + amount
-    h = tx_hash("claim", req.address, amount)
+    entry = ledger_append("reward_claim", req.address, amount)
+    _MOCK_TXS.insert(
+        0,
+        {
+            "tx_hash": entry["tx_hash"],
+            "type": "reward",
+            "amount": amount,
+            "to": req.address,
+            "timestamp": entry["timestamp"],
+        },
+    )
     return {
         "status": "claimed",
         "amount": amount,
         "remaining_pending": _PENDING_REWARDS[req.address],
-        "tx_hash": h,
+        "balance": _MOCK_BALANCES[req.address],
+        "tx_hash": entry["tx_hash"],
+        "chain": entry,
     }
 
 
@@ -592,6 +688,7 @@ async def get_economics() -> dict[str, Any]:
             ],
         },
         "indicators": compute_indicators(_STATE),
+        "chain": chain_config(),
     }
 
 
@@ -631,14 +728,15 @@ async def burn(
     if req.amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be positive")
     bal = _MOCK_BALANCES.get(req.address, 0.0)
-    if bal >= req.amount:
-        _MOCK_BALANCES[req.address] = bal - req.amount
+    if bal < req.amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+    _MOCK_BALANCES[req.address] = bal - req.amount
     _STATE.total_burned += req.amount
-    h = tx_hash("burn", req.address, req.amount, req.reason)
+    entry = ledger_append("burn", req.address, req.amount, req.reason)
     return {
         "status": "burned",
         "amount": req.amount,
         "reason": req.reason,
-        "tx_hash": h,
+        "tx_hash": entry["tx_hash"],
         "total_burned": _STATE.total_burned,
     }
