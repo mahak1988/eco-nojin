@@ -1,10 +1,12 @@
 /**
- * Phase A i18n extras — keys not yet in CONTENT (or shared UI).
+ * i18n extras — keys not in CONTENT.
  * Resolution: CONTENT → I18N_EXTRAS[lang] → I18N_EXTRAS.en → key
+ * Phase B packs are merged from i18n_phase_b.ts
  */
 import type { Lang } from "./i18n";
+import { PHASE_B_EXTRAS } from "./i18n_phase_b";
 
-export const I18N_EXTRAS: Record<Lang, Record<string, string>> = {
+const BASE: Record<Lang, Record<string, string>> = {
   fa: {
     nav_farms: "مزارع",
     nav_group_monitoring: "پایش و تحلیل",
@@ -266,6 +268,16 @@ export const I18N_EXTRAS: Record<Lang, Record<string, string>> = {
     state_error: "فشل تحميل البيانات",
     state_retry: "إعادة المحاولة",
   },
+};
+
+function mergeLang(lang: Lang): Record<string, string> {
+  return { ...BASE[lang], ...PHASE_B_EXTRAS[lang] };
+}
+
+export const I18N_EXTRAS: Record<Lang, Record<string, string>> = {
+  fa: mergeLang("fa"),
+  en: mergeLang("en"),
+  ar: mergeLang("ar"),
 };
 
 export function tr(
