@@ -1,5 +1,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Package, Loader2, Plus, AlertTriangle } from "lucide-react";
+import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 
 interface Item {
   id: number;
@@ -15,6 +17,8 @@ interface Item {
 }
 
 export default function InventoryPage() {
+  const { lang } = useLang();
+  const tx = (k: string) => tExtra(lang, k);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +46,12 @@ export default function InventoryPage() {
       const j = await res.json();
       setItems(j.data || []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
+      setError(e instanceof Error ? e.message : tx("state_error"));
     } finally {
       setLoading(false);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   useEffect(() => {
     void load();
@@ -85,12 +90,12 @@ export default function InventoryPage() {
             <Package className="h-5 w-5 text-orange-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">Inventory</h1>
-            <p className="text-sm text-stone-500">Seeds · fertilizers · pesticides · tools</p>
+            <h1 className="font-display text-3xl text-stone-800">{tx("inv_title")}</h1>
+            <p className="text-sm text-stone-500">{tx("inv_sub")}</p>
           </div>
         </div>
         <button type="button" onClick={() => setShow((v) => !v)} className="inline-flex items-center gap-1 rounded-xl bg-orange-600 px-3 py-2 text-sm font-bold text-white">
-          <Plus className="h-4 w-4" /> Item
+          <Plus className="h-4 w-4" /> {tx("inv_item")}
         </button>
       </div>
       {error && <div className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</div>}
@@ -108,7 +113,7 @@ export default function InventoryPage() {
             </label>
           ))}
           <button type="submit" className="sm:col-span-2 rounded-xl bg-orange-600 py-2 font-bold text-white">
-            Save
+            {tx("inv_save")}
           </button>
         </form>
       )}
@@ -121,10 +126,10 @@ export default function InventoryPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b bg-stone-50 text-xs uppercase text-stone-500">
               <tr>
-                <th className="p-3">Name</th>
-                <th className="p-3">Cat</th>
-                <th className="p-3">Qty</th>
-                <th className="p-3">Detail</th>
+                <th className="p-3">{tx("inv_name")}</th>
+                <th className="p-3">{tx("inv_cat")}</th>
+                <th className="p-3">{tx("inv_qty")}</th>
+                <th className="p-3">{tx("inv_detail")}</th>
               </tr>
             </thead>
             <tbody>
