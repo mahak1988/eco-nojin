@@ -1,0 +1,22 @@
+{
+  "appName": "Econojin",
+  "loading": "Loading…",
+  "error": "Something went wrong",
+  "retry": "Retry",
+  "empty": "No data yet",
+  "save": "Save",
+  "cancel": "Cancel",
+  "search": "Search",
+  "language": "Language",
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "farms": "Farms",
+    "crops": "Crops",
+    "water": "Water",
+    "science": "Science",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "register": "Register"
+  }
+}
