@@ -1,33 +1,42 @@
-"""R13/R14 shared pagination and list envelope."""
+"""Standard list envelope (R13/R14)."""
 
 from __future__ import annotations
 
-from math import ceil
-from typing import Generic, List, TypeVar
+from typing import Generic, Sequence, TypeVar
 
 from pydantic import BaseModel, Field
 
 T = TypeVar("T")
 
 
-class ListMeta(BaseModel):
-    total: int = Field(..., ge=0)
-    page: int = Field(..., ge=1)
-    pages: int = Field(..., ge=0)
-    size: int = Field(..., ge=1)
+class PageMeta(BaseModel):
+    total: int = 0
+    page: int = Field(1, ge=1)
+    size: int = Field(20, ge=1, le=200)
+    pages: int = 0
 
 
-class ListEnvelope(BaseModel, Generic[T]):
-    """Canonical list response (R14)."""
-
-    data: List[T]
-    meta: ListMeta
+class Page(BaseModel, Generic[T]):
+    data: Sequence[T]
+    meta: PageMeta
 
 
-def page_to_offset(page: int, size: int) -> int:
-    return max(0, (page - 1) * size)
+def page_params(page: int = 1, size: int = 20) -> tuple[int, int, int]:
+    """Return page, size, skip."""
+    page = max(1, int(page))
+    size = min(200, max(1, int(size)))
+    skip = (page - 1) * size
+    return page, size, skip
 
 
-def build_meta(total: int, page: int, size: int) -> ListMeta:
-    pages = ceil(total / size) if size > 0 and total > 0 else (0 if total == 0 else 1)
-    return ListMeta(total=total, page=page, pages=pages, size=size)
+def build_page(items: Sequence[T], total: int, page: int, size: int) -> dict:
+    pages = (total + size - 1) // size if size else 0
+    return {
+        "data": list(items),
+        "meta": {
+            "total": total,
+            "page": page,
+            "size": size,
+            "pages": pages,
+        },
+    }

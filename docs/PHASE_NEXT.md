@@ -1,13 +1,12 @@
 # فاز بعدی
 
-**فاز ۱:** امنیتی — تأیید شده با health.security
-**فاز ۲:** دیتابیس — `docs/PHASE2_DATABASE.md` + migrations idempotent
+- فاز ۱–۲: تأیید شده
+- فاز ۳: `docs/PHASE3_API.md`
 
 ```powershell
-cd D:\econojin.com
 git pull origin main
-.\scripts\alembic_upgrade_safe.ps1
-# سپس restart API یا:\n.\scripts\run_local.ps1
+curl.exe -H "User-Agent: Mozilla/5.0" http://127.0.0.1:8000/api/v1/dashboard/stats
+.\.venv\Scripts\python.exe -m pytest tests/contract/test_phase3_api.py -q
 ```
 
-**فاز ۳ بعدی:** یکپارچه‌سازی API (debug routers، pagination، contract smoke)
+فاز ۴ بعدی: اتصال کامل FE (login, farms, crops, science)
