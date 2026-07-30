@@ -1,5 +1,5 @@
-/** Main navigation — labels from CONTENT + i18n_extras (fa / en / ar). */
-import { useState, useEffect } from "react";
+/** Main navigation — click-stable More menu + CONTENT i18n (fa/en/ar). */
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -100,11 +100,32 @@ export function Header() {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
   const canGoBack = location.pathname !== "/";
 
   useEffect(() => {
     setMobileOpen(false);
+    setMoreOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   const navLinkCls = (to: string) =>
     `inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
@@ -132,7 +153,7 @@ export function Header() {
               <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             </button>
           )}
-          <Link to="/" className="group flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
               <Leaf className="h-5 w-5" />
             </div>
@@ -150,39 +171,52 @@ export function Header() {
             </Link>
           ))}
 
-          <div className="group relative">
+          <div className="relative" ref={moreRef}>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-700"
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
+              onClick={() => setMoreOpen((o) => !o)}
+              className={`inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
+                moreOpen ? "bg-emerald-50 text-emerald-700" : "text-slate-600 hover:bg-slate-100"
+              }`}
             >
               {t("menu")}
-              <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+              <ChevronDown className={`h-4 w-4 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
             </button>
-            <div className="invisible absolute end-0 top-full z-50 mt-2 grid w-[520px] grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-slate-200 bg-white p-5 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-              {MORE_GROUPS.map((group) => (
-                <div key={group.labelKey}>
-                  <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                    {t(group.labelKey)}
-                  </p>
-                  <div className="space-y-0.5">
-                    {group.items.map((item) => (
-                      <Link
-                        key={item.key}
-                        to={item.to}
-                        className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
-                          location.pathname === item.to
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "text-slate-600 hover:bg-slate-100"
-                        }`}
-                      >
-                        <item.icon className="h-4 w-4 opacity-70" />
-                        {t(item.key)}
-                      </Link>
-                    ))}
+
+            {moreOpen && (
+              <div
+                role="menu"
+                className="absolute end-0 top-full z-[60] mt-1 grid w-[min(520px,90vw)] grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xl"
+              >
+                {MORE_GROUPS.map((group) => (
+                  <div key={group.labelKey}>
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                      {t(group.labelKey)}
+                    </p>
+                    <div className="space-y-0.5">
+                      {group.items.map((item) => (
+                        <Link
+                          key={item.key}
+                          to={item.to}
+                          role="menuitem"
+                          onClick={() => setMoreOpen(false)}
+                          className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
+                            location.pathname === item.to
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "text-slate-600 hover:bg-slate-100"
+                          }`}
+                        >
+                          <item.icon className="h-4 w-4 opacity-70" />
+                          {t(item.key)}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </nav>
 
@@ -235,13 +269,14 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-slate-200 bg-white lg:hidden">
-          <nav className="mx-auto max-w-7xl space-y-3 px-4 py-4">
+        <div className="max-h-[80vh] overflow-y-auto border-t border-slate-200 bg-white lg:hidden">
+          <nav className="mx-auto max-w-7xl space-y-4 px-4 py-4">
             <div className="grid grid-cols-2 gap-1">
               {MAIN_NAV.map((item) => (
                 <Link
                   key={item.key}
                   to={item.to}
+                  onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
                     location.pathname.startsWith(item.to)
                       ? "bg-emerald-50 text-emerald-700"
@@ -253,10 +288,34 @@ export function Header() {
                 </Link>
               ))}
             </div>
+            {MORE_GROUPS.map((group) => (
+              <div key={group.labelKey}>
+                <p className="mb-1 px-2 text-[11px] font-bold uppercase text-slate-400">
+                  {t(group.labelKey)}
+                </p>
+                <div className="grid grid-cols-2 gap-1">
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.key}
+                      to={item.to}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                    >
+                      <item.icon className="h-4 w-4 opacity-70" />
+                      {t(item.key)}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
             <div className="flex gap-2 border-t border-slate-100 pt-3">
               {isAuthenticated ? (
                 <>
-                  <Link to="/account" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
+                  <Link
+                    to="/account"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 rounded-xl border py-2 text-center text-sm font-bold"
+                  >
                     {t("profile")}
                   </Link>
                   <button
@@ -269,11 +328,16 @@ export function Header() {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 rounded-xl border py-2 text-center text-sm font-bold"
+                  >
                     {t("auth_signin")}
                   </Link>
                   <Link
                     to="/register"
+                    onClick={() => setMobileOpen(false)}
                     className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white"
                   >
                     {t("auth_register")}
