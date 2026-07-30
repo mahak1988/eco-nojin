@@ -129,6 +129,12 @@ def ensure_source() -> dict[str, str]:
     return starter
 
 
+def _bullet_lines(errors: list[str]) -> list[str]:
+    if not errors:
+        return ["- none"]
+    return [f"- {e}" for e in errors]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Auto-translate EN -> FA/AR for Econojin")
     parser.add_argument("--apply", action="store_true", help="Write generated_fa/ar.json")
@@ -149,11 +155,11 @@ def main() -> int:
         print(f"Dry-run: {len(keys)} keys")
 
     batch = dict(keys)
-    print(f"Translating {len(batch)} keys -> fa, ar …")
+    print(f"Translating {len(batch)} keys -> fa, ar ...")
     fa, err_fa = translate_batch(batch, "fa", sleep_s=args.sleep)
     ar, err_ar = translate_batch(batch, "ar", sleep_s=args.sleep)
 
-    report = [
+    report_lines = [
         "# i18n auto-translate report",
         "",
         f"- Source keys: {len(source)}",
@@ -162,10 +168,10 @@ def main() -> int:
         f"- AR failures: {len(err_ar)}",
         "",
         "## Failures (FA)",
-        *[f"- {e}" for e in err_fa] or ["- none"],
+        *_bullet_lines(err_fa),
         "",
         "## Failures (AR)",
-        *[f"- {e}" for e in err_ar] or ["- none"],
+        *_bullet_lines(err_ar),
         "",
         "## Next steps",
         "1. Review `locale/generated_fa.json` and `locale/generated_ar.json`",
@@ -173,7 +179,7 @@ def main() -> int:
         "3. Prefer human edit for navigation, legal, and science labels",
         "",
     ]
-    REPORT.write_text("\n".join(report), encoding="utf-8")
+    REPORT.write_text("\n".join(report_lines), encoding="utf-8")
     print(f"Report: {REPORT}")
 
     if args.apply or args.dry_run:
