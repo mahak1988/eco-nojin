@@ -1,20 +1,22 @@
-// apps/web/src/pages/EcocoinPage.tsx — full EcoCoin hub
+// apps/web/src/pages/EcocoinPage.tsx — hub with active actions + subpage links
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Coins,
   TrendingUp,
   ArrowDownToLine,
   Lock,
   Receipt,
-  LineChart as LineIcon,
   Trophy,
   ShoppingBag,
   Sparkles,
+  Pickaxe,
+  Leaf,
+  Scale,
 } from "lucide-react";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
-import { LineChart } from "../components/charts/LineChart";
 import { WalletCard } from "../components/ecocoin/WalletCard";
 import { TransactionItem } from "../components/ecocoin/TransactionItem";
 import { ChallengeCard } from "../components/ecocoin/ChallengeCard";
@@ -23,10 +25,11 @@ import { MiningPanel } from "../components/ecocoin/MiningPanel";
 import { EconomicsPanel } from "../components/ecocoin/EconomicsPanel";
 import { StakingTiersPanel } from "../components/ecocoin/StakingTiersPanel";
 import { ProtocolStatsBar } from "../components/ecocoin/ProtocolStatsBar";
+import { InteractiveBalanceChart } from "../components/ecocoin/InteractiveBalanceChart";
+import { WalletActionsModal, type WalletAction } from "../components/ecocoin/WalletActionsModal";
 import { ECO_STR, type EcoLang } from "../components/ecocoin/ecocoinI18n";
 import {
   WALLET,
-  BALANCE_SERIES,
   INITIAL_TRANSACTIONS,
   INITIAL_CHALLENGES,
   REDEEM_ITEMS,
@@ -38,23 +41,18 @@ import {
 type Filter = "all" | TxType;
 const FILTERS: Filter[] = ["all", "earn", "spend"];
 
-const PROGRAMS = [
-  { icon: "🌾", key: "farm" },
-  { icon: "💧", key: "water" },
-  { icon: "📚", key: "edu" },
-  { icon: "🛰️", key: "sat" },
-] as const;
-
 export default function EcocoinPage() {
   const { lang } = useLang();
   const s = ECO_STR[lang as EcoLang];
   const locale = lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
 
   const [balance, setBalance] = useState(WALLET.balance);
+  const [staked, setStaked] = useState(WALLET.staked);
   const [txs, setTxs] = useState<EcoTx[]>(INITIAL_TRANSACTIONS);
   const [challenges, setChallenges] = useState<Challenge[]>(INITIAL_CHALLENGES);
   const [redeemed, setRedeemed] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState<Filter>("all");
+  const [modal, setModal] = useState<WalletAction | null>(null);
 
   const prependTx = (category: EcoTx["category"], type: TxType, amount: number, titleKey: string) =>
     setTxs((prev) => [
@@ -78,31 +76,88 @@ export default function EcocoinPage() {
     prependTx("redeem", "spend", -item.cost, "txRedeem");
   };
 
+  const onSend = async (to: string, amount: number) => {
+    try {
+      await fetch("/api/v1/ecocoin/transfer", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from_address: WALLET.address,
+          to_address: to,
+          amount,
+        }),
+      });
+    } catch {
+      /* local fallback */
+    }
+    setBalance((b) => b - amount);
+    prependTx("transfer", "spend", -amount, "tx6");
+  };
+
+  const onStake = async (amount: number, tierId: number) => {
+    try {
+      await fetch("/api/v1/ecocoin/staking/stake", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: WALLET.address, amount, tier_id: tierId }),
+      });
+    } catch {
+      /* local */
+    }
+    setBalance((b) => b - amount);
+    setStaked((x) => x + amount);
+    prependTx("stake", "spend", -amount, "tx4");
+  };
+
   const visibleTx = useMemo(
     () => (filter === "all" ? txs : txs.filter((t) => t.type === filter)),
     [txs, filter],
   );
 
-  const weekLabels =
-    lang === "fa"
-      ? ["ش", "ی", "د", "س", "چ", "پ", "ج"]
-      : lang === "ar"
-        ? ["ح", "ن", "ث", "ر", "خ", "ج", "س"]
-        : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
-
   const kpis = [
     { icon: TrendingUp, label: s.totalEarned, value: WALLET.totalEarned, color: "text-green-700", bg: "bg-green-50" },
     { icon: ArrowDownToLine, label: s.totalSpent, value: WALLET.totalSpent, color: "text-red-700", bg: "bg-red-50" },
-    { icon: Lock, label: s.staked, value: WALLET.staked, color: "text-violet-700", bg: "bg-violet-50" },
+    { icon: Lock, label: s.staked, value: staked, color: "text-violet-700", bg: "bg-violet-50" },
     { icon: Receipt, label: s.txMonth, value: WALLET.txCountMonth, color: "text-blue-700", bg: "bg-blue-50" },
+  ];
+
+  const subLinks = [
+    { to: "/ecocoin/staking", icon: Lock, label: s.stakeTitle },
+    { to: "/ecocoin/mining", icon: Pickaxe, label: s.miningTitle },
+    { to: "/ecocoin/bioeconomy", icon: Leaf, label: s.econTitle },
+    { to: "/ecocoin/challenges", icon: Trophy, label: s.challenges },
   ];
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
+      {modal && (
+        <WalletActionsModal
+          action={modal}
+          onClose={() => setModal(null)}
+          balance={balance}
+          address={WALLET.address}
+          onSend={onSend}
+          onStake={onStake}
+          labels={{
+            send: s.send,
+            receive: s.receive,
+            stake: s.stake,
+            to: "To",
+            amount: s.ecoUnit,
+            tier: "Tier",
+            submit: s.stake,
+            cancel: lang === "fa" ? "انصراف" : lang === "ar" ? "إلغاء" : "Cancel",
+            yourAddress: s.copyAddress,
+            copied: s.copied,
+          }}
+        />
+      )}
+
       <SectionReveal>
         <div className="relative overflow-hidden rounded-3xl border border-emerald-200/60 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 p-6 text-white shadow-xl shadow-emerald-600/20">
           <div className="pointer-events-none absolute -end-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-10 start-10 h-32 w-32 rounded-full bg-amber-300/20 blur-2xl" />
           <div className="relative flex flex-wrap items-center gap-4">
             <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/30 backdrop-blur">
               <Coins className="h-7 w-7" />
@@ -121,6 +176,19 @@ export default function EcocoinPage() {
         </div>
       </SectionReveal>
 
+      <div className="flex flex-wrap gap-2">
+        {subLinks.map((l) => (
+          <Link
+            key={l.to}
+            to={l.to}
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
+          >
+            <l.icon className="h-3.5 w-3.5" />
+            {l.label}
+          </Link>
+        ))}
+      </div>
+
       <SectionReveal delay={60}>
         <ProtocolStatsBar strings={s} />
       </SectionReveal>
@@ -130,25 +198,21 @@ export default function EcocoinPage() {
           <WalletCard
             address={WALLET.address}
             balance={balance}
-            staked={WALLET.staked}
+            staked={staked}
             apy={WALLET.apy}
             strings={s}
             lang={lang as EcoLang}
+            onAction={setModal}
           />
         </SectionReveal>
         <SectionReveal delay={140} className="lg:col-span-2">
-          <div className="h-full rounded-2xl border border-stone-200/80 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center gap-2">
-              <LineIcon className="h-4 w-4 text-emerald-700" />
-              <h2 className="font-display text-lg text-stone-800">{s.balanceTrend}</h2>
-            </div>
-            <LineChart
-              data={BALANCE_SERIES}
-              labels={weekLabels}
-              color="#059669"
-              formatValue={(v) => v.toLocaleString(locale)}
-            />
-          </div>
+          <InteractiveBalanceChart
+            locale={locale}
+            title={s.balanceTrend}
+            period7="7D"
+            period30="30D"
+            period90="90D"
+          />
         </SectionReveal>
       </div>
 
@@ -182,28 +246,6 @@ export default function EcocoinPage() {
       </SectionReveal>
 
       <SectionReveal delay={80}>
-        <div className="mb-3 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-teal-600" />
-          <div>
-            <h2 className="font-display text-xl text-stone-800">{s.programsTitle}</h2>
-            <p className="text-sm text-stone-600">{s.programsSub}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {PROGRAMS.map((p, i) => (
-            <div
-              key={p.key}
-              className="card-hover flex flex-col items-center gap-2 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
-              style={{ animation: `fade-up 0.4s ease ${i * 50}ms both` }}
-            >
-              <span className="text-3xl">{p.icon}</span>
-              <span className="text-xs font-bold uppercase text-stone-500">{p.key}</span>
-            </div>
-          ))}
-        </div>
-      </SectionReveal>
-
-      <SectionReveal delay={100}>
         <div className="mb-3 flex items-center gap-2">
           <Trophy className="h-5 w-5 text-amber-600" />
           <div>
@@ -255,6 +297,7 @@ export default function EcocoinPage() {
               {FILTERS.map((f) => (
                 <button
                   key={f}
+                  type="button"
                   onClick={() => setFilter(f)}
                   className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${
                     filter === f ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"
