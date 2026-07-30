@@ -1,11 +1,13 @@
-# Phase 4 in progress
+# Next steps
 
-API list OK (empty until seed). Pull and seed:
+## Done recently
+- Header More menu: click-stable (no hover jump)
+- Simulator list: `?lang=fa|en|ar` on API + FE badge i18n
+- Auto-translate toolkit: `scripts/i18n_auto_translate.py` + `locale/source_en.json`
 
-```powershell
-git pull origin main
-curl.exe -X POST -H "User-Agent: Mozilla/5.0" http://127.0.0.1:8000/api/v1/crops/seed-demo
-curl.exe -X POST -H "User-Agent: Mozilla/5.0" http://127.0.0.1:8000/api/v1/farms/seed-demo
-```
-
-Then FE: `cd apps\web; pnpm dev` → `/crops` `/farms`
+## Recommended next
+1. `pip install deep-translator` then `python scripts/i18n_auto_translate.py --apply`
+2. Review `locale/generated_*.json` and merge into UI catalogs
+3. Expand `apps/simulation/i18n_catalog.py` for remaining simulator IDs
+4. Wire remaining FE pages (Science, Accounting, …) to `useLang` / `tr()`
+5. Phase 5+: RS256 cookies when keys are ready in `.env`
