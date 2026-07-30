@@ -1,4 +1,4 @@
-// apps/web/src/pages/EcocoinPage.tsx — wallet + filters + empty (ECO_STR) + header polish
+// apps/web/src/pages/EcocoinPage.tsx — full EcoCoin hub
 import { useMemo, useState } from "react";
 import {
   Coins,
@@ -9,9 +9,9 @@ import {
   LineChart as LineIcon,
   Trophy,
   ShoppingBag,
+  Sparkles,
 } from "lucide-react";
 import { useLang } from "../components/eco/i18n";
-import { tExtra } from "../components/eco/i18n_extras";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
 import { LineChart } from "../components/charts/LineChart";
@@ -19,6 +19,10 @@ import { WalletCard } from "../components/ecocoin/WalletCard";
 import { TransactionItem } from "../components/ecocoin/TransactionItem";
 import { ChallengeCard } from "../components/ecocoin/ChallengeCard";
 import { RedeemCard } from "../components/ecocoin/RedeemCard";
+import { MiningPanel } from "../components/ecocoin/MiningPanel";
+import { EconomicsPanel } from "../components/ecocoin/EconomicsPanel";
+import { StakingTiersPanel } from "../components/ecocoin/StakingTiersPanel";
+import { ProtocolStatsBar } from "../components/ecocoin/ProtocolStatsBar";
 import { ECO_STR, type EcoLang } from "../components/ecocoin/ecocoinI18n";
 import {
   WALLET,
@@ -34,10 +38,16 @@ import {
 type Filter = "all" | TxType;
 const FILTERS: Filter[] = ["all", "earn", "spend"];
 
+const PROGRAMS = [
+  { icon: "🌾", key: "farm" },
+  { icon: "💧", key: "water" },
+  { icon: "📚", key: "edu" },
+  { icon: "🛰️", key: "sat" },
+] as const;
+
 export default function EcocoinPage() {
   const { lang } = useLang();
   const s = ECO_STR[lang as EcoLang];
-  const tx = (k: string) => tExtra(lang, k);
   const locale = lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
 
   const [balance, setBalance] = useState(WALLET.balance);
@@ -90,20 +100,29 @@ export default function EcocoinPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
       <SectionReveal>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-700 text-white shadow-lg shadow-emerald-500/25">
-              <Coins className="h-6 w-6" />
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-200/60 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 p-6 text-white shadow-xl shadow-emerald-600/20">
+          <div className="pointer-events-none absolute -end-8 -top-8 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-10 start-10 h-32 w-32 rounded-full bg-amber-300/20 blur-2xl" />
+          <div className="relative flex flex-wrap items-center gap-4">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/30 backdrop-blur">
+              <Coins className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
-              <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
+              <h1 className="font-display text-3xl drop-soft">{s.title}</h1>
+              <p className="mt-1 text-sm text-emerald-50/90">{s.subtitle}</p>
+            </div>
+            <div className="ms-auto rounded-2xl bg-white/15 px-4 py-2 text-center backdrop-blur">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-100">{s.balance}</p>
+              <p className="font-display text-2xl font-black tabular-nums">
+                <AnimatedCounter end={balance} />
+              </p>
             </div>
           </div>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-100">
-            {tx("eco_wallet_live")}
-          </span>
         </div>
+      </SectionReveal>
+
+      <SectionReveal delay={60}>
+        <ProtocolStatsBar strings={s} />
       </SectionReveal>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -148,6 +167,41 @@ export default function EcocoinPage() {
           </SectionReveal>
         ))}
       </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <SectionReveal delay={100}>
+          <MiningPanel strings={s} />
+        </SectionReveal>
+        <SectionReveal delay={140}>
+          <EconomicsPanel strings={s} />
+        </SectionReveal>
+      </div>
+
+      <SectionReveal delay={100}>
+        <StakingTiersPanel strings={s} />
+      </SectionReveal>
+
+      <SectionReveal delay={80}>
+        <div className="mb-3 flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-teal-600" />
+          <div>
+            <h2 className="font-display text-xl text-stone-800">{s.programsTitle}</h2>
+            <p className="text-sm text-stone-600">{s.programsSub}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {PROGRAMS.map((p, i) => (
+            <div
+              key={p.key}
+              className="card-hover flex flex-col items-center gap-2 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
+              style={{ animation: `fade-up 0.4s ease ${i * 50}ms both` }}
+            >
+              <span className="text-3xl">{p.icon}</span>
+              <span className="text-xs font-bold uppercase text-stone-500">{p.key}</span>
+            </div>
+          ))}
+        </div>
+      </SectionReveal>
 
       <SectionReveal delay={100}>
         <div className="mb-3 flex items-center gap-2">
