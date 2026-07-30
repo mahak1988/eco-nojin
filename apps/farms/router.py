@@ -5,8 +5,10 @@ from __future__ import annotations
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.farms.models import Farm
 from apps.farms.schemas import FarmCreate, FarmListResponse, FarmResponse, FarmUpdate
 from apps.farms.service import FarmService
 from apps.shared_core.config import settings
@@ -26,6 +28,8 @@ async def list_farms(
 ):
     service = FarmService(session)
     items, meta = await service.list_farms(page=page, size=size, search=search)
+    if not isinstance(meta, dict):
+        meta = {"total": 0, "page": page, "size": size, "pages": 0}
     return FarmListResponse(data=items, meta=ListMeta(**meta))
 
 
@@ -33,14 +37,22 @@ async def list_farms(
 async def seed_farms(
     session: AsyncSession = Depends(get_db_session),
 ):
-    """Insert a few demo farms (local/dev only)."""
+    """Insert demo farms (local/dev only). Uses direct COUNT — no meta tuple bugs."""
     if settings.ENVIRONMENT == "production":
         raise HTTPException(status_code=403, detail="Seed disabled in production")
-    service = FarmService(session)
-    _items, meta = await service.list_farms(page=1, size=1)
-    total = int(meta.get("total", 0) if isinstance(meta, dict) else 0)
+
+    total = int(
+        (
+            await session.execute(
+                select(func.count()).select_from(Farm).where(Farm.is_deleted.is_(False))
+            )
+        ).scalar_one()
+        or 0
+    )
     if total > 0:
         return {"seeded": 0, "message": "already has farms", "total": total}
+
+    service = FarmService(session)
     demos = [
         FarmCreate(
             name="Isfahan Demo Farm",
@@ -80,15 +92,13 @@ async def create_farm(
     session: AsyncSession = Depends(get_db_session),
     _: object = Depends(require_permission("farms:write")),
 ):
-    service = FarmService(session)
-    return await service.create_farm(payload)
+    return await FarmService(session).create_farm(payload)
 
 
 @router.get("/{farm_id}", response_model=FarmResponse)
 async def get_farm(farm_id: int, session: AsyncSession = Depends(get_db_session)):
-    service = FarmService(session)
     try:
-        return await service.get_farm(farm_id)
+        return await FarmService(session).get_farm(farm_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Farm not found")
 
@@ -100,9 +110,8 @@ async def update_farm(
     session: AsyncSession = Depends(get_db_session),
     _: object = Depends(require_permission("farms:write")),
 ):
-    service = FarmService(session)
     try:
-        return await service.update_farm(farm_id, payload)
+        return await FarmService(session).update_farm(farm_id, payload)
     except ValueError:
         raise HTTPException(status_code=404, detail="Farm not found")
 
@@ -113,17 +122,15 @@ async def delete_farm(
     session: AsyncSession = Depends(get_db_session),
     _: object = Depends(require_permission("farms:write")),
 ):
-    service = FarmService(session)
     try:
-        await service.delete_farm(farm_id)
+        await FarmService(session).delete_farm(farm_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Farm not found")
 
 
 @router.get("/{farm_id}/geojson")
 async def farm_geojson(farm_id: int, session: AsyncSession = Depends(get_db_session)):
-    service = FarmService(session)
     try:
-        return await service.geojson(farm_id)
+        return await FarmService(session).geojson(farm_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Farm not found")
