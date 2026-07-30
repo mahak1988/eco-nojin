@@ -1,4 +1,4 @@
-// apps/web/src/pages/EducationPage.tsx — R1 real API + R16 Loading/Error/Empty
+// apps/web/src/pages/EducationPage.tsx — R1 + R16 + i18n empty/loading
 import { useMemo, useState, useEffect, useCallback } from "react";
 import {
   GraduationCap,
@@ -14,6 +14,7 @@ import {
 import { getEducationCourses, getEducationStats, seedEducationDemo } from "../lib/apiServices";
 import { extractCourseList, mapApiCourseToUi } from "../lib/mappers/education";
 import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
 import { CourseCard } from "../components/education/CourseCard";
@@ -33,7 +34,6 @@ import type { DataSource } from "../types/common";
 
 type LevelFilter = "all" | LevelKey;
 const LEVEL_FILTERS: LevelFilter[] = ["all", "level_beginner", "level_intermediate", "level_advanced"];
-
 type LoadState = "loading" | "ready" | "empty" | "error";
 
 export default function EducationPage() {
@@ -43,6 +43,7 @@ export default function EducationPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const { lang } = useLang();
   const s = EDU_STR[lang as EduLang];
+  const tx = (k: string) => tExtra(lang, k);
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [paths, setPaths] = useState<LearningPathData[]>(INITIAL_PATHS);
@@ -59,7 +60,7 @@ export default function EducationPage() {
       setApiSource("error");
       setCourses([]);
       setLoadState("error");
-      setErrorMsg(coursesRes.errorMessage || "Failed to load courses");
+      setErrorMsg(coursesRes.errorMessage || tx("edu_error"));
       return;
     }
 
@@ -79,21 +80,14 @@ export default function EducationPage() {
       setLoadState("empty");
     }
 
-    const st = statsRes.data as { total_enrollments?: number; total_courses?: number };
+    const st = statsRes.data as { total_enrollments?: number };
     if (statsRes.source === "api" && typeof st.total_enrollments === "number") {
       setApiLearners(st.total_enrollments);
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (cancelled) return;
-      await loadCourses();
-    })();
-    return () => {
-      cancelled = true;
-    };
+    void loadCourses();
   }, [loadCourses]);
 
   const handleSeed = async () => {
@@ -147,8 +141,8 @@ export default function EducationPage() {
       <SectionReveal>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-green-50 ring-1 ring-green-600/15">
-              <GraduationCap className="h-5 w-5 text-green-700" />
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-700 text-white shadow-lg shadow-green-500/20">
+              <GraduationCap className="h-6 w-6" />
             </div>
             <div>
               <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
@@ -162,7 +156,7 @@ export default function EducationPage() {
               className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-600 hover:bg-stone-50"
             >
               <RefreshCw className="h-3.5 w-3.5" />
-              Refresh
+              {tx("edu_refresh")}
             </button>
             <DataSourceBadge source={apiSource} />
           </div>
@@ -172,9 +166,7 @@ export default function EducationPage() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {stats.map((c, i) => (
           <SectionReveal key={c.label} delay={i * 70}>
-            <div
-              className={`flex flex-col items-center rounded-2xl border border-stone-200/80 p-5 text-center shadow-sm ${c.bg}`}
-            >
+            <div className={`card-hover flex flex-col items-center rounded-2xl border border-stone-200/80 p-5 text-center shadow-sm ${c.bg}`}>
               <c.icon className={`mb-2 h-7 w-7 ${c.color}`} />
               <p className={`font-display text-3xl font-black tabular-nums ${c.color}`}>
                 <AnimatedCounter end={c.value} />
@@ -201,7 +193,7 @@ export default function EducationPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={s.searchPlaceholder}
-            className="w-full rounded-xl border border-stone-200 bg-white py-2.5 ps-9 pe-3 text-sm text-stone-800 outline-none transition-colors placeholder:text-stone-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/15"
+            className="w-full rounded-xl border border-stone-200 bg-white py-2.5 ps-9 pe-3 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/15"
           />
         </div>
         <div className="flex flex-wrap items-center gap-1 rounded-full border border-stone-200 bg-white p-1">
@@ -221,16 +213,16 @@ export default function EducationPage() {
       </div>
 
       {loadState === "loading" && (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white py-20">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-stone-200 bg-white py-20">
           <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-          <p className="text-sm font-medium text-stone-500">Loading courses…</p>
+          <p className="text-sm font-medium text-stone-500">{tx("edu_loading")}</p>
         </div>
       )}
 
       {loadState === "error" && (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/50 py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-rose-200 bg-rose-50/50 py-16 text-center">
           <AlertCircle className="h-10 w-10 text-rose-500" />
-          <p className="font-medium text-rose-800">Could not load courses</p>
+          <p className="font-medium text-rose-800">{tx("edu_error")}</p>
           <p className="max-w-md text-sm text-rose-600">{errorMsg}</p>
           <button
             type="button"
@@ -238,15 +230,15 @@ export default function EducationPage() {
             className="mt-2 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700"
           >
             <RefreshCw className="h-4 w-4" />
-            Retry
+            {tx("edu_retry")}
           </button>
         </div>
       )}
 
       {loadState === "empty" && (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-stone-300 bg-white py-16 text-center">
           <BookOpen className="h-10 w-10 text-stone-300" />
-          <p className="text-stone-500">{s.noCourses || "No courses yet"}</p>
+          <p className="text-stone-500">{s.noCourses || tx("state_empty")}</p>
           <button
             type="button"
             disabled={seeding}
@@ -254,13 +246,13 @@ export default function EducationPage() {
             className="mt-2 inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-700 disabled:opacity-60"
           >
             {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Seed demo courses
+            {tx("edu_seed")}
           </button>
         </div>
       )}
 
       {loadState === "ready" && visibleCourses.length === 0 && (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-stone-300 bg-white py-16 text-center">
           <BookOpen className="h-10 w-10 text-stone-300" />
           <p className="text-stone-500">{s.noCourses}</p>
         </div>
@@ -270,13 +262,7 @@ export default function EducationPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleCourses.map((c, i) => (
             <SectionReveal key={c.id} delay={Math.min(i * 60, 240)}>
-              <CourseCard
-                course={c}
-                strings={s}
-                lang={lang as EduLang}
-                onEnroll={enroll}
-                onCompleteLesson={completeLesson}
-              />
+              <CourseCard course={c} strings={s} lang={lang as EduLang} onEnroll={enroll} onCompleteLesson={completeLesson} />
             </SectionReveal>
           ))}
         </div>
