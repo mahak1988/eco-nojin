@@ -1,7 +1,17 @@
-// apps/web/src/pages/EcocoinPage.tsx
+// apps/web/src/pages/EcocoinPage.tsx — wallet + filters + empty (ECO_STR) + header polish
 import { useMemo, useState } from "react";
-import { Coins, TrendingUp, ArrowDownToLine, Lock, Receipt, LineChart as LineIcon, Trophy, ShoppingBag } from "lucide-react";
+import {
+  Coins,
+  TrendingUp,
+  ArrowDownToLine,
+  Lock,
+  Receipt,
+  LineChart as LineIcon,
+  Trophy,
+  ShoppingBag,
+} from "lucide-react";
 import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { AnimatedCounter } from "../components/eco/AnimatedCounter";
 import { LineChart } from "../components/charts/LineChart";
@@ -9,10 +19,16 @@ import { WalletCard } from "../components/ecocoin/WalletCard";
 import { TransactionItem } from "../components/ecocoin/TransactionItem";
 import { ChallengeCard } from "../components/ecocoin/ChallengeCard";
 import { RedeemCard } from "../components/ecocoin/RedeemCard";
-import { ECO_STR, ecoText, type EcoLang } from "../components/ecocoin/ecocoinI18n";
+import { ECO_STR, type EcoLang } from "../components/ecocoin/ecocoinI18n";
 import {
-  WALLET, BALANCE_SERIES, INITIAL_TRANSACTIONS, INITIAL_CHALLENGES, REDEEM_ITEMS,
-  type EcoTx, type Challenge, type TxType,
+  WALLET,
+  BALANCE_SERIES,
+  INITIAL_TRANSACTIONS,
+  INITIAL_CHALLENGES,
+  REDEEM_ITEMS,
+  type EcoTx,
+  type Challenge,
+  type TxType,
 } from "../components/ecocoin/ecocoinData";
 
 type Filter = "all" | TxType;
@@ -21,6 +37,7 @@ const FILTERS: Filter[] = ["all", "earn", "spend"];
 export default function EcocoinPage() {
   const { lang } = useLang();
   const s = ECO_STR[lang as EcoLang];
+  const tx = (k: string) => tExtra(lang, k);
   const locale = lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
 
   const [balance, setBalance] = useState(WALLET.balance);
@@ -30,7 +47,10 @@ export default function EcocoinPage() {
   const [filter, setFilter] = useState<Filter>("all");
 
   const prependTx = (category: EcoTx["category"], type: TxType, amount: number, titleKey: string) =>
-    setTxs((prev) => [{ id: `u${Date.now()}`, category, type, amount, titleKey, timestamp: new Date().toISOString() }, ...prev]);
+    setTxs((prev) => [
+      { id: `u${Date.now()}`, category, type, amount, titleKey, timestamp: new Date().toISOString() },
+      ...prev,
+    ]);
 
   const claim = (id: string) => {
     const c = challenges.find((x) => x.id === id);
@@ -50,13 +70,15 @@ export default function EcocoinPage() {
 
   const visibleTx = useMemo(
     () => (filter === "all" ? txs : txs.filter((t) => t.type === filter)),
-    [txs, filter]
+    [txs, filter],
   );
 
   const weekLabels =
-    lang === "fa" ? ["ش", "ی", "د", "س", "چ", "پ", "ج"]
-    : lang === "ar" ? ["ح", "ن", "ث", "ر", "خ", "ج", "س"]
-    : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+    lang === "fa"
+      ? ["ش", "ی", "د", "س", "چ", "پ", "ج"]
+      : lang === "ar"
+        ? ["ح", "ن", "ث", "ر", "خ", "ج", "س"]
+        : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
   const kpis = [
     { icon: TrendingUp, label: s.totalEarned, value: WALLET.totalEarned, color: "text-green-700", bg: "bg-green-50" },
@@ -67,43 +89,54 @@ export default function EcocoinPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
-      {/* header */}
       <SectionReveal>
-        <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-emerald-50 ring-1 ring-emerald-600/15">
-            <Coins className="h-5 w-5 text-emerald-700" />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-700 text-white shadow-lg shadow-emerald-500/25">
+              <Coins className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
+              <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
-            <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
-          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-100">
+            {tx("eco_wallet_live")}
+          </span>
         </div>
       </SectionReveal>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* wallet card */}
         <SectionReveal delay={80}>
-          <WalletCard address={WALLET.address} balance={balance} staked={WALLET.staked} apy={WALLET.apy} strings={s} lang={lang as EcoLang} />
+          <WalletCard
+            address={WALLET.address}
+            balance={balance}
+            staked={WALLET.staked}
+            apy={WALLET.apy}
+            strings={s}
+            lang={lang as EcoLang}
+          />
         </SectionReveal>
-
-        {/* balance trend */}
         <SectionReveal delay={140} className="lg:col-span-2">
           <div className="h-full rounded-2xl border border-stone-200/80 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
               <LineIcon className="h-4 w-4 text-emerald-700" />
               <h2 className="font-display text-lg text-stone-800">{s.balanceTrend}</h2>
             </div>
-            <LineChart data={BALANCE_SERIES} labels={weekLabels} color="#059669"
-              formatValue={(v) => v.toLocaleString(locale)} />
+            <LineChart
+              data={BALANCE_SERIES}
+              labels={weekLabels}
+              color="#059669"
+              formatValue={(v) => v.toLocaleString(locale)}
+            />
           </div>
         </SectionReveal>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {kpis.map((k, i) => (
           <SectionReveal key={k.label} delay={i * 70}>
-            <div className={`rounded-2xl border border-stone-200/80 p-4 shadow-sm ${k.bg}`}>
+            <div className={`card-hover rounded-2xl border border-stone-200/80 p-4 shadow-sm ${k.bg}`}>
               <div className="flex items-center gap-2">
                 <k.icon className={`h-4 w-4 ${k.color}`} />
                 <p className="text-sm font-medium text-stone-600">{k.label}</p>
@@ -116,7 +149,6 @@ export default function EcocoinPage() {
         ))}
       </div>
 
-      {/* challenges */}
       <SectionReveal delay={100}>
         <div className="mb-3 flex items-center gap-2">
           <Trophy className="h-5 w-5 text-amber-600" />
@@ -134,7 +166,6 @@ export default function EcocoinPage() {
         ))}
       </div>
 
-      {/* redeem shop */}
       <SectionReveal delay={100}>
         <div className="mb-3 flex items-center gap-2">
           <ShoppingBag className="h-5 w-5 text-rose-600" />
@@ -147,12 +178,18 @@ export default function EcocoinPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {REDEEM_ITEMS.map((item, i) => (
           <SectionReveal key={item.id} delay={i * 70}>
-            <RedeemCard item={item} balance={balance} redeemed={!!redeemed[item.id]} strings={s} lang={lang as EcoLang} onRedeem={redeem} />
+            <RedeemCard
+              item={item}
+              balance={balance}
+              redeemed={!!redeemed[item.id]}
+              strings={s}
+              lang={lang as EcoLang}
+              onRedeem={redeem}
+            />
           </SectionReveal>
         ))}
       </div>
 
-      {/* transactions */}
       <SectionReveal delay={100}>
         <div className="rounded-2xl border border-stone-200/80 bg-white p-6 shadow-sm">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -162,17 +199,22 @@ export default function EcocoinPage() {
             </div>
             <div className="flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 p-1">
               {FILTERS.map((f) => (
-                <button key={f} onClick={() => setFilter(f)}
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
                   className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${
                     filter === f ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"
-                  }`}>
+                  }`}
+                >
                   {f === "all" ? s.filterAll : f === "earn" ? s.filterEarn : s.filterSpend}
                 </button>
               ))}
             </div>
           </div>
           {visibleTx.length === 0 ? (
-            <p className="py-10 text-center text-stone-500">{s.noTx}</p>
+            <div className="rounded-2xl border border-dashed border-stone-300 py-12 text-center text-stone-500">
+              {s.noTx}
+            </div>
           ) : (
             <ul className="divide-y divide-stone-100">
               {visibleTx.map((t) => (
