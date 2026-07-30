@@ -1,13 +1,13 @@
 # فاز بعدی
 
-**فاز ۱ (امنیت):** انجام‌شده در مخزن — `docs/PHASE1_SECURITY.md`
-
-**فاز ۲ بعدی:** دیتابیس local-first — merge Alembic heads، seed پایدار SQLite.
+**فاز ۱:** امنیتی — تأیید شده با health.security
+**فاز ۲:** دیتابیس — `docs/PHASE2_DATABASE.md` + migrations idempotent
 
 ```powershell
 cd D:\econojin.com
 git pull origin main
-Copy-Item .env.example .env -ErrorAction SilentlyContinue
-.\scripts\run_local.ps1
-curl.exe -H "User-Agent: Mozilla/5.0" http://localhost:8000/health
+.\scripts\alembic_upgrade_safe.ps1
+# سپس restart API یا:\n.\scripts\run_local.ps1
 ```
+
+**فاز ۳ بعدی:** یکپارچه‌سازی API (debug routers، pagination، contract smoke)
