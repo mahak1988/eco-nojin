@@ -4,11 +4,12 @@
 // client engine (lesson: Vite "failed to fetch" robustness — never a white screen).
 import type { Series } from "../components/simulators/simulatorsData";
 
+// Use environment variable with safe fallback to Vite proxy (empty string)
 export const API_BASE =
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE) ||
-  "http://localhost:8000";
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL) ||
+  "";
 export const API_V1 =
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_V1) ||
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_V1) ||
   "/api/v1";
 
 const RUN_TIMEOUT = 8000;
