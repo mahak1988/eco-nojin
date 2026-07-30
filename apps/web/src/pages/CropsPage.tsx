@@ -3,9 +3,17 @@ import { Link } from "react-router-dom";
 import { Leaf, Loader2, AlertCircle, RefreshCw, Sprout, Search } from "lucide-react";
 import { fetchCrops, type Crop } from "../api/resources";
 import { apiFetch, v1 } from "../api/http";
-import { t } from "../i18n";
+import { useLang, CONTENT } from "../components/eco/i18n";
+import { tr, tExtra } from "../components/eco/i18n_extras";
 
 export default function CropsPage() {
+  const { lang } = useLang();
+  const c = CONTENT[lang] as unknown as Record<string, unknown>;
+  const tx = (key: string) => {
+    const a = tr(c, lang, key);
+    return a !== key ? a : tExtra(lang, key);
+  };
+
   const [crops, setCrops] = useState<Crop[]>([]);
   const [total, setTotal] = useState(0);
   const [q, setQ] = useState("");
@@ -23,36 +31,37 @@ export default function CropsPage() {
           await apiFetch(v1("/crops/seed-demo?force=true"), { method: "POST" });
           res = await fetchCrops(1, 200);
         } catch {
-          /* seed may fail offline; still show empty */
+          /* seed may fail offline */
         }
       }
       let list = res.data || [];
       if (q.trim()) {
         const qq = q.trim().toLowerCase();
         list = list.filter(
-          (c) =>
-            c.name.toLowerCase().includes(qq) ||
-            (c.name_fa || "").toLowerCase().includes(qq),
+          (item) =>
+            item.name.toLowerCase().includes(qq) ||
+            (item.name_fa || "").toLowerCase().includes(qq),
         );
       }
       if (category) {
-        list = list.filter((c) => c.category === category);
+        list = list.filter((item) => item.category === category);
       }
       setCrops(list);
       setTotal(res.meta?.total ?? list.length);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("common.error"));
+      setError(e instanceof Error ? e.message : tx("state_error"));
     } finally {
       setLoading(false);
     }
-  }, [q, category]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q, category, lang]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   const categories = useMemo(() => {
-    const s = new Set(crops.map((c) => c.category));
+    const s = new Set(crops.map((item) => item.category));
     return Array.from(s).sort();
   }, [crops]);
 
@@ -64,9 +73,9 @@ export default function CropsPage() {
             <Sprout className="h-5 w-5 text-lime-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">{t("common.nav.crops")}</h1>
+            <h1 className="font-display text-3xl text-stone-800">{tx("crops_title")}</h1>
             <p className="text-sm text-stone-500">
-              {total} entries · water · season · growth
+              {total} {tx("crops_subtitle")}
             </p>
           </div>
         </div>
@@ -75,7 +84,7 @@ export default function CropsPage() {
           onClick={() => void load()}
           className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold"
         >
-          <RefreshCw className="h-3.5 w-3.5" /> {t("common.retry")}
+          <RefreshCw className="h-3.5 w-3.5" /> {tx("state_retry")}
         </button>
       </div>
 
@@ -85,7 +94,7 @@ export default function CropsPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder={t("common.search")}
+            placeholder={tx("search_placeholder")}
             className="w-full rounded-xl border border-stone-200 py-2.5 ps-9 pe-3 text-sm"
           />
         </div>
@@ -94,10 +103,10 @@ export default function CropsPage() {
           onChange={(e) => setCategory(e.target.value)}
           className="rounded-xl border border-stone-200 px-3 py-2 text-sm"
         >
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
+          <option value="">{tx("crops_all_categories")}</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
             </option>
           ))}
         </select>
@@ -115,31 +124,31 @@ export default function CropsPage() {
         </div>
       )}
       {!loading && !error && crops.length === 0 && (
-        <p className="py-12 text-center text-stone-500">{t("common.empty")}</p>
+        <p className="py-12 text-center text-stone-500">{tx("state_empty")}</p>
       )}
       {!loading && !error && crops.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {crops.map((c) => (
+          {crops.map((item) => (
             <Link
-              key={c.id}
-              to={`/crops/${c.id}`}
+              key={item.id}
+              to={`/crops/${item.id}`}
               className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-lime-200 hover:shadow-md"
             >
               <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-lime-500 to-emerald-600 text-white">
                 <Leaf className="h-4 w-4" />
               </div>
               <h3 className="font-display text-base text-stone-800">
-                {c.name}
-                {c.name_fa ? <span className="ms-1 text-xs text-stone-400">{c.name_fa}</span> : null}
+                {item.name}
+                {item.name_fa ? <span className="ms-1 text-xs text-stone-400">{item.name_fa}</span> : null}
               </h3>
-              <p className="mt-1 text-xs font-bold uppercase tracking-wide text-lime-700">{c.category}</p>
+              <p className="mt-1 text-xs font-bold uppercase tracking-wide text-lime-700">{item.category}</p>
               <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] font-bold text-stone-500">
-                {c.season && <span className="rounded-full bg-stone-100 px-2 py-0.5">{c.season}</span>}
-                {c.water_need_mm != null && (
-                  <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">{c.water_need_mm} mm</span>
+                {item.season && <span className="rounded-full bg-stone-100 px-2 py-0.5">{item.season}</span>}
+                {item.water_need_mm != null && (
+                  <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">{item.water_need_mm} mm</span>
                 )}
-                {c.growth_days != null && (
-                  <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-800">{c.growth_days}d</span>
+                {item.growth_days != null && (
+                  <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-800">{item.growth_days}d</span>
                 )}
               </div>
             </Link>

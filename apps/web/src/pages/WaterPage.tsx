@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Droplets, Loader2, AlertTriangle, Waves } from "lucide-react";
+import { useLang, CONTENT } from "../components/eco/i18n";
+import { tr, tExtra } from "../components/eco/i18n_extras";
 
 interface Dash {
   soil_moisture_pct: number;
@@ -12,30 +14,38 @@ interface Dash {
 }
 
 export default function WaterPage() {
+  const { lang } = useLang();
+  const c = CONTENT[lang] as unknown as Record<string, unknown>;
+  const tx = (key: string) => {
+    const a = tr(c, lang, key);
+    return a !== key ? a : tExtra(lang, key);
+  };
+
   const [dash, setDash] = useState<Dash | null>(null);
   const [sources, setSources] = useState<Array<Record<string, unknown>>>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let c = false;
+    let cancelled = false;
     (async () => {
       try {
         const [d, s] = await Promise.all([
           fetch("/api/v1/water/dashboard", { credentials: "include" }).then((r) => r.json()),
           fetch("/api/v1/water/sources", { credentials: "include" }).then((r) => r.json()),
         ]);
-        if (!c) {
+        if (!cancelled) {
           setDash(d);
           setSources(Array.isArray(s) ? s : []);
         }
       } catch (e) {
-        if (!c) setError(e instanceof Error ? e.message : "Error");
+        if (!cancelled) setError(e instanceof Error ? e.message : tx("state_error"));
       }
     })();
     return () => {
-      c = true;
+      cancelled = true;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   if (error) {
     return <div className="p-8 text-center text-rose-700">{error}</div>;
@@ -49,11 +59,11 @@ export default function WaterPage() {
   }
 
   const cards = [
-    { label: "Soil moisture", value: `${dash.soil_moisture_pct}%`, color: "text-sky-700 bg-sky-50" },
-    { label: "Reservoir", value: `${dash.reservoir_level_pct}%`, color: "text-blue-700 bg-blue-50" },
-    { label: "Daily use", value: `${dash.daily_usage_m3} m³`, color: "text-cyan-700 bg-cyan-50" },
+    { label: tx("water_soil_moisture"), value: `${dash.soil_moisture_pct}%`, color: "text-sky-700 bg-sky-50" },
+    { label: tx("water_reservoir"), value: `${dash.reservoir_level_pct}%`, color: "text-blue-700 bg-blue-50" },
+    { label: tx("water_daily_use"), value: `${dash.daily_usage_m3} m³`, color: "text-cyan-700 bg-cyan-50" },
     {
-      label: "Quality index",
+      label: tx("water_quality_index"),
       value: dash.quality_index.toFixed(2),
       color: "text-emerald-700 bg-emerald-50",
     },
@@ -66,19 +76,20 @@ export default function WaterPage() {
           <Droplets className="h-5 w-5 text-sky-700" />
         </div>
         <div>
-          <h1 className="font-display text-3xl text-stone-800">Water</h1>
+          <h1 className="font-display text-3xl text-stone-800">{tx("water_title")}</h1>
           <p className="text-sm text-stone-500">
-            Dashboard · {dash.sources_count} sources · irrigation{" "}
-            {dash.irrigation_active ? "active" : "idle"}
+            {tx("water_dashboard")} · {dash.sources_count} {tx("water_sources_count")} · {" "}
+            {tx("water_irrigation")}{" "}
+            {dash.irrigation_active ? tx("water_active") : tx("water_idle")}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {cards.map((c) => (
-          <div key={c.label} className={`rounded-2xl border border-stone-200 p-4 ${c.color}`}>
-            <p className="text-xs font-bold opacity-70">{c.label}</p>
-            <p className="mt-1 font-display text-2xl font-black">{c.value}</p>
+        {cards.map((card) => (
+          <div key={card.label} className={`rounded-2xl border border-stone-200 p-4 ${card.color}`}>
+            <p className="text-xs font-bold opacity-70">{card.label}</p>
+            <p className="mt-1 font-display text-2xl font-black">{card.value}</p>
           </div>
         ))}
       </div>
@@ -96,7 +107,7 @@ export default function WaterPage() {
 
       <h2 className="flex items-center gap-2 font-display text-xl text-stone-800">
         <Waves className="h-5 w-5 text-sky-600" />
-        Sources
+        {tx("water_sources")}
       </h2>
       <div className="grid gap-3 sm:grid-cols-3">
         {sources.map((s) => (
