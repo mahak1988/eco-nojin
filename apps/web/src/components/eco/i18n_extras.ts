@@ -1,10 +1,10 @@
 /**
  * i18n extras — keys not in CONTENT.
- * Resolution: CONTENT → I18N_EXTRAS[lang] → I18N_EXTRAS.en → key
- * Phase B packs are merged from i18n_phase_b.ts
+ * Phase B + B2 packs merged at load.
  */
 import type { Lang } from "./i18n";
 import { PHASE_B_EXTRAS } from "./i18n_phase_b";
+import { PHASE_B2_EXTRAS } from "./i18n_phase_b2";
 
 const BASE: Record<Lang, Record<string, string>> = {
   fa: {
@@ -271,7 +271,7 @@ const BASE: Record<Lang, Record<string, string>> = {
 };
 
 function mergeLang(lang: Lang): Record<string, string> {
-  return { ...BASE[lang], ...PHASE_B_EXTRAS[lang] };
+  return { ...BASE[lang], ...PHASE_B_EXTRAS[lang], ...PHASE_B2_EXTRAS[lang] };
 }
 
 export const I18N_EXTRAS: Record<Lang, Record<string, string>> = {
@@ -293,4 +293,15 @@ export function tr(
 
 export function tExtra(lang: Lang, key: string): string {
   return I18N_EXTRAS[lang]?.[key] ?? I18N_EXTRAS.en[key] ?? key;
+}
+
+/** Shared helper for pages. */
+export function useTx(lang: Lang, content?: Record<string, unknown>) {
+  return (key: string) => {
+    if (content) {
+      const a = tr(content, lang, key);
+      if (a !== key) return a;
+    }
+    return tExtra(lang, key);
+  };
 }
