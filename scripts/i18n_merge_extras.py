@@ -43,6 +43,12 @@ def keys_in_extras_ts(text: str) -> set[str]:
     return set(re.findall(r"^\s{4}([a-z][a-z0-9_]*):\s*\"", text, flags=re.M))
 
 
+def _bullet_keys(keys: list[str]) -> list[str]:
+    if not keys:
+        return ["- none"]
+    return [f"- `{k}`" for k in keys]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--print-ts", action="store_true", help="Print TS snippets for missing keys")
@@ -69,7 +75,7 @@ def main() -> int:
     out = LOCALE / "merge_candidates.json"
     out.write_text(json.dumps(candidates, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    report = [
+    report_lines = [
         "# i18n merge report (Phase A)",
         "",
         f"- Keys in source_en: {len(en)}",
@@ -79,12 +85,12 @@ def main() -> int:
         f"- generated_ar loaded: {bool(ar)}",
         "",
         "## Missing keys",
-        *[f"- `{k}`" for k in missing] or ["- none"],
+        *_bullet_keys(missing),
         "",
         "Policy: do not overwrite human-curated extras. Review merge_candidates.json then paste.",
         "",
     ]
-    (LOCALE / "merge_report.md").write_text("\n".join(report), encoding="utf-8")
+    (LOCALE / "merge_report.md").write_text("\n".join(report_lines), encoding="utf-8")
     print(f"Wrote {out}")
     print(f"Missing keys: {len(missing)}")
 
