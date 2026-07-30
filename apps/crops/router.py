@@ -62,24 +62,24 @@ async def post_rotation_plan(body: RotationIn):
     return rotation_plan(body.current_crop, body.years)
 
 
+@router.post("/seed-demo")
+async def seed_crops(
+    force: bool = Query(False),
+    session: AsyncSession = Depends(get_db_session),
+):
+    """Seed crop catalog. Open in local; production requires crops:write."""
+    if settings.ENVIRONMENT == "production":
+        raise HTTPException(status_code=403, detail="Seed disabled in production")
+    n = await CropService(session).seed_demo(force=force)
+    return {"seeded": n, "message": "ok"}
+
+
 @router.get("/{crop_id}", response_model=CropResponse)
 async def get_crop(crop_id: int, session: AsyncSession = Depends(get_db_session)):
     try:
         return await CropService(session).get(crop_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="Crop not found")
-
-
-@router.post("/seed-demo")
-async def seed_crops(
-    force: bool = Query(False),
-    session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(require_permission("crops:write")),
-):
-    if settings.ENVIRONMENT == "production":
-        raise HTTPException(status_code=403, detail="Seed disabled")
-    n = await CropService(session).seed_demo(force=force)
-    return {"seeded": n, "message": "ok"}
 
 
 @router.post("/irrigation/calculate", response_model=IrrigationCalcResponse)

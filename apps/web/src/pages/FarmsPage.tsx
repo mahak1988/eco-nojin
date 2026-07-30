@@ -11,6 +11,8 @@ import {
   Map,
 } from "lucide-react";
 import { farmsApi, type FarmDto } from "../lib/farmsApi";
+import { apiFetch, v1 } from "../api/http";
+import { t } from "../i18n";
 
 export default function FarmsPage() {
   const [farms, setFarms] = useState<FarmDto[]>([]);
@@ -23,11 +25,19 @@ export default function FarmsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await farmsApi.list(1, 50, q.trim());
+      let res = await farmsApi.list(1, 50, q.trim());
+      if ((res.meta?.total ?? 0) === 0) {
+        try {
+          await apiFetch(v1("/farms/seed-demo"), { method: "POST" });
+          res = await farmsApi.list(1, 50, q.trim());
+        } catch {
+          /* ignore seed errors */
+        }
+      }
       setFarms(res.data || []);
       setTotal(res.meta?.total ?? res.data?.length ?? 0);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load farms");
+      setError(e instanceof Error ? e.message : t("common.error"));
       setFarms([]);
     } finally {
       setLoading(false);
@@ -46,7 +56,7 @@ export default function FarmsPage() {
             <Wheat className="h-5 w-5 text-emerald-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">Farms</h1>
+            <h1 className="font-display text-3xl text-stone-800">{t("common.nav.farms")}</h1>
             <p className="text-sm text-stone-500">{total} registered · manage boundaries & area</p>
           </div>
         </div>
@@ -57,7 +67,7 @@ export default function FarmsPage() {
             className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs font-bold text-stone-600 hover:bg-stone-50"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            Refresh
+            {t("common.retry")}
           </button>
           <Link
             to="/farms/wizard"
@@ -81,7 +91,7 @@ export default function FarmsPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search farms…"
+          placeholder={t("common.search")}
           className="w-full rounded-xl border border-stone-200 bg-white py-2.5 ps-9 pe-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
         />
       </div>
@@ -101,7 +111,7 @@ export default function FarmsPage() {
             onClick={() => void load()}
             className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white"
           >
-            Retry
+            {t("common.retry")}
           </button>
         </div>
       )}
@@ -109,7 +119,7 @@ export default function FarmsPage() {
       {!loading && !error && farms.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center">
           <MapPin className="h-10 w-10 text-stone-300" />
-          <p className="text-stone-500">No farms yet</p>
+          <p className="text-stone-500">{t("common.empty")}</p>
           <Link
             to="/farms/wizard"
             className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-bold text-white"
