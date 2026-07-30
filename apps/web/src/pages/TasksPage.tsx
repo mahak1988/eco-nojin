@@ -1,5 +1,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { CheckSquare, Loader2, Plus } from "lucide-react";
+import { useLang } from "../components/eco/i18n";
+import { tExtra } from "../components/eco/i18n_extras";
 
 interface Task {
   id: number;
@@ -14,6 +16,8 @@ interface Task {
 }
 
 export default function TasksPage() {
+  const { lang } = useLang();
+  const tx = (k: string) => tExtra(lang, k);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,11 +44,12 @@ export default function TasksPage() {
       const j = await res.json();
       setTasks(j.data || []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed");
+      setError(e instanceof Error ? e.message : tx("state_error"));
     } finally {
       setLoading(false);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   useEffect(() => {
     void load();
@@ -90,8 +95,8 @@ export default function TasksPage() {
             <CheckSquare className="h-5 w-5 text-violet-700" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-800">Farm tasks</h1>
-            <p className="text-sm text-stone-500">Priority · due date · assignment</p>
+            <h1 className="font-display text-3xl text-stone-800">{tx("tasks_title")}</h1>
+            <p className="text-sm text-stone-500">{tx("tasks_sub")}</p>
           </div>
         </div>
         <button
@@ -99,7 +104,7 @@ export default function TasksPage() {
           onClick={() => setShowForm((v) => !v)}
           className="inline-flex items-center gap-1 rounded-xl bg-violet-600 px-3 py-2 text-sm font-bold text-white"
         >
-          <Plus className="h-4 w-4" /> Task
+          <Plus className="h-4 w-4" /> {tx("tasks_new")}
         </button>
       </div>
 
@@ -108,7 +113,7 @@ export default function TasksPage() {
       {showForm && (
         <form onSubmit={onCreate} className="grid gap-3 rounded-2xl border bg-white p-5 sm:grid-cols-2">
           <label className="text-sm sm:col-span-2">
-            Title *
+            {tx("tasks_title_field")}
             <input
               required
               value={form.title}
@@ -117,7 +122,7 @@ export default function TasksPage() {
             />
           </label>
           <label className="text-sm">
-            Category
+            {tx("tasks_category")}
             <select
               value={form.category}
               onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
@@ -131,7 +136,7 @@ export default function TasksPage() {
             </select>
           </label>
           <label className="text-sm">
-            Priority
+            {tx("tasks_priority")}
             <select
               value={form.priority}
               onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value }))}
@@ -145,7 +150,7 @@ export default function TasksPage() {
             </select>
           </label>
           <label className="text-sm">
-            Due date
+            {tx("tasks_due")}
             <input
               type="date"
               value={form.due_date}
@@ -154,7 +159,7 @@ export default function TasksPage() {
             />
           </label>
           <label className="text-sm">
-            Assigned to
+            {tx("tasks_assigned")}
             <input
               value={form.assigned_to}
               onChange={(e) => setForm((f) => ({ ...f, assigned_to: e.target.value }))}
@@ -162,7 +167,7 @@ export default function TasksPage() {
             />
           </label>
           <label className="text-sm">
-            Est. hours
+            {tx("tasks_hours")}
             <input
               type="number"
               min={0}
@@ -173,7 +178,7 @@ export default function TasksPage() {
             />
           </label>
           <label className="text-sm sm:col-span-2">
-            Description
+            {tx("farm_description")}
             <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -182,7 +187,7 @@ export default function TasksPage() {
             />
           </label>
           <button type="submit" className="sm:col-span-2 rounded-xl bg-violet-600 py-2.5 text-sm font-bold text-white">
-            Save task
+            {tx("tasks_save")}
           </button>
         </form>
       )}
@@ -198,7 +203,7 @@ export default function TasksPage() {
               <div>
                 <p className="font-bold text-stone-800">{t.title}</p>
                 <p className="text-xs text-stone-500">
-                  {t.category} · due {t.due_date || "—"} · {t.assigned_to || "unassigned"}
+                  {t.category} · {t.due_date || "—"} · {t.assigned_to || tx("tasks_unassigned")}
                   {t.estimated_hours != null ? ` · ${t.estimated_hours}h` : ""}
                 </p>
               </div>
@@ -212,7 +217,7 @@ export default function TasksPage() {
               </div>
             </li>
           ))}
-          {tasks.length === 0 && <p className="py-8 text-center text-stone-500">No tasks</p>}
+          {tasks.length === 0 && <p className="py-8 text-center text-stone-500">{tx("tasks_empty")}</p>}
         </ul>
       )}
     </div>
