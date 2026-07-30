@@ -1,7 +1,7 @@
 """Standard list pagination helpers (R13/R14).
 
-Backward-compatible exports used by farms/crops/education/inventory routers:
-  ListMeta, ListEnvelope, build_meta, page_to_offset
+page_to_offset(page, size) -> int offset  (used by farms/crops/planting/...)
+page_params(page, size) -> (page, size, offset)
 """
 
 from __future__ import annotations
@@ -15,15 +15,12 @@ T = TypeVar("T")
 
 
 class ListMeta(BaseModel):
-    """Legacy + current list metadata."""
-
     total: int = Field(0, ge=0)
     page: int = Field(1, ge=1)
     size: int = Field(20, ge=1, le=200)
     pages: int = Field(0, ge=0)
 
 
-# Alias for newer code
 PageMeta = ListMeta
 
 
@@ -35,16 +32,18 @@ class ListEnvelope(BaseModel, Generic[T]):
 Page = ListEnvelope
 
 
-def page_to_offset(page: int = 1, size: int = 20) -> tuple[int, int, int]:
-    """Return (page, size, offset/skip)."""
+def page_to_offset(page: int, size: int) -> int:
+    """Return SQL OFFSET for 1-based page index."""
     page = max(1, int(page or 1))
     size = min(200, max(1, int(size or 20)))
-    offset = (page - 1) * size
-    return page, size, offset
+    return max(0, (page - 1) * size)
 
 
 def page_params(page: int = 1, size: int = 20) -> tuple[int, int, int]:
-    return page_to_offset(page, size)
+    """Return (page, size, offset)."""
+    page = max(1, int(page or 1))
+    size = min(200, max(1, int(size or 20)))
+    return page, size, page_to_offset(page, size)
 
 
 def build_meta(total: int, page: int, size: int) -> ListMeta:
