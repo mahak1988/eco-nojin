@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,7 +18,7 @@ router = APIRouter(prefix="/api/v1/farms", tags=["Farms"])
 async def list_farms(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
-    search: Optional[str] = None,
+    search: str | None = None,
     session: AsyncSession = Depends(get_db_session),
 ):
     service = FarmService(session)

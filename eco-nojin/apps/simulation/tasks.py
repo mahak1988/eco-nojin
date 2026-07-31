@@ -6,7 +6,7 @@ import csv
 import io
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -78,7 +78,7 @@ def _write_pdf_stub(path: Path, title: str, body: dict[str, Any]) -> None:
 @celery_app.task(name="simulation.run_aquacrop", bind=True)
 def run_aquacrop(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
     result = _run_aquacrop_sync(params or {})
-    run_id = self.request.id or datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    run_id = self.request.id or datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     csv_path = EXPORT_DIR / f"aquacrop_{run_id}.csv"
     pdf_path = EXPORT_DIR / f"aquacrop_{run_id}.pdf"
     _write_csv(
@@ -95,7 +95,7 @@ def run_aquacrop(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
 @celery_app.task(name="simulation.run_rothc", bind=True)
 def run_rothc(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
     result = _run_rothc_sync(params or {})
-    run_id = self.request.id or datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    run_id = self.request.id or datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     csv_path = EXPORT_DIR / f"rothc_{run_id}.csv"
     pdf_path = EXPORT_DIR / f"rothc_{run_id}.pdf"
     series = result.get("series") or []
@@ -111,7 +111,7 @@ def run_rothc(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def run_aquacrop_local(params: dict[str, Any] | None = None) -> dict[str, Any]:
     result = _run_aquacrop_sync(params or {})
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    run_id = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     pdf_path = EXPORT_DIR / f"aquacrop_{run_id}.pdf"
     csv_path = EXPORT_DIR / f"aquacrop_{run_id}.csv"
     _write_csv(
@@ -128,7 +128,7 @@ def run_aquacrop_local(params: dict[str, Any] | None = None) -> dict[str, Any]:
 
 def run_rothc_local(params: dict[str, Any] | None = None) -> dict[str, Any]:
     result = _run_rothc_sync(params or {})
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    run_id = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     pdf_path = EXPORT_DIR / f"rothc_{run_id}.pdf"
     csv_path = EXPORT_DIR / f"rothc_{run_id}.csv"
     _write_csv(csv_path, result.get("series") or [])

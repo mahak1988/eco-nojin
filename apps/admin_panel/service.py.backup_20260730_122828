@@ -1,0 +1,409 @@
+"""service module."""
+
+import logging
+import os
+import sys
+import time
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional
+
+from sqlalchemy import func, select, text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from apps.admin_panel.repository import AdminSettingRepository, AuditLogRepository, SystemReportRepository
+from apps.shared_core.models import AdminSetting, AuditLog, SystemReport
+from apps.users.models import User
+from apps.users.repository import UserRepository
+
+logger = logging.getLogger(__name__)
+
+
+class AdminService:
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+        self.settings_repo = AdminSettingRepository(session)
+        self.audit_repo = AuditLogRepository(session)
+        self.report_repo = SystemReportRepository(session)
+        self.user_repo = UserRepository(session)
+        
+        # Caching for frequently accessed data
+        self._settings_cache = {}
+        self._dashboard_cache = None
+        self._cache_timestamp = {}
+
+    # ==========================================
+    # System Settings with Caching
+    # ==========================================
+
+    async def get_system_settings(self, limit: int = 100, offset: int = 0) -> list[AdminSetting]:
+        # Simple caching for settings - refresh every 5 minutes
+        cache_key = f"settings_{limit}_{offset}"
+        current_time = time.time()
+        
+        # Check if cached and not expired (5 minutes)
+        if cache_key in self._settings_cache:
+            cached_time = self._cache_timestamp.get(cache_key, 0)
+            if current_time - cached_time < 300:  # 5 minutes
+                return self._settings_cache[cache_key]
+        
+        settings = await self.settings_repo.get_multi(limit=limit, offset=offset)
+        self._settings_cache[cache_key] = settings
+        self._cache_timestamp[cache_key] = current_time
+        return settings
+
+    async def get_setting_by_key(self, key: str) -> Optional[AdminSetting]:
+        # Check cache first
+        if key in self._settings_cache:
+            current_time = time.time()
+            cached_time = self._cache_timestamp.get(f"setting_{key}", 0)
+            if current_time - cached_time < 300:  # 5 minutes
+                return self._settings_cache[f"setting_{key}"]
+        
+        setting = await self.settings_repo.get_by_key(key)
+        if setting:
+            self._settings_cache[f"setting_{key}"] = setting
+            self._cache_timestamp[f"setting_{key}"] = time.time()
+        return setting
+
+    async def upsert_system_setting(
+        self,
+        key: str,
+        value: Optional[str] = None,
+        description: Optional[str] = None,
+        is_active: Optional[bool] = None
+    ) -> AdminSetting:
+        # Invalidate cache when updating
+        if key in self._settings_cache:
+            del self._settings_cache[key]
+            del self._cache_timestamp[f"setting_{key}"]
+        
+        existing = await self.get_setting_by_key(key)
+        payload: Dict[str, Any] = {}
+        if value is not None:
+            payload["value"] = value
+        if description is not None:
+            payload["description"] = description
+        if is_active is not None:
+            payload["is_active"] = is_active
+
+        if existing:
+            return await self.settings_repo.update(existing, payload)
+
+        payload.update({
+            "key": key,
+            "value": value or "",
+            "description": description or "",
+            "is_active": is_active if is_active is not None else True,
+        })
+        result = await self.settings_repo.create(payload)
+        
+        # Update cache
+        self._settings_cache[f"setting_{key}"] = result
+        self._cache_timestamp[f"setting_{key}"] = time.time()
+        return result
+
+    # ==========================================
+    # Audit Logs
+    # ==========================================
+
+    async def list_audit_logs(
+        self,
+        event_type: Optional[str] = None,
+        actor_email: Optional[str] = None,
+        date_from: Optional[datetime] = None,
+        date_to: Optional[datetime] = None,
+        limit: int = 100,
+        offset: int = 0,
+        cursor: Optional[int] = None  # For cursor-based pagination
+    ) -> list[AuditLog]:
+        if cursor is not None:
+            # Cursor-based pagination implementation
+            return await self.audit_repo.filter_by_params_cursor(
+                cursor=cursor,
+                event_type=event_type,
+                actor_email=actor_email,
+                date_from=date_from,
+                date_to=date_to,
+                limit=limit
+            )
+        else:
+            return await self.audit_repo.filter_by_params(
+                event_type=event_type,
+                actor_email=actor_email,
+                date_from=date_from,
+                date_to=date_to,
+                limit=limit,
+                offset=offset
+            )
+
+    async def record_audit_event(
+        self,
+        event_type: str,
+        event_data: Optional[str] = None,
+        actor: Optional[User] = None
+    ) -> AuditLog:
+        payload = {
+            "event_type": event_type,
+            "event_data": event_data,
+            "actor_id": actor.id if actor else None,
+            "actor_email": actor.email if actor else None,
+        }
+        return await self.audit_repo.create(payload)
+
+    # ==========================================
+    # System Reports
+    # ==========================================
+
+    async def list_system_reports(self, limit: int = 100, offset: int = 0, cursor: Optional[int] = None) -> list[SystemReport]:
+        if cursor is not None:
+            # Cursor-based pagination implementation
+            return await self.report_repo.get_multi_cursor(cursor=cursor, limit=limit)
+        else:
+            return await self.report_repo.get_multi(limit=limit, offset=offset)
+
+    async def create_system_report(self, report_name: str, report_type: str = "csv") -> SystemReport:
+        payload = {
+            "report_name": report_name,
+            "status": "pending",
+        }
+        report = await self.report_repo.create(payload)
+        # In real implementation, this would trigger a Celery task
+        # For now, we simulate completion
+        await self.report_repo.update(report, {"status": "completed", "report_data": f"Report '{report_name}' generated successfully."})
+        updated = await self.report_repo.get_by_id(report.id)
+        return updated
+
+    # ==========================================
+    # Dashboard Summary with Caching
+    # ==========================================
+
+    async def get_dashboard_summary(self) -> dict:
+        # Cache dashboard data for 1 minute to reduce DB queries
+        current_time = time.time()
+        if self._dashboard_cache and current_time - self._cache_timestamp.get("dashboard", 0) < 60:
+            return self._dashboard_cache
+        
+        user_count = await self._count_users()
+        active_user_count = await self._count_users(filter_by={"is_active": True})
+        superuser_count = await self._count_users(filter_by={"is_superuser": True})
+        total_settings = await self.settings_repo.count()
+        total_audit_logs = await self.audit_repo.count()
+        total_reports = await self.report_repo.count()
+
+        dashboard_data = {
+            "user_count": user_count,
+            "active_user_count": active_user_count,
+            "superuser_count": superuser_count,
+            "total_settings": total_settings,
+            "total_audit_logs": total_audit_logs,
+            "total_reports": total_reports,
+        }
+        
+        self._dashboard_cache = dashboard_data
+        self._cache_timestamp["dashboard"] = current_time
+        return dashboard_data
+
+    # ==========================================
+    # User Management with Advanced Filtering and Bulk Operations
+    # ==========================================
+
+    async def list_users(
+        self,
+        search: Optional[str] = None,
+        role: Optional[str] = None,
+        is_active: Optional[bool] = None,
+        is_superuser: Optional[bool] = None,
+        created_after: Optional[datetime] = None,  # New filter
+        last_login_before: Optional[datetime] = None,  # New filter
+        limit: int = 100,
+        offset: int = 0,
+        cursor: Optional[int] = None  # For cursor-based pagination
+    ) -> list[User]:
+        """List users with optional search and filters."""
+        stmt = select(User)
+
+        if search:
+            pattern = f"%{search}%"
+            stmt = stmt.where(
+                User.email.ilike(pattern) | User.full_name.ilike(pattern) | User.phone.ilike(pattern)
+            )
+        if role:
+            stmt = stmt.where(User.role == role)
+        if is_active is not None:
+            stmt = stmt.where(User.is_active == is_active)
+        if is_superuser is not None:
+            stmt = stmt.where(User.is_superuser == is_superuser)
+        if created_after:
+            stmt = stmt.where(User.created_at >= created_after)
+        # Note: last_login tracking would need to be added to the User model separately
+        
+        if cursor is not None:
+            # Cursor-based pagination
+            stmt = stmt.where(User.id > cursor).order_by(User.id.asc()).limit(limit)
+        else:
+            stmt = stmt.order_by(User.id.desc()).limit(limit).offset(offset)
+            
+        result = await self.session.execute(stmt)
+        users = list(result.scalars().all())
+        
+        # Update cache for user list
+        cache_key = f"users_{limit}_{offset}"
+        current_time = time.time()
+        self._settings_cache[cache_key] = users
+        self._cache_timestamp[cache_key] = current_time
+        
+        return users
+
+    # Bulk operations for users
+    async def bulk_update_user_status(self, user_ids: list[int], is_active: bool) -> int:
+        """Bulk activate/deactivate users."""
+        stmt = (
+            User.__table__.update()
+            .where(User.id.in_(user_ids))
+            .values(is_active=is_active)
+        )
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+        return result.rowcount
+
+    async def bulk_update_user_roles(self, user_ids: list[int], is_superuser: bool) -> int:
+        """Bulk promote/demote users."""
+        stmt = (
+            User.__table__.update()
+            .where(User.id.in_(user_ids))
+            .values(is_superuser=is_superuser)
+        )
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+        return result.rowcount
+
+    async def bulk_delete_users(self, user_ids: list[int]) -> int:
+        """Bulk delete users."""
+        stmt = User.__table__.delete().where(User.id.in_(user_ids))
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+        return result.rowcount
+
+    async def get_user_detail(self, user_id: int) -> Optional[User]:
+        """Get detailed info for a specific user."""
+        # Check cache first
+        cache_key = f"user_{user_id}"
+        if cache_key in self._settings_cache:
+            current_time = time.time()
+            cached_time = self._cache_timestamp.get(cache_key, 0)
+            if current_time - cached_time < 300:  # 5 minutes
+                return self._settings_cache[cache_key]
+        
+        user = await self.user_repo.get_by_id(user_id)
+        if user:
+            self._settings_cache[cache_key] = user
+            self._cache_timestamp[cache_key] = time.time()
+        return user
+
+    async def update_user_status(self, user_id: int, is_active: bool) -> Optional[User]:
+        """Activate or deactivate a user."""
+        # Invalidate cache
+        cache_key = f"user_{user_id}"
+        if cache_key in self._settings_cache:
+            del self._settings_cache[cache_key]
+            del self._cache_timestamp[cache_key]
+        
+        user = await self.user_repo.get_by_id(user_id)
+        if not user:
+            return None
+        updated_user = await self.user_repo.update(user, {"is_active": is_active})
+        
+        # Update cache
+        self._settings_cache[cache_key] = updated_user
+        self._cache_timestamp[cache_key] = time.time()
+        return updated_user
+
+    async def update_user_role(self, user_id: int, is_superuser: bool) -> Optional[User]:
+        """Promote or demote a user (superuser status)."""
+        # Invalidate cache
+        cache_key = f"user_{user_id}"
+        if cache_key in self._settings_cache:
+            del self._settings_cache[cache_key]
+            del self._cache_timestamp[cache_key]
+        
+        user = await self.user_repo.get_by_id(user_id)
+        if not user:
+            return None
+        updated_user = await self.user_repo.update(user, {"is_superuser": is_superuser})
+        
+        # Update cache
+        self._settings_cache[cache_key] = updated_user
+        self._cache_timestamp[cache_key] = time.time()
+        return updated_user
+
+    async def delete_user(self, user_id: int) -> bool:
+        """Permanently delete a user."""
+        # Invalidate cache
+        cache_key = f"user_{user_id}"
+        if cache_key in self._settings_cache:
+            del self._settings_cache[cache_key]
+            if cache_key in self._cache_timestamp:
+                del self._cache_timestamp[cache_key]
+        
+        user = await self.user_repo.get_by_id(user_id)
+        if not user:
+            return False
+        await self.session.delete(user)
+        await self.session.flush()
+        return True
+
+    # ==========================================
+    # System Health
+    # ==========================================
+
+    async def get_system_health(self) -> dict:
+        """Get system health status including DB, routes, and uptime."""
+
+        # Database health check
+        db_status = "healthy"
+        db_latency = None
+        try:
+            start = time.monotonic()
+            await self.session.execute(text("SELECT 1"))
+            db_latency = round((time.monotonic() - start) * 1000, 2)
+        except Exception as e:
+            db_status = f"unhealthy: {str(e)}"
+            logger.error("Database health check failed: %s", e)
+
+        # Count total users
+        total_users = await self._count_users()
+
+        # Count active users in last 24h
+        last_24h = datetime.now(timezone.utc) - timedelta(hours=24)
+        stmt = select(func.count()).select_from(User).where(User.created_at >= last_24h)
+        result = await self.session.execute(stmt)
+        active_24h = result.scalar_one()
+
+        # Count registered API routes
+        # This is approximate - the actual count comes from the app
+        total_routes = 0
+
+        return {
+            "database": db_status,
+            "database_latency_ms": db_latency,
+            "redis": "not_configured",
+            "redis_latency_ms": None,
+            "uptime_seconds": None,  # Filled by router
+            "total_users": total_users,
+            "active_users_last_24h": active_24h,
+            "total_api_routes": total_routes,
+            "environment": os.getenv("ENVIRONMENT", "local"),
+            "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+        }
+
+    # ==========================================
+    # Helpers
+    # ==========================================
+
+    async def _count_users(self, filter_by: Optional[dict] = None) -> int:
+        stmt = select(func.count()).select_from(User)
+        if filter_by:
+            for key, value in filter_by.items():
+                stmt = stmt.where(getattr(User, key) == value)
+        result = await self.session.execute(stmt)
+        return result.scalar_one()

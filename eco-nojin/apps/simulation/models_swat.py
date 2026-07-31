@@ -12,7 +12,7 @@ Open process model — not the official SWAT/SWAT+ executable.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -80,5 +80,5 @@ def run_swat_plus(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "water_yield_m3_year": round(volume_m3, 1),
             "sediment_t_km2_year": round(sediment_t_km2_y, 2),
         },
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

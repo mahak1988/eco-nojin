@@ -12,7 +12,7 @@ No external aquacrop package required — uses in-repo process model.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from apps.api.services.ecocoin_engine import compute_impact_mint, quality_from_mrv
 from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
@@ -24,20 +24,20 @@ def aquacrop_to_mrv(
     crop: str = "wheat",
     days: int = 90,
     area_ha: float = 1.0,
-    et0_mm_day: Optional[float] = None,
+    et0_mm_day: float | None = None,
     rain_mm_day: float = 0.5,
     taw_mm: float = 100.0,
-    total_irrigation_mm: Optional[float] = None,
-    ndvi_values: Optional[list[float]] = None,
-    ndvi_observed: Optional[float] = None,
-    ndvi_expected: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
+    total_irrigation_mm: float | None = None,
+    ndvi_values: list[float] | None = None,
+    ndvi_observed: float | None = None,
+    ndvi_expected: float | None = None,
+    field_yield_t_ha: float | None = None,
     credit_type: int = 0,
     measured_value: float = 40.0,
     region_multiplier: float = 1.0,
 ) -> dict[str, Any]:
     """Pure offline path: params → AquaCrop metrics → Q → mint."""
-    canopy: Optional[list[float]] = None
+    canopy: list[float] | None = None
     if ndvi_values:
         canopy = ndvi_to_canopy(ndvi_values)
         if ndvi_observed is None:
@@ -111,7 +111,7 @@ async def aquacrop_mrv_from_location(
     *,
     crop: str = "wheat",
     days: int = 90,
-    field_yield_t_ha: Optional[float] = None,
+    field_yield_t_ha: float | None = None,
     credit_type: int = 0,
     measured_value: float = 40.0,
     region_multiplier: float = 1.0,

@@ -8,10 +8,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 from enum import Enum
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SchoolTypeEnum(str, Enum):
@@ -25,26 +24,26 @@ class AgricultureSchoolBase(BaseModel):
     province: str = Field(..., min_length=1, max_length=128)
     city: str = Field(..., min_length=1, max_length=128)
     school_type: SchoolTypeEnum = SchoolTypeEnum.UNIVERSITY
-    established: Optional[int] = Field(None, ge=1900, le=2100)
+    established: int | None = Field(None, ge=1900, le=2100)
     students_count: int = Field(0, ge=0)
-    website: Optional[str] = Field(None, max_length=500)
+    website: str | None = Field(None, max_length=500)
     logo: str = Field("📣", max_length=10)
 
 
 class AgricultureSchoolCreate(AgricultureSchoolBase):
-    fields: Optional[List[str]] = Field(default_factory=list)
+    fields: list[str] | None = Field(default_factory=list)
 
 
 class AgricultureSchoolUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    province: Optional[str] = None
-    city: Optional[str] = None
-    school_type: Optional[SchoolTypeEnum] = None
-    established: Optional[int] = None
-    students_count: Optional[int] = None
-    website: Optional[str] = None
-    logo: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    province: str | None = None
+    city: str | None = None
+    school_type: SchoolTypeEnum | None = None
+    established: int | None = None
+    students_count: int | None = None
+    website: str | None = None
+    logo: str | None = None
+    is_active: bool | None = None
 
 
 class AgricultureSchoolResponse(AgricultureSchoolBase):
@@ -66,7 +65,7 @@ class AgricultureSchoolResponse(AgricultureSchoolBase):
 
 
 class AgricultureSchoolListResponse(BaseModel):
-    items: List[AgricultureSchoolResponse]
+    items: list[AgricultureSchoolResponse]
     total: int
     skip: int = 0
     limit: int = 100

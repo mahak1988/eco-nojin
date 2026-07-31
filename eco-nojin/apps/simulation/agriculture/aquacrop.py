@@ -9,8 +9,11 @@ import time
 from typing import Any
 
 from apps.simulation.base import (
-    BaseSimulator, SimulationParameter, SimulationResult,
-    SimulationRegistry, SimulationStatus,
+    BaseSimulator,
+    SimulationParameter,
+    SimulationRegistry,
+    SimulationResult,
+    SimulationStatus,
 )
 
 CROPS = {
@@ -72,7 +75,7 @@ class AquaCropSimulator(BaseSimulator):
         crop_key = params.get("crop", "wheat")
         crop = CROPS.get(crop_key, CROPS["wheat"])
         n_days = crop["cycle"]
-        
+
         fc = params.get("field_capacity", 30.0) / 100.0
         wp = params.get("wilting_point", 14.0) / 100.0
         soil_depth = params.get("soil_depth", 1.2)
@@ -92,26 +95,26 @@ class AquaCropSimulator(BaseSimulator):
             tmean = 15.0 + 10.0 * math.sin(math.pi * i / n_days)
             et0 = 5.0 * (0.6 + 0.6 * math.sin(math.pi * i / n_days))
             rain = (params.get("fallback_precip", 250.0) / n_days) * (1 + 0.5 * math.sin(math.pi * i / n_days))
-            
+
             kc = crop["kc_ini"] + (crop["kc_max"] - crop["kc_ini"]) * (i / n_days)
             etc = kc * et0
-            
+
             taw = (fc - wp) * root * 1000
             sw_max = fc * root * 1000
             sw = sw + rain + irr_per_day - etc
             drainage = max(0.0, sw - sw_max); sw -= drainage
             sw = max(0.0, sw)
-            
+
             depletion = sw_max - sw
             frac = depletion / taw if taw > 0 else 1.0
             if frac <= crop["p_lo"]: ks = 1.0
             elif frac >= crop["p_up"]: ks = max(0.05, 1 - (frac - crop["p_up"]) / (1 - crop["p_up"]))
             else: ks = 1.0
-            
+
             transp = ks * etc
             total_et += etc; total_transp += transp
             biomass += crop["wp"] * transp * co2_factor
-            
+
             sw_series.append(round(sw, 1))
             biomass_series.append(round(biomass / 100, 2))
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 '''
 generate_tests.py — تولید خودکار تست برای اپ‌های بدون پوشش
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -235,14 +234,14 @@ def main() -> int:
     print(f'\n{"═" * 60}')
     print(f'  📊 {total} فایل تست جدید')
     if apply:
-        print(f'\n  📋 اجرا:')
-        print(f'     python -m pytest apps/ -v --tb=short -x 2>&1 | Select-Object -First 50')
-        print(f'\n  📋 commit:')
-        print(f'     git add -A')
-        print(f'     git commit -m "test: phase 3 - add unit tests for uncovered modules"')
-        print(f'     git push')
+        print('\n  📋 اجرا:')
+        print('     python -m pytest apps/ -v --tb=short -x 2>&1 | Select-Object -First 50')
+        print('\n  📋 commit:')
+        print('     git add -A')
+        print('     git commit -m "test: phase 3 - add unit tests for uncovered modules"')
+        print('     git push')
     else:
-        print(f'\n  → python generate_tests.py --apply')
+        print('\n  → python generate_tests.py --apply')
     print('═' * 60)
     return 0
 

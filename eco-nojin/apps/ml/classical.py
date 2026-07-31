@@ -10,10 +10,9 @@ from __future__ import annotations
 
 import json
 import math
-import random
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 def _dot(a: list[float], b: list[float]) -> float:
@@ -157,7 +156,7 @@ def fit_linear(X: list[list[float]], y: list[float], ridge: float = 1e-2) -> Lin
 def fit_logistic(
     X: list[list[float]],
     y: list[str],
-    classes: Optional[list[str]] = None,
+    classes: list[str] | None = None,
     lr: float = 0.15,
     epochs: int = 400,
 ) -> LogisticModel:
@@ -233,7 +232,7 @@ class ModelBundle:
         }
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "ModelBundle":
+    def from_dict(d: dict[str, Any]) -> ModelBundle:
         return ModelBundle(
             yield_regressor=LinearModel(**d["yield_regressor"]),
             risk_classifier=LogisticModel(**d["risk_classifier"]),
@@ -247,7 +246,7 @@ def save_bundle(bundle: ModelBundle, path: Path) -> None:
     path.write_text(json.dumps(bundle.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def load_bundle(path: Path) -> Optional[ModelBundle]:
+def load_bundle(path: Path) -> ModelBundle | None:
     if not path.is_file():
         return None
     try:

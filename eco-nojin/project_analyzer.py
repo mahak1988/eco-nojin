@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 ═══════════════════════════════════════════════════════════════════════════
   Secure Project Analyzer — ابزار امن تحلیل پروژه (نسخه بهینه v1.1.0)
@@ -43,11 +42,12 @@ import urllib.error
 import urllib.request
 import warnings
 from collections import Counter
+from collections.abc import Callable, Iterator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Iterator
+from typing import Any
 
 try:
     import tomllib  # پایتون ۳.۱۱+
@@ -751,7 +751,7 @@ class ProjectAnalyzer:
             key=lambda d: d["complexity"], reverse=True)[:8]
         return {
             "tool": {"name": TOOL_NAME, "version": TOOL_VERSION},
-            "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
             "duration_seconds": round(dur, 2),
             "project": {"name": self.root.name, "path": str(self.root), "git": git},
             "options": {

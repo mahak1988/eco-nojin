@@ -8,14 +8,14 @@ Units SI / agronomic (t/ha, mm, dS/m, %).
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.evaluation_metrics import evaluate_series, kge, pbias
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:

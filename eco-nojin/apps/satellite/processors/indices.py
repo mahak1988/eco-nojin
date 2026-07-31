@@ -7,7 +7,8 @@ Aligned with OpenFarm / AGRS / NASA Harvest common practice.
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
 
 def _safe_div(a: float, b: float) -> float:
@@ -76,9 +77,9 @@ def canopy_cover_from_ndvi(
 def compute_all_indices(
     red: float,
     nir: float,
-    green: Optional[float] = None,
-    blue: Optional[float] = None,
-    swir1: Optional[float] = None,
+    green: float | None = None,
+    blue: float | None = None,
+    swir1: float | None = None,
 ) -> dict[str, float]:
     """Compute available indices from reflectance bands in [0, 1]."""
     out: dict[str, float] = {

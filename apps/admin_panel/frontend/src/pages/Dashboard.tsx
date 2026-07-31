@@ -1,49 +1,107 @@
-import { useTranslation } from 'react-i18next'
-import { Users, FolderOpen, TrendingUp, Activity } from 'lucide-react'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  Users, 
+  Settings, 
+  FileText, 
+  Activity, 
+  Shield, 
+  BookOpen, 
+  Receipt, 
+  CreditCard, 
+  BarChart3,
+  Brain,
+  FileCode
+} from 'lucide-react';
+import CustomizableDashboard from '../components/CustomizableDashboard';
 
-export default function Dashboard() {
-  const { t } = useTranslation()
-
-  const stats = [
-    { label: 'Total Users', value: '4,256', icon: Users, color: 'text-eco-600' },
-    { label: 'Active Projects', value: '124', icon: FolderOpen, color: 'text-water-600' },
-    { label: 'Growth', value: '+23%', icon: TrendingUp, color: 'text-green-600' },
-    { label: 'System Status', value: 'Healthy', icon: Activity, color: 'text-amber-600' },
-  ]
-
+const Dashboard = () => {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to the admin control panel</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl border bg-card p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
-            </div>
-            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+      <CustomizableDashboard />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link 
+          to="/users" 
+          className="p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+        >
+          <div className="p-3 rounded-lg bg-blue-100 text-blue-600">
+            <Users className="w-6 h-6" />
           </div>
-        ))}
-      </div>
-
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
-        <h2 className="font-semibold mb-4">Recent Activity</h2>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <div className="w-2 h-2 rounded-full bg-eco-500" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">System update #{i}</p>
-                <p className="text-xs text-muted-foreground">2 hours ago</p>
-              </div>
-            </div>
-          ))}
-        </div>
+          <div>
+            <h3 className="font-semibold">مدیریت کاربران</h3>
+            <p className="text-sm text-muted-foreground">مشاهده و مدیریت کاربران سیستم</p>
+          </div>
+        </Link>
+        
+        <Link 
+          to="/settings" 
+          className="p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+        >
+          <div className="p-3 rounded-lg bg-green-100 text-green-600">
+            <Settings className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold">تنظیمات سیستم</h3>
+            <p className="text-sm text-muted-foreground">پیکربندی تنظیمات سیستم</p>
+          </div>
+        </Link>
+        
+        <Link 
+          to="/audit-logs" 
+          className="p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+        >
+          <div className="p-3 rounded-lg bg-purple-100 text-purple-600">
+            <Activity className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold">لاگ‌های حسابرسی</h3>
+            <p className="text-sm text-muted-foreground">مشاهده فعالیت‌های سیستم</p>
+          </div>
+        </Link>
+        
+        <Link 
+          to="/content-management" 
+          className="p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+        >
+          <div className="p-3 rounded-lg bg-amber-100 text-amber-600">
+            <FileText className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold">مدیریت محتوا</h3>
+            <p className="text-sm text-muted-foreground">مدیریت صفحات، مقالات و محصولات</p>
+          </div>
+        </Link>
+        
+        <Link 
+          to="/intelligent-analytics" 
+          className="p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+        >
+          <div className="p-3 rounded-lg bg-indigo-100 text-indigo-600">
+            <Brain className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold">تحلیل‌های هوشمند</h3>
+            <p className="text-sm text-muted-foreground">تحلیل‌های پیشرفته با هوش مصنوعی</p>
+          </div>
+        </Link>
+        
+        <Link 
+          to="/reports" 
+          className="p-6 bg-card rounded-xl border shadow-sm hover:shadow-md transition-shadow flex items-center gap-4"
+        >
+          <div className="p-3 rounded-lg bg-emerald-100 text-emerald-600">
+            <BarChart3 className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-semibold">گزارش‌ها</h3>
+            <p className="text-sm text-muted-foreground">گزارش‌های سیستم و عملکرد</p>
+          </div>
+        </Link>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default Dashboard;

@@ -5,14 +5,17 @@ Deterministic, returns standard outputs.series + metrics for the frontend.
 import logging
 
 logger = logging.getLogger(__name__)
-import math
 import hashlib
+import math
 import time
 from typing import Any
 
 from apps.simulation.base import (
-    BaseSimulator, SimulationParameter, SimulationResult,
-    SimulationRegistry, SimulationStatus,
+    BaseSimulator,
+    SimulationParameter,
+    SimulationRegistry,
+    SimulationResult,
+    SimulationStatus,
 )
 
 

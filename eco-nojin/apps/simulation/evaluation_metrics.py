@@ -18,7 +18,8 @@ Common thresholds (Moriasi et al. 2007, adapted):
 from __future__ import annotations
 
 import math
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 
 def _align(obs: Sequence[float], sim: Sequence[float]) -> tuple[list[float], list[float]]:

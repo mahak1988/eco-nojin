@@ -60,14 +60,14 @@ def patch_data_router(root: Path) -> str:
     f = root / "apps" / "simulation" / "data" / "router.py"
     if not f.exists():
         return "⚠ data/router.py یافت نشد"
-    
+
     text = f.read_text(encoding="utf-8")
     if "fetch_satellite_agro_data" in text:
         return "· API داده‌های ماهواره‌ای ازقبل اضافه شده است"
-    
+
     # افزودن ایمپورت
     text = "from apps.simulation.data.satellite import fetch_satellite_agro_data\n" + text
-    
+
     # افزودن endpoint جدید
     new_endpoint = '''
 @router.get("/satellite", summary="دریافت داده‌های ماهواره‌ای کشاورزی (رطوبت خاک و تبخیر-تعرق)")
@@ -85,18 +85,18 @@ def patch_frontend_detail(root: Path) -> str:
     f = root / "apps" / "web" / "src" / "pages" / "SimulatorDetailPage.tsx"
     if not f.exists():
         return "⚠ SimulatorDetailPage.tsx یافت نشد"
-    
+
     text = f.read_text(encoding="utf-8")
     if "satelliteData" in text:
         return "· کارت داده‌های ماهواره‌ای ازقبل در فرانت وجود دارد"
-    
+
     # ۱. افزودن state برای داده‌های ماهواره‌ای
     if "const [validation, setValidation]" in text:
         text = text.replace(
             "const [validation, setValidation] = useState<any>(null);",
             "const [validation, setValidation] = useState<any>(null);\n  const [satelliteData, setSatelliteData] = useState<any>(null);"
         )
-    
+
     # ۲. افزودن تابع دریافت داده ماهواره‌ای
     fetch_sat_func = '''
   // Fetch Satellite Data
@@ -158,7 +158,7 @@ def patch_frontend_detail(root: Path) -> str:
           )}
         </div>
 '''
-    
+
     # تزریق کارت قبل از دکمه "اجرا" (Play)
     if 'className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white' in text:
         text = text.replace(
@@ -167,7 +167,7 @@ def patch_frontend_detail(root: Path) -> str:
         )
         f.write_text(text, encoding="utf-8")
         return "✓ frontend: کارت داده‌های ماهواره‌ای و تابع دریافت آن اضافه شد"
-    
+
     return "⚠ frontend: الگوی دکمه اجرا یافت نشد"
 
 def main():

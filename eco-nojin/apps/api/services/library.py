@@ -7,13 +7,12 @@ Business logic layer — orchestrates repositories and enforces rules.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.models.library import LibraryResource
 from apps.api.repositories.library import LibraryRepository
 from apps.api.schemas.library import LibraryResourceCreate, LibraryResourceUpdate
-from apps.api.models.library import LibraryResource
 
 
 class LibraryService:
@@ -25,8 +24,8 @@ class LibraryService:
 
     async def list(
         self, skip: int = 0, limit: int = 100,
-        search: Optional[str] = None, category: Optional[str] = None, author: Optional[str] = None
-    ) -> tuple[List[LibraryResource], int]:
+        search: str | None = None, category: str | None = None, author: str | None = None
+    ) -> tuple[list[LibraryResource], int]:
         """Handle list (skip, limit, search, category, author)."""
         limit = min(limit, 200)
         return await self.repo.list(skip, limit, search, category, author)

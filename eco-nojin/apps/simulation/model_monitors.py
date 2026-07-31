@@ -4,8 +4,8 @@ Model monitors (پایشگرها) — evaluate science outputs against dynamic t
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 MONITOR_CATALOG: list[dict[str, Any]] = [
     {
@@ -231,8 +231,8 @@ def extract_metrics(bundle: dict[str, Any]) -> dict[str, float]:
 def evaluate_monitors(
     metrics: dict[str, float],
     *,
-    monitor_ids: Optional[list[str]] = None,
-    catalog: Optional[list[dict[str, Any]]] = None,
+    monitor_ids: list[str] | None = None,
+    catalog: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     catalog = catalog or effective_catalog()
     events: list[dict[str, Any]] = []
@@ -264,7 +264,7 @@ def evaluate_monitors(
                 "message_fa": _msg_fa(mon, value, sev),
                 "message_en": _msg_en(mon, value, sev),
                 "icon": mon.get("icon", "activity"),
-                "observed_at": datetime.now(timezone.utc).isoformat(),
+                "observed_at": datetime.now(UTC).isoformat(),
             }
         )
     order = {"critical": 0, "warning": 1, "ok": 2}
@@ -307,9 +307,9 @@ def run_full_watch(
     lat: float = 32.65,
     lon: float = 51.67,
     include_sensors: bool = True,
-    aquacrop_params: Optional[dict[str, Any]] = None,
-    scs_params: Optional[dict[str, Any]] = None,
-    rothc_params: Optional[dict[str, Any]] = None,
+    aquacrop_params: dict[str, Any] | None = None,
+    scs_params: dict[str, Any] | None = None,
+    rothc_params: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
     from apps.simulation.models_swat import run_swat_plus
@@ -426,5 +426,5 @@ def run_full_watch(
             },
         },
         "sensors": sensors,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

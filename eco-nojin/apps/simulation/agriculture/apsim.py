@@ -7,16 +7,13 @@ APSIM is a modular modelling framework for agricultural systems. Simulates crop 
 import logging
 
 logger = logging.getLogger(__name__)
-import random
-import math
-from datetime import datetime, UTC
 from typing import Any
 
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
 
@@ -71,7 +68,7 @@ class APSIMSimulator(BaseSimulator):
         """Execute the simulation."""
         import time
         start = time.time()
-        
+
         errors = self.validate(parameters)
         if errors:
             return SimulationResult(
@@ -81,7 +78,7 @@ class APSIMSimulator(BaseSimulator):
                 parameters=parameters,
                 error="; ".join(errors),
             )
-        
+
         try:
             outputs = await self._run_simulation(parameters)
             elapsed = (time.time() - start) * 1000

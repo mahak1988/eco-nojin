@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import APSIMWrapper, APSIMOutput
 from .farming_systems_model import FarmingSystemsModel
+from .wrapper import APSIMOutput, APSIMWrapper
 
 __all__ = ["APSIMWrapper", "APSIMOutput", "FarmingSystemsModel"]

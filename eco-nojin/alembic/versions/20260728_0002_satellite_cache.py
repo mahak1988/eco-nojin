@@ -1,50 +1,37 @@
-"""satellite_index_cache table
-
-Revision ID: 20260728_0002
-Revises: 20260728_0001
-"""
+"""Create satellite_index_cache table."""
 
 from __future__ import annotations
 
-from typing import Sequence, Union
+from contextlib import suppress
 
 import sqlalchemy as sa
+
 from alembic import op
 
-revision: str = "20260728_0002"
-down_revision: Union[str, None] = "20260728_0001"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+# revision identifiers, used by Alembic.
+revision = "20260728_0002"
+down_revision = "20260728_0001"
+branch_labels = None
+depends_on = None
 
 
 def upgrade() -> None:
-    bind = op.get_bind()
-    insp = sa.inspect(bind)
-    if "satellite_index_cache" in insp.get_table_names():
-        return
+    """Upgrade: Create satellite_index_cache table."""
     op.create_table(
         "satellite_index_cache",
-        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
-        sa.Column("farm_id", sa.Integer(), nullable=True),
-        sa.Column("lat", sa.Float(), nullable=False),
-        sa.Column("lon", sa.Float(), nullable=False),
-        sa.Column("geom_wkt", sa.String(128), nullable=False),
-        sa.Column("acquired_on", sa.String(16), nullable=False),
-        sa.Column("ndvi", sa.Float(), nullable=False),
-        sa.Column("ndwi", sa.Float(), nullable=False),
-        sa.Column("ndmi", sa.Float(), nullable=False),
-        sa.Column("smi", sa.Float(), nullable=False),
-        sa.Column("cloud_pct", sa.Float(), server_default="0"),
-        sa.Column("provider", sa.String(64), server_default="synthetic-s2"),
-        sa.Column("payload_json", sa.Text(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("date", sa.Date(), nullable=False),
+        sa.Column("location_wkt", sa.String(length=255), nullable=False),
+        sa.Column("ndvi_mean", sa.Float(), nullable=True),
+        sa.Column("ndvi_std", sa.Float(), nullable=True),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("date", "location_wkt", name="uq_date_location"),
     )
-    op.create_index("ix_sat_cache_farm", "satellite_index_cache", ["farm_id"])
-    op.create_index("ix_sat_cache_date", "satellite_index_cache", ["acquired_on"])
+    op.create_index(op.f("ix_satellite_index_cache_date"), "satellite_index_cache", ["date"], unique=False)
 
 
 def downgrade() -> None:
-    try:
+    """Downgrade: Drop satellite_index_cache table."""
+    with suppress(Exception):
         op.drop_table("satellite_index_cache")
-    except Exception:
-        pass

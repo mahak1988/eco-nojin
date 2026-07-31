@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from apps.satellite.providers.base import SatelliteProvider
 from apps.satellite.providers.opentopo import OpenTopoProvider
@@ -32,7 +32,7 @@ class ProviderChain:
                 results.append({"provider": p.name, "available": False, "error": str(e)[:120]})
         return {"providers": results}
 
-    async def ndvi(self, lat: float, lon: float, date: Optional[str] = None) -> dict[str, Any]:
+    async def ndvi(self, lat: float, lon: float, date: str | None = None) -> dict[str, Any]:
         errors = []
         for p in self.providers:
             if p.name in ("opentopodata", "thermal_lst", "soil_moisture"):
@@ -60,7 +60,7 @@ class ProviderChain:
                 errors.append({"provider": p.name, "error": str(e)[:120]})
         return {"error": "all_providers_failed", "details": errors}
 
-    async def by_role(self, role: str, lat: float, lon: float, date: Optional[str] = None) -> dict[str, Any]:
+    async def by_role(self, role: str, lat: float, lon: float, date: str | None = None) -> dict[str, Any]:
         if role == "topography":
             topo = next((p for p in self.providers if isinstance(p, OpenTopoProvider)), OpenTopoProvider())
             return await topo.elevation(lat, lon)

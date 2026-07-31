@@ -8,9 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 
-from sqlalchemy import String, Integer, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.session import Base
@@ -26,16 +25,16 @@ class AgricultureSchool(Base):
     province: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     city: Mapped[str] = mapped_column(String(128), nullable=False)
     school_type: Mapped[str] = mapped_column(String(30), default="university", nullable=False)
-    established: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    established: Mapped[int | None] = mapped_column(Integer, nullable=True)
     students_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    website: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    website: Mapped[str | None] = mapped_column(String(500), nullable=True)
     logo: Mapped[str] = mapped_column(String(10), default="📣", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # Relationships
-    fields: Mapped[List["SchoolField"]] = relationship("SchoolField", back_populates="school", cascade="all, delete-orphan")
+    fields: Mapped[list["SchoolField"]] = relationship("SchoolField", back_populates="school", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Handle __repr__."""

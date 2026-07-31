@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +14,9 @@ _active: dict[str, float] = {}
 
 def _redis():
     try:
-        from apps.shared_core.config import settings
-
         import redis
+
+        from apps.shared_core.config import settings
 
         url = settings.REDIS_URL or ""
         if not url:

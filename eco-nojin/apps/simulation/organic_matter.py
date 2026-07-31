@@ -11,8 +11,7 @@ Units: t OM/ha or t C/ha (when carbon_fraction applied).
 
 from __future__ import annotations
 
-import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -91,7 +90,7 @@ def run_om_two_pool(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "carbon_fraction": c_frac,
         },
         "series": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -194,7 +193,7 @@ def run_om_cn_coupled(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "moisture_frac": moist,
         },
         "series": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
         "notes_fa": (
             "اگر C:N ورودی بالا باشد، نیتروژن معدنی موقتاً قفل می‌شود (immobilization)."
         ),
@@ -259,7 +258,7 @@ def run_litter_cascade(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "temp_c": temp,
             "moisture_frac": moist,
         },
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 

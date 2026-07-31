@@ -2,10 +2,10 @@
 Tests for Accounting, Alerts, and Agriculture Schools API routes
 Aligned with actual router prefixes and response envelopes.
 """
-import pytest
-from fastapi.testclient import TestClient
 import sys
 from pathlib import Path
+
+from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 

@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "content_versions",
+  "info": {
+    "singularName": "version",
+    "pluralName": "versions",
+    "displayName": "Version",
+    "description": "Content versioning system"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "entityId": {
+      "type": "string",
+      "required": true
+    },
+    "contentType": {
+      "type": "string",
+      "required": true
+    },
+    "versionNumber": {
+      "type": "integer",
+      "required": true
+    },
+    "contentData": {
+      "type": "json",
+      "required": true
+    },
+    "userId": {
+      "type": "string"
+    },
+    "changeSummary": {
+      "type": "text"
+    },
+    "createdAt": {
+      "type": "datetime"
+    }
+  }
+}

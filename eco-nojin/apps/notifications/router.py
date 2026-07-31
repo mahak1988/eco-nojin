@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
@@ -17,7 +16,7 @@ _STORE: list[dict] = [
         "body": "Zone B soil moisture below threshold",
         "type": "irrigation",
         "read": False,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
     },
     {
         "id": 2,
@@ -25,7 +24,7 @@ _STORE: list[dict] = [
         "body": "Aphid risk elevated for next 48h",
         "type": "pest",
         "read": False,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
     },
 ]
 
@@ -55,5 +54,5 @@ async def mark_read(notif_id: int):
 
 
 @router.post("/email-stub")
-async def email_stub(to: str, subject: str, body: Optional[str] = None):
+async def email_stub(to: str, subject: str, body: str | None = None):
     return {"queued": True, "to": to, "subject": subject, "channel": "email-stub"}

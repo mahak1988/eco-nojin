@@ -1,4 +1,9 @@
-from apps.ml.sensitivity import coefficient_importance, full_sensitivity_report, oat_sensitivity, partial_dependence
+from apps.ml.sensitivity import (
+    coefficient_importance,
+    full_sensitivity_report,
+    oat_sensitivity,
+    partial_dependence,
+)
 from apps.ml.service import train_default_models
 
 

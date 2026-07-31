@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
@@ -47,6 +47,6 @@ async def overview(session: AsyncSession = Depends(get_db_session)):
         "crops_count": crops,
         "sensors_count": sensors,
         "alerts_open": 0,
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
         "status": "ok",
     }

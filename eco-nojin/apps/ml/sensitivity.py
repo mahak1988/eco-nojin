@@ -10,9 +10,9 @@ Methods:
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
-from apps.ml.features import FEATURE_NAMES, vector_from_dict
+from apps.ml.features import FEATURE_NAMES
 from apps.ml.service import get_bundle, predict_bundle
 
 # Typical operational ranges for sweeps (min, max)
@@ -77,10 +77,10 @@ def coefficient_importance() -> dict[str, Any]:
 
 
 def oat_sensitivity(
-    baseline: Optional[dict[str, float]] = None,
+    baseline: dict[str, float] | None = None,
     *,
     rel_step: float = 0.10,
-    abs_floor: Optional[dict[str, float]] = None,
+    abs_floor: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """
     One-at-a-time: perturb each feature ±rel_step (or abs_floor) and measure Δ yield and risk proba.
@@ -179,7 +179,7 @@ def oat_sensitivity(
 
 def partial_dependence(
     feature: str,
-    baseline: Optional[dict[str, float]] = None,
+    baseline: dict[str, float] | None = None,
     *,
     points: int = 15,
 ) -> dict[str, Any]:
@@ -220,10 +220,10 @@ def partial_dependence(
 
 
 def full_sensitivity_report(
-    baseline: Optional[dict[str, float]] = None,
+    baseline: dict[str, float] | None = None,
     *,
     rel_step: float = 0.10,
-    pd_features: Optional[list[str]] = None,
+    pd_features: list[str] | None = None,
     pd_points: int = 12,
 ) -> dict[str, Any]:
     """Combined report for API / UI."""

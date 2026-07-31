@@ -4,7 +4,8 @@ EcoNojin i18n Generator — generates all 15 language translation files.
 Base: English (en.json) — all other languages are translations of en.json.
 """
 
-import json, os, sys
+import json
+import os
 
 LOCALES_DIR = os.path.join("apps", "web", "src", "i18n", "locales")
 os.makedirs(LOCALES_DIR, exist_ok=True)
@@ -896,8 +897,8 @@ for lang_code, translations in LANGUAGES.items():
 write_json("en.json", EN)
 
 print(f"\nDone! Generated {len(LANGUAGES) + 1} language files:")
-print(f"  fa (Persian) - by hand (already exists)")
+print("  fa (Persian) - by hand (already exists)")
 for code in LANGUAGES:
     print(f"  {code}")
-print(f"  en (English)")
+print("  en (English)")
 print(f"\nTotal: 15 languages supported (fa + en + {len(LANGUAGES)} more)")

@@ -8,9 +8,8 @@ Services call repositories; repositories never call services.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_ai.models import SharedAi
@@ -24,7 +23,7 @@ class SharedAiRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, id: int) -> Optional[SharedAi]:
+    async def get_by_id(self, id: int) -> SharedAi | None:
         """Fetch a single record by ID."""
         result = await self.session.execute(
             select(SharedAi).where(SharedAi.id == id)
@@ -55,7 +54,7 @@ class SharedAiRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, id: int, data: SharedAiUpdate) -> Optional[SharedAi]:
+    async def update(self, id: int, data: SharedAiUpdate) -> SharedAi | None:
         """Update an existing record. Returns None if not found."""
         obj = await self.get_by_id(id)
         if not obj:

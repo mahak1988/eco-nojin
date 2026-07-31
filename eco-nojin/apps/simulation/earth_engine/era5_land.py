@@ -7,17 +7,16 @@ Fetches ERA5-Land reanalysis climate data for meteorological inputs.
 import logging
 
 logger = logging.getLogger(__name__)
-from datetime import datetime, UTC
+from datetime import datetime
 from typing import Any
 
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
-
 
 # ERA5-Land variables
 ERA5_VARIABLES = [
@@ -93,7 +92,7 @@ class ERA5LandFetcher(BaseSimulator):
             return SimulationResult(simulator_id=self.id, simulator_name=self.name,
                 status=SimulationStatus.FAILED, parameters=parameters,
                 error="; ".join(errors))
-        
+
         try:
             outputs = await self._run_simulation(parameters)
             elapsed = (time.time() - start) * 1000
@@ -113,7 +112,7 @@ class ERA5LandFetcher(BaseSimulator):
         start = datetime.strptime(params["start_date"], "%Y-%m-%d")
         end = datetime.strptime(params["end_date"], "%Y-%m-%d")
         days = (end - start).days + 1
-        
+
         # Simulate daily values
         data = {}
         for var in variables:
@@ -125,7 +124,7 @@ class ERA5LandFetcher(BaseSimulator):
                 data[var] = [round(15 + 15 * (i % 60) / 60, 1) for i in range(days)]
             else:
                 data[var] = [0.0] * days
-        
+
         return {
             "bounds": params["bounds"],
             "variables": variables,

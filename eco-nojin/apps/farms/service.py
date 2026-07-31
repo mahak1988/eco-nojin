@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.farms.repository import FarmRepository
@@ -20,8 +18,8 @@ class FarmService:
         *,
         page: int = 1,
         size: int = 20,
-        search: Optional[str] = None,
-        owner_id: Optional[int] = None,
+        search: str | None = None,
+        owner_id: int | None = None,
     ) -> tuple[list[FarmResponse], dict]:
         skip = page_to_offset(page, size)
         rows, total = await self.repo.list(skip=skip, limit=size, search=search, owner_id=owner_id)
@@ -35,7 +33,7 @@ class FarmService:
             raise ValueError("FARM_NOT_FOUND")
         return FarmResponse.model_validate(farm)
 
-    async def create_farm(self, data: FarmCreate, owner_id: Optional[int] = None) -> FarmResponse:
+    async def create_farm(self, data: FarmCreate, owner_id: int | None = None) -> FarmResponse:
         farm = await self.repo.create(data, owner_id=owner_id)
         return FarmResponse.model_validate(farm)
 

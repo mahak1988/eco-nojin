@@ -1,0 +1,51 @@
+{
+  "collectionName": "components_dynamic_content_dynamic_blocks",
+  "info": {
+    "displayName": "Dynamic Block",
+    "icon": "cubes",
+    "description": "Reusable dynamic content block"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "blockType": {
+      "type": "enumeration",
+      "enum": [
+        "hero",
+        "feature",
+        "testimonial",
+        "pricing",
+        "faq",
+        "call-to-action",
+        "content-grid",
+        "slider",
+        "stats",
+        "contact-form"
+      ],
+      "required": true
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "settings": {
+      "type": "json"
+    },
+    "styles": {
+      "type": "json"
+    },
+    "dataSource": {
+      "type": "string"
+    },
+    "cacheTimeout": {
+      "type": "integer",
+      "default": 3600
+    },
+    "isVisible": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

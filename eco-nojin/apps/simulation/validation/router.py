@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -53,7 +53,7 @@ async def validation(req: CalibrationRequest) -> dict[str, Any]:
     except Exception:
         validated_params = sim_params
 
-    sim_yield: Optional[float] = None
+    sim_yield: float | None = None
     metrics: dict[str, Any] = {}
     try:
         result = await sim.run(validated_params)

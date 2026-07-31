@@ -4,8 +4,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 from typing import Any
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+
 from apps.simulation.base import SimulationRegistry
 
 router = APIRouter(prefix="/api/v1/simulation", tags=["🔗 Model Chaining"])
@@ -26,7 +28,7 @@ async def run_chain(req: ChainRequest) -> None:
     results = {}
     """Handle run_chain (req)."""
     base = req.base_parameters
-    
+
     if req.chain_id == "climate_to_economy":
         # Step 1: Climate (با پارامترهای کامل پیش‌فرض)
         climate_sim = _get_sim_instance("climate")
@@ -38,11 +40,11 @@ async def run_chain(req: ChainRequest) -> None:
             "base_precipitation": 600.0
         }
         climate_res = await climate_sim.run(climate_params)
-        
+
         # استخراج تغییرات (اگر مدل climate خروجی خاصی دارد، وگرنه فرض خشکسالی)
         temp_change = climate_res.metrics.get("temp_change", 1.5) if climate_res.status.name == "COMPLETED" else 1.5
-        precip_factor = 0.85 if temp_change > 1.0 else 1.0 
-        
+        precip_factor = 0.85 if temp_change > 1.0 else 1.0
+
         # Step 2: AquaCrop (با پارامترهای کامل پیش‌فرض برای عبور از Validation)
         crop_sim = _get_sim_instance("aquacrop")
         crop_params = {
@@ -59,15 +61,15 @@ async def run_chain(req: ChainRequest) -> None:
         }
         crop_res = await crop_sim.run(crop_params)
         results["aquacrop"] = {"metrics": crop_res.metrics, "status": str(crop_res.status)}
-        
+
         new_yield = crop_res.metrics.get("yield_t_ha", 0) if crop_res.status.name == "COMPLETED" else 0
-        
+
         # Step 3: CBA (با پارامترهای کامل پیش‌فرض)
         cba_sim = _get_sim_instance("cba")
         # مقیاس‌دهی برای رعایت محدودیت‌های Pydantic شبیه‌ساز CBA (max 500)
         safe_benefit = min(max((new_yield * 300) / 100, 10.0), 400.0)
         safe_cost = 50.0
-        
+
         cba_params = {
             "initial_investment": 100.0,
             "annual_benefit": safe_benefit,
@@ -77,13 +79,13 @@ async def run_chain(req: ChainRequest) -> None:
         }
         cba_res = await cba_sim.run(cba_params)
         results["cba"] = {
-            "metrics": cba_res.metrics, 
+            "metrics": cba_res.metrics,
             "status": str(cba_res.status),
             "error": cba_res.error if cba_res.status.name == "FAILED" else None
         }
-        
+
         final_npv = cba_res.metrics.get("npv", 0) if cba_res.status.name == "COMPLETED" else 0
-        
+
         return {
             "chain_id": req.chain_id,
             "steps_executed": ["climate", "aquacrop", "cba"],
@@ -95,5 +97,5 @@ async def run_chain(req: ChainRequest) -> None:
             },
             "detailed_results": results
         }
-    
+
     raise HTTPException(400, f"Unknown chain_id: {req.chain_id}")

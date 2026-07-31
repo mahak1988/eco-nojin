@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -22,9 +21,9 @@ class SensorIn(BaseModel):
     name: str = Field(..., min_length=1)
     sensor_type: str = Field(..., pattern="^(soil|weather|water|air)$")
     unit: str = "%"
-    farm_id: Optional[int] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    farm_id: int | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 class SensorOut(SensorIn):
@@ -94,7 +93,7 @@ async def monitoring_overview(session: AsyncSession = Depends(get_db_session)):
         "open_alerts": alerts,
         "rules_count": rules,
         "status": "ok",
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -197,7 +196,7 @@ async def push_reading(
                     "sensor_id": sensor_id,
                     "rule": rule.name,
                     "value": value,
-                    "ts": datetime.now(timezone.utc).isoformat(),
+                    "ts": datetime.now(UTC).isoformat(),
                 }
             )
     await session.flush()

@@ -1,0 +1,50 @@
+name: CI/CD Pipeline - Admin Panel Validation
+
+# تریگرها: این پایپ‌لاین چه زمانی اجرا شود؟
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  validate-and-test:
+    name: Validate Syntax and Run Tests
+    # استفاده از ubuntu-latest به جای windows-latest توصیه می‌شود 
+    # زیرا محیط‌های CI لینوکسی سریع‌تر هستند و مشکلات قفل فایل (File Lock) ویندوز را ندارند.
+    runs-on: ubuntu-latest
+
+    steps:
+      # ۱. دریافت کد از مخزن
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ۲. تنظیم نسخه دقیق پایتون (جلوگیری از خطاهای نسخه‌ای که تجربه کردیم)
+      - name: Set up Python 3.12.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+          # فعال‌سازی کش برای تسریع نصب پکیج‌ها در اجرای‌های بعدی
+          cache: 'pip' 
+
+      # ۳. ارتقای pip و نصب وابستگی‌ها
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # نصب ابزارهای لینتینگ برای تشخیص زودهنگام خطاهای سینتکسی و BOM
+          pip install ruff pytest pytest-asyncio
+
+      # ۴. بررسی کیفیت کد و سینتکس (Linter)
+      # این مرحله قبل از تست اجرا می‌شود تا خطاهایی مثل BOM یا ایمپورت اشتباه را فوراً رد کند
+      - name: Lint with Ruff
+        run: |
+          # بررسی خطاهای سینتکسی، نام‌های تعریف‌نشده و فرمت‌بندی
+          ruff check .
+          ruff format --check .
+
+      # ۵. اجرای تست‌های پنل ادمین
+      - name: Run Pytest for Admin Panel
+        run: |
+          # اجرای تست‌ها با جزئیات کامل (verbose) و نمایش Traceback کوتاه در صورت شکست
+          python -m pytest apps/admin_panel/tests/ -v --tb=short

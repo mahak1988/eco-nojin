@@ -3,20 +3,22 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import List, Any
+from typing import Any
+
 from langchain_core.tools import BaseTool
+
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
-from apps.shared_ai.ai.tools.web_tools import (
-    web_search,
-    summarize_text,
-    extract_key_points,
-    fetch_url_content
-)
 from apps.shared_ai.ai.tools.rag_tools import (
+    get_knowledge_base_stats,
     get_rag_context,
     search_knowledge_base,
     upload_document,
-    get_knowledge_base_stats
+)
+from apps.shared_ai.ai.tools.web_tools import (
+    extract_key_points,
+    fetch_url_content,
+    summarize_text,
+    web_search,
 )
 
 # ==========================================
@@ -56,11 +58,11 @@ RESEARCH_AGENT_PROMPT = """شما یک محقق حرفه‌ای و دقیق هس
 
 class ResearchAgent:
     """ایجنت محقق با RAG."""
-    
+
     def __init__(self, llm: Any) -> None:
         self.llm = llm
         """Handle __init__ (llm)."""
-        self.tools: List[BaseTool] = [
+        self.tools: list[BaseTool] = [
             web_search,
             fetch_url_content,
             summarize_text,
@@ -76,7 +78,7 @@ class ResearchAgent:
             system_prompt=RESEARCH_AGENT_PROMPT
         )
         self.graph = self.builder.build()
-    
+
     async def chat(self, user_message: str, context: dict = None) -> str:
         """اجرای ایجنت با یک پیام."""
         return await self.builder.run(user_message, context)

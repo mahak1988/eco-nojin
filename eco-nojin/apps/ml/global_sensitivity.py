@@ -15,11 +15,13 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from apps.ml.features import FEATURE_NAMES
 from apps.ml.sensitivity import FEATURE_RANGES
 from apps.ml.service import predict_bundle
+
 
 # Default operational bounds (same as FEATURE_RANGES)
 def _bounds() -> list[tuple[float, float]]:

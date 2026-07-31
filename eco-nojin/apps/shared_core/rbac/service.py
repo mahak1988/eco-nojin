@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from apps.shared_core.rbac.models import Permission, Role, UserRole
+from apps.shared_core.rbac.models import Role, UserRole
 
 
 async def get_user_permission_codes(session: AsyncSession, user_id: int) -> set[str]:

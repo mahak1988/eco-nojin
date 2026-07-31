@@ -8,8 +8,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
-from apps.users.service import UserService, decode_access_token
 from apps.users.models import User
+from apps.users.service import UserService, decode_access_token
 
 # ==========================================
 # OAuth2 Configuration
@@ -42,34 +42,34 @@ async def get_current_user(
         detail="توکن احراز هویت نامعتبر است",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     # رمزگشایی توکن
     payload = decode_access_token(token)
     if payload is None:
         raise credentials_exception
-    
+
     user_id: str = payload.get("sub")
     if user_id is None:
         raise credentials_exception
-    
+
     # دریافت کاربر از دیتابیس
     try:
         user = await user_service.get_user_by_id(int(user_id))
     except (ValueError, TypeError):
         raise credentials_exception
-    
+
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="کاربر یافت نشد"
         )
-    
+
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="کاربر غیرفعال است"
         )
-    
+
     return user
 
 async def get_current_active_superuser(

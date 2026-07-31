@@ -1,4 +1,10 @@
-from apps.simulation.soil_carbon import catalog, run_century3, run_ensemble, run_icbm, run_yasso_lite
+from apps.simulation.soil_carbon import (
+    catalog,
+    run_century3,
+    run_ensemble,
+    run_icbm,
+    run_yasso_lite,
+)
 
 
 def test_icbm_runs():

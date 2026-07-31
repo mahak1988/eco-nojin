@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models.education import Course, Enrollment, Lesson
 from apps.api.repositories.education import EducationRepository
-from apps.api.schemas.education import CourseCreate, CourseUpdate, LessonCreate, LessonUpdate, EnrollmentUpdate
+from apps.api.schemas.education import (
+    CourseCreate,
+    CourseUpdate,
+    EnrollmentUpdate,
+    LessonCreate,
+    LessonUpdate,
+)
 from apps.shared_core.schemas.pagination import page_to_offset
 
 logger = logging.getLogger(__name__)
@@ -24,13 +29,13 @@ class EducationService:
         *,
         page: int = 1,
         size: int = 20,
-        skip: Optional[int] = None,
-        limit: Optional[int] = None,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
-        level: Optional[str] = None,
-        sort: Optional[str] = "-id",
-    ) -> tuple[List[Course], int, int, int]:
+        skip: int | None = None,
+        limit: int | None = None,
+        search: str | None = None,
+        category: str | None = None,
+        level: str | None = None,
+        sort: str | None = "-id",
+    ) -> tuple[list[Course], int, int, int]:
         """Returns (items, total, page, size). Prefer page/size (R13); skip/limit legacy."""
         size = min(limit if limit is not None else size, 200)
         size = max(1, size)
@@ -67,7 +72,7 @@ class EducationService:
 
     async def list_lessons(
         self, course_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Lesson], int]:
+    ) -> tuple[list[Lesson], int]:
         return await self.repo.list_lessons_by_course(course_id, skip, limit)
 
     async def create_lesson(self, course_id: int, data: LessonCreate) -> Lesson:
@@ -92,7 +97,7 @@ class EducationService:
 
     async def list_enrollments(
         self, user_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Enrollment], int]:
+    ) -> tuple[list[Enrollment], int]:
         return await self.repo.list_enrollments_by_user(user_id, skip, limit)
 
     async def create_enrollment(self, course_id: int, user_id: int) -> Enrollment:

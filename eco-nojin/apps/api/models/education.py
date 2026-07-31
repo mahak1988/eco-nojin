@@ -8,9 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 
-from sqlalchemy import String, Integer, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.session import Base
@@ -23,18 +22,18 @@ class Course(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     level: Mapped[str] = mapped_column(String(50), default="beginner", nullable=False)
     duration_hours: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    instructor: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    instructor: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # Relationships
-    lessons: Mapped[List["Lesson"]] = relationship("Lesson", back_populates="course", cascade="all, delete-orphan")
-    enrollments: Mapped[List["Enrollment"]] = relationship("Enrollment", back_populates="course", cascade="all, delete-orphan")
+    lessons: Mapped[list["Lesson"]] = relationship("Lesson", back_populates="course", cascade="all, delete-orphan")
+    enrollments: Mapped[list["Enrollment"]] = relationship("Enrollment", back_populates="course", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Handle __repr__."""
@@ -49,8 +48,8 @@ class Lesson(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     course_id: Mapped[int] = mapped_column(Integer, ForeignKey("courses.id"), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    video_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    content: Mapped[str | None] = mapped_column(Text, nullable=True)
+    video_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     duration_minutes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
@@ -72,7 +71,7 @@ class Enrollment(Base):
     user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # percentage 0-100
     enrolled_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Relationships
     course: Mapped["Course"] = relationship("Course", back_populates="enrollments")

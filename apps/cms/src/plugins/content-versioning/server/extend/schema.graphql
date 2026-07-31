@@ -1,0 +1,52 @@
+export default {
+  definition: /* GraphQL */ `
+    type Version {
+      id: ID!
+      entityId: String!
+      contentType: String!
+      versionNumber: Int!
+      contentData: JSON
+      userId: String
+      changeSummary: String
+      createdAt: DateTime
+    }
+
+    type VersionComparison {
+      version1: Int!
+      version2: Int!
+      differences: JSON
+    }
+
+    extend type Query {
+      version(id: ID!): Version
+      versions(entityId: String!, contentType: String!): [Version!]!
+      compareVersions(versionId1: ID!, versionId2: ID!): VersionComparison
+    }
+
+    extend type Mutation {
+      createVersion(entityId: String!, contentType: String!, userId: String, changeSummary: String): Version
+      restoreVersion(versionId: ID!): Boolean
+    }
+  `,
+  resolvers: {
+    Query: {
+      version: {
+        resolver: 'plugin::content-versioning.version.getVersion',
+      },
+      versions: {
+        resolver: 'plugin::content-versioning.version.getVersions',
+      },
+      compareVersions: {
+        resolver: 'plugin::content-versioning.version.compareVersions',
+      },
+    },
+    Mutation: {
+      createVersion: {
+        resolver: 'plugin::content-versioning.version.createVersion',
+      },
+      restoreVersion: {
+        resolver: 'plugin::content-versioning.version.restoreVersion',
+      },
+    },
+  },
+};

@@ -7,7 +7,6 @@ Three ecosystem services (carbon storage, water yield, habitat quality) across a
 import logging
 
 logger = logging.getLogger(__name__)
-import math
 import hashlib
 import time
 from typing import Any
@@ -15,8 +14,8 @@ from typing import Any
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
 

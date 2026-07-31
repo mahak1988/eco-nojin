@@ -3,17 +3,20 @@
 # Creates demo user, courses, accounting entries, and sample simulation runs.
 
 import sys
+
 sys.path.insert(0, '.')
 
 import asyncio
-from apps.shared_core.database.session import init_db, get_db_session
-from apps.users.models import User
+
+from apps.shared_core.database.session import get_db_session, init_db
 from apps.shared_core.security import get_password_hash
+from apps.users.models import User
+
 
 async def seed():
     print("[seed] Initializing database...")
     await init_db()
-    
+
     async with get_db_session() as db:
         # Demo user
         demo = User(
@@ -25,7 +28,7 @@ async def seed():
             is_superuser=False,
         )
         db.add(demo)
-        
+
         # Admin user
         admin = User(
             email="admin@econojin.com",
@@ -36,9 +39,9 @@ async def seed():
             is_superuser=True,
         )
         db.add(admin)
-        
+
         await db.commit()
-    
+
     print("[seed] Done. Demo users created:")
     print("  demo@econojin.com / demo123456 (farmer)")
     print("  admin@econojin.com / admin123456 (admin)")

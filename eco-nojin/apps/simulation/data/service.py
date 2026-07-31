@@ -4,9 +4,9 @@ In-memory cache (TTL) to avoid repeated external calls.
 """
 import asyncio
 import time
-from datetime import date, timedelta
+from datetime import date
 
-from apps.simulation.data import nasa_power, open_meteo, open_elevation
+from apps.simulation.data import nasa_power, open_elevation, open_meteo
 
 _CACHE: dict[str, tuple[float, dict]] = {}
 _TTL = 3600  # 1 hour

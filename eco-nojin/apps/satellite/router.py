@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
@@ -22,23 +22,23 @@ router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
 class BandsRequest(BaseModel):
     red: float = Field(..., ge=0, le=1, description="Sentinel-2 B04 reflectance")
     nir: float = Field(..., ge=0, le=1, description="Sentinel-2 B08 reflectance")
-    green: Optional[float] = Field(None, ge=0, le=1)
-    blue: Optional[float] = Field(None, ge=0, le=1)
-    swir1: Optional[float] = Field(None, ge=0, le=1)
+    green: float | None = Field(None, ge=0, le=1)
+    blue: float | None = Field(None, ge=0, le=1)
+    swir1: float | None = Field(None, ge=0, le=1)
 
 
 class MrvBridgeRequest(BaseModel):
-    red: Optional[float] = Field(None, ge=0, le=1)
-    nir: Optional[float] = Field(None, ge=0, le=1)
-    green: Optional[float] = Field(None, ge=0, le=1)
-    blue: Optional[float] = Field(None, ge=0, le=1)
-    ndvi_observed: Optional[float] = Field(None, ge=-1, le=1)
-    ndvi_expected: Optional[float] = Field(None, ge=-1, le=1)
-    lat: Optional[float] = Field(None, ge=-90, le=90)
-    lon: Optional[float] = Field(None, ge=-180, le=180)
+    red: float | None = Field(None, ge=0, le=1)
+    nir: float | None = Field(None, ge=0, le=1)
+    green: float | None = Field(None, ge=0, le=1)
+    blue: float | None = Field(None, ge=0, le=1)
+    ndvi_observed: float | None = Field(None, ge=-1, le=1)
+    ndvi_expected: float | None = Field(None, ge=-1, le=1)
+    lat: float | None = Field(None, ge=-90, le=90)
+    lon: float | None = Field(None, ge=-180, le=180)
     days: int = Field(30, ge=7, le=365)
-    model_yield_t_ha: Optional[float] = Field(None, ge=0)
-    field_yield_t_ha: Optional[float] = Field(None, ge=0)
+    model_yield_t_ha: float | None = Field(None, ge=0)
+    field_yield_t_ha: float | None = Field(None, ge=0)
     credit_type: int = Field(0, ge=0, le=3)
     measured_value: float = Field(40.0, gt=0)
     region_multiplier: float = Field(1.0, ge=0.8, le=1.3)
@@ -48,14 +48,14 @@ class AquaCropMrvRequest(BaseModel):
     crop: str = Field("wheat", description="wheat|maize|rice|...")
     days: int = Field(90, ge=30, le=200)
     area_ha: float = Field(1.0, gt=0, le=10000)
-    et0_mm_day: Optional[float] = Field(None, ge=0, le=15)
+    et0_mm_day: float | None = Field(None, ge=0, le=15)
     rain_mm_day: float = Field(0.5, ge=0, le=50)
     taw_mm: float = Field(100.0, ge=20, le=300)
-    ndvi_values: Optional[list[float]] = None
-    ndvi_observed: Optional[float] = Field(None, ge=-1, le=1)
-    field_yield_t_ha: Optional[float] = Field(None, ge=0)
-    lat: Optional[float] = Field(None, ge=-90, le=90)
-    lon: Optional[float] = Field(None, ge=-180, le=180)
+    ndvi_values: list[float] | None = None
+    ndvi_observed: float | None = Field(None, ge=-1, le=1)
+    field_yield_t_ha: float | None = Field(None, ge=0)
+    lat: float | None = Field(None, ge=-90, le=90)
+    lon: float | None = Field(None, ge=-180, le=180)
     credit_type: int = Field(0, ge=0, le=3)
     measured_value: float = Field(40.0, gt=0)
     region_multiplier: float = Field(1.0, ge=0.8, le=1.3)
@@ -70,7 +70,7 @@ class RothcMrvRequest(BaseModel):
     c_input_t_ha_y: float = Field(1.5, ge=0, le=20)
     soc_t_ha: float = Field(40.0, ge=1, le=200)
     plant_cover: bool = True
-    lab_soc_final_t_ha: Optional[float] = Field(None, ge=0)
+    lab_soc_final_t_ha: float | None = Field(None, ge=0)
     region_multiplier: float = Field(1.0, ge=0.8, le=1.3)
 
 
@@ -266,8 +266,8 @@ async def aquacrop_mrv_get(
     days: int = Query(90, ge=30, le=200),
     measured_value: float = Query(40.0, gt=0),
     credit_type: int = Query(0, ge=0, le=3),
-    lat: Optional[float] = Query(None),
-    lon: Optional[float] = Query(None),
+    lat: float | None = Query(None),
+    lon: float | None = Query(None),
 ) -> dict[str, Any]:
     if lat is not None and lon is not None:
         return await aquacrop_mrv_from_location(
@@ -355,7 +355,7 @@ async def change_detection(
 
 
 @router.get("/fields")
-async def fields_stub(farm_id: Optional[int] = None) -> dict[str, Any]:
+async def fields_stub(farm_id: int | None = None) -> dict[str, Any]:
     return {
         "data": [],
         "farm_id": farm_id,

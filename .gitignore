@@ -47,3 +47,4 @@ apps/econojin.db
 
 # Logs
 *.log
+.pnpm-store/

@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 MAX_SUPPLY = 1_000_000_000.0
 GENESIS_SUPPLY = 50_000_000.0
@@ -102,10 +102,10 @@ def scarcity_at_ratio(ratio: float) -> float:
 
 
 def quality_from_mrv(
-    ndvi_observed: Optional[float] = None,
-    ndvi_expected: Optional[float] = None,
-    model_yield_t_ha: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
+    ndvi_observed: float | None = None,
+    ndvi_expected: float | None = None,
+    model_yield_t_ha: float | None = None,
+    field_yield_t_ha: float | None = None,
     field_data_present: bool = False,
     satellite_available: bool = False,
 ) -> dict[str, Any]:
@@ -165,9 +165,9 @@ def compute_impact_mint(
     measured_value: float,
     quality_score: float = 1.0,
     region_multiplier: float = 1.0,
-    state: Optional[ProtocolState] = None,
-    credit_factor_override: Optional[float] = None,
-    scarcity_override: Optional[float] = None,
+    state: ProtocolState | None = None,
+    credit_factor_override: float | None = None,
+    scarcity_override: float | None = None,
 ) -> dict[str, Any]:
     if credit_type not in CREDIT_FACTORS:
         return {"ok": False, "error": "invalid_credit_type", "mint_total": 0.0}
@@ -219,7 +219,7 @@ def sensitivity_analysis(
     measured_value: float = 40.0,
     quality_score: float = 1.0,
     region_multiplier: float = 1.0,
-    state: Optional[ProtocolState] = None,
+    state: ProtocolState | None = None,
 ) -> dict[str, Any]:
     st = state or ProtocolState()
     base = compute_impact_mint(
@@ -326,7 +326,7 @@ def sensitivity_analysis(
     }
 
 
-def get_tier(tier_id: int) -> Optional[dict[str, Any]]:
+def get_tier(tier_id: int) -> dict[str, Any] | None:
     return next((t for t in STAKING_TIERS if t["id"] == tier_id), None)
 
 
@@ -339,7 +339,7 @@ def estimate_stake_reward(amount: float, tier_id: int) -> dict[str, Any]:
     if amount < tier["min_amount"]:
         return {"ok": False, "error": "below_minimum", "min_amount": tier["min_amount"]}
     estimated = amount * tier["apy"] / 100.0
-    unlock = datetime.now(timezone.utc) + timedelta(days=tier["days"])
+    unlock = datetime.now(UTC) + timedelta(days=tier["days"])
     return {
         "ok": True,
         "estimated_reward": estimated,
@@ -417,7 +417,7 @@ def compute_indicators(state: ProtocolState) -> dict[str, Any]:
 
 
 def tx_hash(*parts: Any) -> str:
-    raw = "|".join(str(p) for p in parts) + "|" + datetime.now(timezone.utc).isoformat()
+    raw = "|".join(str(p) for p in parts) + "|" + datetime.now(UTC).isoformat()
     return "0x" + hashlib.sha256(raw.encode()).hexdigest()
 
 

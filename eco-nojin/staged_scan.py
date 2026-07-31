@@ -1,5 +1,4 @@
 ﻿#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """staged_scan.py â€” hook ظ‡ظˆط´ظ…ظ†ط¯: ظپظ‚ط· ظپط§غŒظ„â€Œظ‡ط§غŒ ظˆط§ظ‚ط¹غŒطŒ ظپظ‚ط· ط¨ط­ط±ط§ظ†غŒ ظ…ط³ط¯ظˆط¯ ط´ظˆط¯."""
 from __future__ import annotations
 

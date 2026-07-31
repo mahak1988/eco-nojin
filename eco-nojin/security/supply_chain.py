@@ -1,11 +1,12 @@
 
 """OWASP A03:2025 — Software Supply Chain Security."""
 from __future__ import annotations
+
 import json
 import subprocess
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -15,7 +16,7 @@ def generate_sbom() -> dict:
         "bomFormat": "CycloneDX",
         "specVersion": "1.5",
         "metadata": {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "component": {"name": "econojin.com", "type": "application"},
         },
         "components": [],

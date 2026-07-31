@@ -3,20 +3,22 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import List, Any
+from typing import Any
+
 from langchain_core.tools import BaseTool
+
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
-from apps.shared_ai.ai.tools.database_tools import query_database, get_table_schema
+from apps.shared_ai.ai.tools.database_tools import get_table_schema, query_database
 from apps.shared_ai.ai.tools.fast_compute import (
     fast_statistics,
     monte_carlo_simulation,
-    optimization_solver
+    optimization_solver,
 )
 from apps.shared_ai.ai.tools.rag_tools import (
+    get_knowledge_base_stats,
     get_rag_context,
     search_knowledge_base,
     upload_document,
-    get_knowledge_base_stats
 )
 
 # ==========================================
@@ -56,11 +58,11 @@ FINANCIAL_ANALYST_PROMPT = """شما یک تحلیلگر مالی حرفه‌ا�
 
 class FinancialAnalystAgent:
     """ایجنت تحلیلگر مالی با ابزارهای محاسباتی و RAG."""
-    
+
     def __init__(self, llm: Any) -> None:
         self.llm = llm
         """Handle __init__ (llm)."""
-        self.tools: List[BaseTool] = [
+        self.tools: list[BaseTool] = [
             query_database,
             get_table_schema,
             fast_statistics,
@@ -77,7 +79,7 @@ class FinancialAnalystAgent:
             system_prompt=FINANCIAL_ANALYST_PROMPT
         )
         self.graph = self.builder.build()
-    
+
     async def chat(self, user_message: str, context: dict = None) -> str:
         """اجرای ایجنت با یک پیام."""
         return await self.builder.run(user_message, context)

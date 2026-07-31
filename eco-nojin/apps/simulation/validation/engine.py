@@ -6,8 +6,7 @@ Validation & Uncertainty Engine.
 """
 import math
 import random
-from typing import Any, Callable, Awaitable
-
+from collections.abc import Awaitable, Callable
 
 # کلیدهای محتمل برای عملکرد/خروجی اصلی هر شبیه‌ساز
 _METRIC_CANDIDATES = ["yield_t_ha", "yield", "grain_yield", "biomass_t_ha",

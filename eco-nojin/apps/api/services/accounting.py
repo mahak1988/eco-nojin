@@ -5,9 +5,9 @@ Accounting Service | لایه کسب‌وکار حسابداری
 
 from __future__ import annotations
 
+import builtins
 import logging
 from decimal import Decimal
-from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -65,8 +65,8 @@ class AccountService:
         return _attach_balance(obj, bal)
 
     async def list(
-        self, skip: int = 0, limit: int = 100, account_type: Optional[str] = None
-    ) -> tuple[List[Account], int]:
+        self, skip: int = 0, limit: int = 100, account_type: str | None = None
+    ) -> tuple[builtins.list[Account], int]:
         limit = min(limit, 1000)
         accounts, total = await self.repo.list(skip, limit, account_type)
         for account in accounts:
@@ -106,8 +106,8 @@ class JournalEntryService:
         return obj
 
     async def list(
-        self, skip: int = 0, limit: int = 100, is_posted: Optional[bool] = None
-    ) -> tuple[List[JournalEntry], int]:
+        self, skip: int = 0, limit: int = 100, is_posted: bool | None = None
+    ) -> tuple[builtins.list[JournalEntry], int]:
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit, is_posted)
 
@@ -144,7 +144,7 @@ class InvoiceService:
         return obj
 
     async def list(
-        self, skip: int = 0, limit: int = 100, status: Optional[str] = None
+        self, skip: int = 0, limit: int = 100, status: str | None = None
     ) -> tuple[list, int]:
         limit = min(limit, 1000)
         return await self.repo.list(skip, limit, status)

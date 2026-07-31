@@ -8,14 +8,14 @@ for high-resolution precipitation analysis.
 import logging
 
 logger = logging.getLogger(__name__)
-from datetime import datetime, UTC
+from datetime import datetime
 from typing import Any
 
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
 
@@ -81,7 +81,7 @@ class CHIRPSFetcher(BaseSimulator):
             return SimulationResult(simulator_id=self.id, simulator_name=self.name,
                 status=SimulationStatus.FAILED, parameters=parameters,
                 error="; ".join(errors))
-        
+
         try:
             outputs = await self._run_simulation(parameters)
             elapsed = (time.time() - start) * 1000
@@ -100,7 +100,7 @@ class CHIRPSFetcher(BaseSimulator):
         start = datetime.strptime(params["start_date"], "%Y-%m-%d")
         end = datetime.strptime(params["end_date"], "%Y-%m-%d")
         aggregation = params["aggregation"]
-        
+
         days = (end - start).days + 1
         if aggregation == "weekly":
             n_periods = days // 7
@@ -108,10 +108,10 @@ class CHIRPSFetcher(BaseSimulator):
             n_periods = days // 30
         else:
             n_periods = days
-        
+
         # Simulate precipitation values
         precip = [round(1 + 30 * (i % 20) / 20, 1) for i in range(n_periods)]
-        
+
         return {
             "bounds": params["bounds"],
             "aggregation": aggregation,

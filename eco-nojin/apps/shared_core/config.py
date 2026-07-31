@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from functools import lru_cache
-from typing import List, Literal, Optional
+from typing import Literal
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     )
 
     @property
-    def all_cors_origins(self) -> List[str]:
+    def all_cors_origins(self) -> list[str]:
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
 
     DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./apps/econojin.db")
@@ -38,12 +38,12 @@ class Settings(BaseSettings):
     FORCE_POSTGRES: bool = Field(default=False)
 
     SECRET_KEY: str = Field(default="local-dev-only-change-me-use-secrets-token-urlsafe-48")
-    JWT_SECRET_KEY: Optional[str] = Field(default=None)
+    JWT_SECRET_KEY: str | None = Field(default=None)
     ALGORITHM: str = Field(default="HS256")
-    JWT_PRIVATE_KEY_PATH: Optional[str] = Field(default=None)
-    JWT_PUBLIC_KEY_PATH: Optional[str] = Field(default=None)
-    JWT_PRIVATE_KEY: Optional[str] = Field(default=None)
-    JWT_PUBLIC_KEY: Optional[str] = Field(default=None)
+    JWT_PRIVATE_KEY_PATH: str | None = Field(default=None)
+    JWT_PUBLIC_KEY_PATH: str | None = Field(default=None)
+    JWT_PRIVATE_KEY: str | None = Field(default=None)
+    JWT_PUBLIC_KEY: str | None = Field(default=None)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=14)
     JWT_COOKIE_NAME: str = Field(default="access_token")
@@ -54,29 +54,29 @@ class Settings(BaseSettings):
     REQUIRE_AUTH_FOR_WRITES: bool = Field(default=False)
 
     REDIS_URL: str = Field(default="redis://localhost:6379/0")
-    CELERY_BROKER_URL: Optional[str] = Field(default=None)
+    CELERY_BROKER_URL: str | None = Field(default=None)
 
-    GEE_SERVICE_ACCOUNT: Optional[str] = Field(default=None)
-    GEE_CREDENTIALS_FILE: Optional[str] = Field(default=None)
-    GEE_PROJECT_ID: Optional[str] = Field(default=None)
-    COPERNICUS_USERNAME: Optional[str] = Field(default=None)
-    COPERNICUS_PASSWORD: Optional[str] = Field(default=None)
+    GEE_SERVICE_ACCOUNT: str | None = Field(default=None)
+    GEE_CREDENTIALS_FILE: str | None = Field(default=None)
+    GEE_PROJECT_ID: str | None = Field(default=None)
+    COPERNICUS_USERNAME: str | None = Field(default=None)
+    COPERNICUS_PASSWORD: str | None = Field(default=None)
 
     BLOCKCHAIN_RPC_URL: str = Field(default="https://rpc-amoy.polygon.technology/")
     BLOCKCHAIN_CHAIN_ID: int = Field(default=80002)
     ECOCONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000001")
     ORACLE_CONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000002")
-    BACKEND_WALLET_PRIVATE_KEY: Optional[str] = Field(default=None)
+    BACKEND_WALLET_PRIVATE_KEY: str | None = Field(default=None)
 
     LLM_PROVIDER: Literal["groq", "openai", "gemini", "openrouter", "ollama", "fake"] = Field(
         default="fake"
     )
-    LLM_API_KEY: Optional[str] = Field(default=None)
+    LLM_API_KEY: str | None = Field(default=None)
     LLM_MODEL: str = Field(default="llama3-8b-8192")
     OLLAMA_BASE_URL: str = Field(default="http://localhost:11434")
 
     OPEN_METEO_URL: str = Field(default="https://api.open-meteo.com/v1")
-    FAO_API_KEY: Optional[str] = Field(default=None)
+    FAO_API_KEY: str | None = Field(default=None)
 
     @property
     def jwt_secret(self) -> str:

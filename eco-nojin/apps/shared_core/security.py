@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
-from jose import JWTError, jwt
+from jose import jwt
 
 from apps.shared_core.config import settings
 from apps.shared_core.jwt_keys import algorithms, signing_key, verify_key
@@ -36,16 +36,16 @@ except Exception:  # pragma: no cover
         return _ctx.hash(password)
 
 
-def create_access_token(subject: str | int, extra: Optional[dict[str, Any]] = None) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+def create_access_token(subject: str | int, extra: dict[str, Any] | None = None) -> str:
+    expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload: dict[str, Any] = {"sub": str(subject), "type": "access", "exp": expire}
     if extra:
         payload.update(extra)
     return jwt.encode(payload, signing_key(), algorithm=settings.ALGORITHM)
 
 
-def create_refresh_token(subject: str | int, jti: Optional[str] = None) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+def create_refresh_token(subject: str | int, jti: str | None = None) -> str:
+    expire = datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     token_jti = jti or str(uuid.uuid4())
     payload: dict[str, Any] = {
         "sub": str(subject),

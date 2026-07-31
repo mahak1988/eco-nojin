@@ -21,7 +21,8 @@ Decomposition helps diagnose: correlation skill vs bias vs variability.
 from __future__ import annotations
 
 import math
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 
 def _align(obs: Sequence[float], sim: Sequence[float]) -> tuple[list[float], list[float]]:

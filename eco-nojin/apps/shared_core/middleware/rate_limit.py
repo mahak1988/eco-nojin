@@ -8,11 +8,11 @@ Uses in-memory store by default, Redis for production.
 import logging
 
 logger = logging.getLogger(__name__)
-from time import time
 from collections import defaultdict
-from typing import Callable
+from collections.abc import Callable
+from time import time
 
-from fastapi import Request, HTTPException, status
+from fastapi import HTTPException, Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
@@ -32,24 +32,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     Tracks failed authentication attempts and blocks IPs that exceed
     the maximum number of attempts within the time window.
     """
-    
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Handle dispatch (request, call_next)."""
         client_ip = request.client.host if request.client else "unknown"
         path = request.url.path
-        
+
         # Only apply to authentication endpoints
         if path in RATE_LIMIT_PATHS or path.startswith("/api/v1/auth"):
             now = time()
             key = f"{client_ip}:{path}"
             attempts = _failed_attempts[key]
-            
+
             # Clean up old attempts outside the window
             _failed_attempts[key] = [
-                attempt_time for attempt_time in attempts 
+                attempt_time for attempt_time in attempts
                 if now - attempt_time < RATE_LIMIT_WINDOW_SECONDS
             ]
-            
+
             # Check if rate limited
             if len(_failed_attempts[key]) >= MAX_FAILED_ATTEMPTS:
                 raise HTTPException(
@@ -57,14 +57,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     detail="Too many failed attempts. Please try again later.",
                     headers={"Retry-After": str(RATE_LIMIT_WINDOW_SECONDS)},
                 )
-        
+
         response = await call_next(request)
-        
+
         # Record failed authentication attempts
         if path in RATE_LIMIT_PATHS and response.status_code == 401:
             key = f"{client_ip}:{path}"
             _failed_attempts[key].append(time())
-        
+
         return response
 
 
@@ -82,12 +82,12 @@ def get_rate_limit_status(client_ip: str, path: str) -> dict:
     key = f"{client_ip}:{path}"
     attempts = _failed_attempts.get(key, [])
     now = time()
-    
+
     # Clean up
     _failed_attempts[key] = [
         t for t in attempts if now - t < RATE_LIMIT_WINDOW_SECONDS
     ]
-    
+
     return {
         "remaining_attempts": max(0, MAX_FAILED_ATTEMPTS - len(attempts)),
         "limit": MAX_FAILED_ATTEMPTS,

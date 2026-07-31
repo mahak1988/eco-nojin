@@ -7,7 +7,7 @@ Optional lab SOC measurement improves Q via field agreement proxy.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from apps.api.services.ecocoin_engine import compute_impact_mint, quality_from_mrv
 from apps.simulation.rothc_model import run_rothc
@@ -23,7 +23,7 @@ def rothc_to_mrv(
     c_input_t_ha_y: float = 1.5,
     soc_t_ha: float = 40.0,
     plant_cover: bool = True,
-    lab_soc_final_t_ha: Optional[float] = None,
+    lab_soc_final_t_ha: float | None = None,
     region_multiplier: float = 1.0,
 ) -> dict[str, Any]:
     sim = run_rothc(
@@ -73,7 +73,7 @@ def rothc_to_mrv(
             **mint,
             "ok": True,
             "mint_total": 0.0,
-            "distribution": {k: 0.0 for k in mint.get("distribution", {})},
+            "distribution": dict.fromkeys(mint.get("distribution", {}), 0.0),
             "note": "no_positive_delta_soc",
             "raw_before_scarcity": 0.0,
         }

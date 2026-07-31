@@ -1,14 +1,11 @@
 """seed_data module."""
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 import logging
 
-from apps.shared_knowledge.knowledge.models import (
-    KnowledgeArticle,
-    BusinessRule,
-    ResponseTemplate
-)
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from apps.shared_knowledge.knowledge.models import BusinessRule, KnowledgeArticle, ResponseTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -561,13 +558,13 @@ RESPONSE_TEMPLATES = [
 async def seed_knowledge_base(session: AsyncSession) -> None:
     """بارگذاری داده‌های اولیه به دانش‌نامه."""
     logger.info("🌱 Seeding knowledge base...")
-    
+
     # بررسی وجود داده‌ها
     result = await session.execute(select(KnowledgeArticle).limit(1))
     if result.scalars().first():
         logger.info("✅ Knowledge base already seeded")
         return
-    
+
     # بارگذاری مقالات
     all_articles = (
         FINANCIAL_KNOWLEDGE +
@@ -577,26 +574,26 @@ async def seed_knowledge_base(session: AsyncSession) -> None:
         DATA_ANALYST_KNOWLEDGE +
         CODE_ASSISTANT_KNOWLEDGE
     )
-    
+
     for article_data in all_articles:
         article = KnowledgeArticle(**article_data)
         session.add(article)
-    
+
     logger.info(f"✅ Added {len(all_articles)} knowledge articles")
-    
+
     # بارگذاری قوانین
     for rule_data in BUSINESS_RULES:
         rule = BusinessRule(**rule_data)
         session.add(rule)
-    
+
     logger.info(f"✅ Added {len(BUSINESS_RULES)} business rules")
-    
+
     # بارگذاری قالب‌ها
     for template_data in RESPONSE_TEMPLATES:
         template = ResponseTemplate(**template_data)
         session.add(template)
-    
+
     logger.info(f"✅ Added {len(RESPONSE_TEMPLATES)} response templates")
-    
+
     await session.commit()
     logger.info("✅ Knowledge base seeded successfully")

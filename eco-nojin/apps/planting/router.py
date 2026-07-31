@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,7 +17,7 @@ from apps.planting.schemas import (
 )
 from apps.planting.season import GROWTH_STAGES, season_plan, seed_selection
 from apps.shared_core.database.session import get_db_session
-from apps.shared_core.schemas.pagination import ListMeta, build_meta, page_to_offset
+from apps.shared_core.schemas.pagination import build_meta, page_to_offset
 
 router = APIRouter(tags=["Planting"])
 
@@ -50,7 +48,7 @@ async def growth_stages(crop: str = Query("wheat")):
 async def list_plans(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
-    farm_id: Optional[int] = None,
+    farm_id: int | None = None,
     session: AsyncSession = Depends(get_db_session),
 ):
     q = select(PlantingPlan).where(PlantingPlan.is_deleted.is_(False))
@@ -100,8 +98,8 @@ async def get_plan(plan_id: int, session: AsyncSession = Depends(get_db_session)
 async def list_tasks(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
-    farm_id: Optional[int] = None,
-    status_filter: Optional[str] = Query(None, alias="status"),
+    farm_id: int | None = None,
+    status_filter: str | None = Query(None, alias="status"),
     session: AsyncSession = Depends(get_db_session),
 ):
     q = select(FarmTask).where(FarmTask.is_deleted.is_(False))

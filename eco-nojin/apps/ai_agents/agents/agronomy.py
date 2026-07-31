@@ -7,19 +7,21 @@ Smart farming and crop advisory agent.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import List, Any
+from typing import Any
+
 from langchain_core.tools import BaseTool
+
+from apps.ai_agents.tools.registry import (
+    calculate_irrigation,
+    get_crop_recommendation,
+    get_weather_data,
+)
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
 from apps.shared_ai.ai.tools.rag_tools import (
+    get_knowledge_base_stats,
     get_rag_context,
     search_knowledge_base,
     upload_document,
-    get_knowledge_base_stats
-)
-from apps.ai_agents.tools.registry import (
-    get_weather_data,
-    get_crop_recommendation,
-    calculate_irrigation,
 )
 
 # ==========================================
@@ -58,7 +60,7 @@ class AgronomyAgent:
     def __init__(self, llm: Any) -> None:
         """Handle __init__ (llm)."""
         self.llm = llm
-        self.tools: List[BaseTool] = [
+        self.tools: list[BaseTool] = [
             get_weather_data,
             get_crop_recommendation,
             calculate_irrigation,

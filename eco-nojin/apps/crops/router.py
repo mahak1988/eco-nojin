@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,8 +30,8 @@ class RotationIn(BaseModel):
 async def list_crops(
     page: int = Query(1, ge=1),
     size: int = Query(100, ge=1, le=200),
-    search: Optional[str] = None,
-    category: Optional[str] = None,
+    search: str | None = None,
+    category: str | None = None,
     session: AsyncSession = Depends(get_db_session),
 ):
     items, meta = await CropService(session).list_crops(
@@ -43,7 +41,7 @@ async def list_crops(
 
 
 @router.get("/disease-rules")
-async def get_disease_rules(crop: Optional[str] = None):
+async def get_disease_rules(crop: str | None = None):
     return {"data": disease_rules(crop)}
 
 

@@ -1,7 +1,9 @@
 
 """Spider Web Security - AI/LLM Prompt Injection Prevention."""
 from __future__ import annotations
+
 import re
+
 
 class AISecurityGuard:
     INJECTION = [

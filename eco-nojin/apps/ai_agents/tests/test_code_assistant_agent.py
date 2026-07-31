@@ -8,10 +8,11 @@ if str(project_root) not in sys.path:
 
 import asyncio
 import logging
+
 from fastapi.testclient import TestClient
 
-from apps.shared_core.database.session import init_db, close_db
 from apps.main import app
+from apps.shared_core.database.session import close_db, init_db
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -19,20 +20,20 @@ logger = logging.getLogger(__name__)
 async def test_code_assistant_agent():
     """تست ایجنت Code Assistant."""
     logger.info("🚀 Starting Code Assistant Agent Test")
-    
+
     # Initialize Database
     logger.info("\n📦 Step 1: Initializing Database...")
     await init_db()
-    
+
     client = TestClient(app)
-    
+
     # Step 2: Register & Login
     logger.info("\n👤 Step 2: Creating test user...")
     client.post(
         "/api/users/register",
         json={"email": "code_test@example.com", "password": "securepass123", "full_name": "Code Tester"}
     )
-    
+
     login_resp = client.post(
         "/api/users/login",
         json={"email": "code_test@example.com", "password": "securepass123"}
@@ -40,7 +41,7 @@ async def test_code_assistant_agent():
     token = login_resp.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
     logger.info("✅ User authenticated")
-    
+
     # Step 3: Check Agent Types
     logger.info("\n🤖 Step 3: Checking available agent types...")
     types_resp = client.get("/api/ai-agents/types")
@@ -55,9 +56,9 @@ async def test_code_assistant_agent():
             logger.error("❌ Code Assistant agent not found in types")
             return
     else:
-        logger.error(f"❌ Failed to get agent types")
+        logger.error("❌ Failed to get agent types")
         return
-    
+
     # Sample Python code for testing
     sample_code = """
 def calculate_average(numbers):
@@ -76,7 +77,7 @@ class DataProcessor:
     def filter_positive(self):
         return [x for x in self.data if x > 0]
 """
-    
+
     # Step 4: Test Code Analysis
     logger.info("\n🔍 Step 4: Testing code analysis...")
     analysis_resp = client.post(
@@ -87,7 +88,7 @@ class DataProcessor:
             "message": f"لطفاً این کد را تحلیل کن:\n\n```python\n{sample_code}\n```"
         }
     )
-    
+
     if analysis_resp.status_code == 200:
         analysis_data = analysis_resp.json()
         conversation_id = analysis_data["conversation_id"]
@@ -96,7 +97,7 @@ class DataProcessor:
     else:
         logger.error(f"❌ Code analysis failed: {analysis_resp.json()}")
         return
-    
+
     # Step 5: Test Bug Finding
     logger.info("\n🐛 Step 5: Testing bug finding...")
     buggy_code = """
@@ -109,7 +110,7 @@ def process_data(data):
     except:
         pass
 """
-    
+
     bug_resp = client.post(
         "/api/ai-agents/chat",
         headers=headers,
@@ -119,13 +120,13 @@ def process_data(data):
             "message": f"این کد را برای باگ بررسی کن:\n\n```python\n{buggy_code}\n```"
         }
     )
-    
+
     if bug_resp.status_code == 200:
         logger.info("✅ Bug finding completed")
     else:
-        logger.error(f"❌ Bug finding failed")
+        logger.error("❌ Bug finding failed")
         return
-    
+
     # Step 6: Test Complexity Calculation
     logger.info("\n📈 Step 6: Testing complexity calculation...")
     complex_code = """
@@ -137,7 +138,7 @@ def find_duplicates(numbers):
                 duplicates.append(numbers[i])
     return duplicates
 """
-    
+
     complexity_resp = client.post(
         "/api/ai-agents/chat",
         headers=headers,
@@ -147,13 +148,13 @@ def find_duplicates(numbers):
             "message": f"پیچیدگی این تابع را محاسبه کن:\n\n```python\n{complex_code}\n```"
         }
     )
-    
+
     if complexity_resp.status_code == 200:
         logger.info("✅ Complexity calculation completed")
     else:
-        logger.error(f"❌ Complexity calculation failed")
+        logger.error("❌ Complexity calculation failed")
         return
-    
+
     # Step 7: Test Test Generation
     logger.info("\n🧪 Step 7: Testing test generation...")
     test_gen_resp = client.post(
@@ -165,32 +166,32 @@ def find_duplicates(numbers):
             "message": f"برای تابع calculate_average تست واحد بنویس:\n\n```python\n{sample_code}\n```"
         }
     )
-    
+
     if test_gen_resp.status_code == 200:
         logger.info("✅ Test generation completed")
     else:
-        logger.error(f"❌ Test generation failed")
+        logger.error("❌ Test generation failed")
         return
-    
+
     # Step 8: Verify Conversation History
     logger.info("\n📋 Step 8: Verifying conversation history...")
     detail_resp = client.get(
         f"/api/ai-agents/conversations/{conversation_id}",
         headers=headers
     )
-    
+
     if detail_resp.status_code == 200:
         detail = detail_resp.json()
         message_count = len(detail["messages"])
         logger.info(f"✅ Conversation has {message_count} messages")
     else:
-        logger.error(f"❌ Failed to get conversation details")
+        logger.error("❌ Failed to get conversation details")
         return
-    
+
     # Cleanup
     logger.info("\n🧹 Step 9: Cleaning up...")
     await close_db()
-    
+
     logger.info("\n✅ Code Assistant Agent Test Completed Successfully!")
     logger.info("\n📊 Summary:")
     logger.info("   - Agent Registration: ✅")

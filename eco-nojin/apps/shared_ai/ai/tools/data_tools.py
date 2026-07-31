@@ -1,12 +1,12 @@
 """data_tools module."""
 
-from langchain_core.tools import tool
-from typing import List, Dict, Any, Optional
-import logging
-import json
 import base64
 import io
+import json
+import logging
 import os
+
+from langchain_core.tools import tool
 
 logger = logging.getLogger(__name__)
 
@@ -31,17 +31,17 @@ async def analyze_statistics(data_json: str, operations: str = "all") -> str:
         {"column1": [1,2,3], "column2": [4,5,6]}
     """
     logger.info(f"📊 Analyzing statistics with operations: {operations}")
-    
+
     try:
         import numpy as np
-        
+
         data = json.loads(data_json)
-        
+
         # اگر داده لیست ساده است
         if isinstance(data, list):
             values = np.array(data, dtype=float)
             return _compute_stats(values, "data", operations)
-        
+
         # اگر دیکشنری با چند ستون است
         if isinstance(data, dict):
             results = []
@@ -51,9 +51,9 @@ async def analyze_statistics(data_json: str, operations: str = "all") -> str:
                     stats = _compute_stats(values, col_name, operations)
                     results.append(stats)
             return "\n\n".join(results)
-        
+
         return "❌ فرمت داده نامعتبر است."
-    
+
     except ImportError:
         return "❌ کتابخانه numpy نصب نیست. دستور: pip install numpy"
     except json.JSONDecodeError:
@@ -65,10 +65,10 @@ async def analyze_statistics(data_json: str, operations: str = "all") -> str:
 def _compute_stats(values, name: str, operations: str) -> str:
     """محاسبه آمار برای یک ستون."""
     import numpy as np
-    
+
     results = [f"📊 آمار برای: {name}"]
     results.append(f"   تعداد: {len(values)}")
-    
+
     if operations in ["all", "mean"]:
         results.append(f"   میانگین: {np.mean(values):.4f}")
     if operations in ["all", "median"]:
@@ -85,7 +85,7 @@ def _compute_stats(values, name: str, operations: str) -> str:
         results.append(f"   چارک اول (Q1): {np.percentile(values, 25):.4f}")
         results.append(f"   چارک سوم (Q3): {np.percentile(values, 75):.4f}")
         results.append(f"   IQR: {np.percentile(values, 75) - np.percentile(values, 25):.4f}")
-    
+
     return "\n".join(results)
 
 # ==========================================
@@ -167,7 +167,7 @@ async def correlation_analysis(data_json: str, method: str = "pearson") -> str:
         ماتریس همبستگی و تحلیل
     """
     logger.info(f"🔗 Computing {method} correlation")
-    
+
     _correlation_analysis_extracted()  # refactored: was Try block
 
 def _correlation_strength(corr: float) -> str:
@@ -299,7 +299,7 @@ async def hypothesis_test(data_json: str, test_type: str = "ttest") -> str:
         نتایج آزمون فرضیه
     """
     logger.info(f"🧪 Performing {test_type} test")
-    
+
     _hypothesis_test_extracted()  # refactored: was Try block
 
 # ==========================================
@@ -317,12 +317,12 @@ async def trend_analysis(data_json: str) -> str:
         تحلیل روند (صعودی، نزولی، ثابت)
     """
     logger.info("📈 Analyzing trends")
-    
+
     try:
         import numpy as np
-        
+
         data = json.loads(data_json)
-        
+
         # استخراج داده‌ها
         if isinstance(data, list):
             values = np.array(data, dtype=float)
@@ -336,27 +336,27 @@ async def trend_analysis(data_json: str) -> str:
                 return "❌ هیچ ستون عددی یافت نشد."
         else:
             return "❌ فرمت داده نامعتبر."
-        
+
         if len(values) < 3:
             return "❌ حداقل 3 نقطه داده برای تحلیل روند نیاز است."
-        
+
         # رگرسیون خطی ساده
         x = np.arange(len(values))
         slope, intercept = np.polyfit(x, values, 1)
-        
+
         # محاسبه R-squared
         y_pred = slope * x + intercept
         ss_res = np.sum((values - y_pred) ** 2)
         ss_tot = np.sum((values - np.mean(values)) ** 2)
         r_squared = 1 - (ss_res / ss_tot) if ss_tot > 0 else 0
-        
+
         # تحلیل روند
         output = ["📈 تحلیل روند:\n"]
         output.append(f"   تعداد نقاط: {len(values)}")
         output.append(f"   شیب خط روند: {slope:.4f}")
         output.append(f"   R-squared: {r_squared:.4f}")
         output.append("")
-        
+
         # تعیین نوع روند
         if abs(slope) < 0.01 * np.std(values):
             trend = "ثابت"
@@ -367,9 +367,9 @@ async def trend_analysis(data_json: str) -> str:
         else:
             trend = "نزولی"
             emoji = "📉"
-        
+
         output.append(f"   {emoji} روند: {trend}")
-        
+
         # قدرت روند
         if r_squared > 0.8:
             output.append("   💪 قدرت روند: قوی")
@@ -377,13 +377,13 @@ async def trend_analysis(data_json: str) -> str:
             output.append("   💪 قدرت روند: متوسط")
         else:
             output.append("   💪 قدرت روند: ضعیف")
-        
+
         # پیش‌بینی ساده
         next_value = slope * len(values) + intercept
         output.append(f"\n🔮 پیش‌بینی مقدار بعدی: {next_value:.4f}")
-        
+
         return "\n".join(output)
-    
+
     except ImportError:
         return "❌ کتابخانه numpy نصب نیست."
     except Exception as e:
@@ -508,7 +508,7 @@ async def generate_chart(data_json: str, chart_type: str = "line", title: str = 
         مسیر فایل نمودار یا base64
     """
     logger.info(f"📊 Generating {chart_type} chart")
-    
+
     _generate_chart_extracted()  # refactored: was Try block
 
 # ==========================================
@@ -526,27 +526,27 @@ async def data_summary(data_json: str) -> str:
         خلاصه جامع داده‌ها
     """
     logger.info("📋 Generating data summary")
-    
+
     try:
         import numpy as np
-        
+
         data = json.loads(data_json)
-        
+
         output = ["📋 خلاصه داده‌ها:\n"]
-        
+
         if isinstance(data, list):
             values = np.array(data, dtype=float)
-            output.append(f"📊 نوع: لیست عددی")
+            output.append("📊 نوع: لیست عددی")
             output.append(f"📏 تعداد: {len(values)}")
             output.append(f"📈 میانگین: {np.mean(values):.4f}")
             output.append(f"📉 انحراف معیار: {np.std(values):.4f}")
             output.append(f"⬇️ حداقل: {np.min(values):.4f}")
             output.append(f"⬆️ حداکثر: {np.max(values):.4f}")
             output.append(f"🎯 میانه: {np.median(values):.4f}")
-        
+
         elif isinstance(data, dict):
             output.append(f"📊 نوع: دیکشنری با {len(data)} ستون\n")
-            
+
             for col_name, col_values in data.items():
                 if isinstance(col_values, list):
                     values = np.array(col_values, dtype=float)
@@ -556,9 +556,9 @@ async def data_summary(data_json: str) -> str:
                     output.append(f"   انحراف معیار: {np.std(values):.4f}")
                     output.append(f"   محدوده: [{np.min(values):.4f}, {np.max(values):.4f}]")
                     output.append("")
-        
+
         return "\n".join(output)
-    
+
     except ImportError:
         return "❌ کتابخانه numpy نصب نیست."
     except Exception as e:

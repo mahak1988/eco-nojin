@@ -2,7 +2,9 @@
 #!/usr/bin/env python3
 """Spider Web Security - Automated Audit."""
 from __future__ import annotations
-import re, sys
+
+import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent

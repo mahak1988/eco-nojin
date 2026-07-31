@@ -3,47 +3,49 @@
 import logging
 
 logger = logging.getLogger(__name__)
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
-from typing import List, Optional
-from apps.shared_core.database.repository import BaseRepository
+
 from apps.ai_agents.models import Conversation, Message
+from apps.shared_core.database.repository import BaseRepository
+
 
 class ConversationRepository(BaseRepository[Conversation]):
     """Repository برای مدیریت مکالمات."""
-    
+
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Conversation)
         """Handle __init__ (session)."""
-    
+
     async def get_user_conversations(
         self,
         user_id: int,
-        agent_type: Optional[str] = None,
+        agent_type: str | None = None,
         limit: int = 50,
         offset: int = 0
-    ) -> List[Conversation]:
+    ) -> list[Conversation]:
         """دریافت مکالمات یک کاربر با تعداد پیام‌ها."""
         stmt = (
             select(Conversation)
             .where(Conversation.user_id == user_id)
         )
-        
+
         if agent_type:
             stmt = stmt.where(Conversation.agent_type == agent_type)
-        
+
         stmt = (
             stmt
             .order_by(Conversation.updated_at.desc())
             .limit(limit)
             .offset(offset)
         )
-        
+
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
-    
-    async def get_with_messages(self, conversation_id: int) -> Optional[Conversation]:
+
+    async def get_with_messages(self, conversation_id: int) -> Conversation | None:
         """دریافت مکالمه با تمام پیام‌ها."""
         stmt = (
             select(Conversation)
@@ -52,7 +54,7 @@ class ConversationRepository(BaseRepository[Conversation]):
         )
         result = await self.session.execute(stmt)
         return result.scalars().first()
-    
+
     async def get_message_count(self, conversation_id: int) -> int:
         """شمارش پیام‌های یک مکالمه."""
         stmt = (
@@ -65,16 +67,16 @@ class ConversationRepository(BaseRepository[Conversation]):
 
 class MessageRepository(BaseRepository[Message]):
     """Repository برای مدیریت پیام‌ها."""
-    
+
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Message)
         """Handle __init__ (session)."""
-    
+
     async def get_conversation_messages(
         self,
         conversation_id: int,
         limit: int = 100
-    ) -> List[Message]:
+    ) -> list[Message]:
         """دریافت پیام‌های یک مکالمه به ترتیب زمانی."""
         stmt = (
             select(Message)
@@ -84,15 +86,15 @@ class MessageRepository(BaseRepository[Message]):
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
-    
+
     async def create_message(
         self,
         conversation_id: int,
         role: str,
         content: str,
-        tool_calls: Optional[dict] = None,
-        tool_call_id: Optional[str] = None,
-        metadata_json: Optional[dict] = None
+        tool_calls: dict | None = None,
+        tool_call_id: str | None = None,
+        metadata_json: dict | None = None
     ) -> Message:
         """ایجاد پیام جدید."""
         data = {

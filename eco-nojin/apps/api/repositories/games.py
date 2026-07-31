@@ -7,12 +7,11 @@ Data access layer — all database queries live here.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.models.games import VocabularyWord, Quiz, QuizQuestion, QuizAttempt
+from apps.api.models.games import Quiz, QuizAttempt, QuizQuestion, VocabularyWord
 from apps.api.schemas.games import VocabularyWordCreate, VocabularyWordUpdate
 
 
@@ -25,7 +24,7 @@ class GamesRepository:
 
     # ==================== Vocabulary Operations ====================
 
-    async def get_vocabulary_by_id(self, word_id: int) -> Optional[VocabularyWord]:
+    async def get_vocabulary_by_id(self, word_id: int) -> VocabularyWord | None:
         """Handle get_vocabulary_by_id (word_id)."""
         result = await self.session.execute(
             select(VocabularyWord).where(VocabularyWord.id == word_id)
@@ -36,9 +35,9 @@ class GamesRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        category: Optional[str] = None
-    ) -> tuple[List[VocabularyWord], int]:
+        search: str | None = None,
+        category: str | None = None
+    ) -> tuple[list[VocabularyWord], int]:
         """Handle list_vocabulary (skip, limit, search, category)."""
         query = select(VocabularyWord)
 
@@ -78,7 +77,7 @@ class GamesRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_vocabulary(self, word_id: int, data: VocabularyWordUpdate) -> Optional[VocabularyWord]:
+    async def update_vocabulary(self, word_id: int, data: VocabularyWordUpdate) -> VocabularyWord | None:
         """Handle update_vocabulary (word_id, data)."""
         obj = await self.get_vocabulary_by_id(word_id)
         if not obj:
@@ -103,7 +102,7 @@ class GamesRepository:
 
     # ==================== Quiz Operations ====================
 
-    async def get_quiz_by_id(self, quiz_id: int) -> Optional[Quiz]:
+    async def get_quiz_by_id(self, quiz_id: int) -> Quiz | None:
         """Handle get_quiz_by_id (quiz_id)."""
         result = await self.session.execute(
             select(Quiz).where(Quiz.id == quiz_id)
@@ -114,10 +113,10 @@ class GamesRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
-        difficulty: Optional[str] = None
-    ) -> tuple[List[Quiz], int]:
+        search: str | None = None,
+        category: str | None = None,
+        difficulty: str | None = None
+    ) -> tuple[list[Quiz], int]:
         """Handle list_quizzes (skip, limit, search, category, difficulty)."""
         query = select(Quiz)
 
@@ -156,7 +155,7 @@ class GamesRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_quiz(self, quiz_id: int, data: dict) -> Optional[Quiz]:
+    async def update_quiz(self, quiz_id: int, data: dict) -> Quiz | None:
         """Handle update_quiz (quiz_id, data)."""
         from apps.api.schemas.games import QuizUpdate
         obj = await self.get_quiz_by_id(quiz_id)
@@ -183,7 +182,7 @@ class GamesRepository:
 
     # ==================== Quiz Question Operations ====================
 
-    async def get_question_by_id(self, question_id: int) -> Optional[QuizQuestion]:
+    async def get_question_by_id(self, question_id: int) -> QuizQuestion | None:
         """Handle get_question_by_id (question_id)."""
         result = await self.session.execute(
             select(QuizQuestion).where(QuizQuestion.id == question_id)
@@ -192,7 +191,7 @@ class GamesRepository:
 
     async def list_questions_by_quiz(
         self, quiz_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[QuizQuestion], int]:
+    ) -> tuple[list[QuizQuestion], int]:
         """Handle list_questions_by_quiz (quiz_id, skip, limit)."""
         query = select(QuizQuestion).where(QuizQuestion.quiz_id == quiz_id)
         query = query.order_by(QuizQuestion.order).offset(skip).limit(limit)
@@ -212,7 +211,7 @@ class GamesRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_question(self, question_id: int, data: dict) -> Optional[QuizQuestion]:
+    async def update_question(self, question_id: int, data: dict) -> QuizQuestion | None:
         """Handle update_question (question_id, data)."""
         from apps.api.schemas.games import QuizQuestionUpdate
         obj = await self.get_question_by_id(question_id)
@@ -241,7 +240,6 @@ class GamesRepository:
 
     async def create_attempt(self, quiz_id: int, user_id: int, data: dict) -> QuizAttempt:
         """Handle create_attempt (quiz_id, user_id, data)."""
-        from apps.api.schemas.games import QuizAttemptCreate
         obj = QuizAttempt(quiz_id=quiz_id, user_id=user_id, **data)
         self.session.add(obj)
         await self.session.flush()
@@ -250,7 +248,7 @@ class GamesRepository:
 
     async def list_attempts_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[QuizAttempt], int]:
+    ) -> tuple[list[QuizAttempt], int]:
         """Handle list_attempts_by_user (user_id, skip, limit)."""
         query = select(QuizAttempt).where(QuizAttempt.user_id == user_id)
         query = query.order_by(QuizAttempt.completed_at.desc()).offset(skip).limit(limit)

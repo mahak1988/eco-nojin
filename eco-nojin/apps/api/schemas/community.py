@@ -8,10 +8,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 from enum import Enum
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PostCategoryEnum(str, Enum):
@@ -26,9 +25,9 @@ class PostCategoryEnum(str, Enum):
 class PostBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
     content: str = Field(..., min_length=1)
-    author_name: Optional[str] = Field(None, max_length=100)
+    author_name: str | None = Field(None, max_length=100)
     category: PostCategoryEnum = PostCategoryEnum.GENERAL
-    tags: Optional[List[str]] = Field(default_factory=list)
+    tags: list[str] | None = Field(default_factory=list)
 
 
 class PostCreate(PostBase):
@@ -36,21 +35,21 @@ class PostCreate(PostBase):
 
 
 class PostUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    content: Optional[str] = None
-    author_name: Optional[str] = None
-    category: Optional[PostCategoryEnum] = None
-    tags: Optional[List[str]] = None
-    is_published: Optional[bool] = None
+    title: str | None = Field(None, min_length=1, max_length=255)
+    content: str | None = None
+    author_name: str | None = None
+    category: PostCategoryEnum | None = None
+    tags: list[str] | None = None
+    is_published: bool | None = None
 
 
 class CommentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    author_name: Optional[str] = None
+    author_name: str | None = None
     content: str
-    parent_id: Optional[int] = None
+    parent_id: int | None = None
     like_count: int
     created_at: datetime
 
@@ -65,7 +64,7 @@ class PostResponse(PostBase):
     comment_count: int
     created_at: datetime
     updated_at: datetime
-    comments: List[CommentResponse] = Field(default_factory=list)
+    comments: list[CommentResponse] = Field(default_factory=list)
 
     @classmethod
     def model_validate(cls, obj: "Post") -> "PostResponse":
@@ -79,7 +78,7 @@ class PostResponse(PostBase):
 
 
 class PostListResponse(BaseModel):
-    items: List[PostResponse]
+    items: list[PostResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -87,8 +86,8 @@ class PostListResponse(BaseModel):
 
 class CommentBase(BaseModel):
     content: str = Field(..., min_length=1)
-    author_name: Optional[str] = Field(None, max_length=100)
-    parent_id: Optional[int] = None
+    author_name: str | None = Field(None, max_length=100)
+    parent_id: int | None = None
 
 
 class CommentCreate(CommentBase):
@@ -96,8 +95,8 @@ class CommentCreate(CommentBase):
 
 
 class CommentUpdate(BaseModel):
-    content: Optional[str] = Field(None, min_length=1)
-    author_name: Optional[str] = None
+    content: str | None = Field(None, min_length=1)
+    author_name: str | None = None
 
 
 class LikeResponse(BaseModel):
@@ -105,8 +104,8 @@ class LikeResponse(BaseModel):
 
     id: int
     user_id: int
-    post_id: Optional[int] = None
-    comment_id: Optional[int] = None
+    post_id: int | None = None
+    comment_id: int | None = None
     created_at: datetime
 
 

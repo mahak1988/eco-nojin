@@ -5,8 +5,9 @@ Docs: https://power.larc.nasa.gov/docs/
 import logging
 
 logger = logging.getLogger(__name__)
+
 import httpx
-from typing import Optional
+
 
 async def fetch_nasa_power_data(lat: float, lon: float, start_date: str, end_date: str) -> dict:
     """
@@ -28,7 +29,7 @@ async def fetch_nasa_power_data(lat: float, lon: float, start_date: str, end_dat
             response = await client.get(url, params=params)
             response.raise_for_status()
             data = response.json()
-            
+
             # Extract and format the time series
             timeseries = data.get("properties", {}).get("parameter", {})
             return {

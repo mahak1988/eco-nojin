@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from apps.simulation.rothc_model import run_rothc
 from apps.simulation.soil_models import run_rusle2

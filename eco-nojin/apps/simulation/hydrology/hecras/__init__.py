@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import HECRASWrapper, HECRASOutput
 from .flood_analyzer import FloodRiskAnalyzer
+from .wrapper import HECRASOutput, HECRASWrapper
 
 __all__ = ["HECRASWrapper", "HECRASOutput", "FloodRiskAnalyzer"]

@@ -8,13 +8,13 @@ result serialization, and registry pattern.
 import logging
 
 logger = logging.getLogger(__name__)
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, UTC
-from enum import Enum
-from typing import Any, Optional
 import json
 import uuid
+from abc import ABC, abstractmethod
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
+from enum import Enum
+from typing import Any
 
 
 class SimulationStatus(str, Enum):
@@ -35,8 +35,8 @@ class SimulationParameter:
     default: Any = None
     description: str = ""
     unit: str = ""
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
+    min_value: float | None = None
+    max_value: float | None = None
     options: list[str] = field(default_factory=list)  # for select type
     required: bool = True
 
@@ -57,7 +57,7 @@ class SimulationResult:
     outputs: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, float] = field(default_factory=dict)
     charts: dict[str, list] = field(default_factory=dict)  # chart data series
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float = 0.0
 
     def to_dict(self) -> dict:
@@ -81,7 +81,7 @@ class SimulationRegistry:
         return simulator_class
 
     @classmethod
-    def get(cls, simulator_id: str) -> Optional[type["BaseSimulator"]]:
+    def get(cls, simulator_id: str) -> type["BaseSimulator"] | None:
         """Handle get (cls, simulator_id)."""
         return cls._simulators.get(simulator_id)
 

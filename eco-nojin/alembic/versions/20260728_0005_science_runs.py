@@ -1,42 +1,42 @@
-"""science_runs table (phase3 persist, avoids legacy simulation_runs conflict)
-
-Revision ID: 20260728_0005
-Revises: 20260728_0004
-"""
+"""Create science_runs table for tracking model executions."""
 
 from __future__ import annotations
 
-from typing import Sequence, Union
+from contextlib import suppress
 
 import sqlalchemy as sa
+
 from alembic import op
 
-revision: str = "20260728_0005"
-down_revision: Union[str, None] = "20260728_0004"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+# revision identifiers, used by Alembic.
+revision = "20260728_0005"
+down_revision = "20260728_0004"
+branch_labels = None
+depends_on = None
 
 
 def upgrade() -> None:
-    bind = op.get_bind()
-    insp = sa.inspect(bind)
-    if "science_runs" not in insp.get_table_names():
-        op.create_table(
-            "science_runs",
-            sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
-            sa.Column("model", sa.String(64), nullable=False),
-            sa.Column("status", sa.String(32), server_default="completed"),
-            sa.Column("params_json", sa.Text(), nullable=True),
-            sa.Column("result_json", sa.Text(), nullable=True),
-            sa.Column("task_id", sa.String(128), nullable=True),
-            sa.Column("farm_id", sa.Integer(), nullable=True),
-            sa.Column("created_at", sa.DateTime(), server_default=sa.text("CURRENT_TIMESTAMP")),
-        )
-        op.create_index("ix_science_runs_model", "science_runs", ["model"])
+    """Upgrade: Create science_runs table."""
+    op.create_table(
+        "science_runs",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("model_type", sa.String(length=100), nullable=False),
+        sa.Column("parameters", sa.JSON(), nullable=False),
+        sa.Column("results", sa.JSON(), nullable=True),
+        sa.Column("status", sa.String(length=50), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("completed_at", sa.DateTime(), nullable=True),
+        sa.Column("execution_time_ms", sa.Integer(), nullable=True),
+        sa.Column("user_id", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="SET NULL"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(op.f("ix_science_runs_model_type"), "science_runs", ["model_type"], unique=False)
+    op.create_index(op.f("ix_science_runs_status"), "science_runs", ["status"], unique=False)
+    op.create_index(op.f("ix_science_runs_created_at"), "science_runs", ["created_at"], unique=False)
 
 
 def downgrade() -> None:
-    try:
+    """Downgrade: Drop science_runs table."""
+    with suppress(Exception):
         op.drop_table("science_runs")
-    except Exception:
-        pass

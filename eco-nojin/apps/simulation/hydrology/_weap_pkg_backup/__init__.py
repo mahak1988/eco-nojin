@@ -2,6 +2,6 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import WEAPWrapper, WEAPOutput, WEAPScenario
+from .wrapper import WEAPOutput, WEAPScenario, WEAPWrapper
 
 __all__ = ["WEAPWrapper", "WEAPOutput", "WEAPScenario"]

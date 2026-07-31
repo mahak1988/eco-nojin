@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
@@ -49,7 +49,7 @@ class QualitySample(BaseModel):
     source_id: str
     ph: float
     ec_ds_m: float
-    nitrate_mg_l: Optional[float] = None
+    nitrate_mg_l: float | None = None
     sampled_at: str
     status: str
 
@@ -65,7 +65,7 @@ class ScheduleIn(BaseModel):
 
 
 @router.get("/dashboard", response_model=WaterDashboard)
-async def water_dashboard(farm_id: Optional[int] = Query(None)):
+async def water_dashboard(farm_id: int | None = Query(None)):
     _ = farm_id
     return WaterDashboard(
         soil_moisture_pct=42.5,
@@ -74,7 +74,7 @@ async def water_dashboard(farm_id: Optional[int] = Query(None)):
         irrigation_active=False,
         sources_count=3,
         quality_index=0.86,
-        updated_at=datetime.now(timezone.utc).isoformat(),
+        updated_at=datetime.now(UTC).isoformat(),
         alerts=["Soil moisture below ideal for corn zone B"],
     )
 
@@ -114,7 +114,7 @@ async def water_sources():
 
 @router.get("/quality", response_model=list[QualitySample])
 async def water_quality():
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     return [
         QualitySample(id="q1", source_id="ws1", ph=7.2, ec_ds_m=1.1, nitrate_mg_l=8.0, sampled_at=now, status="good"),
         QualitySample(id="q2", source_id="ws2", ph=7.8, ec_ds_m=1.6, nitrate_mg_l=15.0, sampled_at=now, status="fair"),

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -53,11 +52,11 @@ async def list_courses(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=200),
     sort: str = Query("-id"),
-    skip: Optional[int] = Query(None, ge=0),
-    limit: Optional[int] = Query(None, ge=1, le=200),
-    search: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
-    level: Optional[str] = Query(None),
+    skip: int | None = Query(None, ge=0),
+    limit: int | None = Query(None, ge=1, le=200),
+    search: str | None = Query(None),
+    category: str | None = Query(None),
+    level: str | None = Query(None),
     session: AsyncSession = Depends(get_db_session),
 ) -> CourseListResponse:
     service = EducationService(session)

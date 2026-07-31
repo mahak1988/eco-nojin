@@ -2,7 +2,9 @@
 #!/usr/bin/env python3
 """Spider Web Security Audit v2 — OWASP 2025 + DevSecOps 2026."""
 from __future__ import annotations
-import json, re, subprocess, sys
+
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent

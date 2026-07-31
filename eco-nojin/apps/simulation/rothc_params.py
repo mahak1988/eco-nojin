@@ -7,7 +7,7 @@ Ref: Coleman & Jenkinson (RothC-26.3); Falloon et al. IOM estimate.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 # ── Rate constants at standard conditions (1/year) ───────────────────────────
 K_DPM = 10.0

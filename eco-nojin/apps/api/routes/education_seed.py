@@ -5,12 +5,12 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.shared_core.database.session import get_db_session
-from apps.shared_core.config import settings
 from apps.api.models.education import Course, Lesson
+from apps.shared_core.config import settings
+from apps.shared_core.database.session import get_db_session
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/education", tags=["Education"])

@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tenant_sharing_agreements",
+  "info": {
+    "singularName": "tenant-sharing-agreement",
+    "pluralName": "tenant-sharing-agreements",
+    "displayName": "Tenant Sharing Agreement",
+    "description": "Defines content sharing permissions between tenants"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "sourceTenant": {
+      "type": "string",
+      "required": true
+    },
+    "targetTenant": {
+      "type": "string",
+      "required": true
+    },
+    "allowedContentTypes": {
+      "type": "enumeration",
+      "enum": [
+        "page",
+        "blog-post",
+        "category",
+        "tag",
+        "media"
+      ],
+      "multiple": true
+    },
+    "permissions": {
+      "type": "enumeration",
+      "enum": [
+        "read",
+        "write",
+        "read-write"
+      ],
+      "required": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "expiresAt": {
+      "type": "datetime"
+    },
+    "createdAt": {
+      "type": "datetime"
+    },
+    "updatedAt": {
+      "type": "datetime"
+    }
+  }
+}

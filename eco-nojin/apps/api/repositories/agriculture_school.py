@@ -7,15 +7,12 @@ Data access layer — all database queries live here.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models.agriculture_school import AgricultureSchool, SchoolField
-from apps.api.schemas.agriculture_school import (
-    AgricultureSchoolCreate, AgricultureSchoolUpdate
-)
+from apps.api.schemas.agriculture_school import AgricultureSchoolCreate, AgricultureSchoolUpdate
 
 
 class AgricultureSchoolRepository:
@@ -25,7 +22,7 @@ class AgricultureSchoolRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, school_id: int) -> Optional[AgricultureSchool]:
+    async def get_by_id(self, school_id: int) -> AgricultureSchool | None:
         """Handle get_by_id (school_id)."""
         result = await self.session.execute(
             select(AgricultureSchool).where(AgricultureSchool.id == school_id)
@@ -36,12 +33,12 @@ class AgricultureSchoolRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        school_type: Optional[str] = None
-    ) -> tuple[List[AgricultureSchool], int]:
+        search: str | None = None,
+        school_type: str | None = None
+    ) -> tuple[list[AgricultureSchool], int]:
         """Handle list (skip, limit, search, school_type)."""
         query = select(AgricultureSchool)
-        
+
         if search:
             search_term = f"%{search.lower()}%"
             query = query.where(
@@ -49,10 +46,10 @@ class AgricultureSchoolRepository:
                 (AgricultureSchool.province.ilike(search_term)) |
                 (AgricultureSchool.city.ilike(search_term))
             )
-        
+
         if school_type:
             query = query.where(AgricultureSchool.school_type == school_type)
-        
+
         query = query.order_by(AgricultureSchool.name).offset(skip).limit(limit)
         result = await self.session.execute(query)
         items = list(result.scalars().all())
@@ -67,7 +64,7 @@ class AgricultureSchoolRepository:
             )
         if school_type:
             count_query = count_query.where(AgricultureSchool.school_type == school_type)
-        
+
         count_result = await self.session.execute(count_query)
         total = count_result.scalar_one()
         return items, total
@@ -75,26 +72,26 @@ class AgricultureSchoolRepository:
     async def create(self, data: AgricultureSchoolCreate) -> AgricultureSchool:
         """Handle create (data)."""
         obj = AgricultureSchool(**data.model_dump(exclude={"fields"}))
-        
+
         # Add fields
         for field_name in (data.fields or []):
             obj.fields.append(SchoolField(field_name=field_name))
-        
+
         self.session.add(obj)
         await self.session.flush()
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, school_id: int, data: AgricultureSchoolUpdate) -> Optional[AgricultureSchool]:
+    async def update(self, school_id: int, data: AgricultureSchoolUpdate) -> AgricultureSchool | None:
         """Handle update (school_id, data)."""
         obj = await self.get_by_id(school_id)
         if not obj:
             return None
-        
+
         update_data = data.model_dump(exclude_unset=True, exclude={"fields"})
         for key, value in update_data.items():
             setattr(obj, key, value)
-        
+
         await self.session.flush()
         await self.session.refresh(obj)
         return obj
@@ -112,7 +109,7 @@ class AgricultureSchoolRepository:
         """Handle get_stats."""
         result = await self.session.execute(select(AgricultureSchool))
         schools = result.scalars().all()
-        
+
         return {
             "total_schools": len(schools),
             "total_students": sum(s.students_count for s in schools),

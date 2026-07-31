@@ -1,21 +1,22 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-import logging
 
-from apps.shared_core.database.session import get_db_session
-from apps.shared_ai.ai.llm_factory import LLMFactory
-from apps.users.dependencies import get_current_user
-from apps.users.models import User
-from apps.ai_agents.service import AIAgentService
 from apps.ai_agents.schemas import (
     ChatRequest,
     ChatResponse,
     ConversationCreate,
-    ConversationResponse,
     ConversationDetail,
-    MessageResponse
+    ConversationResponse,
+    MessageResponse,
 )
+from apps.ai_agents.service import AIAgentService
+from apps.shared_ai.ai.llm_factory import LLMFactory
+from apps.shared_core.database.session import get_db_session
+from apps.users.dependencies import get_current_user
+from apps.users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ async def chat_stream(
         except Exception as e:
             logger.error(f"Streaming error: {e}")
             yield f"data: {{\"error\": \"{str(e)}\"}}\n\n"
-    
+
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
@@ -90,7 +91,7 @@ async def chat(
             user_id=current_user.id,
             request=request
         )
-        
+
         return ChatResponse(
             conversation_id=result["conversation_id"],
             assistant_message=result["assistant_message"],
@@ -141,15 +142,15 @@ async def get_conversation(
         conversation_id=conversation_id,
         user_id=current_user.id
     )
-    
+
     if not conv:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="مکالمه یافت نشد"
         )
-    
+
     msg_count = await agent_service.conversation_repo.get_message_count(conversation_id)
-    
+
     return ConversationDetail(
         id=conv.id,
         user_id=conv.user_id,
@@ -274,13 +275,13 @@ async def list_llm_providers() -> None:
 async def get_current_llm() -> None:
     """دریافت اطلاعات LLM فعلی."""
     import os
-    
+
     provider = os.getenv("LLM_PROVIDER", "xai")
     model = os.getenv("LLM_MODEL", "")
-    
+
     from apps.shared_ai.ai.llm_factory import PROVIDER_DEFAULTS
     model = model or PROVIDER_DEFAULTS.get(provider, "unknown")
-    
+
     return {
         "provider": provider,
         "model": model,
