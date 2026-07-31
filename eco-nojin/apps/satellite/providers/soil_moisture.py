@@ -6,8 +6,8 @@ import json
 import math
 import urllib.parse
 import urllib.request
-from datetime import date, datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, date, datetime
+from typing import Any
 
 from apps.satellite.providers.base import SatelliteProvider
 
@@ -37,7 +37,7 @@ class SoilMoistureProvider(SatelliteProvider):
             "sm_pct_0_7cm": round(sm0 * 100, 1),
         }
 
-    async def ndvi(self, lat: float, lon: float, date_str: Optional[str] = None) -> dict[str, Any]:
+    async def ndvi(self, lat: float, lon: float, date_str: str | None = None) -> dict[str, Any]:
         """Return SM payload under generic probe interface."""
         d = date.fromisoformat(date_str) if date_str else date.today()
         live = await self._open_meteo_sm(lat, lon)
@@ -74,7 +74,7 @@ class SoilMoistureProvider(SatelliteProvider):
             "start": start,
             "end": end,
             "points": points,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
         }
 
     async def _open_meteo_sm(self, lat: float, lon: float) -> dict[str, Any] | None:

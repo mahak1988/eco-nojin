@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date, timedelta
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +110,7 @@ async def fetch_chirps_like(
         }
 
 
-def _at(daily: dict, key: str, i: int) -> Optional[float]:
+def _at(daily: dict, key: str, i: int) -> float | None:
     arr = daily.get(key) or []
     if i >= len(arr) or arr[i] is None:
         return None

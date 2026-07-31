@@ -8,28 +8,29 @@ All secrets are loaded from .env via shared_core.config.
 import logging
 
 logger = logging.getLogger(__name__)
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import model_validator
-from typing import Literal
 import warnings
+from typing import Literal
+
+from pydantic import model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class UserModuleSettings(BaseSettings):
     """User module-specific settings with security validation."""
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_ignore_empty=True,
         extra="ignore",
     )
-    
+
     # JWT Configuration
     JWT_ALGORITHM: Literal["HS256", "RS256"] = "HS256"
     JWT_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    
+
     # Password Policy
     PASSWORD_MIN_LENGTH: int = 8
-    
+
     @model_validator(mode="after")
     def _validate_production_secrets(self) -> None:
         """Warn about weak algorithms in production."""

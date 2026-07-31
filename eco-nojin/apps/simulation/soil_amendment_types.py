@@ -7,7 +7,7 @@ clay-compacted, organic-poor, waterlogged, gypsiferous, polluted (generic).
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -65,7 +65,7 @@ def classify_soil(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "om_pct": om,
             "bulk_density": bd,
         },
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -185,7 +185,7 @@ def recommend_amendments(params: dict[str, Any] | None = None) -> dict[str, Any]
         "classification": clf,
         "plans": plans,
         "quantitative": quant,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 

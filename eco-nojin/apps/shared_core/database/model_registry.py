@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +23,8 @@ _MODEL_MODULES = [
 ]
 
 
-def import_all_models() -> List[str]:
-    loaded: List[str] = []
+def import_all_models() -> list[str]:
+    loaded: list[str] = []
     for mod in _MODEL_MODULES:
         try:
             __import__(mod)

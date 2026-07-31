@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_mobile_mobile_editors",
+  "info": {
+    "displayName": "Mobile Editor",
+    "icon": "mobile-alt",
+    "description": "Mobile-friendly content editing interface"
+  },
+  "options": {},
+  "attributes": {
+    "enableMobileEditing": {
+      "type": "boolean",
+      "default": true
+    },
+    "touchGestures": {
+      "type": "boolean",
+      "default": true
+    },
+    "swipeNavigation": {
+      "type": "boolean",
+      "default": true
+    },
+    "voiceInput": {
+      "type": "boolean",
+      "default": false
+    },
+    "offlineMode": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

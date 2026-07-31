@@ -3,11 +3,16 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, Dict, Any
-from sqlalchemy import select, func
+from typing import Any
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.admin_panel.repository import AdminSettingRepository, AuditLogRepository, SystemReportRepository
+from apps.admin_panel.repository import (
+    AdminSettingRepository,
+    AuditLogRepository,
+    SystemReportRepository,
+)
 from apps.shared_core.models import AdminSetting, AuditLog, SystemReport
 from apps.users.models import User
 
@@ -24,20 +29,20 @@ class AdminService:
         return await self.settings_repo.get_multi(limit=limit, offset=offset)
         """Handle get_system_settings (limit, offset)."""
 
-    async def get_setting_by_key(self, key: str) -> Optional[AdminSetting]:
+    async def get_setting_by_key(self, key: str) -> AdminSetting | None:
         return await self.settings_repo.get_by_key(key)
         """Handle get_setting_by_key (key)."""
 
     async def upsert_system_setting(
         self,
         key: str,
-        value: Optional[str] = None,
-        description: Optional[str] = None,
-        is_active: Optional[bool] = None
+        value: str | None = None,
+        description: str | None = None,
+        is_active: bool | None = None
     ) -> AdminSetting:
         existing = await self.get_setting_by_key(key)
         """Handle upsert_system_setting (key, value, description, is_active)."""
-        payload: Dict[str, Any] = {}
+        payload: dict[str, Any] = {}
         if value is not None:
             payload["value"] = value
         if description is not None:
@@ -58,7 +63,7 @@ class AdminService:
 
     async def list_audit_logs(
         self,
-        event_type: Optional[str] = None,
+        event_type: str | None = None,
         limit: int = 100,
         offset: int = 0
     ) -> list[AuditLog]:
@@ -68,8 +73,8 @@ class AdminService:
     async def record_audit_event(
         self,
         event_type: str,
-        event_data: Optional[str] = None,
-        actor: Optional[User] = None
+        event_data: str | None = None,
+        actor: User | None = None
     ) -> AuditLog:
         payload = {
         """Handle record_audit_event (event_type, event_data, actor)."""
@@ -102,7 +107,7 @@ class AdminService:
             "total_reports": total_reports,
         }
 
-    async def _count_users(self, filter_by: Optional[dict] = None) -> int:
+    async def _count_users(self, filter_by: dict | None = None) -> int:
         stmt = select(func.count()).select_from(User)
         """Handle _count_users (filter_by)."""
         if filter_by:

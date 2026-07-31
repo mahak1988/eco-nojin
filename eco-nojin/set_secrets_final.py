@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 set_secrets_final.py — تنظیم GitHub Secrets (روش file-based، با اعتبارسنجی)
 """

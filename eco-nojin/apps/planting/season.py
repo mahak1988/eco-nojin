@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 GROWTH_STAGES: dict[str, list[dict[str, Any]]] = {
     "wheat": [
         {"stage": "emergence", "das": 10, "note": "Coleoptile visible"},

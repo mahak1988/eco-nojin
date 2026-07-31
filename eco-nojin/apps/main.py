@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Econojin API entrypoint."""
 
 from __future__ import annotations
@@ -8,9 +7,10 @@ import logging
 import os
 import sys
 import time
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, AsyncGenerator
+from typing import Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,8 +21,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from security.middleware.security_middleware import SecurityMiddleware
 from apps.shared_core.middleware.request_id import RequestIDMiddleware
+from security.middleware.security_middleware import SecurityMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -118,8 +118,8 @@ app.add_middleware(RequestIDMiddleware)
 
 if settings.ENVIRONMENT != "local":
     try:
-        from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
         from apps.shared_core.middleware.audit_log import AuditLogMiddleware
+        from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
 
         app.add_middleware(RateLimitMiddleware)
         app.add_middleware(AuditLogMiddleware)

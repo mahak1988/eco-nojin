@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import Generic, List, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -20,7 +20,7 @@ class ListMeta(BaseModel):
 class ListEnvelope(BaseModel, Generic[T]):
     """Canonical list response (R14)."""
 
-    data: List[T]
+    data: list[T]
     meta: ListMeta
 
 

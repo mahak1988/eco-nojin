@@ -9,10 +9,9 @@ import logging
 logger = logging.getLogger(__name__)
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List
 from enum import Enum
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # ── Enums ──────────────────────────────────────────────────────
@@ -56,10 +55,10 @@ class TaxType(str, Enum):
 class AccountBase(BaseModel):
     code: str = Field(..., min_length=1, max_length=20, description="Account code")
     name: str = Field(..., min_length=1, max_length=255, description="Account name")
-    name_fa: Optional[str] = Field(None, max_length=255, description="Persian name")
+    name_fa: str | None = Field(None, max_length=255, description="Persian name")
     account_type: AccountType = Field(..., description="Account type")
-    parent_id: Optional[str] = Field(None, description="Parent account ID")
-    description: Optional[str] = None
+    parent_id: str | None = Field(None, description="Parent account ID")
+    description: str | None = None
     is_active: bool = True
     is_system: bool = False
 
@@ -69,12 +68,12 @@ class AccountCreate(AccountBase):
 
 
 class AccountUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    name_fa: Optional[str] = None
-    account_type: Optional[AccountType] = None
-    parent_id: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    name_fa: str | None = None
+    account_type: AccountType | None = None
+    parent_id: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
 
 
 class AccountResponse(AccountBase):
@@ -87,7 +86,7 @@ class AccountResponse(AccountBase):
 
 
 class AccountListResponse(BaseModel):
-    items: List[AccountResponse]
+    items: list[AccountResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -98,7 +97,7 @@ class JournalItemBase(BaseModel):
     account_id: str = Field(..., description="Account ID")
     entry_type: EntryType = Field(..., description="Debit or Credit")
     amount: Decimal = Field(..., ge=0, description="Entry amount")
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class JournalItemCreate(JournalItemBase):
@@ -115,18 +114,18 @@ class JournalItemResponse(JournalItemBase):
 class JournalEntryBase(BaseModel):
     date: datetime = Field(..., description="Entry date")
     description: str = Field(..., min_length=1, max_length=500, description="Entry description")
-    reference: Optional[str] = None
+    reference: str | None = None
     is_posted: bool = False
 
 
 class JournalEntryCreate(JournalEntryBase):
-    items: List[JournalItemCreate] = Field(..., min_length=2, description="At least 2 items for double-entry")
+    items: list[JournalItemCreate] = Field(..., min_length=2, description="At least 2 items for double-entry")
 
 
 class JournalEntryUpdate(BaseModel):
-    date: Optional[datetime] = None
-    description: Optional[str] = None
-    reference: Optional[str] = None
+    date: datetime | None = None
+    description: str | None = None
+    reference: str | None = None
 
 
 class JournalEntryResponse(JournalEntryBase):
@@ -138,11 +137,11 @@ class JournalEntryResponse(JournalEntryBase):
     total_debits: Decimal = Decimal("0.00")
     total_credits: Decimal = Decimal("0.00")
     is_balanced: bool = True
-    items: List[JournalItemResponse] = []
+    items: list[JournalItemResponse] = []
 
 
 class JournalEntryListResponse(BaseModel):
-    items: List[JournalEntryResponse]
+    items: list[JournalEntryResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -168,22 +167,22 @@ class InvoiceItemResponse(InvoiceItemBase):
 
 class InvoiceBase(BaseModel):
     client_name: str = Field(..., min_length=1, max_length=255)
-    client_email: Optional[str] = None
+    client_email: str | None = None
     issue_date: datetime
     due_date: datetime
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class InvoiceCreate(InvoiceBase):
-    items: List[InvoiceItemCreate] = Field(..., min_length=1)
+    items: list[InvoiceItemCreate] = Field(..., min_length=1)
 
 
 class InvoiceUpdate(BaseModel):
-    client_name: Optional[str] = None
-    client_email: Optional[str] = None
-    due_date: Optional[datetime] = None
-    status: Optional[InvoiceStatus] = None
-    notes: Optional[str] = None
+    client_name: str | None = None
+    client_email: str | None = None
+    due_date: datetime | None = None
+    status: InvoiceStatus | None = None
+    notes: str | None = None
 
 
 class InvoiceResponse(InvoiceBase):
@@ -197,11 +196,11 @@ class InvoiceResponse(InvoiceBase):
     total: Decimal
     created_at: datetime
     updated_at: datetime
-    items: List[InvoiceItemResponse] = []
+    items: list[InvoiceItemResponse] = []
 
 
 class InvoiceListResponse(BaseModel):
-    items: List[InvoiceResponse]
+    items: list[InvoiceResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -209,12 +208,12 @@ class InvoiceListResponse(BaseModel):
 
 # ── Payment Schemas ────────────────────────────────────────────
 class PaymentBase(BaseModel):
-    invoice_id: Optional[str] = None
+    invoice_id: str | None = None
     amount: Decimal = Field(..., ge=0)
     currency: str = "USD"
     payment_method: PaymentMethod
-    reference: Optional[str] = None
-    notes: Optional[str] = None
+    reference: str | None = None
+    notes: str | None = None
 
 
 class PaymentCreate(PaymentBase):
@@ -230,7 +229,7 @@ class PaymentResponse(PaymentBase):
 
 
 class PaymentListResponse(BaseModel):
-    items: List[PaymentResponse]
+    items: list[PaymentResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -243,7 +242,7 @@ class BudgetBase(BaseModel):
     period_start: datetime
     period_end: datetime
     planned_amount: Decimal = Field(..., ge=0)
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class BudgetCreate(BudgetBase):
@@ -251,9 +250,9 @@ class BudgetCreate(BudgetBase):
 
 
 class BudgetUpdate(BaseModel):
-    name: Optional[str] = None
-    planned_amount: Optional[Decimal] = None
-    notes: Optional[str] = None
+    name: str | None = None
+    planned_amount: Decimal | None = None
+    notes: str | None = None
 
 
 class BudgetResponse(BudgetBase):
@@ -261,13 +260,13 @@ class BudgetResponse(BudgetBase):
 
     id: str
     actual_amount: Decimal = Decimal("0.00")
-    variance: Optional[Decimal] = None
+    variance: Decimal | None = None
     created_at: datetime
     updated_at: datetime
 
 
 class BudgetListResponse(BaseModel):
-    items: List[BudgetResponse]
+    items: list[BudgetResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -280,7 +279,7 @@ class TaxRateBase(BaseModel):
     rate: Decimal = Field(..., ge=0, le=100)
     account_id: str
     effective_from: datetime
-    effective_to: Optional[datetime] = None
+    effective_to: datetime | None = None
 
 
 class TaxRateCreate(TaxRateBase):
@@ -288,10 +287,10 @@ class TaxRateCreate(TaxRateBase):
 
 
 class TaxRateUpdate(BaseModel):
-    name: Optional[str] = None
-    rate: Optional[Decimal] = None
-    effective_to: Optional[datetime] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    rate: Decimal | None = None
+    effective_to: datetime | None = None
+    is_active: bool | None = None
 
 
 class TaxRateResponse(TaxRateBase):
@@ -305,7 +304,7 @@ class TaxRateResponse(TaxRateBase):
 # ── Fixed Asset Schemas ────────────────────────────────────────
 class FixedAssetBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     purchase_date: datetime
     purchase_cost: Decimal = Field(..., ge=0)
     useful_life_years: int = Field(..., gt=0)
@@ -319,10 +318,10 @@ class FixedAssetCreate(FixedAssetBase):
 
 
 class FixedAssetUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    salvage_value: Optional[Decimal] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    salvage_value: Decimal | None = None
+    is_active: bool | None = None
 
 
 class FixedAssetResponse(FixedAssetBase):

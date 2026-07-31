@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -12,37 +11,37 @@ from apps.shared_core.schemas.pagination import ListMeta
 
 class CropCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=120)
-    name_fa: Optional[str] = None
-    scientific_name: Optional[str] = None
+    name_fa: str | None = None
+    scientific_name: str | None = None
     category: str = "cereal"
-    season: Optional[str] = None
-    water_need_mm: Optional[float] = Field(None, ge=0)
-    growth_days: Optional[int] = Field(None, ge=1)
-    description: Optional[str] = None
-    planting_method: Optional[str] = None
-    row_spacing_cm: Optional[float] = None
-    plant_spacing_cm: Optional[float] = None
-    sowing_depth_cm: Optional[float] = None
-    seed_rate_kg_ha: Optional[float] = None
-    irrigation_method: Optional[str] = None
-    irrigation_interval_days: Optional[int] = None
-    kc_mid: Optional[float] = None
-    fertilizer_n_kg_ha: Optional[float] = None
-    fertilizer_p_kg_ha: Optional[float] = None
-    fertilizer_k_kg_ha: Optional[float] = None
-    soil_ph_min: Optional[float] = None
-    soil_ph_max: Optional[float] = None
-    harvest_method: Optional[str] = None
-    harvest_moisture_pct: Optional[float] = None
-    common_pests: Optional[str] = None
-    common_diseases: Optional[str] = None
-    care_notes: Optional[str] = None
+    season: str | None = None
+    water_need_mm: float | None = Field(None, ge=0)
+    growth_days: int | None = Field(None, ge=1)
+    description: str | None = None
+    planting_method: str | None = None
+    row_spacing_cm: float | None = None
+    plant_spacing_cm: float | None = None
+    sowing_depth_cm: float | None = None
+    seed_rate_kg_ha: float | None = None
+    irrigation_method: str | None = None
+    irrigation_interval_days: int | None = None
+    kc_mid: float | None = None
+    fertilizer_n_kg_ha: float | None = None
+    fertilizer_p_kg_ha: float | None = None
+    fertilizer_k_kg_ha: float | None = None
+    soil_ph_min: float | None = None
+    soil_ph_max: float | None = None
+    harvest_method: str | None = None
+    harvest_moisture_pct: float | None = None
+    common_pests: str | None = None
+    common_diseases: str | None = None
+    care_notes: str | None = None
 
 
 class CropResponse(CropCreate):
     id: int
     is_active: bool = True
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -66,4 +65,4 @@ class IrrigationCalcResponse(BaseModel):
     gross_mm_period: float
     volume_m3: float
     volume_liters: float
-    recommended_interval_days: Optional[int] = None
+    recommended_interval_days: int | None = None

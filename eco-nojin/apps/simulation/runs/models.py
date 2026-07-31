@@ -8,9 +8,8 @@ import logging
 logger = logging.getLogger(__name__)
 import uuid
 from datetime import datetime
-from typing import Optional
 
-from sqlalchemy import String, Text, DateTime, JSON
+from sqlalchemy import JSON, DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 # resolve the project's declarative Base (fallback to a local one)
@@ -30,12 +29,12 @@ class SimulationRun(Base):
     __tablename__ = "simulation_runs"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
+    user_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     simulator_id: Mapped[str] = mapped_column(String(50), index=True)
     simulator_name: Mapped[str] = mapped_column(String(200), default="")
     parameters: Mapped[dict] = mapped_column(JSON, default=dict)
     metrics: Mapped[dict] = mapped_column(JSON, default=dict)
     advisory: Mapped[dict] = mapped_column(JSON, default=dict)
-    scenario_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    scenario_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

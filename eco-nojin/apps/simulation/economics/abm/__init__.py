@@ -2,8 +2,8 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .agents import UserAgent, TreeAgent, EcosystemAgent
-from .model import EcoNozhinModel
+from .agents import EcosystemAgent, TreeAgent, UserAgent
 from .behaviors import BehaviorLibrary
+from .model import EcoNozhinModel
 
 __all__ = ["UserAgent", "TreeAgent", "EcosystemAgent", "EcoNozhinModel", "BehaviorLibrary"]

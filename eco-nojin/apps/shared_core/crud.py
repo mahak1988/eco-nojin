@@ -9,9 +9,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 from typing import Any, Generic, TypeVar
-from pydantic import BaseModel
 
-from sqlalchemy import select, func, delete as sa_delete, update as sa_update
+from pydantic import BaseModel
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import Base
@@ -82,16 +82,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             List of model instances
         """
         query = select(self.model)
-        
+
         if filters:
             for field, value in filters.items():
                 column = getattr(self.model, field, None)
                 if column is not None:
                     query = query.where(column == value)
-        
+
         if order_by is not None:
             query = query.order_by(order_by)
-        
+
         query = query.offset(skip).limit(limit)
         result = await db.execute(query)
         return list(result.scalars().all())
@@ -112,13 +112,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             Total count
         """
         query = select(func.count()).select_from(self.model)
-        
+
         if filters:
             for field, value in filters.items():
                 column = getattr(self.model, field, None)
                 if column is not None:
                     query = query.where(column == value)
-        
+
         result = await db.execute(query)
         return result.scalar_one()
 
@@ -162,10 +162,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             update_data = obj_in
         else:
             update_data = obj_in.model_dump(exclude_unset=True)
-        
+
         for field, value in update_data.items():
             setattr(db_obj, field, value)
-        
+
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)

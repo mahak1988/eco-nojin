@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
@@ -20,16 +18,16 @@ router = APIRouter(prefix="/api/v1/inventory", tags=["Inventory"])
 class ItemIn(BaseModel):
     name: str = Field(..., min_length=1)
     category: str = Field(..., pattern="^(seed|fertilizer|pesticide|tool|other)$")
-    sku: Optional[str] = None
+    sku: str | None = None
     unit: str = "kg"
     quantity: float = 0
     min_stock: float = 0
-    unit_cost: Optional[float] = None
-    npk: Optional[str] = None
-    active_ingredient: Optional[str] = None
-    target_pest: Optional[str] = None
-    farm_id: Optional[int] = None
-    notes: Optional[str] = None
+    unit_cost: float | None = None
+    npk: str | None = None
+    active_ingredient: str | None = None
+    target_pest: str | None = None
+    farm_id: int | None = None
+    notes: str | None = None
 
 
 class ItemOut(ItemIn):
@@ -48,7 +46,7 @@ class ItemList(BaseModel):
 async def list_items(
     page: int = Query(1, ge=1),
     size: int = Query(50, ge=1, le=100),
-    category: Optional[str] = None,
+    category: str | None = None,
     session: AsyncSession = Depends(get_db_session),
 ):
     q = select(InventoryItem).where(InventoryItem.is_deleted.is_(False))

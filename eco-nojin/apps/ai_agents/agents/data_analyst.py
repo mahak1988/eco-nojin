@@ -3,34 +3,36 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import List, Any
+from typing import Any
+
 from langchain_core.tools import BaseTool
+
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
 from apps.shared_ai.ai.tools.data_tools import (
     analyze_statistics,
     correlation_analysis,
+    data_summary,
+    generate_chart,
     hypothesis_test,
     trend_analysis,
-    generate_chart,
-    data_summary
 )
 from apps.shared_ai.ai.tools.fast_compute import (
     fast_statistics,
     monte_carlo_simulation,
-    optimization_solver
-)
-from apps.shared_ai.ai.tools.scientific_compute import (
-    solve_differential_equation,
-    advanced_matrix_operations,
-    train_ml_model,
-    numerical_integration,
-    scientific_optimization
+    optimization_solver,
 )
 from apps.shared_ai.ai.tools.rag_tools import (
+    get_knowledge_base_stats,
     get_rag_context,
     search_knowledge_base,
     upload_document,
-    get_knowledge_base_stats
+)
+from apps.shared_ai.ai.tools.scientific_compute import (
+    advanced_matrix_operations,
+    numerical_integration,
+    scientific_optimization,
+    solve_differential_equation,
+    train_ml_model,
 )
 
 # ==========================================
@@ -82,11 +84,11 @@ DATA_ANALYST_PROMPT = """شما یک تحلیلگر داده حرفه‌ای ه�
 
 class DataAnalystAgent:
     """ایجنت تحلیلگر داده با RAG."""
-    
+
     def __init__(self, llm: Any) -> None:
         self.llm = llm
         """Handle __init__ (llm)."""
-        self.tools: List[BaseTool] = [
+        self.tools: list[BaseTool] = [
             # ابزارهای سریع (Numba)
             fast_statistics,
             monte_carlo_simulation,
@@ -116,7 +118,7 @@ class DataAnalystAgent:
             system_prompt=DATA_ANALYST_PROMPT
         )
         self.graph = self.builder.build()
-    
+
     async def chat(self, user_message: str, context: dict = None) -> str:
         """اجرای ایجنت با یک پیام."""
         return await self.builder.run(user_message, context)

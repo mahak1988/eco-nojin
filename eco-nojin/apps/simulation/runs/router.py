@@ -3,11 +3,10 @@ Saved Runs Router — save / list / fetch / delete simulation runs.
 """
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
-from sqlalchemy import select, desc
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
@@ -34,9 +33,9 @@ class RunCreate(BaseModel):
     parameters: dict = Field(default_factory=dict)
     metrics: dict = Field(default_factory=dict)
     advisory: dict = Field(default_factory=dict)
-    scenario_name: Optional[str] = None
-    note: Optional[str] = Field(default=None, max_length=1000)
-    user_id: Optional[str] = None
+    scenario_name: str | None = None
+    note: str | None = Field(default=None, max_length=1000)
+    user_id: str | None = None
 
 
 def _to_dict(r: SimulationRun) -> dict:
@@ -73,8 +72,8 @@ async def save_run(data: RunCreate, db: AsyncSession = Depends(get_db_session)) 
 
 @router.get("", summary="List saved runs (newest first)")
 async def list_runs(
-    simulator_id: Optional[str] = Query(None),
-    user_id: Optional[str] = Query(None),
+    simulator_id: str | None = Query(None),
+    user_id: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db_session),
 ):

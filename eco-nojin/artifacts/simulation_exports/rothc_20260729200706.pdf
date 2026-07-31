@@ -1,0 +1,62 @@
+%PDF-1.1
+1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj
+2 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj
+3 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>endobj
+4 0 obj<< /Length 1456 >>stream
+BT /F1 10 Tf 40 750 Td
+(RothC-26.3 Report) Tj
+0 -12 Td () Tj
+0 -12 Td ({) Tj
+0 -12 Td (  "model": "rothc_26_3",) Tj
+0 -12 Td (  "citation": "Coleman & Jenkinson RothC-26.3 \(open reimplementation\)",) Tj
+0 -12 Td (  "soc_initial": 40.0,) Tj
+0 -12 Td (  "soc_final": 33.49,) Tj
+0 -12 Td (  "delta": -6.51,) Tj
+0 -12 Td (  "co2_total_t_ha": 16.51,) Tj
+0 -12 Td (  "rate_modifiers": {) Tj
+0 -12 Td (    "a_temp": 1.8984,) Tj
+0 -12 Td (    "b_moisture": 0.9259,) Tj
+0 -12 Td (    "c_cover": 0.6,) Tj
+0 -12 Td (    "abc": 1.0547,) Tj
+0 -12 Td (    "f_bio_hum": 0.224) Tj
+0 -12 Td (  },) Tj
+0 -12 Td (  "params_resolved": {) Tj
+0 -12 Td (    "years": 10,) Tj
+0 -12 Td (    "soc_t_ha": 40.0,) Tj
+0 -12 Td (    "iom_t_ha": 3.273,) Tj
+0 -12 Td (    "dpm_t_ha": 0.3673,) Tj
+0 -12 Td (    "rpm_t_ha": 4.4072,) Tj
+0 -12 Td (    "bio_t_ha": 0.7345,) Tj
+0 -12 Td (    "hum_t_ha": 31.218,) Tj
+0 -12 Td (    "c_input_t_ha_y": 1.0,) Tj
+0 -12 Td (    "dpm_rpm_ratio": 1.44,) Tj
+0 -12 Td (    "plant_cover": true,) Tj
+0 -12 Td (    "clay_pct": 25.0,) Tj
+0 -12 Td (    "temp_c": 15.0,) Tj
+0 -12 Td (    "rain_mm_year": 650.0,) Tj
+0 -12 Td (    "et_mm_year": 700.0,) Tj
+0 -12 Td (    "k_dpm": 10.0,) Tj
+0 -12 Td (    "k_rpm": 0.3,) Tj
+0 -12 Td (    "k_bio": 0.66,) Tj
+0 -12 Td (    "k_hum": 0.02) Tj
+0 -12 Td (  },) Tj
+0 -12 Td (  "clay_pct": 25.0,) Tj
+0 -12 Td (  "c_input_t_ha_y": 1.0,) Tj
+0 -12 Td (  "completed_at": "2026-07-29T20:07:06.284866+00:00") Tj
+0 -12 Td (}) Tj
+ET
+endstream
+endobj
+5 0 obj<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000056 00000 n 
+0000000111 00000 n 
+0000000235 00000 n 
+0000001741 00000 n 
+trailer<< /Size 6 /Root 1 0 R >>
+startxref
+1809
+%%EOF

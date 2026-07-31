@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -24,9 +24,9 @@ class PredictBody(BaseModel):
 
 
 class SensitivityBody(BaseModel):
-    baseline: Optional[dict[str, float]] = None
+    baseline: dict[str, float] | None = None
     rel_step: float = Field(0.10, ge=0.01, le=0.5)
-    pd_features: Optional[list[str]] = None
+    pd_features: list[str] | None = None
     pd_points: int = Field(12, ge=5, le=40)
 
 

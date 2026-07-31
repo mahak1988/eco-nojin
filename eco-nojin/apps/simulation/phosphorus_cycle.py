@@ -15,7 +15,7 @@ Not a full EPIC/APSIM-P replacement — screening / educational process model.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -170,5 +170,5 @@ def run_phosphorus_cycle(params: dict[str, Any] | None = None) -> dict[str, Any]
             "واحد kg P/ha. در pH اسیدی یا قلیایی شدید، فسفر قابل‌جذب کم می‌شود. "
             "مدل غربالگری است."
         ),
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

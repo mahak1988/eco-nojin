@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import RUSLE2Wrapper, RUSLE2Output
 from .erosion_factors import ErosionFactorsCalculator
+from .wrapper import RUSLE2Output, RUSLE2Wrapper
 
 __all__ = ["RUSLE2Wrapper", "RUSLE2Output", "ErosionFactorsCalculator"]

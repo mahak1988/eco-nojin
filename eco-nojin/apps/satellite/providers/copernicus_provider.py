@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import logging
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 
-from apps.satellite.providers.base import BBox, NDVIResult, SatelliteProvider, SatelliteSource
+from apps.satellite.providers.base import BBox, NDVIResult, SatelliteProvider
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class CopernicusProvider(SatelliteProvider):
     )
 
     def __init__(self) -> None:
-        self._token: Optional[str] = None
+        self._token: str | None = None
 
     @property
     def is_available(self) -> bool:
@@ -34,9 +34,9 @@ class CopernicusProvider(SatelliteProvider):
     async def _get_token(self) -> str:
         if self._token:
             return self._token
+        import json
         import urllib.parse
         import urllib.request
-        import json
 
         from apps.shared_core.config import settings
 

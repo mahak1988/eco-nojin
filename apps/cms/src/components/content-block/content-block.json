@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_content_block_content_blocks",
+  "info": {
+    "displayName": "Content Block",
+    "icon": "layer-group",
+    "description": "A draggable content block for visual content editor"
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "text",
+        "image",
+        "gallery",
+        "video",
+        "heading",
+        "button",
+        "divider",
+        "quote",
+        "code",
+        "html"
+      ],
+      "required": true
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "settings": {
+      "type": "json"
+    },
+    "styles": {
+      "type": "json"
+    },
+    "order": {
+      "type": "integer"
+    }
+  }
+}

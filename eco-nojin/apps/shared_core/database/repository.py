@@ -1,10 +1,12 @@
 """repository module."""
 
-from typing import TypeVar, Generic, Type, Any, Dict, List, Optional, Sequence
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete, func
-from sqlalchemy.exc import SQLAlchemyError
 import logging
+from collections.abc import Sequence
+from typing import Any, Generic, TypeVar
+
+from sqlalchemy import delete, func, select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +21,13 @@ class BaseRepository(Generic[T]):
             def __init__(self, session: AsyncSession):
                 super().__init__(session, User)
     """
-    
-    def __init__(self, session: AsyncSession, model: Type[T]) -> None:
+
+    def __init__(self, session: AsyncSession, model: type[T]) -> None:
         self.session = session
         """Handle __init__ (session, model)."""
         self.model = model
 
-    async def get_by_id(self, id: Any, options: Optional[Sequence[Any]] = None) -> Optional[T]:
+    async def get_by_id(self, id: Any, options: Sequence[Any] | None = None) -> T | None:
         """دریافت رکورد بر اساس شناسه اصلی."""
         try:
             stmt = select(self.model).where(self.model.id == id)
@@ -39,11 +41,11 @@ class BaseRepository(Generic[T]):
 
     async def get_multi(
         self,
-        filter_by: Optional[Dict[str, Any]] = None,
+        filter_by: dict[str, Any] | None = None,
         limit: int = 100,
         offset: int = 0,
-        options: Optional[Sequence[Any]] = None
-    ) -> List[T]:
+        options: Sequence[Any] | None = None
+    ) -> list[T]:
         """دریافت چندین رکورد با فیلتر و صفحه‌بندی."""
         try:
             stmt = select(self.model)
@@ -52,7 +54,7 @@ class BaseRepository(Generic[T]):
                     stmt = stmt.where(getattr(self.model, key) == value)
             if options:
                 stmt = stmt.options(*options)
-            
+
             stmt = stmt.limit(limit).offset(offset)
             result = await self.session.execute(stmt)
             return list(result.scalars().all())
@@ -60,7 +62,7 @@ class BaseRepository(Generic[T]):
             logger.error(f"Error fetching multiple {self.model.__name__}: {e}")
             raise
 
-    async def create(self, obj_in: Dict[str, Any]) -> T:
+    async def create(self, obj_in: dict[str, Any]) -> T:
         """ایجاد رکورد جدید."""
         try:
             db_obj = self.model(**obj_in)
@@ -72,7 +74,7 @@ class BaseRepository(Generic[T]):
             logger.error(f"Error creating {self.model.__name__}: {e}")
             raise
 
-    async def update(self, db_obj: T, obj_in: Dict[str, Any]) -> T:
+    async def update(self, db_obj: T, obj_in: dict[str, Any]) -> T:
         """بروزرسانی رکورد موجود."""
         try:
             for field, value in obj_in.items():
@@ -95,7 +97,7 @@ class BaseRepository(Generic[T]):
             logger.error(f"Error deleting {self.model.__name__} with id {id}: {e}")
             raise
 
-    async def count(self, filter_by: Optional[Dict[str, Any]] = None) -> int:
+    async def count(self, filter_by: dict[str, Any] | None = None) -> int:
         """شمارش تعداد رکوردها."""
         try:
             stmt = select(func.count()).select_from(self.model)

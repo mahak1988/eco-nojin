@@ -11,7 +11,7 @@ This is an open process model for decision support — not the FAO AquaCrop soft
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.et0 import resolve_et0_mm_day
@@ -140,5 +140,5 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
         "yield_total_t": round(y_actual * area_ha, 3),
         "ndvi_calibrated": bool(isinstance(canopy, list) and len(canopy) > 0),
         "series_sample": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

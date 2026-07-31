@@ -1,7 +1,9 @@
 
 """Spider Web Security - Central Configuration."""
 from __future__ import annotations
+
 import os
+
 
 class SecurityConfig:
     JWT_ALGORITHM = "HS256"

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -27,13 +27,13 @@ class NDVIPoint(BaseModel):
 
 
 class TimeseriesResponse(BaseModel):
-    farm_id: Optional[int] = None
+    farm_id: int | None = None
     data: list[NDVIPoint]
     meta: dict[str, Any] = Field(default_factory=dict)
 
 
 class ChangeDetectionRequest(BaseModel):
-    farm_id: Optional[int] = None
+    farm_id: int | None = None
     lat: float = 32.65
     lon: float = 51.67
     period_a_start: date
@@ -47,4 +47,4 @@ class ChangeDetectionResult(BaseModel):
     mean_ndvi_b: float
     delta_ndvi: float
     status: str  # improved | degraded | stable
-    provider: Optional[str] = None
+    provider: str | None = None

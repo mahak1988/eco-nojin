@@ -2,13 +2,14 @@
 
 This implementation is intentionally small and dependency-free so you can review and extend it.
 """
-from typing import Callable
+import re
+import time
+from collections import defaultdict
+from collections.abc import Callable
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
-import time
-import re
-from collections import defaultdict
+from starlette.responses import JSONResponse, Response
 
 BOT_UA_PATTERNS = [
     r"bot",

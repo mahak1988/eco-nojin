@@ -12,8 +12,9 @@ from __future__ import annotations
 
 import math
 import random
-from datetime import datetime, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from apps.simulation.rothc_model import run_rothc
 from apps.simulation.soil_carbon import run_century3, run_icbm, run_yasso_lite
@@ -224,5 +225,5 @@ def calibrate_soil_carbon(
             "کالیبراسیون با جستجوی تصادفی/محلی روی پارامترهای آزاد؛ "
             "برای MRV رسمی از روش‌های بیزی و دادهٔ بیشتر استفاده کنید."
         ),
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

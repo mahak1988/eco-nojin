@@ -1,10 +1,11 @@
 """llm_factory module."""
 
-import os
 import logging
-from typing import Optional, Any, Literal
-from dotenv import load_dotenv
+import os
 from pathlib import Path
+from typing import Any, Literal
+
+from dotenv import load_dotenv
 
 # بارگذاری .env در ابتدای فایل
 load_dotenv(Path(__file__).parent.parent.parent.parent / ".env")
@@ -46,20 +47,20 @@ class LLMFactory:
     - Ollama (محلی و آفلاین)
     - Fake (برای تست)
     """
-    
+
     @staticmethod
     def create(
-        provider: Optional[LLMProvider] = None,
-        model: Optional[str] = None,
+        provider: LLMProvider | None = None,
+        model: str | None = None,
         temperature: float = 0.7,
         **kwargs
     ) -> Any:
         """ساخت نمونه LLM."""
         provider = provider or DEFAULT_PROVIDER
         model = model or DEFAULT_MODEL or PROVIDER_DEFAULTS.get(provider, "fake")
-        
+
         logger.info(f"🤖 Creating LLM: provider={provider}, model={model}")
-        
+
         try:
             if provider == "groq":
                 return LLMFactory._create_groq(model, temperature, **kwargs)
@@ -83,32 +84,32 @@ class LLMFactory:
             logger.error(f"❌ Failed to create LLM: {e}")
             logger.info("🔄 Falling back to fake LLM")
             return LLMFactory._create_fake(model, temperature, **kwargs)
-    
+
     @staticmethod
     def _create_groq(model: str, temperature: float, **kwargs) -> Any:
         """ساخت Groq LLM."""
         from langchain_groq import ChatGroq
-        
+
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise RuntimeError("GROQ_API_KEY not set. Get one at https://console.groq.com")
-        
+
         return ChatGroq(
             model=model,
             api_key=api_key,
             temperature=temperature,
             **kwargs
         )
-    
+
     @staticmethod
     def _create_xai(model: str, temperature: float, **kwargs) -> Any:
         """ساخت xAI/Grok LLM."""
         from langchain_openai import ChatOpenAI
-        
+
         api_key = os.getenv("XAI_API_KEY")
         if not api_key:
             raise RuntimeError("XAI_API_KEY not set. Get one at https://console.x.ai")
-        
+
         return ChatOpenAI(
             model=model,
             api_key=api_key,
@@ -120,32 +121,32 @@ class LLMFactory:
             },
             **kwargs
         )
-    
+
     @staticmethod
     def _create_gemini(model: str, temperature: float, **kwargs) -> Any:
         """ساخت Google Gemini LLM."""
         from langchain_google_genai import ChatGoogleGenerativeAI
-        
+
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise RuntimeError("GOOGLE_API_KEY not set. Get one at https://aistudio.google.com")
-        
+
         return ChatGoogleGenerativeAI(
             model=model,
             google_api_key=api_key,
             temperature=temperature,
             **kwargs
         )
-    
+
     @staticmethod
     def _create_openrouter(model: str, temperature: float, **kwargs) -> Any:
         """ساخت OpenRouter LLM."""
         from langchain_openai import ChatOpenAI
-        
+
         api_key = os.getenv("OPENROUTER_API_KEY")
         if not api_key:
             raise RuntimeError("OPENROUTER_API_KEY not set. Get one at https://openrouter.ai")
-        
+
         return ChatOpenAI(
             model=model,
             api_key=api_key,
@@ -157,14 +158,14 @@ class LLMFactory:
             },
             **kwargs
         )
-    
+
     @staticmethod
     def _create_ollama(model: str, temperature: float, **kwargs) -> Any:
         """ساخت Ollama LLM (محلی)."""
         from langchain_ollama import ChatOllama
-        
+
         base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        
+
         return ChatOllama(
             model=model,
             base_url=base_url,
@@ -172,24 +173,24 @@ class LLMFactory:
             timeout=120,
             **kwargs
         )
-    
+
     @staticmethod
     def _create_fake(model: str, temperature: float, **kwargs) -> Any:
         """ساخت Fake LLM برای تست."""
         from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
         from langchain_core.messages import AIMessage
-        
+
         class FakeToolCallingModel(FakeMessagesListChatModel):
             def bind_tools(self, tools, **kwargs) -> None:
                 return self
                 """Handle bind_tools (tools)."""
-        
+
         return FakeToolCallingModel(
             responses=[
                 AIMessage(content="این یک پاسخ آزمایشی است. لطفاً یکی از API Keyها را در فایل .env تنظیم کنید:")
             ]
         )
-    
+
     @staticmethod
     def list_providers() -> dict:
         """لیست providerهای موجود و وضعیت آن‌ها."""

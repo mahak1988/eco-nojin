@@ -5,9 +5,10 @@ Generates analysis, recommendations, and actionable scenarios based on simulatio
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Any, Dict, List
+from typing import Any
 
-def generate_advisory(simulator_id: str, metrics: Dict[str, Any], parameters: Dict[str, Any]) -> Dict[str, Any]:
+
+def generate_advisory(simulator_id: str, metrics: dict[str, Any], parameters: dict[str, Any]) -> dict[str, Any]:
     """
     Main entry point for generating advisory content.
     """
@@ -19,7 +20,7 @@ def generate_advisory(simulator_id: str, metrics: Dict[str, Any], parameters: Di
     if simulator_id == "aquacrop":
         yield_val = metrics.get("yield_t_ha", 0)
         wue = metrics.get("water_use_efficiency_kg_m3", 0)
-        
+
         analysis = f"عملکرد شبیه‌سازی‌شده {yield_val:.2f} تن در هکتار است. "
         if yield_val < 3.0:
             analysis += "این مقدار نشان‌دهندهٔ تنش شدید (آبی یا غذایی) در طول دوره رشد است."
@@ -65,7 +66,7 @@ def generate_advisory(simulator_id: str, metrics: Dict[str, Any], parameters: Di
     elif simulator_id == "cba":
         npv = metrics.get("npv_m_usd", 0)
         irr = metrics.get("irr_pct", 0)
-        
+
         analysis = f"ارزش خالص فعلی (NPV) پروژه برابر با {npv:.2f} و نرخ بازده داخلی (IRR) برابر {irr:.1f}٪ است. "
         if npv > 0 and irr > 8.0:
             analysis += "پروژه از نظر اقتصادی کاملاً توجیه‌پذیر و سودآور است."
@@ -83,7 +84,7 @@ def generate_advisory(simulator_id: str, metrics: Dict[str, Any], parameters: Di
                 "text": "NPV منفی یا پایین است. پیشنهاد می‌شود هزینه‌های سرمایه‌گذاری اولیه را کاهش دهید یا به دنبال تسهیلات با نرخ بهره پایین‌تر باشید.",
                 "source": "World Bank Project Appraisal Guidelines"
             })
-            
+
         scenarios = [
             {
                 "id": "cost_reduction",
@@ -119,7 +120,7 @@ def generate_advisory(simulator_id: str, metrics: Dict[str, Any], parameters: Di
                 "text": "مدیریت فعلی خاک مؤثر است. حفظ پوشش گیاهی و عدم شخم عمیق را ادامه دهید.",
                 "source": "USDA NRCS Conservation Practice Standards"
             })
-            
+
         scenarios = [
             {
                 "id": "contour_farming",

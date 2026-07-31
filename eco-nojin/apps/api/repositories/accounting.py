@@ -7,12 +7,11 @@ Services call repositories; repositories never call services.
 
 from __future__ import annotations
 
+import builtins
 import logging
-from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional
 
-from sqlalchemy import and_, case, desc, func, select
+from sqlalchemy import case, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -33,13 +32,10 @@ from apps.api.schemas.accounting import (
     BudgetCreate,
     BudgetUpdate,
     FixedAssetCreate,
-    FixedAssetUpdate,
     InvoiceCreate,
     InvoiceUpdate,
     JournalEntryCreate,
     PaymentCreate,
-    TaxRateCreate,
-    TaxRateUpdate,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,13 +47,13 @@ class AccountRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, account_id: str) -> Optional[Account]:
+    async def get_by_id(self, account_id: str) -> Account | None:
         result = await self.session.execute(
             select(Account).where(Account.id == account_id)
         )
         return result.scalar_one_or_none()
 
-    async def get_by_code(self, code: str) -> Optional[Account]:
+    async def get_by_code(self, code: str) -> Account | None:
         result = await self.session.execute(
             select(Account).where(Account.code == code)
         )
@@ -67,9 +63,9 @@ class AccountRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        account_type: Optional[str] = None,
-        is_active: Optional[bool] = None,
-    ) -> tuple[List[Account], int]:
+        account_type: str | None = None,
+        is_active: bool | None = None,
+    ) -> tuple[builtins.list[Account], int]:
         query = select(Account)
         if account_type:
             query = query.where(Account.account_type == account_type)
@@ -97,7 +93,7 @@ class AccountRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, account_id: str, data: AccountUpdate) -> Optional[Account]:
+    async def update(self, account_id: str, data: AccountUpdate) -> Account | None:
         obj = await self.get_by_id(account_id)
         if not obj:
             return None
@@ -137,7 +133,7 @@ class JournalEntryRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, entry_id: str) -> Optional[JournalEntry]:
+    async def get_by_id(self, entry_id: str) -> JournalEntry | None:
         result = await self.session.execute(
             select(JournalEntry)
             .options(selectinload(JournalEntry.items))
@@ -149,8 +145,8 @@ class JournalEntryRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        is_posted: Optional[bool] = None,
-    ) -> tuple[List[JournalEntry], int]:
+        is_posted: bool | None = None,
+    ) -> tuple[builtins.list[JournalEntry], int]:
         query = select(JournalEntry).options(selectinload(JournalEntry.items))
         if is_posted is not None:
             query = query.where(JournalEntry.is_posted == is_posted)
@@ -182,7 +178,7 @@ class JournalEntryRepository:
         await self.session.refresh(obj, attribute_names=["items"])
         return obj
 
-    async def post_entry(self, entry_id: str) -> Optional[JournalEntry]:
+    async def post_entry(self, entry_id: str) -> JournalEntry | None:
         obj = await self.get_by_id(entry_id)
         if not obj:
             return None
@@ -198,7 +194,7 @@ class InvoiceRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, invoice_id: str) -> Optional[Invoice]:
+    async def get_by_id(self, invoice_id: str) -> Invoice | None:
         result = await self.session.execute(
             select(Invoice)
             .options(selectinload(Invoice.items))
@@ -206,7 +202,7 @@ class InvoiceRepository:
         )
         return result.scalar_one_or_none()
 
-    async def get_by_number(self, number: str) -> Optional[Invoice]:
+    async def get_by_number(self, number: str) -> Invoice | None:
         result = await self.session.execute(
             select(Invoice).where(Invoice.number == number)
         )
@@ -216,8 +212,8 @@ class InvoiceRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        status: Optional[str] = None,
-    ) -> tuple[List[Invoice], int]:
+        status: str | None = None,
+    ) -> tuple[builtins.list[Invoice], int]:
         query = select(Invoice).options(selectinload(Invoice.items))
         if status:
             query = query.where(Invoice.status == status)
@@ -260,7 +256,7 @@ class InvoiceRepository:
         await self.session.refresh(obj, attribute_names=["items"])
         return obj
 
-    async def update(self, invoice_id: str, data: InvoiceUpdate) -> Optional[Invoice]:
+    async def update(self, invoice_id: str, data: InvoiceUpdate) -> Invoice | None:
         obj = await self.get_by_id(invoice_id)
         if not obj:
             return None
@@ -278,7 +274,7 @@ class PaymentRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, payment_id: str) -> Optional[Payment]:
+    async def get_by_id(self, payment_id: str) -> Payment | None:
         result = await self.session.execute(
             select(Payment).where(Payment.id == payment_id)
         )
@@ -286,7 +282,7 @@ class PaymentRepository:
 
     async def list(
         self, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Payment], int]:
+    ) -> tuple[builtins.list[Payment], int]:
         query = select(Payment).order_by(desc(Payment.paid_at))
         query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -312,7 +308,7 @@ class BudgetRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, budget_id: str) -> Optional[Budget]:
+    async def get_by_id(self, budget_id: str) -> Budget | None:
         result = await self.session.execute(
             select(Budget).where(Budget.id == budget_id)
         )
@@ -320,7 +316,7 @@ class BudgetRepository:
 
     async def list(
         self, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Budget], int]:
+    ) -> tuple[builtins.list[Budget], int]:
         query = select(Budget).order_by(Budget.period_start)
         query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)
@@ -339,7 +335,7 @@ class BudgetRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, budget_id: str, data: BudgetUpdate) -> Optional[Budget]:
+    async def update(self, budget_id: str, data: BudgetUpdate) -> Budget | None:
         obj = await self.get_by_id(budget_id)
         if not obj:
             return None
@@ -357,13 +353,13 @@ class TaxRateRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, tax_id: str) -> Optional[TaxRate]:
+    async def get_by_id(self, tax_id: str) -> TaxRate | None:
         result = await self.session.execute(
             select(TaxRate).where(TaxRate.id == tax_id)
         )
         return result.scalar_one_or_none()
 
-    async def list_active(self) -> List[TaxRate]:
+    async def list_active(self) -> list[TaxRate]:
         result = await self.session.execute(
             select(TaxRate).where(TaxRate.is_active == True)  # noqa: E712
         )
@@ -376,7 +372,7 @@ class FixedAssetRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(self, asset_id: str) -> Optional[FixedAsset]:
+    async def get_by_id(self, asset_id: str) -> FixedAsset | None:
         result = await self.session.execute(
             select(FixedAsset).where(FixedAsset.id == asset_id)
         )
@@ -384,7 +380,7 @@ class FixedAssetRepository:
 
     async def list(
         self, skip: int = 0, limit: int = 100
-    ) -> tuple[List[FixedAsset], int]:
+    ) -> tuple[builtins.list[FixedAsset], int]:
         query = select(FixedAsset).order_by(FixedAsset.purchase_date)
         query = query.offset(skip).limit(limit)
         result = await self.session.execute(query)

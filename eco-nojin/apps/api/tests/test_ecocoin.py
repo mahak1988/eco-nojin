@@ -2,10 +2,10 @@
 Tests for EcoCoin API routes
 Prefix: /api/v1/ecocoin (matches router)
 """
-import pytest
-from fastapi.testclient import TestClient
 import sys
 from pathlib import Path
+
+from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 

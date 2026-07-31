@@ -7,9 +7,8 @@ Data access layer — all database queries live here.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models.library import LibraryResource
@@ -23,7 +22,7 @@ class LibraryRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, resource_id: int) -> Optional[LibraryResource]:
+    async def get_by_id(self, resource_id: int) -> LibraryResource | None:
         """Handle get_by_id (resource_id)."""
         result = await self.session.execute(
             select(LibraryResource).where(LibraryResource.id == resource_id)
@@ -34,10 +33,10 @@ class LibraryRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
-        author: Optional[str] = None
-    ) -> tuple[List[LibraryResource], int]:
+        search: str | None = None,
+        category: str | None = None,
+        author: str | None = None
+    ) -> tuple[list[LibraryResource], int]:
         """Handle list (skip, limit, search, category, author)."""
         query = select(LibraryResource)
 
@@ -89,7 +88,7 @@ class LibraryRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, resource_id: int, data: LibraryResourceUpdate) -> Optional[LibraryResource]:
+    async def update(self, resource_id: int, data: LibraryResourceUpdate) -> LibraryResource | None:
         """Handle update (resource_id, data)."""
         obj = await self.get_by_id(resource_id)
         if not obj:

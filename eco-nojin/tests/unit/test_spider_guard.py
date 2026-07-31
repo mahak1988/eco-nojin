@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 from apps.spider_security.middleware import SpiderGuardMiddleware
 
 

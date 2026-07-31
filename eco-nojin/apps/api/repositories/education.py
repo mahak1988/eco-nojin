@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
 
 from sqlalchemy import asc, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,7 +32,7 @@ class EducationRepository:
             selectinload(Course.enrollments),
         )
 
-    def _apply_sort(self, query, sort: Optional[str]):
+    def _apply_sort(self, query, sort: str | None):
         if not sort:
             return query.order_by(desc(Course.id))
         direction = desc if sort.startswith("-") else asc
@@ -41,7 +40,7 @@ class EducationRepository:
         col = _SORTABLE.get(key, Course.id)
         return query.order_by(direction(col))
 
-    async def get_course_by_id(self, course_id: int) -> Optional[Course]:
+    async def get_course_by_id(self, course_id: int) -> Course | None:
         result = await self.session.execute(
             select(Course).where(Course.id == course_id).options(*self._course_options())
         )
@@ -51,11 +50,11 @@ class EducationRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
-        level: Optional[str] = None,
-        sort: Optional[str] = None,
-    ) -> tuple[List[Course], int]:
+        search: str | None = None,
+        category: str | None = None,
+        level: str | None = None,
+        sort: str | None = None,
+    ) -> tuple[list[Course], int]:
         query = select(Course).options(*self._course_options())
 
         if search:
@@ -95,7 +94,7 @@ class EducationRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_course(self, course_id: int, data: CourseUpdate) -> Optional[Course]:
+    async def update_course(self, course_id: int, data: CourseUpdate) -> Course | None:
         obj = await self.get_course_by_id(course_id)
         if not obj:
             return None
@@ -112,13 +111,13 @@ class EducationRepository:
         await self.session.flush()
         return True
 
-    async def get_lesson_by_id(self, lesson_id: int) -> Optional[Lesson]:
+    async def get_lesson_by_id(self, lesson_id: int) -> Lesson | None:
         result = await self.session.execute(select(Lesson).where(Lesson.id == lesson_id))
         return result.scalar_one_or_none()
 
     async def list_lessons_by_course(
         self, course_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Lesson], int]:
+    ) -> tuple[list[Lesson], int]:
         q = (
             select(Lesson)
             .where(Lesson.course_id == course_id)
@@ -141,7 +140,7 @@ class EducationRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_lesson(self, lesson_id: int, data: dict) -> Optional[Lesson]:
+    async def update_lesson(self, lesson_id: int, data: dict) -> Lesson | None:
         from apps.api.schemas.education import LessonUpdate
 
         obj = await self.get_lesson_by_id(lesson_id)
@@ -161,7 +160,7 @@ class EducationRepository:
         await self.session.flush()
         return True
 
-    async def get_enrollment_by_id(self, enrollment_id: int) -> Optional[Enrollment]:
+    async def get_enrollment_by_id(self, enrollment_id: int) -> Enrollment | None:
         result = await self.session.execute(
             select(Enrollment).where(Enrollment.id == enrollment_id)
         )
@@ -169,7 +168,7 @@ class EducationRepository:
 
     async def list_enrollments_by_user(
         self, user_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Enrollment], int]:
+    ) -> tuple[list[Enrollment], int]:
         q = (
             select(Enrollment)
             .where(Enrollment.user_id == user_id)
@@ -185,7 +184,7 @@ class EducationRepository:
         ).scalar_one()
         return items, int(total)
 
-    async def get_user_enrollment(self, course_id: int, user_id: int) -> Optional[Enrollment]:
+    async def get_user_enrollment(self, course_id: int, user_id: int) -> Enrollment | None:
         result = await self.session.execute(
             select(Enrollment).where(
                 Enrollment.course_id == course_id,
@@ -201,7 +200,7 @@ class EducationRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_enrollment(self, enrollment_id: int, data: dict) -> Optional[Enrollment]:
+    async def update_enrollment(self, enrollment_id: int, data: dict) -> Enrollment | None:
         from apps.api.schemas.education import EnrollmentUpdate
 
         obj = await self.get_enrollment_by_id(enrollment_id)

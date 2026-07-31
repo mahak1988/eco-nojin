@@ -10,7 +10,7 @@ Live path (optional):
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from apps.api.services.ecocoin_engine import (
     compute_impact_mint,
@@ -26,12 +26,12 @@ def mrv_from_bands(
     red: float,
     nir: float,
     *,
-    green: Optional[float] = None,
-    blue: Optional[float] = None,
-    swir1: Optional[float] = None,
-    ndvi_expected: Optional[float] = None,
-    model_yield_t_ha: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
+    green: float | None = None,
+    blue: float | None = None,
+    swir1: float | None = None,
+    ndvi_expected: float | None = None,
+    model_yield_t_ha: float | None = None,
+    field_yield_t_ha: float | None = None,
     credit_type: int = 0,
     measured_value: float = 40.0,
     region_multiplier: float = 1.0,
@@ -68,10 +68,10 @@ def mrv_from_bands(
 
 def mrv_from_ndvi(
     ndvi_observed: float,
-    ndvi_expected: Optional[float] = None,
+    ndvi_expected: float | None = None,
     *,
-    model_yield_t_ha: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
+    model_yield_t_ha: float | None = None,
+    field_yield_t_ha: float | None = None,
     credit_type: int = 0,
     measured_value: float = 40.0,
     region_multiplier: float = 1.0,
@@ -108,9 +108,9 @@ async def mrv_from_location(
     lon: float,
     *,
     days: int = 30,
-    ndvi_expected: Optional[float] = None,
-    model_yield_t_ha: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
+    ndvi_expected: float | None = None,
+    model_yield_t_ha: float | None = None,
+    field_yield_t_ha: float | None = None,
     credit_type: int = 0,
     measured_value: float = 40.0,
     region_multiplier: float = 1.0,

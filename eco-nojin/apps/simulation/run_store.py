@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -68,8 +68,8 @@ def save_run_sync(
     result: dict[str, Any],
     *,
     status: str = "completed",
-    task_id: Optional[str] = None,
-    farm_id: Optional[int] = None,
+    task_id: str | None = None,
+    farm_id: int | None = None,
 ) -> int:
     from sqlalchemy.orm import Session
 
@@ -102,8 +102,8 @@ async def save_run_async(
     result: dict[str, Any],
     *,
     status: str = "completed",
-    task_id: Optional[str] = None,
-    farm_id: Optional[int] = None,
+    task_id: str | None = None,
+    farm_id: int | None = None,
 ) -> ScienceRun:
     try:
         await ensure_science_runs_table(session)
@@ -125,7 +125,7 @@ async def save_run_async(
     return row
 
 
-async def get_run(session: AsyncSession, run_id: int) -> Optional[ScienceRun]:
+async def get_run(session: AsyncSession, run_id: int) -> ScienceRun | None:
     r = await session.execute(select(ScienceRun).where(ScienceRun.id == run_id))
     return r.scalar_one_or_none()
 
@@ -133,8 +133,8 @@ async def get_run(session: AsyncSession, run_id: int) -> Optional[ScienceRun]:
 async def list_runs(
     session: AsyncSession,
     *,
-    model: Optional[str] = None,
-    farm_id: Optional[int] = None,
+    model: str | None = None,
+    farm_id: int | None = None,
     limit: int = 50,
 ) -> list[ScienceRun]:
     try:

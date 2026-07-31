@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -32,8 +32,8 @@ class SoilCBody(BaseModel):
     plant_cover: bool = True
     persist: bool = False
     # ICBM extras
-    young_frac: Optional[float] = Field(None, ge=0.01, le=0.5)
-    humification: Optional[float] = Field(None, ge=0.05, le=0.5)
+    young_frac: float | None = Field(None, ge=0.01, le=0.5)
+    humification: float | None = Field(None, ge=0.05, le=0.5)
 
 
 async def _maybe_persist(session: AsyncSession, name: str, params: dict, result: dict, persist: bool) -> dict:

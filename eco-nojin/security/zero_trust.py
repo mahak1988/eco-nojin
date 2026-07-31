@@ -2,6 +2,7 @@
 """Zero Trust Security — Never Trust, Always Verify (2026)."""
 from __future__ import annotations
 
+
 class ZeroTrustConfig:
     """تنظیمات Zero Trust."""
 

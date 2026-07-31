@@ -1,8 +1,10 @@
 
 """Spider Web Security - Anti-Phishing Protection."""
 from __future__ import annotations
+
 import re
 from urllib.parse import urlparse
+
 
 class AntiPhishingGuard:
     ALLOWED_DOMAINS = {"econojin.com","www.econojin.com","supabase.co","qdrant.io","github.com"}

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class SatelliteSource(str, Enum):
@@ -109,7 +109,7 @@ class SatelliteProvider(ABC):
             "lon": lon,
         }
 
-    async def ndvi(self, lat: float, lon: float, date_str: Optional[str] = None) -> dict[str, Any]:
+    async def ndvi(self, lat: float, lon: float, date_str: str | None = None) -> dict[str, Any]:
         d = date.fromisoformat(date_str) if date_str else date.today()
         r = await self.get_ndvi_image(BBox.from_point(lat, lon), d)
         out = r.to_dict()

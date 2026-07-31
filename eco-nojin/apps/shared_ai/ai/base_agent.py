@@ -1,10 +1,12 @@
 """base_agent module."""
 
-from typing import TypedDict, Annotated, Sequence, Any, List, AsyncGenerator
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, ToolMessage
-from langgraph.graph import StateGraph, END, START
-from langgraph.graph.message import add_messages
 import logging
+from collections.abc import AsyncGenerator, Sequence
+from typing import Annotated, Any, TypedDict
+
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langgraph.graph import END, START, StateGraph
+from langgraph.graph.message import add_messages
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +23,8 @@ class AgentState(TypedDict):
 # ==========================================
 class ModularAgentBuilder:
     """سازنده ماژولار ایجنت‌های LangGraph."""
-    
-    def __init__(self, llm: Any, tools: List[Any], system_prompt: str = "") -> None:
+
+    def __init__(self, llm: Any, tools: list[Any], system_prompt: str = "") -> None:
         self.llm = llm.bind_tools(tools) if tools else llm
         """Handle __init__ (llm, tools, system_prompt)."""
         self.tools = {t.name: t for t in tools}
@@ -33,11 +35,11 @@ class ModularAgentBuilder:
         """نود اصلی: فراخوانی مدل زبانی."""
         logger.info("🧠 [Agent] Processing...")
         messages = state["messages"]
-        
+
         if self.system_prompt and len(messages) == 1:
             from langchain_core.messages import SystemMessage
             messages = [SystemMessage(content=self.system_prompt)] + list(messages)
-        
+
         response = self.llm.invoke(messages)
         return {"messages": [response], "context": state.get("context", {})}
 
@@ -46,10 +48,10 @@ class ModularAgentBuilder:
         logger.info("🛠️ [Agent] Executing tool...")
         messages = state["messages"]
         last_message = messages[-1]
-        
+
         tool_calls = last_message.tool_calls
         tool_results = []
-        
+
         for tc in tool_calls:
             tool_func = self.tools.get(tc["name"])
             if not tool_func:
@@ -57,20 +59,20 @@ class ModularAgentBuilder:
                     ToolMessage(content=f"❌ ابزار '{tc['name']}' یافت نشد.", tool_call_id=tc["id"])
                 )
                 continue
-            
+
             try:
                 if hasattr(tool_func, 'ainvoke'):
                     result = await tool_func.ainvoke(tc["args"])
                 else:
                     result = tool_func.invoke(tc["args"])
-                
+
                 tool_results.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
             except Exception as e:
                 logger.error(f"Error executing tool {tc['name']}: {e}")
                 tool_results.append(
                     ToolMessage(content=f"❌ خطا در اجرای ابزار: {str(e)}", tool_call_id=tc["id"])
                 )
-        
+
         return {"messages": tool_results, "context": state.get("context", {})}
 
     def _should_continue(self, state: AgentState) -> str:
@@ -89,7 +91,7 @@ class ModularAgentBuilder:
             workflow.add_node("tools", self._call_tool)
 
         workflow.add_edge(START, "agent")
-        
+
         if self.tools:
             workflow.add_conditional_edges(
                 "agent",
@@ -107,21 +109,21 @@ class ModularAgentBuilder:
         """اجرای ایجنت با یک پیام (non-streaming)."""
         if not self.graph:
             self.build()
-        
+
         initial_state = {
             "messages": [HumanMessage(content=user_input)],
             "context": context or {}
         }
-        
+
         final_state = await self.graph.ainvoke(
             initial_state,
             config={"recursion_limit": 25}
         )
-        
+
         for msg in reversed(final_state["messages"]):
             if isinstance(msg, AIMessage) and msg.content:
                 return msg.content
-        
+
         return "متأسفانه پاسخی تولید نشد."
 
     async def run_stream(self, user_input: str, context: dict = None) -> AsyncGenerator[str, None]:
@@ -133,14 +135,14 @@ class ModularAgentBuilder:
         """
         if not self.graph:
             self.build()
-        
+
         initial_state = {
             "messages": [HumanMessage(content=user_input)],
             "context": context or {}
         }
-        
+
         logger.info("🌊 Starting streaming execution...")
-        
+
         try:
             # اجرای گراف به صورت streaming
             async for event in self.graph.astream_events(
@@ -149,23 +151,23 @@ class ModularAgentBuilder:
                 version="v2"
             ):
                 kind = event["event"]
-                
+
                 # پردازش رویدادهای LLM streaming
                 if kind == "on_chat_model_stream":
                     content = event["data"]["chunk"].content
                     if content:
                         yield content
-                
+
                 # پردازش tool calls
                 elif kind == "on_tool_start":
                     tool_name = event["name"]
                     yield f"\n\n🛠️ **اجرای ابزار: {tool_name}**\n\n"
-                
+
                 elif kind == "on_tool_end":
                     tool_output = event["data"].get("output", "")
                     if tool_output:
                         yield f"\n\n📊 **نتیجه ابزار:**\n{str(tool_output)[:500]}...\n\n"
-        
+
         except Exception as e:
             logger.error(f"❌ Streaming error: {e}")
             # ارسال خطا به صورت chunk

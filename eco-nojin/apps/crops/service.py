@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.crops.agronomy_defaults import CATEGORY_DEFAULTS
 from apps.crops.repository import CropRepository
-from apps.crops.schemas import CropCreate, CropResponse, IrrigationCalcRequest, IrrigationCalcResponse
+from apps.crops.schemas import (
+    CropCreate,
+    CropResponse,
+    IrrigationCalcRequest,
+    IrrigationCalcResponse,
+)
 from apps.crops.seed_data import RAW_CROPS
 from apps.shared_core.schemas.pagination import build_meta, page_to_offset
 
@@ -42,8 +45,8 @@ class CropService:
         *,
         page: int = 1,
         size: int = 50,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
+        search: str | None = None,
+        category: str | None = None,
     ):
         skip = page_to_offset(page, size)
         rows, total = await self.repo.list(skip=skip, limit=size, search=search, category=category)

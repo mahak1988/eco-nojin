@@ -20,5 +20,8 @@
   "devDependencies": {
     "turbo": "^2.10.5"
   },
-  "packageManager": "pnpm@11.4.0"
+  "packageManager": "pnpm@11.4.0",
+  "dependencies": {
+    "tailwindcss-flip": "^1.0.0"
+  }
 }

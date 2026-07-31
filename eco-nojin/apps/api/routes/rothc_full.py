@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -25,17 +25,17 @@ class RothCBody(BaseModel):
     et_mm_year: float = Field(700.0, ge=0, le=3000)
     plant_cover: bool = True
     dpm_rpm_ratio: float = Field(1.44, ge=0.1, le=5.0)
-    iom_t_ha: Optional[float] = Field(None, ge=0, le=50)
-    dpm_t_ha: Optional[float] = Field(None, ge=0, le=50)
-    rpm_t_ha: Optional[float] = Field(None, ge=0, le=80)
-    bio_t_ha: Optional[float] = Field(None, ge=0, le=20)
-    hum_t_ha: Optional[float] = Field(None, ge=0, le=150)
+    iom_t_ha: float | None = Field(None, ge=0, le=50)
+    dpm_t_ha: float | None = Field(None, ge=0, le=50)
+    rpm_t_ha: float | None = Field(None, ge=0, le=80)
+    bio_t_ha: float | None = Field(None, ge=0, le=20)
+    hum_t_ha: float | None = Field(None, ge=0, le=150)
     use_falloon_iom: bool = True
     k_dpm: float = Field(10.0, ge=1, le=20)
     k_rpm: float = Field(0.3, ge=0.05, le=2)
     k_bio: float = Field(0.66, ge=0.1, le=2)
     k_hum: float = Field(0.02, ge=0.005, le=0.1)
-    preset: Optional[str] = Field(None, description="Preset id from /rothc/presets")
+    preset: str | None = Field(None, description="Preset id from /rothc/presets")
     with_sa: bool = False
     persist: bool = True
 
@@ -57,7 +57,7 @@ async def rothc_presets() -> dict[str, Any]:
 
 
 @router.get("/rothc/defaults")
-async def rothc_defaults(preset: Optional[str] = Query(None)) -> dict[str, Any]:
+async def rothc_defaults(preset: str | None = Query(None)) -> dict[str, Any]:
     base = RothCBody().model_dump()
     if preset:
         if preset not in PRESETS:

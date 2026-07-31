@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -32,7 +32,7 @@ CurrentSuperuser = Annotated["User", Depends(get_current_active_superuser)]
 
 
 async def get_admin_service(
-    session: Annotated["AsyncSession", DBSessionDependency],
+    session: Annotated[AsyncSession, DBSessionDependency],
 ) -> AdminService:
     return AdminService(session)
 
@@ -90,7 +90,7 @@ async def upsert_system_setting(
 async def list_audit_logs(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-    event_type: Optional[str] = None,
+    event_type: str | None = None,
     limit: int = 100,
     offset: int = 0,
 ):

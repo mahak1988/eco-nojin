@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import HOMERWrapper, HOMEROutput
 from .energy_resources import EnergyResourcesDatabase
+from .wrapper import HOMEROutput, HOMERWrapper
 
 __all__ = ["HOMERWrapper", "HOMEROutput", "EnergyResourcesDatabase"]

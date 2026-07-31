@@ -14,7 +14,6 @@ Endpoints:
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,16 +23,16 @@ try:
     from apps.shared_core.database.session import get_db_session
 except ImportError:
     # Fallback stub — replace with real implementation
-    from typing import AsyncGenerator
+    from collections.abc import AsyncGenerator
     async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
         """Handle get_db_session."""
         raise NotImplementedError("Wire up get_db_session in apps.shared_core.database.session")
 
 from apps.shared_ai.schemas import (
     SharedAiCreate,
-    SharedAiUpdate,
-    SharedAiResponse,
     SharedAiListResponse,
+    SharedAiResponse,
+    SharedAiUpdate,
 )
 from apps.shared_ai.service import SharedAiService
 

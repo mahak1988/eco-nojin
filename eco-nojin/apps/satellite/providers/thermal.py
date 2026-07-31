@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 
 from apps.satellite.providers.base import SatelliteProvider
 
@@ -28,7 +28,7 @@ class ThermalProvider(SatelliteProvider):
         lat_effect = max(0, (40 - abs(lat)) * 0.15)
         return round(seasonal + lat_effect + 0.5 * math.sin(lon), 2)
 
-    async def ndvi(self, lat: float, lon: float, date_str: Optional[str] = None) -> dict[str, Any]:
+    async def ndvi(self, lat: float, lon: float, date_str: str | None = None) -> dict[str, Any]:
         d = date.fromisoformat(date_str) if date_str else date.today()
         lst = self._lst(lat, lon, d)
         return {

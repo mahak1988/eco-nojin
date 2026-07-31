@@ -13,7 +13,7 @@ Not official binaries of Rothamsted / NREL / SYKE software.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -89,7 +89,7 @@ def run_icbm(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "et_mm_year": et,
         },
         "series": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -171,7 +171,7 @@ def run_century3(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "clay_pct": clay * 100,
         },
         "series": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -248,7 +248,7 @@ def run_yasso_lite(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "rain_mm_year": rain,
         },
         "series": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -295,7 +295,7 @@ def run_ensemble(params: dict[str, Any] | None = None) -> dict[str, Any]:
         "ensemble_mean_delta": round(mean_d, 3),
         "agreement": "high" if max(deltas) - min(deltas) < 5 else "moderate" if deltas else "n/a",
         "results": models,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
         "notes_fa": (
             "میانگین ΔSOC بین مدل‌ها؛ اختلاف زیاد یعنی حساسیت به ساختار استخرها. "
             "هیچ‌کدام جایگزین اندازه‌گیری میدانی SOC نیستند."

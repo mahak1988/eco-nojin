@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -37,8 +37,8 @@ ALLOWED_ROLES = {"farmer", "expert", "viewer"}
 
 
 class LoginRequest(BaseModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
+    email: EmailStr | None = None
+    username: str | None = None
     password: str
 
     @model_validator(mode="before")
@@ -55,9 +55,9 @@ class LoginRequest(BaseModel):
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=72)
-    full_name: Optional[str] = Field(None, max_length=255)
-    phone: Optional[str] = Field(None, max_length=40)
-    organization: Optional[str] = Field(None, max_length=255)
+    full_name: str | None = Field(None, max_length=255)
+    phone: str | None = Field(None, max_length=40)
+    organization: str | None = Field(None, max_length=255)
     role: Literal["farmer", "expert", "viewer"] = "farmer"
     accept_terms: bool = False
 
@@ -78,14 +78,14 @@ class RegisterRequest(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    organization: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
+    organization: str | None = None
     role: str = "farmer"
     is_active: bool
     is_superuser: bool = False
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class AuthResponse(BaseModel):
@@ -96,7 +96,7 @@ class AuthResponse(BaseModel):
 
 
 class RefreshRequest(BaseModel):
-    refreshToken: Optional[str] = None
+    refreshToken: str | None = None
 
 
 def _user_response(user: User) -> UserResponse:
@@ -254,7 +254,7 @@ async def logout(request: Request, response: Response) -> dict[str, str]:
 async def refresh_token(
     response: Response,
     request: Request,
-    body: Optional[RefreshRequest] = None,
+    body: RefreshRequest | None = None,
     db: AsyncSession = Depends(get_db),
 ) -> AuthResponse:
     raw = None

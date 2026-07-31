@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import MaxEntWrapper, MaxEntOutput
 from .species_database import SpeciesDatabase, SpeciesTraits
+from .wrapper import MaxEntOutput, MaxEntWrapper
 
 __all__ = ["MaxEntWrapper", "MaxEntOutput", "SpeciesDatabase", "SpeciesTraits"]

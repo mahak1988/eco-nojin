@@ -17,7 +17,7 @@ Not a full APSIM/DAYCENT replacement — educational / screening process model.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.evaluation_metrics import evaluate_series
@@ -199,7 +199,7 @@ def run_nitrogen_cycle(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "واحدها t N/ha. کود ۱۲۰ kg N/ha ≈ ۰.۱۲ t/ha. "
             "مدل غربالگری است نه جایگزین اندازه‌گیری مزرعه."
         ),
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -220,5 +220,5 @@ def evaluate_n_series(
     return {
         "model": result.get("model", "soil_n_cycle"),
         "metrics_by_variable": reports,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

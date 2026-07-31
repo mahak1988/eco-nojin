@@ -4,8 +4,8 @@ EcoCoin API — impact-backed utility token for Econojin.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -14,8 +14,8 @@ from apps.api.services.ecocoin_engine import (
     CREDIT_FACTORS,
     DISTRIBUTION,
     MAX_SUPPLY,
-    ProtocolState,
     STAKING_TIERS,
+    ProtocolState,
     challenge_reward,
     compute_impact_mint,
     compute_indicators,
@@ -43,7 +43,7 @@ class TransferRequest(BaseModel):
     from_address: str
     to_address: str
     amount: float
-    project_id: Optional[str] = None
+    project_id: str | None = None
 
 
 class TransferResponse(BaseModel):
@@ -114,14 +114,14 @@ class ChallengeClaimRequest(BaseModel):
 
 class RewardClaimRequest(BaseModel):
     address: str
-    amount: Optional[float] = None
+    amount: float | None = None
 
 
 class MrvQualityRequest(BaseModel):
-    ndvi_observed: Optional[float] = Field(None, ge=0, le=1)
-    ndvi_expected: Optional[float] = Field(None, ge=0, le=1)
-    model_yield_t_ha: Optional[float] = Field(None, ge=0)
-    field_yield_t_ha: Optional[float] = Field(None, ge=0)
+    ndvi_observed: float | None = Field(None, ge=0, le=1)
+    ndvi_expected: float | None = Field(None, ge=0, le=1)
+    model_yield_t_ha: float | None = Field(None, ge=0)
+    field_yield_t_ha: float | None = Field(None, ge=0)
     field_data_present: bool = False
     satellite_available: bool = False
 
@@ -137,7 +137,7 @@ _MOCK_TXS: list[dict[str, Any]] = [
         "tx_hash": "0x" + "a" * 64,
         "type": "transfer",
         "amount": 100.0,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 ]
 
@@ -149,7 +149,7 @@ _MOCK_MINTS: list[dict[str, Any]] = [
         "amount": 500.0,
         "project_id": "amazon-north-47",
         "tx_hash": "0x" + "b" * 64,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 ]
 
@@ -234,14 +234,14 @@ async def transfer(
             "from": req.from_address,
             "to": req.to_address,
             "project_id": req.project_id,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         },
     )
     return TransferResponse(
         tx_hash=h,
         status="pending",
         amount=req.amount,
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
     )
 
 
@@ -305,7 +305,7 @@ async def get_recent_mints(
 @router.get("/mining/events")
 async def get_mint_events_from_db(
     limit: int = Query(20, ge=1, le=100),
-    recipient: Optional[str] = Query(None),
+    recipient: str | None = Query(None),
 ) -> dict[str, Any]:
     """List persisted mint events (SQLite/Postgres). Falls back to in-memory."""
     try:
@@ -429,7 +429,7 @@ async def impact_mint(
         "amount": mint_total,
         "project_id": req.project_id,
         "tx_hash": h,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "credit_type": req.credit_type,
         "distribution": result["distribution"],
         "oracle_signature": oracle["signature"],
@@ -476,7 +476,7 @@ async def impact_mint(
 
 
 @router.get("/challenges")
-async def list_challenges(status: Optional[str] = Query(None)) -> dict[str, Any]:
+async def list_challenges(status: str | None = Query(None)) -> dict[str, Any]:
     items = _CHALLENGES
     if status:
         items = [c for c in items if c["status"] == status]

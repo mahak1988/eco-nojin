@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import MODFLOWWrapper, MODFLOWOutput
 from .model_builder import MODFLOWModelBuilder
+from .wrapper import MODFLOWOutput, MODFLOWWrapper
 
 __all__ = ["MODFLOWWrapper", "MODFLOWOutput", "MODFLOWModelBuilder"]

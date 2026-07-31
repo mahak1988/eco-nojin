@@ -4,7 +4,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -12,8 +11,8 @@ from pydantic import BaseModel, ConfigDict, Field
 class AdminSettingBase(BaseModel):
     key: str = Field(..., max_length=128)
     value: str
-    description: Optional[str] = None
-    is_active: Optional[bool] = True
+    description: str | None = None
+    is_active: bool | None = True
 
 
 class AdminSettingCreate(AdminSettingBase):
@@ -21,9 +20,9 @@ class AdminSettingCreate(AdminSettingBase):
 
 
 class AdminSettingUpdate(BaseModel):
-    value: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
+    value: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
 
 
 class AdminSettingResponse(AdminSettingBase):
@@ -38,10 +37,10 @@ class AuditLogResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    actor_id: Optional[int]
-    actor_email: Optional[str]
+    actor_id: int | None
+    actor_email: str | None
     event_type: str
-    event_data: Optional[str] = None
+    event_data: str | None = None
     created_at: datetime
 
 
@@ -51,9 +50,9 @@ class SystemReportResponse(BaseModel):
     id: int
     report_name: str
     status: str
-    report_data: Optional[str] = None
+    report_data: str | None = None
     created_at: datetime
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
 
 class AdminDashboardResponse(BaseModel):

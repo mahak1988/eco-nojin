@@ -4,7 +4,7 @@ import os
 
 SIMULATORS = [
     # (module_path, class_name, id, name, category, description)
-    
+
     # ── Agriculture (5) ──
     ("apps/simulation/agriculture/apsim.py", "APSIMSimulator", "apsim", "APSIM (Agricultural Production Systems Simulator)", "agriculture",
      "APSIM is a modular modelling framework for agricultural systems. Simulates crop growth, soil water, nitrogen, and management practices."),
@@ -202,7 +202,7 @@ def generate_simulators():
     for filepath, class_name, sid, name, category, description in SIMULATORS:
         # Create directory if needed
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        
+
         # Generate content
         content = TEMPLATE.format(
             name=name,
@@ -211,10 +211,10 @@ def generate_simulators():
             category=category,
             description=description,
         )
-        
+
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
-        
+
         print(f"✅ Created: {filepath} ({class_name})")
 
 

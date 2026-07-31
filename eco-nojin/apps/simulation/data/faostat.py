@@ -5,8 +5,8 @@ Source: FAO FAOSTAT bulk download API (fenixservices.fao.org).
 import logging
 
 logger = logging.getLogger(__name__)
+
 import httpx
-from typing import Optional
 
 FAOSTAT_BASE = "https://fenixservices.fao.org/faostat/api/v1/en/data/QCL"
 
@@ -30,7 +30,7 @@ FALLBACK_YIELD: dict[str, dict[str, dict[int, float]]] = {
 async def fetch_crop_yield(
     crop: str = "wheat",
     area_code: str = "IRN",
-    years: Optional[list[int]] = None,
+    years: list[int] | None = None,
 ) -> dict:
     """Fetch observed crop yield (t/ha) from FAOSTAT. Returns {year: yield_t_ha}."""
     if years is None:

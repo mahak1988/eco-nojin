@@ -4,16 +4,17 @@ Accounting Tests
 Tests for the accounting module endpoints.
 """
 
-import pytest
 from datetime import datetime
 from decimal import Decimal
+
+import pytest
 
 
 # Mock tests - would need database setup for real tests
 def test_account_types():
     """Test account type enum values."""
     from apps.api.schemas.accounting import AccountType
-    
+
     assert AccountType.ASSET == "asset"
     assert AccountType.LIABILITY == "liability"
     assert AccountType.EQUITY == "equity"
@@ -24,7 +25,7 @@ def test_account_types():
 def test_invoice_statuses():
     """Test invoice status enum values."""
     from apps.api.schemas.accounting import InvoiceStatus
-    
+
     assert InvoiceStatus.DRAFT == "draft"
     assert InvoiceStatus.PENDING == "pending"
     assert InvoiceStatus.PAID == "paid"
@@ -34,8 +35,8 @@ def test_invoice_statuses():
 
 def test_journal_entry_validation():
     """Test journal entry must have at least 2 items."""
-    from apps.api.schemas.accounting import JournalEntryCreate, JournalItemCreate, EntryType
-    
+    from apps.api.schemas.accounting import EntryType, JournalEntryCreate, JournalItemCreate
+
     # Valid - 2 items
     entry = JournalEntryCreate(
         date=datetime.now(),
@@ -52,7 +53,7 @@ def test_journal_entry_validation():
 def test_invoice_calculation():
     """Test invoice total calculations."""
     from apps.api.schemas.accounting import InvoiceCreate, InvoiceItemCreate
-    
+
     inv = InvoiceCreate(
         client_name="Test Client",
         issue_date=datetime.now(),
@@ -62,11 +63,11 @@ def test_invoice_calculation():
             InvoiceItemCreate(description="Item 2", quantity=Decimal("1"), unit_price=Decimal("50"), tax_rate=Decimal("10")),
         ]
     )
-    
+
     # Calculate expected totals
     subtotal = sum((item.quantity * item.unit_price) for item in inv.items)
     tax_amount = sum((item.quantity * item.unit_price * item.tax_rate / 100) for item in inv.items)
-    
+
     assert subtotal == Decimal("250")  # 2*100 + 1*50
     assert tax_amount == Decimal("5")   # 1*50*10/100
 

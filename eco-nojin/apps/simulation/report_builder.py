@@ -5,8 +5,8 @@ Sections: executive summary, metrics table, formulas, sensitivity (optional), ri
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 
 def _sev(level: str) -> str:
@@ -21,8 +21,8 @@ def build_final_report(
     title_en: str,
     model_id: str,
     result: dict[str, Any],
-    sensitivity: Optional[dict[str, Any]] = None,
-    extra_sections: Optional[list[dict[str, Any]]] = None,
+    sensitivity: dict[str, Any] | None = None,
+    extra_sections: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     analysis = result.get("analysis") or {}
     metrics: list[dict[str, Any]] = []
@@ -43,9 +43,7 @@ def build_final_report(
     outs = result.get("outputs") or {}
     if isinstance(outs, dict):
         for k, v in outs.items():
-            if isinstance(v, (int, float)):
-                metrics.append({"id": k, "value": v})
-            elif k == "risk_class":
+            if isinstance(v, (int, float)) or k == "risk_class":
                 metrics.append({"id": k, "value": v})
 
     risks: list[dict[str, str]] = []
@@ -79,7 +77,7 @@ def build_final_report(
 
     report = {
         "report_version": "1.1",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "model_id": model_id,
         "title_fa": title_fa,
         "title_en": title_en,
@@ -99,7 +97,7 @@ def build_final_report(
     return report
 
 
-def report_rothc(result: dict[str, Any], sensitivity: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+def report_rothc(result: dict[str, Any], sensitivity: dict[str, Any] | None = None) -> dict[str, Any]:
     series = result.get("series") or []
     extra = [
         {
@@ -121,7 +119,7 @@ def report_rothc(result: dict[str, Any], sensitivity: Optional[dict[str, Any]] =
     )
 
 
-def report_rusle(result: dict[str, Any], sensitivity: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+def report_rusle(result: dict[str, Any], sensitivity: dict[str, Any] | None = None) -> dict[str, Any]:
     return build_final_report(
         title_fa="گزارش نهایی فرسایش خاک (RUSLE)",
         title_en="Final soil erosion report (RUSLE)",
@@ -131,7 +129,7 @@ def report_rusle(result: dict[str, Any], sensitivity: Optional[dict[str, Any]] =
     )
 
 
-def report_aquacrop(result: dict[str, Any], sensitivity: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+def report_aquacrop(result: dict[str, Any], sensitivity: dict[str, Any] | None = None) -> dict[str, Any]:
     return build_final_report(
         title_fa="گزارش نهایی آب-محصول (AquaCrop مفهومی)",
         title_en="Final crop-water report (conceptual AquaCrop)",
@@ -141,7 +139,7 @@ def report_aquacrop(result: dict[str, Any], sensitivity: Optional[dict[str, Any]
     )
 
 
-def report_scs(result: dict[str, Any], sensitivity: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+def report_scs(result: dict[str, Any], sensitivity: dict[str, Any] | None = None) -> dict[str, Any]:
     return build_final_report(
         title_fa="گزارش نهایی بیلان حوضه (SCS-CN)",
         title_en="Final basin water balance report (SCS-CN)",

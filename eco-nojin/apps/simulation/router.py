@@ -7,12 +7,13 @@ Exposes all 28 simulators via REST API endpoints.
 import logging
 
 logger = logging.getLogger(__name__)
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Any, Optional
 
-from apps.simulation.registry import register_all_simulators
 from apps.simulation.base import SimulationRegistry
+from apps.simulation.registry import register_all_simulators
 
 router = APIRouter(tags=["🔬 Simulation"])
 
@@ -32,7 +33,7 @@ class SimulationRunResponse(BaseModel):
     outputs: dict[str, Any] = {}
     metrics: dict[str, float] = {}
     charts: dict[str, list] = {}
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float = 0.0
 
 
@@ -52,10 +53,10 @@ async def get_simulator(simulator_id: str) -> None:
     params = SimulationRegistry.get_parameters(simulator_id)
     if not params:
         raise HTTPException(status_code=404, detail=f"Simulator '{simulator_id}' not found")
-    
+
     sim_class = SimulationRegistry.get(simulator_id)
     sim = sim_class()
-    
+
     return {
         "metadata": sim.get_metadata(),
         "parameters": params,
@@ -71,10 +72,10 @@ async def run_simulation(request: SimulationRunRequest) -> SimulationRunResponse
             status_code=404,
             detail=f"Simulator '{request.simulator_id}' not found. Available: {[s['id'] for s in register_all_simulators()]}",
         )
-    
+
     sim = sim_class()
     result = await sim.run(request.parameters)
-    
+
     return SimulationRunResponse(
         run_id=result.run_id,
         simulator_id=result.simulator_id,
@@ -98,7 +99,7 @@ async def list_categories() -> None:
         if cat not in categories:
             categories[cat] = []
         categories[cat].append(sim["id"])
-    
+
     return {
         "total_categories": len(categories),
         "categories": {k: {"count": len(v), "simulators": v} for k, v in categories.items()},

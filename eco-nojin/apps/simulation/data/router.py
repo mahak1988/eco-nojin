@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -22,8 +22,8 @@ router = APIRouter(prefix="/api/v1/data", tags=["Real-World Data"])
 async def climate(
     lat: float = Query(..., ge=-90, le=90, description="Latitude"),
     lon: float = Query(..., ge=-180, le=180, description="Longitude"),
-    start: Optional[str] = Query(None, description="YYYY-MM-DD (default: 90 days ago)"),
-    end: Optional[str] = Query(None, description="YYYY-MM-DD (default: today)"),
+    start: str | None = Query(None, description="YYYY-MM-DD (default: 90 days ago)"),
+    end: str | None = Query(None, description="YYYY-MM-DD (default: today)"),
     source: str = Query("auto", description="auto | nasa | openmeteo"),
 ) -> dict[str, Any]:
     try:

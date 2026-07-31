@@ -8,9 +8,8 @@ Services call repositories; repositories never call services.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models import Api
@@ -24,7 +23,7 @@ class ApiRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, id: int) -> Optional[Api]:
+    async def get_by_id(self, id: int) -> Api | None:
         """Fetch a single record by ID."""
         result = await self.session.execute(
             select(Api).where(Api.id == id)
@@ -55,7 +54,7 @@ class ApiRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, id: int, data: ApiUpdate) -> Optional[Api]:
+    async def update(self, id: int, data: ApiUpdate) -> Api | None:
         """Update an existing record. Returns None if not found."""
         obj = await self.get_by_id(id)
         if not obj:

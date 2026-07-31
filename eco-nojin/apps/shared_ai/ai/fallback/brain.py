@@ -1,8 +1,9 @@
 """brain module."""
 
-from typing import Dict, Any, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
 import logging
+from typing import Any
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_ai.ai.fallback.knowledge_base import KnowledgeBaseEngine
 from apps.shared_ai.ai.fallback.rules_engine import RulesEngine
@@ -22,7 +23,7 @@ class FallbackBrain:
     3. قالب مناسب را انتخاب می‌کند
     4. پاسخ نهایی را تولید می‌کند
     """
-    
+
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
         """Handle __init__ (session)."""
@@ -30,38 +31,38 @@ class FallbackBrain:
         self.rules_engine = RulesEngine(session)
         self.template_engine = TemplateEngine(session)
         self.memory_repo = KnowledgeRepository(session)
-    
+
     async def generate_response(
         self,
         agent_type: str,
         user_message: str,
         user_id: int,
-        context: Optional[Dict[str, Any]] = None
+        context: dict[str, Any] | None = None
     ) -> str:
         """تولید پاسخ در حالت offline."""
         logger.info(f"🧠 FallbackBrain processing for {agent_type}")
-        
+
         context = context or {}
         context["query"] = user_message
-        
+
         try:
             # 1. شناسایی intent
             intent = self._detect_intent(user_message, agent_type)
             logger.info(f"📋 Detected intent: {intent}")
-            
+
             # 2. جستجوی دانش
             knowledge_context = await self.knowledge_engine.get_context_for_agent(
                 agent_type, user_message
             )
-            
+
             # 3. ارزیابی قوانین
             rules_summary = await self.rules_engine.get_actions_summary(
                 agent_type, context
             )
-            
+
             # 4. ذخیره در حافظه
             await self._save_to_memory(agent_type, user_id, user_message, intent)
-            
+
             # 5. تولید پاسخ
             if knowledge_context:
                 response = await self.template_engine.format_knowledge_response(
@@ -75,14 +76,14 @@ class FallbackBrain:
                 response = await self.template_engine.get_response(
                     agent_type, intent, context
                 )
-            
+
             logger.info(f"✅ Fallback response generated ({len(response)} chars)")
             return response
-        
+
         except Exception as e:
             logger.error(f"❌ FallbackBrain error: {e}")
             return await self.template_engine.get_response(agent_type, "fallback", {})
-    
+
     def ___detect_intent_extracted_agent_type_____financial():
         """Extracted: if agent_type == 'financial'"""
         if agent_type == "financial":
@@ -125,17 +126,17 @@ class FallbackBrain:
     def _detect_intent(self, message: str, agent_type: str) -> str:
         """شناسایی intent پیام کاربر."""
         message_lower = message.lower()
-        
+
         # greeting detection
         greetings = ["سلام", "درود", "hello", "hi", "صبح بخیر", "عصر بخیر"]
         if any(g in message_lower for g in greetings):
             return "greeting"
-        
+
         # agent-specific intents
         __detect_intent_extracted()  # refactored: was If block
-        
+
         return "general_query"
-    
+
     async def _save_to_memory(
         self,
         agent_type: str,
@@ -154,7 +155,7 @@ class FallbackBrain:
             )
         except Exception as e:
             logger.warning(f"⚠️ Failed to save memory: {e}")
-    
+
     async def seed_knowledge_if_needed(self) -> None:
         """بارگذاری دانش‌نامه در صورت نیاز."""
         from apps.shared_knowledge.knowledge.seed_data import seed_knowledge_base

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 
 from apps.satellite.providers.base import BBox, NDVIResult
 from apps.satellite.providers.copernicus_provider import CopernicusProvider
@@ -157,7 +157,7 @@ class SatelliteService:
         return out
 
 
-_service: Optional[SatelliteService] = None
+_service: SatelliteService | None = None
 
 
 def get_satellite_service() -> SatelliteService:

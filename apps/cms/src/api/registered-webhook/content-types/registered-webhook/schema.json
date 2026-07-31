@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "registered_webhooks",
+  "info": {
+    "singularName": "registered-webhook",
+    "pluralName": "registered-webhooks",
+    "displayName": "Registered Webhook",
+    "description": "Webhooks registered by other modules"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "endpoint": {
+      "type": "string",
+      "required": true
+    },
+    "events": {
+      "type": "json",
+      "required": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "createdAt": {
+      "type": "datetime"
+    },
+    "tenant": {
+      "type": "string"
+    }
+  }
+}

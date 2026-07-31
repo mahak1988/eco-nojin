@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 
@@ -80,9 +79,9 @@ _alerts = [
 
 @router.get("/")
 async def list_alerts(
-    severity: Optional[str] = Query(None, description="Filter: critical, high, medium, low"),
-    acknowledged: Optional[bool] = Query(None),
-    category: Optional[str] = Query(None),
+    severity: str | None = Query(None, description="Filter: critical, high, medium, low"),
+    acknowledged: bool | None = Query(None),
+    category: str | None = Query(None),
     limit: int = Query(50, le=200),
 ):
     result = list(_alerts)

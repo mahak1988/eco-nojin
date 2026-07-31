@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Search GitHub for high-quality reference repositories matching our project structure."""
-import urllib.request
 import json
-import sys
-import os
+import urllib.request
 
 QUERIES = [
     "FastAPI+React+PostgreSQL+monorepo+production",
@@ -129,7 +127,7 @@ for t in TARGETS:
     print(f"📦 {t['repo']}")
     print(f"   📝 {t['reason']}")
     if t['files']:
-        print(f"   📋 Key files to examine:")
+        print("   📋 Key files to examine:")
         for f in t['files']:
             print(f"      - {f}")
 

@@ -8,13 +8,14 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.models.community import Post, Comment, Like
+from apps.api.models.community import Comment, Like, Post
 
 
 @pytest.fixture
 async def community_db_session():
     """Create a test database session for community models."""
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
     from apps.shared_core.database.session import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")

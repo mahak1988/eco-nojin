@@ -8,10 +8,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 
-from sqlalchemy import String, Integer, DateTime, Boolean, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Boolean, DateTime, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from apps.shared_core.database.session import Base
 
@@ -23,14 +22,14 @@ class LibraryResource(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    file_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
-    file_size: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # bytes
-    mime_type: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    file_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    file_size: Mapped[int | None] = mapped_column(Integer, nullable=True)  # bytes
+    mime_type: Mapped[str | None] = mapped_column(String(100), nullable=True)
     category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    tags: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # comma-separated
-    author: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    published_year: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    tags: Mapped[str | None] = mapped_column(Text, nullable=True)  # comma-separated
+    author: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    published_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_public: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     download_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)

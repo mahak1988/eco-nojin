@@ -2,7 +2,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from .wrapper import QUAL2KWrapper, QUAL2KOutput
 from .wqi_calculator import WaterQualityIndex
+from .wrapper import QUAL2KOutput, QUAL2KWrapper
 
 __all__ = ["QUAL2KWrapper", "QUAL2KOutput", "WaterQualityIndex"]

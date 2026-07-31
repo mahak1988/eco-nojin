@@ -1,0 +1,83 @@
+{
+  "collectionName": "components_shared_tenant_settings",
+  "info": {
+    "displayName": "Tenant Settings",
+    "icon": "cog",
+    "description": "Configuration settings for a tenant"
+  },
+  "options": {},
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "required": true
+    },
+    "siteDescription": {
+      "type": "text"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "favicon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "defaultSeoTitle": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "defaultSeoDescription": {
+      "type": "text",
+      "maxLength": 160
+    },
+    "defaultSeoImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "socialMedia": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.social-media-links"
+    },
+    "analyticsTrackingId": {
+      "type": "string"
+    },
+    "customDomain": {
+      "type": "string"
+    },
+    "emailNotifications": {
+      "type": "boolean",
+      "default": true
+    },
+    "contentModeration": {
+      "type": "boolean",
+      "default": false
+    },
+    "allowedContentTypes": {
+      "type": "enumeration",
+      "enum": [
+        "page",
+        "blog-post",
+        "category",
+        "tag"
+      ],
+      "multiple": true,
+      "default": [
+        "page",
+        "blog-post"
+      ]
+    }
+  }
+}

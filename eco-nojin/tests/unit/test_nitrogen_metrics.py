@@ -1,4 +1,4 @@
-from apps.simulation.evaluation_metrics import evaluate_series, nse, rmse
+from apps.simulation.evaluation_metrics import evaluate_series, nse
 from apps.simulation.nitrogen_cycle import evaluate_n_series, run_nitrogen_cycle
 
 

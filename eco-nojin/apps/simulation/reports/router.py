@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 import csv
 import io
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse, HTMLResponse
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.responses import HTMLResponse, StreamingResponse
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
 from apps.simulation.runs.models import SimulationRun
@@ -23,18 +24,18 @@ async def export_run_csv(run_id: UUID, db: AsyncSession = Depends(get_db_session
     run = result.scalar_one_or_none()
     if not run:
         raise HTTPException(404, f"Run {run_id} not found")
-    
+
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(["simulator_id", "simulator_name", "created_at", "metric_key", "metric_value", "parameter_key", "parameter_value"])
-    
+
     metrics = run.metrics or {}
     params = run.parameters or {}
     for mk, mv in metrics.items():
         writer.writerow([run.simulator_id, run.simulator_name, str(run.created_at), mk, mv, "", ""])
     for pk, pv in params.items():
         writer.writerow([run.simulator_id, run.simulator_name, str(run.created_at), "", "", pk, pv])
-    
+
     output.seek(0)
     return StreamingResponse(
         iter([output.getvalue()]),
@@ -49,7 +50,7 @@ async def export_run_html(run_id: UUID, db: AsyncSession = Depends(get_db_sessio
     run = result.scalar_one_or_none()
     if not run:
         raise HTTPException(404, f"Run {run_id} not found")
-    
+
     metrics_html = "".join([f'<div class="metric"><strong>{k}:</strong> {v}</div>' for k, v in (run.metrics or {}).items()])
     params_html = "".join([f'<li><strong>{k}:</strong> {v}</li>' for k, v in (run.parameters or {}).items()])
 
@@ -82,5 +83,5 @@ async def export_run_html(run_id: UUID, db: AsyncSession = Depends(get_db_sessio
         <button class="btn-print no-print" onclick="window.print()">🖨️ چاپ یا ذخیره به‌عنوان PDF</button>
     </body>
     </html>"""
-    
+
     return HTMLResponse(content=html_content)
