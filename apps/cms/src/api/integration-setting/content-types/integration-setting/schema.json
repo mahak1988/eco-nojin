@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "integration_settings",
+  "info": {
+    "singularName": "integration-setting",
+    "pluralName": "integration-settings",
+    "displayName": "Integration Setting",
+    "description": "Settings for connecting to other modules"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "module": {
+      "type": "enumeration",
+      "enum": [
+        "frontend",
+        "auth",
+        "ecommerce",
+        "payment",
+        "analytics",
+        "notifications"
+      ],
+      "required": true
+    },
+    "endpoint": {
+      "type": "string",
+      "required": true
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "apiKey": {
+      "type": "string"
+    },
+    "lastConnection": {
+      "type": "datetime"
+    },
+    "tenant": {
+      "type": "string"
+    }
+  }
+}

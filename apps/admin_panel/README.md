@@ -1,12 +1,13 @@
 # admin_panel | پنل مدیریت Econojin
 
 > **نکته:** این ماژول **پنل مدیریت** پلتفرم Econojin است.
-> شامل مدیریت تنظیمات سیستمی، مشاهده لاگ‌های حسابرسی، گزارش‌های سیستمی و داشبورد مدیریتی.
+> شامل مدیریت تنظیمات سیستمی، مشاهده لاگ‌های حسابرسی، گزارش‌های سیستمی، مدیریت کاربران،
+> پایش سلامت سیستم و داشبورد مدیریتی.
 > تمام endpointهای این ماژول **فقط برای superuser** قابل دسترسی هستند.
 
 ## مسئولیت‌ها
 
-این ماژول چهار وظیفه‌ی اصلی دارد:
+این ماژول هفت وظیفه‌ی اصلی دارد:
 
 1. **داشبورد مدیریت** (`GET /admin/`)
    - نمایش خلاصه‌ای از وضعیت سیستم (تعداد کاربران، تنظیمات، لاگ‌ها، گزارش‌ها)
@@ -17,10 +18,24 @@
 
 3. **مشاهده لاگ‌های حسابرسی** (`GET /admin/audit-logs`)
    - مشاهده رویدادهای ثبت‌شده در سیستم
-   - فیلتر بر اساس نوع رویداد (event_type)
+   - فیلتر بر اساس نوع رویداد (event_type)، ایمیل کاربر (actor_email)، بازه زمانی (date_from, date_to)
 
-4. **مشاهده گزارش‌های سیستمی** (`GET /admin/reports`)
+4. **مشاهده و تولید گزارش‌های سیستمی** (`GET /admin/reports`, `POST /admin/reports`)
    - مشاهده گزارش‌های تولیدشده توسط سیستم
+   - تولید گزارش جدید (CSV/JSON)
+
+5. **مدیریت کاربران** (`GET/PATCH/DELETE /admin/users`)
+   - لیست کاربران با جستجو و فیلتر (search, role, is_active, is_superuser)
+   - مشاهده جزئیات کاربر
+   - فعال/غیرفعال کردن کاربر
+   - تغییر نقش (superuser/user)
+   - حذف کاربر
+
+6. **پایش سلامت سیستم** (`GET /admin/health`)
+   - وضعیت دیتابیس و latency
+   - تعداد کاربران و کاربران فعال ۲۴ ساعت گذشته
+   - تعداد routeهای API
+   - محیط اجرا و نسخه پایتون
 
 ## ساختار
 
@@ -33,7 +48,10 @@ admin_panel/
 ├── repository.py              # ★ Repositoryهای تخصصی
 ├── frontend/                  # ★ فرانت‌اند پنل مدیریت (Vite + React)
 └── tests/                     # Pytest tests
-    └── test_router.py         #   تست روترها
+    ├── test_router.py         #   تست روترها (29 تست)
+    ├── test_service.py        #   تست سرویس
+    ├── test_schemas.py        #   تست اسکیماها
+    └── test_repository.py     #   تست ریپازیتوری
 ```
 
 ## Repositoryهای تخصصی (`repository.py`)
@@ -41,7 +59,7 @@ admin_panel/
 | Repository | مدل | توضیح |
 |------------|------|--------|
 | `AdminSettingRepository` | `AdminSetting` | جستجوی تنظیمات بر اساس کلید (`get_by_key`) |
-| `AuditLogRepository` | `AuditLog` | فیلتر لاگ‌ها بر اساس نوع رویداد (`filter_by_event_type`) |
+| `AuditLogRepository` | `AuditLog` | فیلتر لاگ‌ها بر اساس نوع رویداد (`filter_by_event_type`) و پارامترهای چندگانه (`filter_by_params`) |
 | `SystemReportRepository` | `SystemReport` | مدیریت گزارش‌های سیستمی (CRUD پایه) |
 
 ## Endpointهای API
@@ -53,8 +71,15 @@ admin_panel/
 | GET | `/admin/` | داشبورد مدیریت | superuser |
 | GET | `/admin/settings` | لیست تنظیمات سیستمی | superuser |
 | PUT | `/admin/settings/{key}` | بروزرسانی/ایجاد تنظیم | superuser |
-| GET | `/admin/audit-logs` | لاگ‌های حسابرسی | superuser |
-| GET | `/admin/reports` | گزارش‌های سیستمی | superuser |
+| GET | `/admin/audit-logs` | لاگ‌های حسابرسی (با فیلتر) | superuser |
+| GET | `/admin/reports` | لیست گزارش‌های سیستمی | superuser |
+| POST | `/admin/reports` | تولید گزارش جدید | superuser |
+| GET | `/admin/users` | لیست کاربران (با جستجو و فیلتر) | superuser |
+| GET | `/admin/users/{id}` | جزئیات کاربر | superuser |
+| PATCH | `/admin/users/{id}/status` | فعال/غیرفعال کردن کاربر | superuser |
+| PATCH | `/admin/users/{id}/role` | تغییر نقش کاربر | superuser |
+| DELETE | `/admin/users/{id}` | حذف کاربر | superuser |
+| GET | `/admin/health` | پایش سلامت سیستم | superuser |
 
 ### 1. داشبورد مدیریت
 
@@ -62,7 +87,9 @@ admin_panel/
 // GET /admin/
 // Response 200
 {
-    "total_users": 42,
+    "user_count": 42,
+    "active_user_count": 38,
+    "superuser_count": 3,
     "total_settings": 15,
     "total_audit_logs": 1280,
     "total_reports": 7
@@ -104,18 +131,18 @@ admin_panel/
 }
 ```
 
-### 3. لاگ‌های حسابرسی
+### 3. لاگ‌های حسابرسی (پیشرفته)
 
 ```json
-// GET /admin/audit-logs?event_type=login&limit=10
+// GET /admin/audit-logs?event_type=login&actor_email=admin@example.com&date_from=2025-01-01T00:00:00Z&limit=10
 // Response 200
 [
     {
         "id": 100,
-        "actor": "user@example.com",
+        "actor_id": 1,
+        "actor_email": "admin@example.com",
         "event_type": "login",
-        "description": "ورود کاربر به سیستم",
-        "ip_address": "192.168.1.1",
+        "event_data": "{\"ip\": \"192.168.1.1\"}",
         "created_at": "2025-01-15T10:30:00Z"
     }
 ]
@@ -129,13 +156,80 @@ admin_panel/
 [
     {
         "id": 1,
-        "title": "گزارش عملکرد هفتگی",
-        "report_type": "performance",
+        "report_name": "Weekly Performance",
         "status": "completed",
-        "payload": {},
-        "created_at": "2025-01-15T10:00:00Z"
+        "report_data": "{\"avg_response\": 120}",
+        "created_at": "2025-01-15T10:00:00Z",
+        "completed_at": "2025-01-15T10:05:00Z"
     }
 ]
+
+// POST /admin/reports
+// Request
+{
+    "report_name": "Monthly Summary",
+    "report_type": "csv"
+}
+// Response 201
+{
+    "id": 2,
+    "report_name": "Monthly Summary",
+    "status": "completed",
+    "message": "Report 'Monthly Summary' generated successfully."
+}
+```
+
+### 5. مدیریت کاربران
+
+```json
+// GET /admin/users?search=ali&role=farmer&is_active=true&limit=20
+// Response 200
+[
+    {
+        "id": 1,
+        "email": "ali@example.com",
+        "full_name": "علی محمدی",
+        "phone": "+989123456789",
+        "organization": "مزرعه نمونه",
+        "role": "farmer",
+        "is_active": true,
+        "is_superuser": false,
+        "created_at": "2025-01-15T10:00:00Z",
+        "updated_at": "2025-01-15T10:00:00Z"
+    }
+]
+
+// PATCH /admin/users/1/status
+// Request
+{"is_active": false}
+// Response 200 (کاربر غیرفعال شد)
+
+// PATCH /admin/users/1/role
+// Request
+{"is_superuser": true}
+// Response 200 (کاربر به superuser ارتقا یافت)
+
+// DELETE /admin/users/1
+// Response 204 (کاربر حذف شد)
+```
+
+### 6. پایش سلامت سیستم
+
+```json
+// GET /admin/health
+// Response 200
+{
+    "database": "healthy",
+    "database_latency_ms": 1.23,
+    "redis": "not_configured",
+    "redis_latency_ms": null,
+    "uptime_seconds": 3600.5,
+    "total_users": 42,
+    "active_users_last_24h": 5,
+    "total_api_routes": 15,
+    "environment": "local",
+    "python_version": "3.12"
+}
 ```
 
 ## مدل‌های داده
@@ -155,21 +249,21 @@ admin_panel/
 | فیلد | نوع | توضیح |
 |------|------|--------|
 | `id` | int | شناسه یکتا |
-| `actor` | str | عامل رویداد (ایمیل کاربر) |
+| `actor_id` | int | شناسه کاربر عامل رویداد |
+| `actor_email` | str | ایمیل کاربر عامل رویداد |
 | `event_type` | str | نوع رویداد (login, logout, setting_change, ...) |
-| `description` | str | توضیحات رویداد |
-| `ip_address` | str | آدرس IP |
+| `event_data` | str | داده‌های رویداد (JSON) |
 | `created_at` | datetime | تاریخ رویداد |
 
 ### SystemReport
 | فیلد | نوع | توضیح |
 |------|------|--------|
 | `id` | int | شناسه یکتا |
-| `title` | str | عنوان گزارش |
-| `report_type` | str | نوع گزارش (performance, error, usage, ...) |
+| `report_name` | str | عنوان گزارش |
 | `status` | str | وضعیت (pending, running, completed, failed) |
-| `payload` | dict | محتوای گزارش |
+| `report_data` | str | محتوای گزارش |
 | `created_at` | datetime | تاریخ ایجاد |
+| `completed_at` | datetime | تاریخ تکمیل |
 
 ## نمونه درخواست با curl
 
@@ -192,33 +286,42 @@ curl -X PUT http://localhost:8000/admin/settings/site_name \
   -H "Content-Type: application/json" \
   -d '{"value": "Econojin Platform", "description": "Official name", "is_active": true}'
 
-# لاگ‌ها
+# لاگ‌ها با فیلتر
 curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/audit-logs?event_type=login&limit=50"
 
 # گزارش‌ها
 curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/reports?limit=10"
-```
 
-## استفاده در کد پایتون
+# تولید گزارش
+curl -X POST http://localhost:8000/admin/reports \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"report_name": "Monthly Summary", "report_type": "csv"}'
 
-```python
-import httpx
+# لیست کاربران
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/users?search=ali&is_active=true"
 
-# احراز هویت superuser
-response = httpx.post("http://localhost:8000/api/v1/auth/login",
-    json={"email": "admin@econojin.com", "password": "*****"})
-token = response.json()["access_token"]
-headers = {"Authorization": f"Bearer {token}"}
+# جزئیات کاربر
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/users/1"
 
-# دریافت داشبورد
-dashboard = httpx.get("http://localhost:8000/admin/", headers=headers).json()
-print(f"کاربران: {dashboard['total_users']}")
-print(f"تنظیمات: {dashboard['total_settings']}")
+# فعال/غیرفعال کردن کاربر
+curl -X PATCH http://localhost:8000/admin/users/2/status \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"is_active": false}'
 
-# بروزرسانی تنظیم
-httpx.put("http://localhost:8000/admin/settings/site_name",
-    headers=headers,
-    json={"value": "New Site Name"})
+# تغییر نقش کاربر
+curl -X PATCH http://localhost:8000/admin/users/2/role \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"is_superuser": true}'
+
+# حذف کاربر
+curl -X DELETE http://localhost:8000/admin/users/3 \
+  -H "Authorization: Bearer $TOKEN"
+
+# سلامت سیستم
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:8000/admin/health"
 ```
 
 ## توسعه و تست
@@ -229,6 +332,9 @@ cd d:\econojin.com
 
 # اجرای تست‌ها
 pytest apps/admin_panel/tests/ -v
+
+# اجرای تست‌های روتر (29 تست)
+pytest apps/admin_panel/tests/test_router.py -v
 
 # اجرای سرور توسعه
 python apps/main.py
@@ -250,3 +356,7 @@ FIRST_SUPERUSER_PASSWORD=changethis    # در production تغییر دهید
 - **فاز ۲:** پیاده‌سازی repositoryهای تخصصی برای AdminSetting, AuditLog, SystemReport
 - **فاز ۲:** اعمال محدودیت دسترسی superuser برای تمام endpointها
 - **فاز ۲:** Validation سمت سرور برای بروزرسانی تنظیمات
+- **فاز ۱ (تکمیل):** افزودن ۷ endpoint جدید (مدیریت کاربران، سلامت سیستم، تولید گزارش)
+- **فاز ۱ (تکمیل):** فیلتر پیشرفته لاگ‌ها (event_type, actor_email, date_from, date_to)
+- **فاز ۱ (تکمیل):** ۲۹ تست واقعی با پوشش کامل endpointها
+- **فاز ۱ (تکمیل):** جلوگیری از حذف/غیرفعال کردن خود توسط superuser

@@ -1,0 +1,698 @@
+{
+  "tool": {
+    "name": "Secure Project Analyzer",
+    "version": "1.1.0"
+  },
+  "generated_at": "2026-07-25T04:34:18+00:00",
+  "duration_seconds": 5.23,
+  "project": {
+    "name": "econojin.com",
+    "path": "D:\\econojin.com",
+    "git": {
+      "available": true,
+      "branch": "main",
+      "head": "6fa0b84",
+      "last_commit_date": "2026-07-25T07:53:33+03:30",
+      "last_commit_author": "narvan2050",
+      "dirty_files": 4
+    }
+  },
+  "options": {
+    "max_file_mb": 2.0,
+    "max_depth": 12,
+    "excludes": [
+      ".pnpm-store/*",
+      "node_modules/*",
+      "reports/*",
+      ".security_backup/*",
+      "project-analysis.*",
+      "*/tests/*",
+      "*/test_*"
+    ],
+    "network": false,
+    "fail_on": "critical,high"
+  },
+  "summary": {
+    "files": 1301,
+    "text_files": 1282,
+    "binary_files": 18,
+    "skipped_large_files": 1,
+    "skipped_generated_files": 6,
+    "symlinks_skipped": 0,
+    "total_bytes": 15320138,
+    "total_lines": 233596,
+    "languages": {
+      "TypeScript": {
+        "files": 418,
+        "lines": 46898
+      },
+      "Python": {
+        "files": 299,
+        "lines": 33779
+      },
+      "HTML": {
+        "files": 5,
+        "lines": 472
+      },
+      "CSS": {
+        "files": 4,
+        "lines": 386
+      },
+      "SQL": {
+        "files": 5,
+        "lines": 342
+      },
+      "JavaScript": {
+        "files": 9,
+        "lines": 176
+      },
+      "PowerShell": {
+        "files": 1,
+        "lines": 20
+      },
+      "Shell": {
+        "files": 2,
+        "lines": 18
+      }
+    },
+    "top_extensions": [
+      [
+        ".json",
+        339
+      ],
+      [
+        ".py",
+        299
+      ],
+      [
+        ".ts",
+        210
+      ],
+      [
+        ".tsx",
+        208
+      ],
+      [
+        ".md",
+        95
+      ],
+      [
+        ".yml",
+        30
+      ],
+      [
+        ".log",
+        19
+      ],
+      [
+        ".zst",
+        14
+      ],
+      [
+        ".js",
+        9
+      ],
+      [
+        "(بدون پسوند)",
+        8
+      ]
+    ],
+    "complex_files": [
+      {
+        "path": "analyze_ecocoin_v2.py",
+        "lines": 1090,
+        "complexity": 161,
+        "functions": 32
+      },
+      {
+        "path": "apps/shared_ai/ai/tools/code_tools.py",
+        "lines": 701,
+        "complexity": 134,
+        "functions": 13
+      },
+      {
+        "path": "apps/shared_ai/ai/tools/data_tools.py",
+        "lines": 552,
+        "complexity": 89,
+        "functions": 8
+      },
+      {
+        "path": "apps/simulation/scenario/router.py",
+        "lines": 498,
+        "complexity": 52,
+        "functions": 12
+      },
+      {
+        "path": "sync_repo.py",
+        "lines": 468,
+        "complexity": 50,
+        "functions": 17
+      },
+      {
+        "path": "secure_fix.py",
+        "lines": 301,
+        "complexity": 49,
+        "functions": 13
+      },
+      {
+        "path": "apps/simulation/validation/engine.py",
+        "lines": 163,
+        "complexity": 47,
+        "functions": 9
+      },
+      {
+        "path": "apps/shared_ai/ai/rag/vector_store.py",
+        "lines": 334,
+        "complexity": 42,
+        "functions": 9
+      }
+    ],
+    "findings_total": 16,
+    "findings_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 11,
+      "info": 5
+    },
+    "security_score": 78,
+    "grade": "B"
+  },
+  "findings": [
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "docker-compose.apps.yml",
+      "line": 56,
+      "snippet": "FRONTEND_HOST: http://web:5173",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infra/nginx/default.conf",
+      "line": 38,
+      "snippet": "proxy_pass http://api:8000;",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/docker-compose.yml",
+      "line": 43,
+      "snippet": "STUDIO_PG_META_URL: http://postgres:5432",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/nginx/nginx.conf",
+      "line": 77,
+      "snippet": "proxy_pass http://api_backend;",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/nginx/nginx.conf",
+      "line": 101,
+      "snippet": "proxy_pass http://api_backend;",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/nginx/nginx.conf",
+      "line": 114,
+      "snippet": "proxy_pass http://api_backend/health;",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/nginx/nginx.conf",
+      "line": 120,
+      "snippet": "proxy_pass http://api_backend;",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/security/cloudflared/config.yml",
+      "line": 6,
+      "snippet": "service: http://web:3000",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/security/cloudflared/config.yml",
+      "line": 8,
+      "snippet": "service: http://admin:3002",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/security/cloudflared/config.yml",
+      "line": 10,
+      "snippet": "service: http://supabase-studio:3000",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "low",
+      "category": "transport",
+      "title": "URL ناامن HTTP",
+      "file": "infrastructure/security/cloudflared/config.yml",
+      "line": 12,
+      "snippet": "service: http://n8n:5678",
+      "cwe": "CWE-319"
+    },
+    {
+      "severity": "info",
+      "category": "config",
+      "title": "این فایل پایتون قابل پارس نیست (خطای نحوی)",
+      "file": "data/offline_content/offline_package.py",
+      "line": 0,
+      "snippet": "",
+      "cwe": ""
+    },
+    {
+      "severity": "info",
+      "category": "config",
+      "title": "این فایل پایتون قابل پارس نیست (خطای نحوی)",
+      "file": "merge_branches.py",
+      "line": 0,
+      "snippet": "",
+      "cwe": ""
+    },
+    {
+      "severity": "info",
+      "category": "config",
+      "title": "این فایل پایتون قابل پارس نیست (خطای نحوی)",
+      "file": "packages/ui/src/components/config.py",
+      "line": 0,
+      "snippet": "",
+      "cwe": ""
+    },
+    {
+      "severity": "info",
+      "category": "config",
+      "title": "این فایل پایتون قابل پارس نیست (خطای نحوی)",
+      "file": "scripts/run_econojin.py",
+      "line": 0,
+      "snippet": "",
+      "cwe": ""
+    },
+    {
+      "severity": "info",
+      "category": "config",
+      "title": "این فایل پایتون قابل پارس نیست (خطای نحوی)",
+      "file": "staged_scan.py",
+      "line": 0,
+      "snippet": "",
+      "cwe": ""
+    }
+  ],
+  "dependencies": {
+    "manifests": [
+      "package.json",
+      "pyproject.toml",
+      "packages/ui/package.json",
+      "packages/types/package.json",
+      "packages/lib/package.json",
+      "packages/hooks/package.json",
+      "packages/features/package.json",
+      "packages/config-typescript/package.json",
+      "packages/config-eslint/package.json",
+      "packages/api-client/package.json",
+      "contracts/package.json",
+      "apps/web/package.json",
+      "apps/library/package.json",
+      "apps/cms/package.json",
+      "apps/ai_agents/frontend/package.json",
+      "apps/admin_panel/frontend/package.json",
+      "agents/requirements.txt"
+    ],
+    "packages_total": 57,
+    "packages": [
+      {
+        "name": "@econojin/features",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@econojin/hooks",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@econojin/lib",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@econojin/types",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@econojin/ui",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@nomicfoundation/hardhat-chai-matchers",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "@nomicfoundation/hardhat-toolbox",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "@openzeppelin/contracts",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "@radix-ui/react-label",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "@radix-ui/react-progress",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "@radix-ui/react-select",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "@radix-ui/react-slot",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "@strapi/strapi",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/cms/package.json"
+      },
+      {
+        "name": "@tanstack/react-query",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/lib/package.json"
+      },
+      {
+        "name": "@types/jest",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@types/node",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/lib/package.json"
+      },
+      {
+        "name": "@types/react",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "@types/react-dom",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "@vitejs/plugin-react",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "autoprefixer",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "axios",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/lib/package.json"
+      },
+      {
+        "name": "class-variance-authority",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "clsx",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "dotenv",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "eslint",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "hardhat",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "hardhat-gas-reporter",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "i18next",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "i18next-browser-languagedetector",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "langchain",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "langchain-community",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "langchain-openai",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "langgraph",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "lucide-react",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "onnx",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "onnxruntime",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "postcss",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "pydantic",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "qdrant-client",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "react",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "react-dom",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "react-hot-toast",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/lib/package.json"
+      },
+      {
+        "name": "react-i18next",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "react-router-dom",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "recharts",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/admin_panel/frontend/package.json"
+      },
+      {
+        "name": "redis",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "sentence-transformers",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "solidity-coverage",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "structlog",
+        "version": null,
+        "ecosystem": "PyPI",
+        "source": "agents/requirements.txt"
+      },
+      {
+        "name": "styled-components",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/cms/package.json"
+      },
+      {
+        "name": "tailwind-merge",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "tailwindcss",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "ts-node",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "contracts/package.json"
+      },
+      {
+        "name": "turbo",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "package.json"
+      },
+      {
+        "name": "typescript",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/ui/package.json"
+      },
+      {
+        "name": "vite",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "apps/web/package.json"
+      },
+      {
+        "name": "zod",
+        "version": null,
+        "ecosystem": "npm",
+        "source": "packages/lib/package.json"
+      }
+    ],
+    "vulnerabilities": [],
+    "network_used": false,
+    "notes": [
+      "پرس‌وجوی آسیب‌پذیری غیرفعال بود (--no-network)"
+    ]
+  }
+}
