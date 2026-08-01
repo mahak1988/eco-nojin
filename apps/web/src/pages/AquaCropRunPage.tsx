@@ -33,6 +33,7 @@ export default function AquaCropRunPage() {
   const [oat, setOat] = useState<{ feature: string; abs_delta: number }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [doOat, setDoOat] = useState(true);
   const [crop, setCrop] = useState<string>("wheat");
   const [params, setParams] = useState({
     days: 90,
@@ -56,25 +57,28 @@ export default function AquaCropRunPage() {
     setLoading(true);
     setError(null);
     setOat([]);
+    setResult(null); // clear so charts remount with new data
     try {
       const data = await runOnce(params, crop);
       setResult(data);
-      const keys = ["et0_mm_day", "rain_mm_day", "kc", "taw_mm", "ky"] as const;
-      const rows: { feature: string; abs_delta: number }[] = [];
-      for (const k of keys) {
-        const lo = { ...params, [k]: (params[k] as number) * 0.9 };
-        const hi = { ...params, [k]: (params[k] as number) * 1.1 };
-        try {
-          const a = await runOnce(lo, crop);
-          const b = await runOnce(hi, crop);
-          const dy = Number(b.yield_relative || 0) - Number(a.yield_relative || 0);
-          rows.push({ feature: k, abs_delta: Math.abs(dy) });
-        } catch {
-          rows.push({ feature: k, abs_delta: 0 });
+      if (doOat) {
+        const keys = ["et0_mm_day", "rain_mm_day", "kc", "taw_mm", "ky"] as const;
+        const rows: { feature: string; abs_delta: number }[] = [];
+        for (const k of keys) {
+          const lo = { ...params, [k]: (params[k] as number) * 0.85 };
+          const hi = { ...params, [k]: (params[k] as number) * 1.15 };
+          try {
+            const a = await runOnce(lo, crop);
+            const b = await runOnce(hi, crop);
+            const dy = Number(b.yield_relative || 0) - Number(a.yield_relative || 0);
+            rows.push({ feature: k, abs_delta: Math.abs(dy) });
+          } catch {
+            rows.push({ feature: k, abs_delta: 0 });
+          }
         }
+        rows.sort((x, y) => y.abs_delta - x.abs_delta);
+        setOat(rows);
       }
-      rows.sort((x, y) => y.abs_delta - x.abs_delta);
-      setOat(rows);
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : "run_failed");
@@ -84,9 +88,16 @@ export default function AquaCropRunPage() {
   }
 
   const sample =
-    (result?.series_sample as { depletion_mm?: number; ks?: number }[]) || [];
+    (result?.series_sample as {
+      depletion_mm?: number;
+      ks?: number;
+      et0_mm?: number;
+      irr_mm?: number;
+    }[]) || [];
   const engine = String(result?.engine || "conceptual") as EngineKind;
   const disclaimer = String(result?.disclaimer_fa || result?.disclaimer || "");
+  const runId = String(result?.completed_at || "");
+  const echo = (result?.params_echo as Record<string, unknown> | undefined) || {};
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-5 sm:p-8">
@@ -94,7 +105,7 @@ export default function AquaCropRunPage() {
         <div>
           <h1 className="font-display text-3xl text-stone-800">AquaCrop · Science</h1>
           <p className="mt-1 text-sm text-stone-600">
-            POST /api/v1/science/aquacrop-advanced · OAT روی yield_relative
+            POST /api/v1/science/aquacrop-advanced · بیلان روزانه + FAO Ky
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-emerald-700">
@@ -107,7 +118,9 @@ export default function AquaCropRunPage() {
       <div className="flex gap-2 rounded-xl border border-sky-100 bg-sky-50/60 px-3 py-2 text-xs text-sky-900">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         <span>
-          مدل فرآیندی باز (FAO concepts). باینری رسمی FAO نیست. برای پشتیبانی تصمیم.
+          پس از تغییر اعداد، دکمه <strong>Run</strong> را بزنید. نمودار و متریک‌ها فقط با اجرای جدید به‌روز
+          می‌شوند. برای دیدن تغییر واضح: <code className="rounded bg-white px-1">et0</code> را به ۸ یا{" "}
+          <code className="rounded bg-white px-1">rain</code> را به ۲ تغییر دهید.
         </span>
       </div>
 
@@ -140,13 +153,17 @@ export default function AquaCropRunPage() {
             </label>
           ))}
         </div>
+        <label className="flex items-center gap-2 text-xs font-medium text-stone-600">
+          <input type="checkbox" checked={doOat} onChange={(e) => setDoOat(e.target.checked)} />
+          OAT حساسیت (±15٪ روی پارامترها) — کمی کندتر
+        </label>
         <button
           type="submit"
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-60"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-          Run + OAT
+          {doOat ? "Run + OAT" : "Run"}
         </button>
       </form>
 
@@ -154,40 +171,31 @@ export default function AquaCropRunPage() {
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/50 py-10 text-center">
           <AlertCircle className="h-10 w-10 text-rose-500" />
           <p className="font-medium text-rose-800">{error}</p>
-          <button
-            type="button"
-            onClick={() => {
-              const fake = { preventDefault() {} } as FormEvent;
-              void run(fake);
-            }}
-            className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white"
-          >
-            Retry
-          </button>
         </div>
       )}
 
       {result && !error && (
-        <div className="space-y-4">
+        <div className="space-y-4" key={runId}>
           <div className="flex flex-wrap items-center gap-2">
             <EngineBadge engine={engine} />
             {result.engine_version != null && (
               <span className="text-[11px] font-mono text-stone-500">v{String(result.engine_version)}</span>
             )}
-            {result.ndvi_calibrated === true && (
-              <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-bold text-violet-800 ring-1 ring-violet-200">
-                NDVI canopy
-              </span>
-            )}
           </div>
-          {disclaimer && (
-            <p className="text-xs leading-relaxed text-stone-500">{disclaimer}</p>
+          {disclaimer && <p className="text-xs leading-relaxed text-stone-500">{disclaimer}</p>}
+
+          {Object.keys(echo).length > 0 && (
+            <p className="rounded-lg bg-stone-50 px-3 py-2 font-mono text-[11px] text-stone-600">
+              params: et0={String(echo.et0_mm_day)} kc={String(echo.kc)} rain={String(echo.rain_mm_day)}{" "}
+              taw={String(echo.taw_mm)} ky={String(echo.ky)} crop={String(echo.crop)}
+            </p>
           )}
+
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               icon={<Play className="h-4 w-4" />}
               label="Yield rel"
-              value={`${(Number(result.yield_relative || 0) * 100).toFixed(0)}%`}
+              value={`${(Number(result.yield_relative || 0) * 100).toFixed(1)}%`}
               tone="emerald"
             />
             <MetricCard
@@ -209,25 +217,55 @@ export default function AquaCropRunPage() {
               tone="violet"
             />
           </div>
+
           {sample.length > 0 && (
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl border p-3">
-                <p className="mb-1 text-xs font-semibold">Depletion</p>
-                <LineChart values={sample.map((x) => Number(x.depletion_mm || 0))} color="#059669" />
+                <p className="mb-1 text-xs font-semibold">Depletion (mm)</p>
+                <LineChart
+                  key={`dep-${runId}`}
+                  values={sample.map((x) => Number(x.depletion_mm || 0))}
+                  color="#059669"
+                />
               </div>
               <div className="rounded-xl border p-3">
-                <p className="mb-1 text-xs font-semibold">Ks</p>
-                <LineChart values={sample.map((x) => Number(x.ks || 0))} color="#7c3aed" />
+                <p className="mb-1 text-xs font-semibold">Ks stress</p>
+                <LineChart
+                  key={`ks-${runId}`}
+                  values={sample.map((x) => Number(x.ks || 0))}
+                  color="#7c3aed"
+                />
+              </div>
+              <div className="rounded-xl border p-3">
+                <p className="mb-1 text-xs font-semibold">Daily ET0 (mm)</p>
+                <LineChart
+                  key={`et0-${runId}`}
+                  values={sample.map((x) => Number(x.et0_mm || 0))}
+                  color="#ea580c"
+                />
+              </div>
+              <div className="rounded-xl border p-3">
+                <p className="mb-1 text-xs font-semibold">Irrigation pulses (mm)</p>
+                <LineChart
+                  key={`irr-${runId}`}
+                  values={sample.map((x) => Number(x.irr_mm || 0))}
+                  color="#0284c7"
+                />
               </div>
             </div>
           )}
+
           {oat.length > 0 && (
             <div className="rounded-xl border border-cyan-200 bg-cyan-50/50 p-4">
               <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold">
-                <SlidersHorizontal className="h-4 w-4" /> OAT |Δ yield|
+                <SlidersHorizontal className="h-4 w-4" /> OAT |Δ yield_relative|
               </h3>
               <BarChart
-                items={oat.map((r) => ({ label: r.feature, value: r.abs_delta * 100, color: "#0891b2" }))}
+                items={oat.map((r) => ({
+                  label: r.feature,
+                  value: r.abs_delta * 100,
+                  color: "#0891b2",
+                }))}
               />
             </div>
           )}
