@@ -1,6 +1,6 @@
 """Science API — process models + soil + global SA + final reports.
 
-Public compute: aquacrop-advanced, rothc, status, formulas, crop-library.
+Public compute: aquacrop-advanced, rothc, coupled-run, maturity, crop-library.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def _perm(code: str):
 def _safe_float(v: Any, default: float) -> float:
     try:
         x = float(v)
-        if x != x:  # NaN
+        if x != x:
             return default
         return x
     except (TypeError, ValueError):
@@ -49,8 +49,6 @@ def _safe_int(v: Any, default: int, lo: int, hi: int) -> int:
 
 
 class AquaBody(BaseModel):
-    """Loose schema: coerce/clamp instead of 422 on minor type issues."""
-
     model_config = ConfigDict(extra="ignore")
 
     area_ha: float = 1.0
@@ -69,11 +67,15 @@ class AquaBody(BaseModel):
     farm_id: Optional[int] = None
     persist: bool = False
     crop: str = "wheat"
+    soc_t_ha: float = 40.0
+    c_input_t_ha_y: float = 1.5
+    clay_pct: float = 25.0
+    rothc_years: int = 10
 
-    @field_validator("days", mode="before")
+    @field_validator("days", "rothc_years", mode="before")
     @classmethod
     def _days(cls, v: Any) -> int:
-        return _safe_int(v, 90, 7, 365)
+        return _safe_int(v, 90, 1, 365)
 
     @field_validator(
         "area_ha",
@@ -84,6 +86,9 @@ class AquaBody(BaseModel):
         "ky",
         "y_potential_t_ha",
         "irrig_threshold_frac",
+        "soc_t_ha",
+        "c_input_t_ha_y",
+        "clay_pct",
         mode="before",
     )
     @classmethod
@@ -141,23 +146,38 @@ async def science_status() -> dict[str, Any]:
             db_kind = "sqlite"
     except Exception:
         pass
+    from apps.simulation.science_maturity import science_maturity_report
+
+    mat = science_maturity_report()
     return {
         "phase": 3,
-        "wave": 2,
+        "wave": 3,
         "router": "apps.api.routes.science",
         "database": db_kind,
         "models": [
             "aquacrop_advanced",
-            "swat_plus_proxy",
             "rothc",
+            "coupled_science",
             "ndvi_canopy",
+            "swat_plus_proxy",
             "rusle2_proxy",
             "soil_profile",
+            "ml",
         ],
         "ok": True,
-        "auth": "aquacrop-advanced and rothc are public compute endpoints",
+        "auth": "public: aquacrop-advanced, rothc, coupled-run, maturity, crop-library",
         "crop_library": "/api/v1/science/crop-library",
+        "coupled_run": "/api/v1/science/coupled-run",
+        "maturity": "/api/v1/science/maturity",
+        "overall_score_pct": mat.get("overall_score_pct"),
     }
+
+
+@router.get("/maturity")
+async def science_maturity() -> dict[str, Any]:
+    from apps.simulation.science_maturity import science_maturity_report
+
+    return science_maturity_report()
 
 
 @router.get("/crop-library")
@@ -170,6 +190,26 @@ async def crop_library() -> dict[str, Any]:
         "note_fa": "مقادیر پیش‌فرض آفلاین برای پشتیبانی تصمیم؛ با داده محلی کالیبره کنید.",
         "crops": list_crops(),
     }
+
+
+@router.post("/coupled-run")
+async def coupled_run(request: Request) -> dict[str, Any]:
+    """AquaCrop + RothC + WUE/risks advisory in one payload (public)."""
+    from apps.simulation.science_coupling import run_coupled_science
+
+    try:
+        raw_body = await request.json()
+    except Exception:
+        raw_body = {}
+    if not isinstance(raw_body, dict):
+        raw_body = {}
+    try:
+        body = AquaBody.model_validate(raw_body)
+        params = body.model_dump()
+    except Exception:
+        params = dict(raw_body)
+    params["days"] = _safe_int(params.get("days"), 90, 7, 365)
+    return run_coupled_science(params)
 
 
 @router.post("/swat")
@@ -203,7 +243,6 @@ async def aquacrop_run(
     request: Request,
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
-    """Public conceptual AquaCrop — accepts loose JSON; clamps invalid numbers."""
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
     from apps.simulation.report_builder import report_aquacrop
 
@@ -220,7 +259,6 @@ async def aquacrop_run(
         body = AquaBody()
 
     params = body.model_dump()
-    # clamp sensible ranges after coerce
     params["days"] = _safe_int(params.get("days"), 90, 7, 365)
     params["area_ha"] = max(0.01, _safe_float(params.get("area_ha"), 1.0))
     params["et0_mm_day"] = max(0.1, _safe_float(params.get("et0_mm_day"), 4.5))
@@ -234,6 +272,8 @@ async def aquacrop_run(
     farm_id = params.pop("farm_id", None)
     use_ndvi = bool(params.pop("use_ndvi_canopy", False))
     lat, lon = params.pop("lat", None), params.pop("lon", None)
+    for k in ("soc_t_ha", "c_input_t_ha_y", "clay_pct", "rothc_years"):
+        params.pop(k, None)
     ndvi_meta = None
     if use_ndvi and lat is not None and lon is not None and not params.get("canopy_cover"):
         try:
@@ -431,8 +471,7 @@ async def formulas_catalog() -> dict[str, Any]:
             {
                 "id": "scs_cn",
                 "title_fa": "رواناب SCS-CN",
-                "title_en": "SCS Curve Number runoff",
-                "formulas": ["S = 25.4 × (1000/CN − 10)", "Q = (P − 0.2S)² / (P + 0.8S)  if P > 0.2S"],
+                "formulas": ["S = 25.4 × (1000/CN − 10)", "Q = (P − 0.2S)² / (P + 0.8S)"],
             },
             {
                 "id": "aquacrop_ky",
@@ -446,9 +485,9 @@ async def formulas_catalog() -> dict[str, Any]:
                 "formulas": ["a(T)·b(θ)·c(cover)", "DPM/RPM/BIO/HUM/IOM"],
             },
             {
-                "id": "rusle",
-                "title_fa": "فرسایش RUSLE",
-                "formulas": ["A = R · K · LS · C · P"],
+                "id": "coupled",
+                "title_fa": "اجرای جفت‌شده آب-محصول + کربن خاک",
+                "endpoint": "/api/v1/science/coupled-run",
             },
             {
                 "id": "ndvi",
