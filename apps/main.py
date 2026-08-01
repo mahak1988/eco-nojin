@@ -21,8 +21,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from security.middleware.security_middleware import SecurityMiddleware
-from apps.shared_core.middleware.request_id import RequestIDMiddleware
+# Import the integrated security components
+from apps.shared_core.security_init import initialize_security, apply_response_security_headers, authenticate_request
+from apps.shared_core.config import settings
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,8 +32,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("econojin")
 
-from apps.shared_core.config import settings
-
+# Global variables for status tracking
 _db_status = {"ok": False, "detail": "not_initialized"}
 _OPTIONAL_MODULE_HINTS = ("numba", "psycopg2", "langchain")
 _loaded_routers: list[str] = []
@@ -115,44 +115,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# --- Phase 1 security middleware (order: last added = outermost on request) ---
-app.add_middleware(SecurityMiddleware)
-app.add_middleware(RequestIDMiddleware)
-_security_stack.extend(["SecurityMiddleware", "RequestIDMiddleware"])
-
-if settings.ENABLE_RATE_LIMIT:
-    try:
-        from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
-
-        app.add_middleware(RateLimitMiddleware)
-        _security_stack.append("RateLimitMiddleware")
-        logger.info("RateLimitMiddleware enabled")
-    except Exception as e:
-        logger.warning("RateLimitMiddleware failed: %s", e)
-
-if settings.ENABLE_AUDIT_LOG:
-    try:
-        from apps.shared_core.middleware.audit_log import AuditLogMiddleware
-
-        app.add_middleware(AuditLogMiddleware)
-        _security_stack.append("AuditLogMiddleware")
-        logger.info("AuditLogMiddleware enabled")
-    except Exception as e:
-        logger.warning("AuditLogMiddleware failed: %s", e)
-
-if settings.ENABLE_SPIDERGUARD or settings.ENVIRONMENT == "production":
-    try:
-        from apps.spider_security.middleware import SpiderGuardMiddleware
-
-        app.add_middleware(
-            SpiderGuardMiddleware,
-            max_requests=settings.SPIDERGUARD_MAX_REQUESTS,
-            window_seconds=settings.SPIDERGUARD_WINDOW_SECONDS,
-        )
-        _security_stack.append("SpiderGuardMiddleware")
-        logger.info("SpiderGuardMiddleware enabled")
-    except Exception as e:
-        logger.warning("SpiderGuardMiddleware failed: %s", e)
+# Initialize security components from both main apps and eco-nojin patterns
+_security_stack.extend(initialize_security(app))
 
 _cors_origins = list(settings.all_cors_origins)
 for extra in (
@@ -185,10 +149,21 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next: Any) -> Any:
+async def security_middleware(request: Request, call_next):
+    """Enhanced security middleware with Zero Trust authentication"""
+    # Apply Zero Trust authentication
+    if not authenticate_request(request):
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail": "Authentication required"}
+        )
+    
     start_time = time.time()
     response = await call_next(request)
     response.headers["X-Process-Time"] = f"{time.time() - start_time:.4f}"
+    
+    # Apply security headers to response
+    apply_response_security_headers(response.headers)
     return response
 
 

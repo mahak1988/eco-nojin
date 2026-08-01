@@ -59,7 +59,7 @@ class ScenarioBody(BaseModel):
     scenarios: Optional[list[dict[str, Any]]] = None
 
 
-@router.get("/status")
+@router.get("/status", operation_id="phase3_science_status")
 async def science_status() -> dict[str, Any]:
     gee_ok = False
     gee_detail = "not_configured"
@@ -105,7 +105,7 @@ async def science_status() -> dict[str, Any]:
     }
 
 
-@router.post("/swat")
+@router.post("/swat", operation_id="phase3_swat_run")
 async def swat_run(
     body: SwatBody,
     session: AsyncSession = Depends(get_db_session),
@@ -135,7 +135,7 @@ async def swat_run(
     return result
 
 
-@router.post("/aquacrop-advanced")
+@router.post("/aquacrop-advanced", operation_id="phase3_aquacrop_adv")
 async def aquacrop_adv(
     body: AquaAdvBody,
     session: AsyncSession = Depends(get_db_session),
@@ -215,7 +215,7 @@ async def aquacrop_adv(
     return result
 
 
-@router.get("/ndvi-canopy")
+@router.get("/ndvi-canopy", operation_id="phase3_ndvi_canopy")
 async def ndvi_canopy(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
@@ -224,7 +224,7 @@ async def ndvi_canopy(
     return await fetch_ndvi_canopy_async(lat, lon, days)
 
 
-@router.get("/runs")
+@router.get("/runs", operation_id="phase3_runs_list")
 async def runs_list(
     model: Optional[str] = None,
     farm_id: Optional[int] = None,
@@ -235,7 +235,7 @@ async def runs_list(
     return {"data": [run_to_dict(r) for r in rows], "count": len(rows)}
 
 
-@router.get("/runs/{run_id}")
+@router.get("/runs/{run_id}", operation_id="phase3_runs_get")
 async def runs_get(
     run_id: int,
     session: AsyncSession = Depends(get_db_session),
@@ -246,7 +246,7 @@ async def runs_get(
     return run_to_dict(row)
 
 
-@router.get("/climate-drivers")
+@router.get("/climate-drivers", operation_id="phase3_climate_drivers")
 async def climate_drivers(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
@@ -255,7 +255,7 @@ async def climate_drivers(
     return fetch_climate_series(lat, lon, days)
 
 
-@router.post("/scenarios")
+@router.post("/scenarios", operation_id="phase3_scenarios")
 async def scenarios(
     body: ScenarioBody | None = None,
     _: object = Depends(require_permission("simulation:write")),

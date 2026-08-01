@@ -4,17 +4,18 @@ import { authApi } from "../api/auth.api";
 import type { AuthUser } from "../types/auth";
 
 function mapUser(me: {
-  id: number;
+  id: string;
   email: string;
   full_name?: string | null;
-  role?: string;
+  is_active?: boolean;
   is_superuser?: boolean;
+  is_verified?: boolean;
+  locale?: string;
 }): AuthUser {
   return {
     id: me.id,
     email: me.email,
     full_name: me.full_name ?? undefined,
-    role: me.role,
     is_superuser: me.is_superuser,
   } as AuthUser;
 }
@@ -56,13 +57,13 @@ export function useAuth() {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const res = await authApi.login({ email, password });
+      const res = await authApi.login({ username: email, password });
       const tok = res.access_token || "";
       if (res.user) setSessionFromAuth(tok, res.user);
       else if (tok) setSession(tok);
       return res;
     },
-    [setSession, setSessionFromAuth],
+    [setSession, setSessionFromAuth]
   );
 
   const register = useCallback(
@@ -80,14 +81,12 @@ export function useAuth() {
         email,
         password,
         full_name: extra?.full_name,
-        phone: extra?.phone,
-        organization: extra?.organization,
-        role: extra?.role || "farmer",
-        accept_terms: true,
+        locale: "en-US" // Adding default locale for registration
       });
-      const tok = res.access_token || "";
-      if (res.user) setSessionFromAuth(tok, res.user);
-      else if (tok) setSession(tok);
+      
+      // After registration, login to get the token
+      const loginResult = await login(email, password);
+      
       return res;
     },
     [setSession, setSessionFromAuth],

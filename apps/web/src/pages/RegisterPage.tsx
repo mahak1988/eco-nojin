@@ -18,7 +18,7 @@ import { tr, tExtra } from "../components/eco/i18n_extras";
 type RoleChoice = "farmer" | "expert" | "viewer";
 
 export default function RegisterPage() {
-  const { setSessionFromAuth } = useAuth() as ReturnType<typeof useAuth> & {
+  const { setSessionFromAuth, login } = useAuth() as ReturnType<typeof useAuth> & {
     setSessionFromAuth?: (t: string, u?: unknown) => void;
   };
   const navigate = useNavigate();
@@ -41,11 +41,11 @@ export default function RegisterPage() {
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [organization, setOrganization] = useState("");
+  const [phone, setPhone] = useState(""); // Kept for UI but not used in API
+  const [organization, setOrganization] = useState(""); // Kept for UI but not used in API
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [role, setRole] = useState<RoleChoice>("farmer");
+  const [role, setRole] = useState<RoleChoice>("farmer"); // Kept for UI but not used in API
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,15 +68,16 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      const res = await authApi.register({
+      // Call register with only the fields supported by the new API
+      await authApi.register({
         email,
         password,
         full_name: fullName || undefined,
-        phone: phone || undefined,
-        organization: organization || undefined,
-        role,
-        accept_terms: true,
+        locale: "en-US" // Adding locale as required by the new API
       });
+      
+      // Then log in to get the token
+      const res = await login(email, password);
       const tok = res.access_token || "";
       if (tok && setSessionFromAuth) setSessionFromAuth(tok, res.user);
       navigate("/farms", { replace: true });
@@ -143,29 +144,8 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {roles.map((r) => {
-                const Icon = r.icon;
-                const active = role === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRole(r.id)}
-                    className={`rounded-2xl border p-3 text-start transition-all ${
-                      active
-                        ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/20"
-                        : "border-stone-200 hover:border-stone-300 hover:bg-stone-50"
-                    }`}
-                  >
-                    <Icon className={`mb-2 h-5 w-5 ${active ? "text-emerald-600" : "text-stone-400"}`} />
-                    <p className="text-sm font-bold text-slate-800">{r.title}</p>
-                    <p className="mt-0.5 text-[11px] leading-snug text-slate-500">{r.desc}</p>
-                  </button>
-                );
-              })}
-            </div>
-
+            {/* Removed role selection as it's not supported by the new API */}
+            
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <label className="block text-sm sm:col-span-2">
                 <span className="font-medium text-slate-600">{tx("auth_full_name")}</span>

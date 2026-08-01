@@ -1,12 +1,13 @@
 """
-Cost-Benefit Analysis Model — standardized model (Phase 4 upgrade).
-Deterministic, returns standard outputs.series + metrics for the frontend.
+CBA Cost-Benefit Analysis Model — Economic evaluation of projects and policies.
+This is a skeleton implementation that will be replaced with real CBA model when available.
+
+Current status: skeleton
+Has real Python model?: Possible with custom implementation or libraries like numpy-financial
+Implementation needed: Custom CBA implementation with NPV, IRR, and sensitivity analysis
 """
 import logging
-
-logger = logging.getLogger(__name__)
 import math
-import hashlib
 import time
 from typing import Any
 
@@ -15,11 +16,7 @@ from apps.simulation.base import (
     SimulationRegistry, SimulationStatus,
 )
 
-
-def _noise(i: int, seed: int) -> float:
-    h = hashlib.sha256(f"{seed}:{i}".encode()).hexdigest()
-    return (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
-
+logger = logging.getLogger(__name__)
 
 @SimulationRegistry.register
 class CBASimulator(BaseSimulator):
@@ -30,20 +27,33 @@ class CBASimulator(BaseSimulator):
     @property
     def category(self) -> str: return "economics"
     @property
-    def description(self) -> str: return "Economic feasibility: costs vs. benefits over time with NPV and IRR."
+    def description(self) -> str: return "Cost-benefit analysis model for evaluating economic viability of projects and policies. Current skeleton implementation."
     @property
-    def version(self) -> str: return "2.0.0"
+    def version(self) -> str: return "1.0.0-skeleton"
 
     def get_parameters(self) -> list[SimulationParameter]:
-        return self._get_parameters()
-
-    def _get_parameters(self) -> list[SimulationParameter]:
         return [
-            SimulationParameter(name="initial_investment", label="Initial Investment (M USD)", type="float", default=10.0, min_value=0.1, max_value=1000.0, unit="M USD", description="Upfront investment cost", required=False),
-            SimulationParameter(name="annual_benefit", label="Annual Benefit (M USD/yr)", type="float", default=2.5, min_value=0.0, max_value=500.0, unit="M USD/yr", description="Mean annual benefit", required=False),
-            SimulationParameter(name="annual_cost", label="Annual O&M Cost (M USD/yr)", type="float", default=0.5, min_value=0.0, max_value=200.0, unit="M USD/yr", description="Annual operation & maintenance cost", required=False),
-            SimulationParameter(name="discount_rate", label="Discount Rate (%)", type="float", default=5.0, min_value=0.0, max_value=20.0, unit="%", description="Discount rate for NPV", required=False),
-            SimulationParameter(name="years", label="Project Horizon (years)", type="int", default=25, min_value=5, max_value=60, unit="yr", description="Analysis period", required=False),
+            SimulationParameter(name="project_type", label="Project Type", type="select", 
+                              options=["infrastructure", "environmental", "agricultural", "energy", "social"], 
+                              default="infrastructure", description="Type of project to evaluate", required=True),
+            SimulationParameter(name="initial_investment", label="Initial Investment", type="float", 
+                              default=1000000.0, min_value=1000.0, max_value=1000000000.0, unit="$", 
+                              description="Initial investment cost", required=True),
+            SimulationParameter(name="annual_costs", label="Annual Operating Costs", type="float", 
+                              default=50000.0, min_value=0.0, max_value=100000000.0, unit="$", 
+                              description="Annual operating and maintenance costs", required=True),
+            SimulationParameter(name="annual_benefits", label="Annual Benefits", type="float", 
+                              default=150000.0, min_value=0.0, max_value=100000000.0, unit="$", 
+                              description="Annual benefits from the project", required=True),
+            SimulationParameter(name="project_lifetime", label="Project Lifetime", type="int", 
+                              default=20, min_value=1, max_value=100, unit="years", 
+                              description="Expected lifetime of the project", required=True),
+            SimulationParameter(name="discount_rate", label="Discount Rate", type="float", 
+                              default=0.05, min_value=0.0, max_value=0.5, 
+                              description="Discount rate for present value calculations", required=True),
+            SimulationParameter(name="inflation_rate", label="Inflation Rate", type="float", 
+                              default=0.02, min_value=0.0, max_value=0.3, 
+                              description="Expected inflation rate", required=True),
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
@@ -52,8 +62,10 @@ class CBASimulator(BaseSimulator):
         if errors:
             return SimulationResult(simulator_id=self.id, simulator_name=self.name,
                 status=SimulationStatus.FAILED, parameters=parameters, error="; ".join(errors))
+        
         try:
-            outputs = await self._run_simulation(parameters)
+            # This is a skeleton - in the real implementation, we would run the CBA model
+            outputs = self._run_skeleton_simulation(parameters)
             elapsed = (time.time() - start) * 1000
             return SimulationResult(simulator_id=self.id, simulator_name=self.name,
                 status=SimulationStatus.COMPLETED, parameters=parameters, outputs=outputs,
@@ -65,37 +77,101 @@ class CBASimulator(BaseSimulator):
                 status=SimulationStatus.FAILED, parameters=parameters, error=str(e),
                 execution_time_ms=elapsed)
 
-    async def _run_simulation(self, params: dict[str, Any]) -> dict:
-        inv = params.get("initial_investment", 10.0)
-        benefit = params.get("annual_benefit", 2.5); om = params.get("annual_cost", 0.5)
-        dr = params.get("discount_rate", 5.0) / 100.0
-        n = int(params.get("years", 25)); seed = int(params.get("seed", 1))
-        cum_cash, cum_disc = [-inv], [-inv]
-        npv = -inv
-        for t in range(1, n + 1):
-            net = (benefit * (1 + 0.05 * _noise(t, seed))) - om
-            cum_cash.append(round(cum_cash[-1] + net, 2))
-            disc = net / ((1 + dr) ** t)
-            npv += disc
-            cum_disc.append(round(cum_disc[-1] + disc, 2))
-        # simple IRR estimate (bisection)
-        lo, hi = -0.5, 1.0
-        for _ in range(50):
-            mid = (lo + hi) / 2
-            v = -inv + sum(((benefit - om) / ((1 + mid) ** t)) for t in range(1, n + 1))
-            if v > 0: lo = mid
-            else: hi = mid
-        irr = (lo + hi) / 2
+    def _run_skeleton_simulation(self, params: dict[str, Any]) -> dict:
+        """
+        Skeleton implementation - this will be replaced with real CBA model
+        """
+        initial_investment = params.get("initial_investment", 1000000.0)
+        annual_costs = params.get("annual_costs", 50000.0)
+        annual_benefits = params.get("annual_benefits", 150000.0)
+        project_lifetime = params.get("project_lifetime", 20)
+        discount_rate = params.get("discount_rate", 0.05)
+        inflation_rate = params.get("inflation_rate", 0.02)
+        project_type = params.get("project_type", "infrastructure")
+        
+        # Calculate net annual benefits
+        net_annual_benefit = annual_benefits - annual_costs
+        
+        # Calculate present value of costs and benefits
+        pv_initial_cost = initial_investment
+        pv_annual_costs = 0.0
+        pv_annual_benefits = 0.0
+        pv_net_benefits = []
+        
+        # Calculate present values for each year
+        for year in range(1, project_lifetime + 1):
+            # Adjust for inflation
+            cost_adj = annual_costs * ((1 + inflation_rate) ** year)
+            benefit_adj = annual_benefits * ((1 + inflation_rate) ** year)
+            
+            # Discount to present value
+            pv_cost = cost_adj / ((1 + discount_rate) ** year)
+            pv_benefit = benefit_adj / ((1 + discount_rate) ** year)
+            
+            pv_annual_costs += pv_cost
+            pv_annual_benefits += pv_benefit
+            
+            # Net present value up to this year
+            npv = pv_benefit - pv_cost - initial_investment
+            pv_net_benefits.append(round(npv, 2))
+        
+        # Total present values
+        pv_total_costs = pv_initial_cost + pv_annual_costs
+        pv_total_benefits = pv_annual_benefits
+        npv = pv_total_benefits - pv_total_costs
+        
+        # Calculate Benefit-Cost Ratio
+        bcr = pv_total_benefits / pv_total_costs if pv_total_costs > 0 else 0
+        
+        # Calculate payback period (approximate)
+        cumulative_cash_flow = -initial_investment
+        payback_period = project_lifetime  # Default if never paid back
+        for year in range(1, project_lifetime + 1):
+            annual_net = net_annual_benefit * ((1 + inflation_rate) ** year) / ((1 + discount_rate) ** year)
+            cumulative_cash_flow += annual_net
+            if cumulative_cash_flow >= 0 and payback_period == project_lifetime:
+                payback_period = year
+                break
+        
+        # Calculate IRR (Internal Rate of Return) - simplified approximation
+        # For a more accurate calculation, a numerical method would be needed
+        irr_guess = (net_annual_benefit / initial_investment) * 2  # Rough estimate
+        
+        # Sensitivity analysis: calculate NPV at different discount rates
+        sensitivity_discounts = [0.02, 0.05, 0.08, 0.10, 0.12]
+        sensitivity_npvs = []
+        
+        for disc_rate in sensitivity_discounts:
+            pv_benefits = 0.0
+            pv_costs = initial_investment
+            
+            for year in range(1, project_lifetime + 1):
+                annual_net = net_annual_benefit * ((1 + inflation_rate) ** year) / ((1 + disc_rate) ** year)
+                pv_costs += annual_costs * ((1 + inflation_rate) ** year) / ((1 + disc_rate) ** year)
+                pv_benefits += annual_benefits * ((1 + inflation_rate) ** year) / ((1 + disc_rate) ** year)
+            
+            sensitivity_npvs.append(round(pv_benefits - pv_costs, 2))
+        
         return {
             "series": [
-                {"key": "cumulative_cash", "label": "Cumulative Cash Flow (M USD)", "color": "#16a34a", "values": cum_cash, "kind": "line", "fill": True},
-                {"key": "cumulative_discounted", "label": "Cumulative Discounted (M USD)", "color": "#0284c7", "values": cum_disc, "kind": "line"},
+                {"key": "npv_timeline", "label": "Net Present Value Over Time ($)", "color": "#10b981", 
+                 "values": pv_net_benefits, "kind": "line", "fill": True},
+                {"key": "sensitivity_analysis", "label": "NPV Sensitivity Analysis ($)", "color": "#f59e0b", 
+                 "values": sensitivity_npvs, "kind": "bar", "fill": True},
             ],
             "metrics": {
-                "npv_m_usd": round(npv, 2),
-                "irr_pct": round(irr * 100, 2),
-                "payback_years": round(inv / max(0.01, benefit - om), 1),
-                "benefit_cost_ratio": round((benefit / max(0.01, om + inv / n)), 2),
+                "project_type": project_type,
+                "initial_investment": initial_investment,
+                "annual_costs": annual_costs,
+                "annual_benefits": annual_benefits,
+                "project_lifetime_years": project_lifetime,
+                "discount_rate_applied": discount_rate,
+                "inflation_rate_applied": inflation_rate,
+                "net_present_value": round(npv, 2),
+                "benefit_cost_ratio": round(bcr, 3),
+                "payback_period_years": payback_period,
+                "internal_rate_of_return_estimate": round(irr_guess, 3),
+                "net_annual_benefit": round(net_annual_benefit, 2),
             },
         }
 

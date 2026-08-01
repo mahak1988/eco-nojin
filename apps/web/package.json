@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "clean": "rimraf dist .tsbuildinfo",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "generate:api": "openapi-typescript http://localhost:8000/openapi.json -o src/lib/api/schema.d.ts"
   },
   "dependencies": {
     "@econojin/features": "workspace:*",
@@ -24,6 +25,7 @@
     "i18next": "^23.16.8",
     "i18next-browser-languagedetector": "^8.0.0",
     "lucide-react": "^0.441.0",
+    "openapi-fetch": "^0.17.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.7.4",

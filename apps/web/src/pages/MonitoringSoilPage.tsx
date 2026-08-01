@@ -107,7 +107,7 @@ export default function MonitoringSoilPage() {
                   </p>
                   <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-stone-100">
                     <div
-                      className={`h-full rounded-full bg-gradient-to-r ${BAR[st]} transition-all duration-700"}
+                      className={`h-full rounded-full bg-gradient-to-r ${BAR[st]} transition-all duration-700`}
                       style={{ width: `${layer.value ?? 0}%` }}
                     />
                   </div>
