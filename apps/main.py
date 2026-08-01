@@ -251,6 +251,12 @@ _include(
 )
 _include("payments", lambda: __import__("apps.api.routes.payments", fromlist=["router"]).router)
 _include("ecocoin", lambda: __import__("apps.api.routes.ecocoin", fromlist=["router"]).router)
+_include(
+    "mrv_standards",
+    lambda: __import__("apps.api.routes.mrv_standards_api", fromlist=["router"]).router,
+    prefix=settings.API_V1_STR,
+    tags=["MRV Standards"],
+)
 _include("monitoring", lambda: __import__("apps.api.routes.monitoring", fromlist=["router"]).router)
 _include("alerts", lambda: __import__("apps.api.routes.alerts", fromlist=["router"]).router)
 _include("simulator", lambda: __import__("apps.api.routes.simulator", fromlist=["router"]).router)
@@ -374,6 +380,7 @@ async def health() -> dict[str, Any]:
         "monitors_loaded": "science_monitors" in _loaded_routers,
         "ml_loaded": "ml" in _loaded_routers,
         "payments_loaded": "payments" in _loaded_routers,
+        "mrv_standards_loaded": "mrv_standards" in _loaded_routers,
         "loaded_routers": list(_loaded_routers),
         "failed_routers": list(_failed_routers),
     }
@@ -382,7 +389,7 @@ async def health() -> dict[str, Any]:
 @app.get("/api/v1/debug/routers", tags=["Debug"])
 async def debug_routers() -> dict[str, Any]:
     paths = sorted({getattr(r, "path", "") for r in app.routes if getattr(r, "path", None)})
-    science = [p for p in paths if "science" in p or "/ml" in p]
+    science = [p for p in paths if "science" in p or "/ml" in p or "/mrv" in p]
     return {
         "project_root": str(PROJECT_ROOT),
         "loaded": _loaded_routers,
