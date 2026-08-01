@@ -1,9 +1,10 @@
-/** App shell: Header + main + Footer + global AI assistant. Direction follows active language. */
+/** App shell: Header + main + Footer + global AI assistant + demo RoleSwitcher. */
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useLang, getLanguageDir } from "../eco/i18n";
 import { GlobalAiAssistant } from "../ai/GlobalAiAssistant";
+import { RoleSwitcher } from "../rbac/RoleSwitcher";
 
 export default function Layout() {
   const { lang } = useLang();
@@ -20,6 +21,7 @@ export default function Layout() {
       </main>
       <Footer />
       <GlobalAiAssistant />
+      <RoleSwitcher />
     </div>
   );
 }
