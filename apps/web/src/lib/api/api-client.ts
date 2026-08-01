@@ -1,5 +1,5 @@
 import { paths } from "./minimal-schema"; // Changed from schema to minimal-schema
-import { useAuthStore } from "../stores/auth";
+import { authStore } from "../../stores/authStore";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS";
 
@@ -13,9 +13,10 @@ interface ApiRequest {
   };
 }
 
-
 // Generic API function
-export async function apiClient<T extends keyof paths>(
+export async function apiClient<
+  T extends keyof paths
+>(
   request: ApiRequest
 ): Promise<
   T extends keyof paths
@@ -31,27 +32,30 @@ export async function apiClient<T extends keyof paths>(
   const { endpoint, method, body, params } = request;
 
   // Get the base URL from environment - using public runtime config
-  const baseURL = typeof window !== "undefined" 
-    ? window.location.origin 
-    : process.env.API_BASE_URL || "http://localhost:8000";
+  const baseURL =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : (typeof process !== "undefined" && (process as { env?: Record<string, string> }).env?.API_BASE_URL) ||
+        "http://localhost:8000";
 
   // Construct the full URL with query parameters
   let url = `${baseURL}${endpoint}`;
-  
+
   // Add query parameters if present
   if (params?.query) {
     const queryString = new URLSearchParams(params.query).toString();
     url += `?${queryString}`;
   }
 
-  // Get auth token from store
-  const authStore = useAuthStore.getState();
+  // Get auth token from store (authStore.getState — not React hook)
+  const { token } = authStore.getState();
 
   const response = await fetch(url, {
     method,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(authStore.token ? { Authorization: `Bearer ${authStore.token}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
   });

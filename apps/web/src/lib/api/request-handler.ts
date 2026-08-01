@@ -1,4 +1,4 @@
-import { useAuthStore } from "../stores/auth";
+import { authStore } from "../../stores/authStore";
 
 interface ApiResponse<T> {
   data: T;
@@ -11,47 +11,51 @@ interface ApiResponse<T> {
  */
 export async function makeAuthenticatedRequest<T>(
   endpoint: string,
-  method: string = 'GET',
+  method: string = "GET",
   body?: any
 ): Promise<ApiResponse<T>> {
   try {
-    const authStore = useAuthStore.getState();
-    
+    const { token } = authStore.getState();
+
     const response = await fetch(endpoint, {
       method,
+      credentials: "include",
       headers: {
-        'Content-Type': 'application/json',
-        ...(authStore.token ? { 'Authorization': `Bearer ${authStore.token}` } : {}),
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      ...(body && { body: JSON.stringify(body) })
+      ...(body && { body: JSON.stringify(body) }),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       return {
         data: null as unknown as T,
-        error: errorData.detail || errorData.message || `HTTP error! status: ${response.status}`,
-        success: false
+        error:
+          (errorData as { detail?: string; message?: string }).detail ||
+          (errorData as { message?: string }).message ||
+          `HTTP error! status: ${response.status}`,
+        success: false,
       };
     }
 
     if (response.status === 204) {
       return {
         data: null as unknown as T,
-        success: true
+        success: true,
       };
     }
 
     const data = await response.json();
     return {
       data,
-      success: true
+      success: true,
     };
   } catch (error) {
     return {
       data: null as unknown as T,
-      error: error instanceof Error ? error.message : 'Network error occurred',
-      success: false
+      error: error instanceof Error ? error.message : "Network error occurred",
+      success: false,
     };
   }
 }
