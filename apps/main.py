@@ -21,8 +21,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-# Import the integrated security components
-from apps.shared_core.security_init import initialize_security, apply_response_security_headers, authenticate_request
+from apps.shared_core.security_init import (
+    initialize_security,
+    apply_response_security_headers,
+    authenticate_request,
+)
 from apps.shared_core.config import settings
 
 logging.basicConfig(
@@ -32,7 +35,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("econojin")
 
-# Global variables for status tracking
 _db_status = {"ok": False, "detail": "not_initialized"}
 _OPTIONAL_MODULE_HINTS = ("numba", "psycopg2", "langchain")
 _loaded_routers: list[str] = []
@@ -115,7 +117,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Initialize security components from both main apps and eco-nojin patterns
 _security_stack.extend(initialize_security(app))
 
 _cors_origins = list(settings.all_cors_origins)
@@ -150,19 +151,20 @@ app.add_middleware(
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
-    """Enhanced security middleware with Zero Trust authentication"""
-    # Apply Zero Trust authentication
+    """Zero Trust gate — public science + local soft-open + OPTIONS always pass."""
+    # CORS preflight must never be blocked
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
     if not authenticate_request(request):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={"detail": "Authentication required"}
+            content={"detail": "Authentication required"},
         )
-    
+
     start_time = time.time()
     response = await call_next(request)
     response.headers["X-Process-Time"] = f"{time.time() - start_time:.4f}"
-    
-    # Apply security headers to response
     apply_response_security_headers(response.headers)
     return response
 
