@@ -25,6 +25,16 @@ function url(path: string): string {
   return `${API_BASE.replace(/\/$/, "")}${p}`;
 }
 
+function authHeaders(): Record<string, string> {
+  try {
+    const token =
+      localStorage.getItem("access_token") || localStorage.getItem("token") || "";
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 export type DataSource = "api" | "mock" | "error";
 
 async function fetchSafe<T>(
@@ -41,15 +51,42 @@ async function fetchSafe<T>(
     const res = await fetch(url(path), {
       signal: ctrl.signal,
       credentials: "include",
-      headers: { Accept: "application/json", ...(init?.headers || {}) },
       ...init,
+      headers: {
+        Accept: "application/json",
+        ...authHeaders(),
+        ...(init?.headers || {}),
+      },
     });
     clearTimeout(timer);
     if (!res.ok) {
+      let detail = "";
+      try {
+        const body = await res.json();
+        detail =
+          (body as { detail?: string | { message?: string } }).detail
+            ? typeof (body as { detail: unknown }).detail === "string"
+              ? String((body as { detail: string }).detail)
+              : String(
+                  ((body as { detail: { message?: string } }).detail as { message?: string })
+                    ?.message || "",
+                )
+            : "";
+      } catch {
+        /* ignore */
+      }
+      const hint =
+        res.status === 401
+          ? " (ورود لازم است — /login)"
+          : res.status === 403
+            ? " (مجوز کافی نیست)"
+            : "";
       return {
         data: fallback,
         source: "error",
-        errorMessage: `HTTP ${res.status}`,
+        errorMessage: detail
+          ? `HTTP ${res.status}: ${detail}${hint}`
+          : `HTTP ${res.status}${hint}`,
       };
     }
     const data = (await res.json()) as T;
@@ -138,7 +175,7 @@ export async function seedEducationDemo() {
     const res = await fetch(url("/api/v1/education/seed-demo"), {
       method: "POST",
       credentials: "include",
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json", ...authHeaders() },
     });
     if (!res.ok) throw new Error(String(res.status));
     return { data: await res.json(), source: "api" as const };
@@ -247,7 +284,10 @@ export async function getScienceThresholds() {
 }
 
 export async function putScienceThresholds(body: {
-  overrides: Record<string, { warning?: number; critical?: number; operator?: string; enabled?: boolean }>;
+  overrides: Record<
+    string,
+    { warning?: number; critical?: number; operator?: string; enabled?: boolean }
+  >;
   merge?: boolean;
   preset?: string;
 }) {
