@@ -58,17 +58,25 @@ export function writeMethods(list: PaymentMethod[]) {
 }
 
 export function addPayment(
-  data: { method: PaymentMethodKind; amount: number; reference: string; last4?: string },
+  data: {
+    method: PaymentMethodKind;
+    amount: number;
+    reference: string;
+    last4?: string;
+    invoiceId?: string;
+    status?: PaymentStatus;
+  },
   current: Payment[]
 ): Payment[] {
   const next: Payment = {
     id: `p${Date.now()}`,
     method: data.method,
     amount: data.amount,
-    status: "pending",
+    status: data.status ?? "pending",
     date: new Date().toISOString(),
     reference: data.reference,
     last4: data.last4,
+    invoiceId: data.invoiceId,
   };
   const list = [next, ...current];
   writePayments(list);
