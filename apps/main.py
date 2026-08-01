@@ -152,7 +152,6 @@ app.add_middleware(
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
     """Zero Trust gate — public science + local soft-open + OPTIONS always pass."""
-    # CORS preflight must never be blocked
     if request.method == "OPTIONS":
         return await call_next(request)
 
@@ -284,6 +283,10 @@ _include(
 )
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
+_include(
+    "science_catalog",
+    lambda: __import__("apps.api.routes.science_catalog_routes", fromlist=["router"]).router,
+)
 _include("rothc_full", lambda: __import__("apps.api.routes.rothc_full", fromlist=["router"]).router)
 _include("soil_carbon", lambda: __import__("apps.api.routes.soil_carbon", fromlist=["router"]).router)
 _include(
