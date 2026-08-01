@@ -1,50 +1,214 @@
-# Secrets — never commit
+# ==============================================================================
+# Eco Nojin — .gitignore
+# Stack: FastAPI · Next.js 14 · PostGIS · Celery · Redis · Hardhat · MapLibre
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. SECRETS & CREDENTIALS  —  هرگز commit نشوند (حیاتی)
+# ------------------------------------------------------------------------------
 .env
-.env.local
-.env.*.local
+.env.*
 !.env.example
+!.env.default
 !.env.docker
 !.env.phase3.example
-apps/web/.env
-apps/web/.env.local
+# ↑ الگوی `.env` و `.env.*` به‌صورت بازگشتی در همه دایرکتوری‌ها match می‌شود؛
+#   بنابراین apps/web/.env و services/api/.env خودبه‌خود پوشش داده می‌شوند.
+
 secrets/
 *.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+
+# کلیدهای cloud و service account
 *gee-sa*.json
+*service_account*.json
+service-account*.json
+*.credentials
+
+# artifacts نشست احراز هویت
 login.json
 cookies.txt
 auth-session.xml
 
-# Python
+# SSH و اعتبارنامه‌های git/npm
+id_rsa
+id_ed25519
+.netrc
+.npmrc
+.authrc
+
+# ------------------------------------------------------------------------------
+# 2. PYTHON  —  FastAPI / Celery / pytest / ruff / mypy
+# ------------------------------------------------------------------------------
 .venv/
 venv/
+env/
 __pycache__/
 *.py[cod]
+*$py.class
+
+# کش ابزارها
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.tox/
+.nox/
+.ipynb_checkpoints/
+
+# پوشش و ساخت
 .coverage
+.coverage.*
+coverage.xml
 htmlcov/
 dist/
 build/
+*.egg
 *.egg-info/
+pip-wheel-metadata/
 
-# Node
+# زمان اجرای Celery
+celerybeat-schedule
+celerybeat.pid
+
+# ------------------------------------------------------------------------------
+# 3. NODE / NEXT.JS  —  apps/web
+# ------------------------------------------------------------------------------
 node_modules/
-apps/web/dist/
+.pnpm-store/
 .turbo/
 
-# OS / IDE
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.swp
+# خروجی build نکست  (بحرانی — در نسخه قبلی جا افتاده بود)
+.next/
+out/
+*.tsbuildinfo
+.vercel/
 
-# Local DB
+# لاگ‌های دیباگ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# کش linter
+.eslintcache
+.stylelintcache
+
+# خروجی صریح فرانت‌اند (برای وضوح نگه داشته شد)
+apps/web/dist/
+
+# ------------------------------------------------------------------------------
+# 4. TESTING & E2E  —  Playwright / Cypress / Vitest
+# ------------------------------------------------------------------------------
+test-results/
+playwright-report/
+playwright/.cache/
+cypress/videos/
+cypress/screenshots/
+e2e-tests/cypress/videos/
+e2e-tests/cypress/screenshots/
+junit.xml
+
+# ------------------------------------------------------------------------------
+# 5. BLOCKCHAIN  —  Hardhat / Solidity
+# ------------------------------------------------------------------------------
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+deployments/
+*.mnemonic
+
+# ------------------------------------------------------------------------------
+# 6. GEOSPATIAL & SCIENTIFIC DATA  —  حجم بالا، هرگز در git
+# ------------------------------------------------------------------------------
+*.tif
+*.tiff
+*.pmtiles
+*.shp
+*.shx
+*.dbf
+*.prj
+*.nc
+*.nc4
+*.grib
+*.grib2
+*.hdf5
+*.h5
+*.zarr/
+
+# داده محلی object storage و پایپ‌لاین
+minio-data/
+downloads/
+
+# ------------------------------------------------------------------------------
+# 7. DATABASE  —  SQLite محلی
+# ------------------------------------------------------------------------------
 *.db
 *.db-journal
-apps/econojin.db
+*.sqlite
+*.sqlite3
 
-# Logs
+# ------------------------------------------------------------------------------
+# 8. DOCKER / SERVICE DATA  —  volumeهای محلی
+# ------------------------------------------------------------------------------
+postgres-data/
+pgdata/
+redis-data/
+docker-compose.override.yml
+
+# ------------------------------------------------------------------------------
+# 9. LOGS & GENERATED REPORTS  —  خروجی ابزار، قابل بازتولید
+# ------------------------------------------------------------------------------
 *.log
-.pnpm-store/
+logs/
+reports/
+sre-reports/
+i18n_report/
+analysis_report.json
+project_analysis.json
+
+# ------------------------------------------------------------------------------
+# 10. NESTED REPOS & BACKUPS  —  مخصوص این پروژه
+# ------------------------------------------------------------------------------
+eco-nojin/
+eco-nojin-backup.git/
+backups/
+*.git_disabled/
+tatus
+
+# ------------------------------------------------------------------------------
+# 11. OS / IDE / EDITOR
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+._*
+# Windows
+Thumbs.db
+Desktop.ini
+# JetBrains
+.idea/
+# VS Code — نگه‌داشتن تنظیمات مشترک تیمی
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+# Vim و ویرایشگرها
+*.swp
+*.swo
+*~
+# تاریخچه محلی
+.history/
+
+# ------------------------------------------------------------------------------
+# 12. MISC / TEMP
+# ------------------------------------------------------------------------------
+*.bak
+*.tmp
+*.temp
+*.orig
+*.pid
+*.seed
+project_analysis_report.*
