@@ -1,17 +1,13 @@
 """
 AquaCrop-style daily soil water balance + FAO yield response to water.
 
-Conceptual equations aligned with FAO Irrigation & Drainage Paper 66 (AquaCrop):
+Equations (decision-support, open process):
   ETc = Kc · ET0
-  Ks stress on transpiration when depletion > RAW
-  Y/Yx = 1 - Ky · (1 - Ta/Tc)   (FAO 33 / AquaCrop yield response)
+  Ks when depletion > RAW
+  Y/Yx = 1 - Ky · (1 - Ta/Tc)   (FAO 33)
 
-This is an open process model for decision support — not the FAO AquaCrop software binary.
-
-engine values (Phase B1 contract):
-  conceptual — this module (always available)
-  ospy       — aquacrop-OSPy path (other modules)
-  fallback   — degraded synthetic path when OSPy fails
+Crop defaults from ``apps.simulation.fao_crop_params`` (FAO56 / FAO33 tables).
+Not the official FAO AquaCrop binary.
 """
 
 from __future__ import annotations
@@ -21,108 +17,85 @@ from datetime import datetime, timezone
 from typing import Any
 
 from apps.simulation.et0 import resolve_et0_mm_day
+from apps.simulation.fao_crop_params import get_crop_params
 
 ENGINE = "conceptual"
-ENGINE_VERSION = "2.2.0"
+ENGINE_VERSION = "2.3.0"
 DISCLAIMER_EN = (
     "Open process model aligned with FAO AquaCrop / FAO-33 concepts. "
+    "Crop defaults from embedded FAO56/FAO33 tables. "
     "Not the official FAO AquaCrop binary. For decision support only."
 )
 DISCLAIMER_FA = (
     "مدل فرآیندی باز هم‌راستا با مفاهیم FAO AquaCrop / FAO-33. "
+    "پارامترهای محصول از جداول داخلی FAO56/FAO33. "
     "باینری رسمی FAO نیست. فقط برای پشتیبانی تصمیم."
 )
 
-DEFAULT_KY = {
-    "wheat": 1.15,
-    "maize": 1.25,
-    "corn": 1.25,
-    "rice": 1.10,
-    "tomato": 1.15,
-    "potato": 1.10,
-    "barley": 1.10,
-    "default": 1.15,
-}
 
-DEFAULT_YX = {
-    "wheat": 6.0,
-    "maize": 10.0,
-    "corn": 10.0,
-    "rice": 7.0,
-    "tomato": 60.0,
-    "potato": 35.0,
-    "barley": 5.0,
-    "default": 5.0,
-}
+def _f(v: Any, default: float) -> float:
+    try:
+        x = float(v)
+        if math.isnan(x) or math.isinf(x):
+            return default
+        return x
+    except (TypeError, ValueError):
+        return default
 
-# Typical mid-season Kc by crop (FAO 56 order-of-magnitude)
-DEFAULT_KC = {
-    "wheat": 1.15,
-    "maize": 1.20,
-    "corn": 1.20,
-    "rice": 1.20,
-    "tomato": 1.15,
-    "potato": 1.15,
-    "barley": 1.10,
-    "default": 1.10,
-}
+
+def _i(v: Any, default: int, lo: int, hi: int) -> int:
+    try:
+        x = int(round(float(v)))
+    except (TypeError, ValueError):
+        x = default
+    return max(lo, min(hi, x))
 
 
 def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = dict(params or {})
-    days = max(1, min(int(p.get("days", 90)), 365))
-    area_ha = max(0.01, float(p.get("area_ha", 1.0)))
-    crop = str(p.get("crop", "wheat")).lower().split()[0]
+    crop_meta = get_crop_params(str(p.get("crop", "wheat")))
+    crop = crop_meta["crop_key"]
 
-    et0_base = resolve_et0_mm_day(p)
-    if "et0_mm_day" not in p:
-        p["et0_mm_day"] = et0_base
+    days = _i(p.get("days", crop_meta.get("cycle_days", 90)), 90, 7, 365)
+    area_ha = max(0.01, _f(p.get("area_ha", 1.0), 1.0))
 
-    # If caller did not set kc, use crop default (so changing crop changes ETc)
-    if "kc" in p:
-        kc = float(p["kc"])
+    # Prefer explicit request values; else FAO library
+    if "et0_mm_day" in p:
+        et0_base = max(0.1, _f(p.get("et0_mm_day"), 4.5))
     else:
-        kc = float(DEFAULT_KC.get(crop, DEFAULT_KC["default"]))
+        et0_base = resolve_et0_mm_day(p)
 
-    rain_base = float(p.get("rain_mm_day", 0.5))
-    taw_mm = max(1.0, float(p.get("taw_mm", 100.0)))
-    raw_frac = float(p.get("raw_fraction", 0.55))
+    kc = _f(p.get("kc"), float(crop_meta["kc_mid"]))
+    rain_base = max(0.0, _f(p.get("rain_mm_day"), 0.5))
+    taw_mm = max(10.0, _f(p.get("taw_mm"), float(crop_meta["taw_mm_typical"])))
+    raw_frac = _f(p.get("raw_fraction"), float(crop_meta["raw_fraction"]))
     raw_frac = max(0.1, min(0.95, raw_frac))
-    ky = float(p.get("ky", DEFAULT_KY.get(crop, DEFAULT_KY["default"])))
-    yx = float(p.get("y_potential_t_ha", DEFAULT_YX.get(crop, DEFAULT_YX["default"])))
-    irrig_threshold = float(p.get("irrig_threshold_frac", 0.55))
+    ky = _f(p.get("ky"), float(crop_meta["ky"]))
+    yx = max(0.1, _f(p.get("y_potential_t_ha"), float(crop_meta["yx_t_ha"])))
+    irrig_threshold = max(0.2, min(0.95, _f(p.get("irrig_threshold_frac"), 0.55)))
     canopy = p.get("canopy_cover")
-    # Seasonal amplitude (0–1): makes daily series respond visibly to climate params
-    climate_amp = float(p.get("climate_amplitude", 0.35))
-    climate_amp = max(0.0, min(0.8, climate_amp))
+    climate_amp = max(0.0, min(0.8, _f(p.get("climate_amplitude"), 0.35)))
 
     raw_mm = taw_mm * raw_frac
-    depletion = float(p.get("initial_depletion_mm", taw_mm * 0.35))
-    depletion = max(0.0, min(taw_mm, depletion))
+    depletion = max(0.0, min(taw_mm, _f(p.get("initial_depletion_mm"), taw_mm * 0.35)))
     irrig_total = 0.0
     etc_total = 0.0
     rain_total = 0.0
     tc_total = 0.0
     ta_sum = 0.0
     series: list[dict[str, Any]] = []
-    # denser chart series (every day, capped for payload)
     sample_every = 1 if days <= 120 else max(1, days // 100)
 
     for d in range(days):
-        # Seasonal climate: ET0 peaks mid-season; rain slightly anti-correlated
         phase = math.sin(math.pi * d / max(days - 1, 1))
-        et0 = et0_base * (1.0 + climate_amp * (phase - 0.15))
-        et0 = max(0.2, et0)
-        rain = rain_base * (1.0 + climate_amp * (0.5 - phase))
-        rain = max(0.0, rain)
+        et0 = max(0.2, et0_base * (1.0 + climate_amp * (phase - 0.15)))
+        rain = max(0.0, rain_base * (1.0 + climate_amp * (0.5 - phase)))
         rain_total += rain
 
-        cc = 1.0
         if isinstance(canopy, list) and canopy:
             cc = float(canopy[min(d, len(canopy) - 1)])
             cc = max(0.05, min(1.0, cc))
         else:
-            # Simple canopy build-up / senescence curve (AquaCrop-like CC shape)
             x = d / max(days - 1, 1)
             if x < 0.2:
                 cc = 0.15 + 0.85 * (x / 0.2)
@@ -146,7 +119,6 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
 
         irr = 0.0
         if depletion / max(taw_mm, 1e-6) >= irrig_threshold:
-            # Refill toward RAW (management decision)
             irr = min(depletion, max(raw_mm * 0.85, taw_mm * 0.25))
             irrig_total += irr
 
@@ -174,18 +146,23 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
             )
 
     rel_ta = ta_sum / max(tc_total, 1e-6)
-    y_rel = max(0.0, 1.0 - ky * (1.0 - rel_ta))
-    y_rel = min(1.0, y_rel)
+    y_rel = max(0.0, min(1.0, 1.0 - ky * (1.0 - rel_ta)))
     y_actual = yx * y_rel
 
     return {
         "engine": ENGINE,
         "engine_version": ENGINE_VERSION,
         "model": "aquacrop_fao_conceptual",
-        "citation": "FAO AquaCrop concepts / FAO33 Ky; open process implementation",
+        "citation": "FAO56 Kc · FAO33 Ky · AquaCrop-style water balance (embedded library)",
         "disclaimer": DISCLAIMER_EN,
         "disclaimer_fa": DISCLAIMER_FA,
         "crop": crop,
+        "crop_meta": {
+            "label_en": crop_meta["label_en"],
+            "label_fa": crop_meta["label_fa"],
+            "references": crop_meta["references"],
+            "library_version": crop_meta["library_version"],
+        },
         "area_ha": area_ha,
         "days": days,
         "et0_mm_day": round(et0_base, 3),
