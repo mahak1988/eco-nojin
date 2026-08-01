@@ -24,6 +24,7 @@ import { MiningPanel } from "../components/ecocoin/MiningPanel";
 import { EconomicsPanel } from "../components/ecocoin/EconomicsPanel";
 import { StakingTiersPanel } from "../components/ecocoin/StakingTiersPanel";
 import { ProtocolStatsBar } from "../components/ecocoin/ProtocolStatsBar";
+import { TrustMonitorBar } from "../components/ecocoin/TrustMonitorBar";
 import { InteractiveBalanceChart } from "../components/ecocoin/InteractiveBalanceChart";
 import { WalletActionsModal, type WalletAction } from "../components/ecocoin/WalletActionsModal";
 import { ECO_STR, type EcoLang } from "../components/ecocoin/ecocoinI18n";
@@ -137,6 +138,7 @@ export default function EcocoinPage() {
     { to: "/ecocoin/mining", icon: Pickaxe, label: s.miningTitle },
     { to: "/ecocoin/bioeconomy", icon: Leaf, label: s.econTitle },
     { to: "/ecocoin/challenges", icon: Trophy, label: s.challenges },
+    { to: "/ecocoin/transparency", icon: Coins, label: lang === "fa" ? "شفافیت" : "Transparency" },
   ];
 
   return (
@@ -212,6 +214,10 @@ export default function EcocoinPage() {
           </Link>
         ))}
       </div>
+
+      <SectionReveal delay={40}>
+        <TrustMonitorBar lang={lang} />
+      </SectionReveal>
 
       <SectionReveal delay={60}>
         <ProtocolStatsBar strings={s} />
