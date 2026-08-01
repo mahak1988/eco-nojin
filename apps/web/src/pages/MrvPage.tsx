@@ -11,6 +11,7 @@ import {
   INITIAL_REPORTS, INITIAL_SAFEGUARDS, STATUS_FILTERS, mrvToCSV, downloadCSV,
   type MrvReport, type MrvStatus, type Safeguard, type SortKey, type SortDir,
 } from "../components/mrv/mrvData";
+import { MrvNavGrid } from "./MrvHubPages";
 
 export default function MrvPage() {
   const { lang } = useLang();
@@ -45,7 +46,6 @@ export default function MrvPage() {
     else { setSortKey(k); setSortDir("desc"); }
   };
 
-  // منطق MRV: تأیید → verified (carbon معتبر)؛ رد → rejected (carbon=0 در offset)
   const verify = (id: string) =>
     setReports((prev) => prev.map((r) => (r.id === id ? { ...r, status: "verified" } : r)));
   const reject = (id: string) =>
@@ -69,7 +69,6 @@ export default function MrvPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
-      {/* header */}
       <SectionReveal>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -91,13 +90,14 @@ export default function MrvPage() {
         </div>
       </SectionReveal>
 
-      {/* KPIs (derived) */}
+      <SectionReveal delay={40}>
+        <MrvNavGrid />
+      </SectionReveal>
+
       <MrvStats reports={reports} strings={s} lang={lang as MrvLang} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* reports column */}
         <div className="space-y-4 lg:col-span-2">
-          {/* toolbar */}
           <SectionReveal delay={100}>
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative min-w-[200px] flex-1">
@@ -126,7 +126,6 @@ export default function MrvPage() {
             </div>
           </SectionReveal>
 
-          {/* table */}
           <SectionReveal delay={120}>
             <MrvTable reports={filtered} strings={s} lang={lang as MrvLang}
               sortKey={sortKey} sortDir={sortDir} onSort={onSort}
@@ -134,7 +133,6 @@ export default function MrvPage() {
           </SectionReveal>
         </div>
 
-        {/* safeguards column */}
         <div className="lg:col-span-1">
           <SafeguardsPanel safeguards={safeguards} strings={s} lang={lang as MrvLang} onToggle={toggleSafeguard} />
         </div>
