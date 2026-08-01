@@ -7,6 +7,11 @@ Conceptual equations aligned with FAO Irrigation & Drainage Paper 66 (AquaCrop):
   Y/Yx = 1 - Ky · (1 - Ta/Tc)   (FAO 33 / AquaCrop yield response)
 
 This is an open process model for decision support — not the FAO AquaCrop software binary.
+
+engine values (Phase B1 contract):
+  conceptual — this module (always available)
+  ospy       — aquacrop-OSPy path (other modules)
+  fallback   — degraded synthetic path when OSPy fails
 """
 
 from __future__ import annotations
@@ -15,6 +20,17 @@ from datetime import datetime, timezone
 from typing import Any
 
 from apps.simulation.et0 import resolve_et0_mm_day
+
+ENGINE = "conceptual"
+ENGINE_VERSION = "2.1.0"
+DISCLAIMER_EN = (
+    "Open process model aligned with FAO AquaCrop / FAO-33 concepts. "
+    "Not the official FAO AquaCrop binary. For decision support only."
+)
+DISCLAIMER_FA = (
+    "مدل فرآیندی باز هم‌راستا با مفاهیم FAO AquaCrop / FAO-33. "
+    "باینری رسمی FAO نیست. فقط برای پشتیبانی تصمیم."
+)
 
 # Typical Ky mid-season (FAO 33 / paper 56 ranges)
 DEFAULT_KY = {
@@ -43,8 +59,8 @@ DEFAULT_YX = {
 
 def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = dict(params or {})
-    days = int(p.get("days", 90))
-    area_ha = float(p.get("area_ha", 1.0))
+    days = max(1, min(int(p.get("days", 90)), 365))
+    area_ha = max(0.01, float(p.get("area_ha", 1.0)))
     crop = str(p.get("crop", "wheat")).lower().split()[0]
 
     et0 = resolve_et0_mm_day(p)
@@ -53,8 +69,9 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
 
     kc = float(p.get("kc", 1.1))
     rain_daily = float(p.get("rain_mm_day", 0.5))
-    taw_mm = float(p.get("taw_mm", 100.0))  # total available water in root zone
+    taw_mm = max(1.0, float(p.get("taw_mm", 100.0)))  # total available water in root zone
     raw_frac = float(p.get("raw_fraction", 0.55))  # p-factor → RAW = p·TAW
+    raw_frac = max(0.1, min(0.95, raw_frac))
     ky = float(p.get("ky", DEFAULT_KY.get(crop, DEFAULT_KY["default"])))
     yx = float(p.get("y_potential_t_ha", DEFAULT_YX.get(crop, DEFAULT_YX["default"])))
     irrig_threshold = float(p.get("irrig_threshold_frac", 0.6))
@@ -62,6 +79,7 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
 
     raw_mm = taw_mm * raw_frac
     depletion = float(p.get("initial_depletion_mm", taw_mm * 0.3))
+    depletion = max(0.0, min(taw_mm, depletion))
     irrig_total = 0.0
     etc_total = 0.0
     tc_total = 0.0  # potential transpiration cum
@@ -123,8 +141,14 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
     y_actual = yx * y_rel
 
     return {
+        # --- Phase B1 engine contract ---
+        "engine": ENGINE,
+        "engine_version": ENGINE_VERSION,
         "model": "aquacrop_fao_conceptual",
         "citation": "FAO AquaCrop concepts / FAO33 Ky; open process implementation",
+        "disclaimer": DISCLAIMER_EN,
+        "disclaimer_fa": DISCLAIMER_FA,
+        # --- results ---
         "crop": crop,
         "area_ha": area_ha,
         "days": days,
