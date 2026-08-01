@@ -151,7 +151,6 @@ app.add_middleware(
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
-    """Zero Trust gate — public science + local soft-open + OPTIONS always pass."""
     if request.method == "OPTIONS":
         return await call_next(request)
 
@@ -250,6 +249,7 @@ _include(
     "accounting_seed",
     lambda: __import__("apps.api.routes.accounting_seed", fromlist=["router"]).router,
 )
+_include("payments", lambda: __import__("apps.api.routes.payments", fromlist=["router"]).router)
 _include("ecocoin", lambda: __import__("apps.api.routes.ecocoin", fromlist=["router"]).router)
 _include("monitoring", lambda: __import__("apps.api.routes.monitoring", fromlist=["router"]).router)
 _include("alerts", lambda: __import__("apps.api.routes.alerts", fromlist=["router"]).router)
@@ -373,6 +373,7 @@ async def health() -> dict[str, Any]:
         "science_loaded": "science" in _loaded_routers,
         "monitors_loaded": "science_monitors" in _loaded_routers,
         "ml_loaded": "ml" in _loaded_routers,
+        "payments_loaded": "payments" in _loaded_routers,
         "loaded_routers": list(_loaded_routers),
         "failed_routers": list(_failed_routers),
     }
