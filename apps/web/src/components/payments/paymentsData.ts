@@ -14,6 +14,7 @@ export interface Payment {
   date: string;          // ISO
   reference: string;     // ref number / tx hash
   last4?: string;        // credit_card
+  invoiceId?: string;    // linked invoice e.g. INV-001
 }
 
 export interface PaymentMethod {
@@ -46,11 +47,9 @@ export const INITIAL_METHODS: PaymentMethod[] = [
 export const STATUS_FILTERS: ("all" | PaymentStatus)[] = ["all", "completed", "pending", "failed"];
 export const METHOD_FILTERS: ("all" | PaymentMethodKind)[] = ["all", "credit_card", "ecocoin", "bitcoin", "bank_transfer"];
 
-// ── helpers ──
 export function countByStatus(payments: Payment[], status: PaymentStatus): number {
   return payments.filter((p) => p.status === status).length;
 }
-// نرخ موفقیت = completed / (completed + failed) — معنادار و بدون مشکل واحد
 export function successRate(payments: Payment[]): number {
   const done = payments.filter((p) => p.status === "completed" || p.status === "failed").length;
   if (done === 0) return 0;
@@ -69,7 +68,6 @@ export function shortRef(ref: string): string {
   return ref.length > 14 ? `${ref.slice(0, 8)}…${ref.slice(-4)}` : ref;
 }
 
-// ── CSV (BOM برای Excel فارسی/عربی) ──
 export function paymentsToCSV(payments: Payment[], resolve: (p: Payment) => string[], headers: string[]): string {
   const rows = payments.map((p) => resolve(p).map((c) => `"${c.replace(/"/g, '""')}"`).join(","));
   return [headers.join(","), ...rows].join("\n");
