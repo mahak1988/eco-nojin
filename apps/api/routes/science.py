@@ -1,15 +1,14 @@
 """Science API — process models + soil + global SA + final reports.
 
-Public (no auth) for pure compute: aquacrop-advanced, rothc, status, formulas.
-Write-heavy / admin paths keep RBAC where needed.
+Public compute: aquacrop-advanced, rothc, status, formulas, crop-library.
 """
 
 from __future__ import annotations
 
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
@@ -31,7 +30,75 @@ def _perm(code: str):
         return _noop
 
 
+def _safe_float(v: Any, default: float) -> float:
+    try:
+        x = float(v)
+        if x != x:  # NaN
+            return default
+        return x
+    except (TypeError, ValueError):
+        return default
+
+
+def _safe_int(v: Any, default: int, lo: int, hi: int) -> int:
+    try:
+        x = int(round(float(v)))
+    except (TypeError, ValueError):
+        x = default
+    return max(lo, min(hi, x))
+
+
+class AquaBody(BaseModel):
+    """Loose schema: coerce/clamp instead of 422 on minor type issues."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    area_ha: float = 1.0
+    days: int = 90
+    et0_mm_day: float = 4.5
+    kc: float = 1.1
+    rain_mm_day: float = 0.5
+    taw_mm: float = 100.0
+    ky: float = 1.15
+    y_potential_t_ha: float = 6.0
+    irrig_threshold_frac: float = 0.55
+    canopy_cover: Optional[list[float]] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    use_ndvi_canopy: bool = False
+    farm_id: Optional[int] = None
+    persist: bool = False
+    crop: str = "wheat"
+
+    @field_validator("days", mode="before")
+    @classmethod
+    def _days(cls, v: Any) -> int:
+        return _safe_int(v, 90, 7, 365)
+
+    @field_validator(
+        "area_ha",
+        "et0_mm_day",
+        "kc",
+        "rain_mm_day",
+        "taw_mm",
+        "ky",
+        "y_potential_t_ha",
+        "irrig_threshold_frac",
+        mode="before",
+    )
+    @classmethod
+    def _floats(cls, v: Any) -> float:
+        return _safe_float(v, 0.0)
+
+    @field_validator("crop", mode="before")
+    @classmethod
+    def _crop(cls, v: Any) -> str:
+        s = str(v or "wheat").lower().strip() or "wheat"
+        return s.split()[0][:32]
+
+
 class SwatBody(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     area_km2: float = 25.0
     days: int = Field(365, ge=30, le=3660)
     precip_mm_year: float = 320.0
@@ -42,25 +109,6 @@ class SwatBody(BaseModel):
     land_cover: str = "cropland"
     farm_id: Optional[int] = None
     persist: bool = True
-
-
-class AquaBody(BaseModel):
-    area_ha: float = 1.0
-    days: int = Field(90, ge=7, le=365)
-    et0_mm_day: float = 4.5
-    kc: float = 1.1
-    rain_mm_day: float = 0.5
-    taw_mm: float = 100.0
-    ky: float = 1.15
-    y_potential_t_ha: float = 6.0
-    irrig_threshold_frac: float = 0.6
-    canopy_cover: Optional[list[float]] = None
-    lat: Optional[float] = None
-    lon: Optional[float] = None
-    use_ndvi_canopy: bool = False
-    farm_id: Optional[int] = None
-    persist: bool = False
-    crop: str = "wheat"
 
 
 class RusleBody(BaseModel):
@@ -106,12 +154,21 @@ async def science_status() -> dict[str, Any]:
             "rusle2_proxy",
             "soil_profile",
         ],
-        "global_sa": ["rothc", "rusle", "ml"],
-        "reports": ["rothc", "rusle", "aquacrop", "scs"],
         "ok": True,
         "auth": "aquacrop-advanced and rothc are public compute endpoints",
-        "notes_fa": "خروجی مدل‌ها: analysis + report نهایی؛ SA جهانی برای خاک و ML.",
-        "notes_en": "Model outputs include analysis + final report; global SA for soil and ML.",
+        "crop_library": "/api/v1/science/crop-library",
+    }
+
+
+@router.get("/crop-library")
+async def crop_library() -> dict[str, Any]:
+    from apps.simulation.fao_crop_params import list_crops
+
+    return {
+        "source": "FAO56 Kc · FAO33 Ky (embedded indicative tables)",
+        "note_en": "Offline defaults for DSS; calibrate with local agronomy.",
+        "note_fa": "مقادیر پیش‌فرض آفلاین برای پشتیبانی تصمیم؛ با داده محلی کالیبره کنید.",
+        "crops": list_crops(),
     }
 
 
@@ -143,17 +200,39 @@ async def swat_run(
 
 @router.post("/aquacrop-advanced")
 async def aquacrop_run(
-    body: AquaBody,
+    request: Request,
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
-    """Public conceptual AquaCrop run — no auth required (Phase B1 demo)."""
+    """Public conceptual AquaCrop — accepts loose JSON; clamps invalid numbers."""
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
     from apps.simulation.report_builder import report_aquacrop
 
+    try:
+        raw_body = await request.json()
+    except Exception:
+        raw_body = {}
+    if not isinstance(raw_body, dict):
+        raw_body = {}
+
+    try:
+        body = AquaBody.model_validate(raw_body)
+    except Exception:
+        body = AquaBody()
+
     params = body.model_dump()
-    persist = params.pop("persist", False)
+    # clamp sensible ranges after coerce
+    params["days"] = _safe_int(params.get("days"), 90, 7, 365)
+    params["area_ha"] = max(0.01, _safe_float(params.get("area_ha"), 1.0))
+    params["et0_mm_day"] = max(0.1, _safe_float(params.get("et0_mm_day"), 4.5))
+    params["kc"] = max(0.1, min(2.5, _safe_float(params.get("kc"), 1.1)))
+    params["rain_mm_day"] = max(0.0, _safe_float(params.get("rain_mm_day"), 0.5))
+    params["taw_mm"] = max(10.0, _safe_float(params.get("taw_mm"), 100.0))
+    params["ky"] = max(0.1, min(2.5, _safe_float(params.get("ky"), 1.15)))
+    params["y_potential_t_ha"] = max(0.1, _safe_float(params.get("y_potential_t_ha"), 6.0))
+
+    persist = bool(params.pop("persist", False))
     farm_id = params.pop("farm_id", None)
-    use_ndvi = params.pop("use_ndvi_canopy", False)
+    use_ndvi = bool(params.pop("use_ndvi_canopy", False))
     lat, lon = params.pop("lat", None), params.pop("lon", None)
     ndvi_meta = None
     if use_ndvi and lat is not None and lon is not None and not params.get("canopy_cover"):
@@ -162,11 +241,7 @@ async def aquacrop_run(
 
             bridge = await fetch_ndvi_canopy_async(float(lat), float(lon), days=int(params.get("days", 90)))
             params["canopy_cover"] = bridge["canopy_cover"]
-            ndvi_meta = {
-                "provider": bridge["provider"],
-                "count": bridge["count"],
-                "analysis": bridge.get("analysis"),
-            }
+            ndvi_meta = {"provider": bridge["provider"], "count": bridge["count"]}
         except Exception as e:
             ndvi_meta = {"error": str(e)[:120], "provider": "none"}
     try:
@@ -260,7 +335,6 @@ async def rothc_run(
     with_sa: bool = Query(False),
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:
-    """Public RothC run — no auth required."""
     from apps.simulation.report_builder import report_rothc
     from apps.simulation.rothc_model import run_rothc
 
@@ -364,6 +438,7 @@ async def formulas_catalog() -> dict[str, Any]:
                 "id": "aquacrop_ky",
                 "title_fa": "بیلان آب و عملکرد (FAO Ky)",
                 "formulas": ["ETc = Kc × ET0", "Y/Yx = 1 − Ky × (1 − Ta/Tc)"],
+                "library": "/api/v1/science/crop-library",
             },
             {
                 "id": "rothc",
@@ -373,9 +448,7 @@ async def formulas_catalog() -> dict[str, Any]:
             {
                 "id": "rusle",
                 "title_fa": "فرسایش RUSLE",
-                "title_en": "RUSLE soil loss",
                 "formulas": ["A = R · K · LS · C · P"],
-                "why_fa": "برآورد تلفات خاک سالانه؛ مدیریت پوشش و شیب.",
             },
             {
                 "id": "ndvi",

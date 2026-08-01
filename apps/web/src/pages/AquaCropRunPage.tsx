@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Play, Loader2, SlidersHorizontal, AlertCircle, Info } from "lucide-react";
 import { postAquaCropAdvanced } from "../lib/apiServices";
@@ -7,6 +7,11 @@ import { BarChart, LineChart, MetricCard } from "../components/science/ScienceVi
 const CROPS = ["wheat", "maize", "rice", "barley", "tomato", "potato"] as const;
 
 type EngineKind = "conceptual" | "ospy" | "fallback" | string;
+
+function num(v: unknown, fallback: number): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
 
 function EngineBadge({ engine }: { engine: EngineKind }) {
   const styles: Record<string, string> = {
@@ -33,21 +38,56 @@ export default function AquaCropRunPage() {
   const [oat, setOat] = useState<{ feature: string; abs_delta: number }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [doOat, setDoOat] = useState(true);
+  const [doOat, setDoOat] = useState(false);
   const [crop, setCrop] = useState<string>("wheat");
   const [params, setParams] = useState({
     days: 90,
     et0_mm_day: 4.5,
-    kc: 1.1,
+    kc: 1.15,
     rain_mm_day: 0.5,
-    taw_mm: 100,
+    taw_mm: 120,
     ky: 1.15,
     y_potential_t_ha: 6,
     area_ha: 1,
   });
 
+  // Load FAO defaults when crop changes
+  useEffect(() => {
+    void (async () => {
+      try {
+        const r = await fetch("/api/v1/science/crop-library", { credentials: "include" });
+        if (!r.ok) return;
+        const data = await r.json();
+        const item = (data.crops || []).find((c: { id: string }) => c.id === crop);
+        if (!item) return;
+        setParams((p) => ({
+          ...p,
+          kc: num(item.kc_mid, p.kc),
+          ky: num(item.ky, p.ky),
+          y_potential_t_ha: num(item.yx_t_ha, p.y_potential_t_ha),
+        }));
+      } catch {
+        /* offline ok */
+      }
+    })();
+  }, [crop]);
+
+  function cleanParams(p: typeof params) {
+    return {
+      days: Math.max(7, Math.min(365, Math.round(num(p.days, 90)))),
+      et0_mm_day: Math.max(0.1, num(p.et0_mm_day, 4.5)),
+      kc: Math.max(0.1, Math.min(2.5, num(p.kc, 1.15))),
+      rain_mm_day: Math.max(0, num(p.rain_mm_day, 0.5)),
+      taw_mm: Math.max(10, num(p.taw_mm, 120)),
+      ky: Math.max(0.1, Math.min(2.5, num(p.ky, 1.15))),
+      y_potential_t_ha: Math.max(0.1, num(p.y_potential_t_ha, 6)),
+      area_ha: Math.max(0.01, num(p.area_ha, 1)),
+    };
+  }
+
   async function runOnce(p: typeof params, cropName: string) {
-    const res = await postAquaCropAdvanced({ ...p, persist: false, crop: cropName });
+    const body = { ...cleanParams(p), persist: false, crop: cropName };
+    const res = await postAquaCropAdvanced(body);
     if (res.source === "error") throw new Error(res.errorMessage || "failed");
     return res.data as Record<string, unknown>;
   }
@@ -57,16 +97,17 @@ export default function AquaCropRunPage() {
     setLoading(true);
     setError(null);
     setOat([]);
-    setResult(null); // clear so charts remount with new data
+    setResult(null);
     try {
       const data = await runOnce(params, crop);
       setResult(data);
       if (doOat) {
         const keys = ["et0_mm_day", "rain_mm_day", "kc", "taw_mm", "ky"] as const;
         const rows: { feature: string; abs_delta: number }[] = [];
+        const base = cleanParams(params);
         for (const k of keys) {
-          const lo = { ...params, [k]: (params[k] as number) * 0.85 };
-          const hi = { ...params, [k]: (params[k] as number) * 1.15 };
+          const lo = { ...base, [k]: base[k] * 0.85 };
+          const hi = { ...base, [k]: base[k] * 1.15 };
           try {
             const a = await runOnce(lo, crop);
             const b = await runOnce(hi, crop);
@@ -98,6 +139,7 @@ export default function AquaCropRunPage() {
   const disclaimer = String(result?.disclaimer_fa || result?.disclaimer || "");
   const runId = String(result?.completed_at || "");
   const echo = (result?.params_echo as Record<string, unknown> | undefined) || {};
+  const cropMeta = result?.crop_meta as { references?: string[]; label_fa?: string } | undefined;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-5 sm:p-8">
@@ -105,7 +147,7 @@ export default function AquaCropRunPage() {
         <div>
           <h1 className="font-display text-3xl text-stone-800">AquaCrop · Science</h1>
           <p className="mt-1 text-sm text-stone-600">
-            POST /api/v1/science/aquacrop-advanced · بیلان روزانه + FAO Ky
+            بیلان روزانه + FAO Ky · کتابخانه داخلی FAO56/FAO33
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-emerald-700">
@@ -118,9 +160,8 @@ export default function AquaCropRunPage() {
       <div className="flex gap-2 rounded-xl border border-sky-100 bg-sky-50/60 px-3 py-2 text-xs text-sky-900">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         <span>
-          پس از تغییر اعداد، دکمه <strong>Run</strong> را بزنید. نمودار و متریک‌ها فقط با اجرای جدید به‌روز
-          می‌شوند. برای دیدن تغییر واضح: <code className="rounded bg-white px-1">et0</code> را به ۸ یا{" "}
-          <code className="rounded bg-white px-1">rain</code> را به ۲ تغییر دهید.
+          با تغییر محصول، Kc/Ky/Yx از کتابخانه FAO پر می‌شود. بعد از تغییر اعداد، <strong>Run</strong> بزنید.
+          مثال: et0=8 یا rain=2.
         </span>
       </div>
 
@@ -147,7 +188,10 @@ export default function AquaCropRunPage() {
                 type="number"
                 step="0.05"
                 value={params[k]}
-                onChange={(e) => setParams((p) => ({ ...p, [k]: Number(e.target.value) }))}
+                onChange={(e) => {
+                  const v = e.target.value === "" ? 0 : Number(e.target.value);
+                  setParams((p) => ({ ...p, [k]: Number.isFinite(v) ? v : p[k] }));
+                }}
                 className="mt-1 block w-full rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
               />
             </label>
@@ -155,7 +199,7 @@ export default function AquaCropRunPage() {
         </div>
         <label className="flex items-center gap-2 text-xs font-medium text-stone-600">
           <input type="checkbox" checked={doOat} onChange={(e) => setDoOat(e.target.checked)} />
-          OAT حساسیت (±15٪ روی پارامترها) — کمی کندتر
+          OAT حساسیت (±15٪) — اختیاری
         </label>
         <button
           type="submit"
@@ -170,7 +214,7 @@ export default function AquaCropRunPage() {
       {error && (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-rose-200 bg-rose-50/50 py-10 text-center">
           <AlertCircle className="h-10 w-10 text-rose-500" />
-          <p className="font-medium text-rose-800">{error}</p>
+          <p className="max-w-md font-medium text-rose-800">{error}</p>
         </div>
       )}
 
@@ -183,6 +227,13 @@ export default function AquaCropRunPage() {
             )}
           </div>
           {disclaimer && <p className="text-xs leading-relaxed text-stone-500">{disclaimer}</p>}
+          {cropMeta?.references && (
+            <ul className="list-inside list-disc text-[11px] text-stone-500">
+              {cropMeta.references.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          )}
 
           {Object.keys(echo).length > 0 && (
             <p className="rounded-lg bg-stone-50 px-3 py-2 font-mono text-[11px] text-stone-600">
@@ -222,35 +273,19 @@ export default function AquaCropRunPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl border p-3">
                 <p className="mb-1 text-xs font-semibold">Depletion (mm)</p>
-                <LineChart
-                  key={`dep-${runId}`}
-                  values={sample.map((x) => Number(x.depletion_mm || 0))}
-                  color="#059669"
-                />
+                <LineChart key={`dep-${runId}`} values={sample.map((x) => Number(x.depletion_mm || 0))} color="#059669" />
               </div>
               <div className="rounded-xl border p-3">
                 <p className="mb-1 text-xs font-semibold">Ks stress</p>
-                <LineChart
-                  key={`ks-${runId}`}
-                  values={sample.map((x) => Number(x.ks || 0))}
-                  color="#7c3aed"
-                />
+                <LineChart key={`ks-${runId}`} values={sample.map((x) => Number(x.ks || 0))} color="#7c3aed" />
               </div>
               <div className="rounded-xl border p-3">
                 <p className="mb-1 text-xs font-semibold">Daily ET0 (mm)</p>
-                <LineChart
-                  key={`et0-${runId}`}
-                  values={sample.map((x) => Number(x.et0_mm || 0))}
-                  color="#ea580c"
-                />
+                <LineChart key={`et0-${runId}`} values={sample.map((x) => Number(x.et0_mm || 0))} color="#ea580c" />
               </div>
               <div className="rounded-xl border p-3">
                 <p className="mb-1 text-xs font-semibold">Irrigation pulses (mm)</p>
-                <LineChart
-                  key={`irr-${runId}`}
-                  values={sample.map((x) => Number(x.irr_mm || 0))}
-                  color="#0284c7"
-                />
+                <LineChart key={`irr-${runId}`} values={sample.map((x) => Number(x.irr_mm || 0))} color="#0284c7" />
               </div>
             </div>
           )}
