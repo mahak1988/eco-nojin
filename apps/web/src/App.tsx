@@ -16,6 +16,10 @@ const EcoCoinStakingPage = lazy(() => import("./pages/EcoCoinStakingPage"));
 const EcoCoinMiningPage = lazy(() => import("./pages/EcoCoinMiningPage"));
 const EcoCoinBioeconomyPage = lazy(() => import("./pages/EcoCoinBioeconomyPage"));
 const EcoCoinChallengesPage = lazy(() => import("./pages/EcoCoinChallengesPage"));
+const EcoCoinClaimPage = lazy(() => import("./pages/EcoCoinClaimPage"));
+const EcoCoinClaimsListPage = lazy(() => import("./pages/EcoCoinClaimsListPage"));
+const EcoCoinTransparencyPage = lazy(() => import("./pages/EcoCoinTransparencyPage"));
+const EcoCoinDashboard = lazy(() => import("./pages/EcoCoinDashboard"));
 const GamesPage = lazy(() => import("./pages/GamesPage"));
 const LibraryPage = lazy(() => import("./pages/LibraryPage"));
 const MrvPage = lazy(() => import("./pages/MrvPage"));
@@ -167,10 +171,14 @@ export default function App() {
               <Route path="alerts" element={<AlertsPage />} />
               <Route path="community" element={<CommunityPage />} />
               <Route path="ecocoin" element={<EcocoinPage />} />
+              <Route path="ecocoin/dashboard" element={<EcoCoinDashboard />} />
               <Route path="ecocoin/staking" element={<EcoCoinStakingPage />} />
               <Route path="ecocoin/mining" element={<EcoCoinMiningPage />} />
               <Route path="ecocoin/bioeconomy" element={<EcoCoinBioeconomyPage />} />
               <Route path="ecocoin/challenges" element={<EcoCoinChallengesPage />} />
+              <Route path="ecocoin/claim" element={<EcoCoinClaimPage />} />
+              <Route path="ecocoin/claims" element={<EcoCoinClaimsListPage />} />
+              <Route path="ecocoin/transparency" element={<EcoCoinTransparencyPage />} />
               <Route path="games" element={<GamesPage />} />
               <Route path="library" element={<LibraryPage />} />
               <Route path="mrv" element={<MrvPage />} />
