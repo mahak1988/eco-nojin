@@ -1,4 +1,4 @@
-// apps/web/src/pages/DashboardPage.tsx — live science/runs when API up
+// apps/web/src/pages/DashboardPage.tsx — live science/runs + stats when API up
 import { useMemo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -43,6 +43,7 @@ const FA = {
   link_admin: "پنل ادمین",
   link_accounting: "حسابداری",
   link_science: "فاز علمی",
+  link_farms: "مزارع",
 };
 
 const EN: typeof FA = {
@@ -72,22 +73,24 @@ const EN: typeof FA = {
   link_admin: "Admin panel",
   link_accounting: "Accounting",
   link_science: "Science",
+  link_farms: "Farms",
 };
 
 const AR: typeof FA = { ...EN, title: "لوحة التحكم", subtitle: "نظرة عامة على أداء المنصة" };
 const DASH_STR: Record<DashLang, typeof FA> = { fa: FA, en: EN, ar: AR };
 
-const KPIS = [
-  { key: "users", icon: Users, value: 4256, change: 12.5, color: "text-green-700", bg: "bg-green-50" },
-  { key: "projects", icon: Activity, value: 38, change: 8.2, color: "text-blue-700", bg: "bg-blue-50" },
-  { key: "carbon", icon: Leaf, value: 4820, change: 15.3, color: "text-emerald-700", bg: "bg-emerald-50" },
-  { key: "regions", icon: MapPin, value: 6, change: 2, color: "text-amber-700", bg: "bg-amber-50" },
+const DEFAULT_KPIS = [
+  { key: "users", icon: Users, value: 0, change: 0, color: "text-green-700", bg: "bg-green-50" },
+  { key: "projects", icon: Activity, value: 0, change: 0, color: "text-blue-700", bg: "bg-blue-50" },
+  { key: "carbon", icon: Leaf, value: 0, change: 0, color: "text-emerald-700", bg: "bg-emerald-50" },
+  { key: "regions", icon: MapPin, value: 0, change: 0, color: "text-amber-700", bg: "bg-amber-50" },
 ];
 
 const ACTIVITY_ICONS = [ShieldCheck, FlaskConical, Users, Satellite, ShieldCheck];
 
 const QUICK_LINKS = [
   { key: "link_science", to: "/science", icon: FlaskConical },
+  { key: "link_farms", to: "/farms", icon: Leaf },
   { key: "link_satellite", to: "/satellite", icon: Satellite },
   { key: "link_simulators", to: "/simulators", icon: FlaskConical },
   { key: "link_mrv", to: "/mrv", icon: ShieldCheck },
@@ -98,10 +101,11 @@ const QUICK_LINKS = [
 
 function Sparkline({ values, color }: { values: number[]; color: string }) {
   const W = 120, H = 32;
+  if (!values.length) return null;
   const max = Math.max(...values), min = Math.min(...values);
   const range = max - min || 1;
   const pts = values.map((v, i) =>
-    `${(i / (values.length - 1)) * W},${H - ((v - min) / range) * H}`
+    `${(i / Math.max(1, values.length - 1)) * W},${H - ((v - min) / range) * H}`
   ).join(" ");
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 32 }} preserveAspectRatio="none">
@@ -110,22 +114,29 @@ function Sparkline({ values, color }: { values: number[]; color: string }) {
   );
 }
 
-const SPARK_DATA: Record<string, number[]> = {
-  users: [3200, 3400, 3600, 3800, 4000, 4256],
-  projects: [28, 30, 32, 34, 36, 38],
-  carbon: [3200, 3600, 3900, 4200, 4500, 4820],
-  regions: [3, 4, 4, 5, 5, 6],
-};
-
 export default function DashboardPage() {
   const [apiSource, setApiSource] = useState<DataSource>("mock");
   const [overview, setOverview] = useState<Record<string, unknown> | null>(null);
+  const [kpis, setKpis] = useState(DEFAULT_KPIS);
+
   useEffect(() => {
-    getDashboardStats().then((r) => setApiSource(r.source));
+    getDashboardStats().then((r) => {
+      setApiSource(r.source);
+      if (r.source === "api" && r.data) {
+        const d = r.data as Record<string, number>;
+        setKpis([
+          { key: "users", icon: Users, value: Number(d.totalUsers ?? d.users ?? 0), change: Number(d.usersChange ?? 0), color: "text-green-700", bg: "bg-green-50" },
+          { key: "projects", icon: Activity, value: Number(d.totalProjects ?? d.projects ?? 0), change: Number(d.projectsChange ?? 0), color: "text-blue-700", bg: "bg-blue-50" },
+          { key: "carbon", icon: Leaf, value: Number(d.carbonOffset ?? d.carbon ?? 0), change: Number(d.carbonChange ?? 0), color: "text-emerald-700", bg: "bg-emerald-50" },
+          { key: "regions", icon: MapPin, value: Number(d.activeRegions ?? d.regions ?? 0), change: Number(d.regionsChange ?? 0), color: "text-amber-700", bg: "bg-amber-50" },
+        ]);
+      }
+    });
     getDashboardOverview().then((r) => {
       if (r.source === "api") setOverview(r.data as Record<string, unknown>);
     });
   }, []);
+
   const { lang } = useLang();
   const s = DASH_STR[(lang as DashLang) in DASH_STR ? (lang as DashLang) : "en"];
   const locale = lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
@@ -176,9 +187,10 @@ export default function DashboardPage() {
           <HealthWidget />
         </div>
         <div className="grid grid-cols-2 gap-4 lg:col-span-3 lg:grid-cols-3">
-          {KPIS.slice(0, 3).map((kpi, i) => {
+          {kpis.slice(0, 3).map((kpi, i) => {
             const label = s[`kpi_${kpi.key}` as keyof typeof s] as string;
             const up = kpi.change >= 0;
+            const spark = [0, kpi.value * 0.4, kpi.value * 0.6, kpi.value * 0.75, kpi.value * 0.9, kpi.value];
             return (
               <SectionReveal key={kpi.key} delay={i * 70}>
                 <div className={`rounded-2xl border border-stone-200/80 p-4 shadow-sm ${kpi.bg}`}>
@@ -198,7 +210,7 @@ export default function DashboardPage() {
                   <p className="mt-0.5 text-xs font-medium text-stone-600">{label}</p>
                   <div className="mt-2">
                     <Sparkline
-                      values={SPARK_DATA[kpi.key]}
+                      values={spark}
                       color={kpi.color.includes("green") || kpi.color.includes("emerald") ? "#15803d" : "#1d4ed8"}
                     />
                   </div>
