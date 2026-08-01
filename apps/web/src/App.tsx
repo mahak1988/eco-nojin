@@ -61,6 +61,17 @@ const FarmsPage = lazy(() => import("./pages/FarmsPage"));
 const FarmNewPage = lazy(() => import("./pages/FarmNewPage"));
 const FarmDetailPage = lazy(() => import("./pages/FarmDetailPage"));
 const FarmWizardPage = lazy(() => import("./pages/FarmWizardPage"));
+const FarmRegisterPage = lazy(() => import("./pages/FarmRegisterPage"));
+const FarmFieldsPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmFieldsPage })));
+const FarmLivestockPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmLivestockPage })));
+const FarmCropsPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmCropsPage })));
+const FarmTasksPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmTasksPage })));
+const FarmInputsPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmInputsPage })));
+const FarmTeamPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmTeamPage })));
+const FarmSustainabilityPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmSustainabilityPage })));
+const FarmMonitoringPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmMonitoringPage })));
+const FarmsMapPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmsMapPage })));
+const FarmsPolicyPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmsPolicyPage })));
 const CropsPage = lazy(() => import("./pages/CropsPage"));
 const CropDetailPage = lazy(() => import("./pages/CropDetailPage"));
 const WaterPage = lazy(() => import("./pages/WaterPage"));
@@ -86,39 +97,20 @@ const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [pathname]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); }, [pathname]);
   return null;
 }
-
 function PageLoader() {
-  return (
-    <div className="flex min-h-[50vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-emerald-600" />
-    </div>
-  );
+  return (<div className="flex min-h-[50vh] items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-emerald-600" /></div>);
 }
-
 interface EBProps { children: ReactNode; }
 interface EBState { hasError: boolean; }
-
 class ErrorBoundary extends Component<EBProps, EBState> {
-  constructor(props: EBProps) {
-    super(props);
-    this.state = { hasError: false };
-  }
-  static getDerivedStateFromError(): EBState {
-    return { hasError: true };
-  }
+  constructor(props: EBProps) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(): EBState { return { hasError: true }; }
   render() {
     if (this.state.hasError) {
-      return (
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-          <p className="font-display text-2xl text-stone-800">Something went wrong</p>
-          <button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white">Reload</button>
-        </div>
-      );
+      return (<div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center"><p className="font-display text-2xl text-stone-800">Something went wrong</p><button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white">Reload</button></div>);
     }
     return this.props.children;
   }
@@ -148,6 +140,17 @@ export default function App() {
               <Route path="farms" element={<FarmsPage />} />
               <Route path="farms/new" element={<FarmNewPage />} />
               <Route path="farms/wizard" element={<FarmWizardPage />} />
+              <Route path="farms/register" element={<FarmRegisterPage />} />
+              <Route path="farms/map" element={<FarmsMapPage />} />
+              <Route path="farms/policy" element={<FarmsPolicyPage />} />
+              <Route path="farms/:id/fields" element={<FarmFieldsPage />} />
+              <Route path="farms/:id/livestock" element={<FarmLivestockPage />} />
+              <Route path="farms/:id/crops" element={<FarmCropsPage />} />
+              <Route path="farms/:id/tasks" element={<FarmTasksPage />} />
+              <Route path="farms/:id/inputs" element={<FarmInputsPage />} />
+              <Route path="farms/:id/team" element={<FarmTeamPage />} />
+              <Route path="farms/:id/sustainability" element={<FarmSustainabilityPage />} />
+              <Route path="farms/:id/monitoring" element={<FarmMonitoringPage />} />
               <Route path="farms/:id" element={<FarmDetailPage />} />
               <Route path="crops" element={<CropsPage />} />
               <Route path="crops/:id" element={<CropDetailPage />} />
