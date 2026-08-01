@@ -23,6 +23,17 @@ const EcoCoinDashboard = lazy(() => import("./pages/EcoCoinDashboard"));
 const GamesPage = lazy(() => import("./pages/GamesPage"));
 const LibraryPage = lazy(() => import("./pages/LibraryPage"));
 const MrvPage = lazy(() => import("./pages/MrvPage"));
+const MrvLevelsPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvLevelsPage })));
+const MrvEvidencePage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvEvidencePage })));
+const MrvVerifyPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvVerifyPage })));
+const MrvSatellitesPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvSatellitesPage })));
+const MrvPointsPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvPointsPage })));
+const MrvClaimPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvClaimPage })));
+const MrvMethodologyPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvMethodologyPage })));
+const MrvLedgerPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvLedgerPage })));
+const MrvCalculatorPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvCalculatorPage })));
+const MrvBufferPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvBufferPage })));
+const MrvFarmLinkPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvFarmLinkPage })));
 const NewsPage = lazy(() => import("./pages/NewsPage"));
 const PilotsPage = lazy(() => import("./pages/PilotsPage"));
 const RegionalPage = lazy(() => import("./pages/RegionalPage"));
@@ -185,6 +196,17 @@ export default function App() {
               <Route path="games" element={<GamesPage />} />
               <Route path="library" element={<LibraryPage />} />
               <Route path="mrv" element={<MrvPage />} />
+              <Route path="mrv/levels" element={<MrvLevelsPage />} />
+              <Route path="mrv/evidence" element={<MrvEvidencePage />} />
+              <Route path="mrv/verify" element={<MrvVerifyPage />} />
+              <Route path="mrv/satellites" element={<MrvSatellitesPage />} />
+              <Route path="mrv/points" element={<MrvPointsPage />} />
+              <Route path="mrv/claim" element={<MrvClaimPage />} />
+              <Route path="mrv/methodology" element={<MrvMethodologyPage />} />
+              <Route path="mrv/ledger" element={<MrvLedgerPage />} />
+              <Route path="mrv/calculator" element={<MrvCalculatorPage />} />
+              <Route path="mrv/buffer" element={<MrvBufferPage />} />
+              <Route path="mrv/farm-link" element={<MrvFarmLinkPage />} />
               <Route path="news" element={<NewsPage />} />
               <Route path="pilots" element={<PilotsPage />} />
               <Route path="regional" element={<RegionalPage />} />
