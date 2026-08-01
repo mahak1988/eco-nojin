@@ -41,7 +41,11 @@ const AccountPage = lazy(() => import("./pages/AccountPage"));
 const InvoicesPage = lazy(() => import("./pages/InvoicesPage"));
 const JournalEntriesPage = lazy(() => import("./pages/JournalEntriesPage"));
 const PaymentsPage = lazy(() => import("./pages/PaymentsPage"));
+const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
+const PaymentCancelPage = lazy(() => import("./pages/PaymentCancelPage"));
 const EducationPage = lazy(() => import("./pages/EducationPage"));
+const EducationMethodsIndexPage = lazy(() => import("./pages/EducationMethodsIndexPage"));
+const EducationMethodPage = lazy(() => import("./pages/EducationMethodPage"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 const RisksPage = lazy(() => import("./pages/RisksPage"));
@@ -96,12 +100,8 @@ function PageLoader() {
   );
 }
 
-interface EBProps {
-  children: ReactNode;
-}
-interface EBState {
-  hasError: boolean;
-}
+interface EBProps { children: ReactNode; }
+interface EBState { hasError: boolean; }
 
 class ErrorBoundary extends Component<EBProps, EBState> {
   constructor(props: EBProps) {
@@ -116,9 +116,7 @@ class ErrorBoundary extends Component<EBProps, EBState> {
       return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
           <p className="font-display text-2xl text-stone-800">Something went wrong</p>
-          <button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white">
-            Reload
-          </button>
+          <button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white">Reload</button>
         </div>
       );
     }
@@ -204,7 +202,11 @@ export default function App() {
               <Route path="invoices" element={<InvoicesPage />} />
               <Route path="journal" element={<JournalEntriesPage />} />
               <Route path="payments" element={<PaymentsPage />} />
+              <Route path="payments/success" element={<PaymentSuccessPage />} />
+              <Route path="payments/cancel" element={<PaymentCancelPage />} />
               <Route path="education" element={<EducationPage />} />
+              <Route path="education/methods" element={<EducationMethodsIndexPage />} />
+              <Route path="education/methods/:slug" element={<EducationMethodPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="risks" element={<RisksPage />} />
