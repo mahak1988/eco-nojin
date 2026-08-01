@@ -97,6 +97,53 @@ async function fetchSafe<T>(
   }
 }
 
+export type ClimateZone = {
+  id: string;
+  label_en?: string;
+  label_fa?: string;
+  koppen_hint?: string;
+  traits?: string[];
+  priority_packages?: string[];
+  default_models?: string[];
+  risk_triggers?: string[];
+};
+
+export type SatellitePlatform = {
+  id: string;
+  name: string;
+  domains?: string[];
+  api?: string[];
+  assets?: string[];
+  access?: string;
+  priority_mrv?: boolean;
+  notes_en?: string;
+};
+
+export async function getClimateZones() {
+  return fetchSafe("/api/v1/science/climate-zones", {
+    zones: [] as ClimateZone[],
+    count: 0,
+    note_fa: "",
+    note_en: "",
+  });
+}
+
+export async function getSatelliteCatalog() {
+  return fetchSafe("/api/v1/science/satellite-catalog", {
+    platforms: [] as SatellitePlatform[],
+    count: 0,
+    mrv_stack_recommended: [] as string[],
+  });
+}
+
+export async function getIndicesCatalog() {
+  return fetchSafe("/api/v1/science/indices-catalog", {
+    fao_water_models: [],
+    drought_indices: [],
+    process_models: [],
+  });
+}
+
 export async function getAccountingSummary() {
   return fetchSafe("/api/v1/accounting/summary", {
     total_income: 0,
@@ -240,7 +287,6 @@ export async function postRothC(opts: {
   return fetchSafe(`/api/v1/science/rothc?${q.toString()}`, { model: "error" }, { method: "POST" });
 }
 
-/** Full RothC climate + soil parameters */
 export async function postRothCFull(body: Record<string, unknown>) {
   return fetchSafe(
     "/api/v1/science/rothc/run",
