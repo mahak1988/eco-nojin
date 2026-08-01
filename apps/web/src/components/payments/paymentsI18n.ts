@@ -34,6 +34,7 @@ const FA = {
   defaultBadge: "پیش‌فرض",
   connected: "متصل",
   addCard: "افزودن کارت",
+  removeCard: "حذف کارت",
   cardLast4: "۴ رقم آخر",
   cardHolder: "نام دارنده",
   add: "افزودن",
@@ -59,6 +60,10 @@ const FA = {
   create: "ثبت پرداخت",
   ecoUnit: "اکوسکه",
   csvHeaders: "شناسه,روش,مبلغ,واحد,وضعیت,تاریخ,مرجع",
+  markCompleted: "تکمیل",
+  markFailed: "ناموفق",
+  markPending: "در انتظار",
+  deletePayment: "حذف",
 };
 
 export type PaymentStrings = typeof FA;
@@ -95,6 +100,7 @@ export const PAY_STR: Record<PayLang, PaymentStrings> = {
     defaultBadge: "Default",
     connected: "Connected",
     addCard: "Add card",
+    removeCard: "Remove",
     cardLast4: "Last 4 digits",
     cardHolder: "Cardholder name",
     add: "Add",
@@ -120,6 +126,10 @@ export const PAY_STR: Record<PayLang, PaymentStrings> = {
     create: "Record payment",
     ecoUnit: "EcoCoins",
     csvHeaders: "ID,Method,Amount,Unit,Status,Date,Reference",
+    markCompleted: "Complete",
+    markFailed: "Fail",
+    markPending: "Pending",
+    deletePayment: "Delete",
   },
   ar: {
     title: "المدفوعات",
@@ -151,6 +161,7 @@ export const PAY_STR: Record<PayLang, PaymentStrings> = {
     defaultBadge: "افتراضي",
     connected: "متصل",
     addCard: "إضافة بطاقة",
+    removeCard: "إزالة",
     cardLast4: "آخر ٤ أرقام",
     cardHolder: "اسم حامل البطاقة",
     add: "إضافة",
@@ -176,6 +187,10 @@ export const PAY_STR: Record<PayLang, PaymentStrings> = {
     create: "تسجيل الدفعة",
     ecoUnit: "إيكو-كوين",
     csvHeaders: "المعرّف,الطريقة,المبلغ,الوحدة,الحالة,التاريخ,المرجع",
+    markCompleted: "إكمال",
+    markFailed: "فشل",
+    markPending: "قيد الانتظار",
+    deletePayment: "حذف",
   },
 };
 
@@ -191,7 +206,6 @@ export function methodText(s: PaymentStrings, k: PaymentMethodKind): string {
 export function localeOf(lang: PayLang): string {
   return lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US";
 }
-// واحد پول per-method — باگ «EcoCoin به‌عنوان $» را حل می‌کند
 export function formatAmount(kind: PaymentMethodKind, amount: number, lang: PayLang): string {
   const locale = localeOf(lang);
   if (kind === "bitcoin") return `${amount.toLocaleString(locale, { maximumFractionDigits: 4 })} BTC`;
@@ -201,7 +215,6 @@ export function formatAmount(kind: PaymentMethodKind, amount: number, lang: PayL
 function s_eco(lang: PayLang): string {
   return PAY_STR[lang].ecoUnit;
 }
-// واحد کوتاه برای CSV
 export function unitOf(kind: PaymentMethodKind, lang: PayLang): string {
   if (kind === "bitcoin") return "BTC";
   if (kind === "ecocoin") return PAY_STR[lang].ecoUnit;
