@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { farmsApi } from "../lib/farmsApi";
 import { LeafletPicker } from "../components/maps/LeafletPicker";
+import { ClimateZonePicker } from "../components/science/ClimateZonePicker";
+import type { ClimateZone } from "../lib/apiServices";
 import { useLang } from "../components/eco/i18n";
 import { tExtra } from "../components/eco/i18n_extras";
 
@@ -18,12 +20,18 @@ export default function FarmWizardPage() {
   const navigate = useNavigate();
   const { lang } = useLang();
   const tx = (k: string) => tExtra(lang, k);
-  const STEPS = [tx("farm_step_basics"), tx("farm_step_map"), tx("farm_step_confirm")] as const;
+  const STEPS = [
+    tx("farm_step_basics"),
+    "اقلیم",
+    tx("farm_step_map"),
+    tx("farm_step_confirm"),
+  ] as const;
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [region, setRegion] = useState("");
   const [areaHa, setAreaHa] = useState("");
+  const [climateZone, setClimateZone] = useState<ClimateZone | null>(null);
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,16 +59,26 @@ export default function FarmWizardPage() {
   };
 
   const canNext =
-    step === 0 ? name.trim().length > 0 : step === 1 ? lat != null && lng != null : true;
+    step === 0
+      ? name.trim().length > 0
+      : step === 1
+        ? !!climateZone?.id
+        : step === 2
+          ? lat != null && lng != null
+          : true;
 
   async function onSubmit() {
     setError(null);
     setLoading(true);
     try {
+      const climateNote = climateZone
+        ? `[climate:${climateZone.id}] ${climateZone.label_en || climateZone.label_fa || ""}`
+        : "";
+      const descParts = [description.trim(), climateNote].filter(Boolean);
       const farm = await farmsApi.create({
         name: name.trim(),
-        description: description.trim() || undefined,
-        region: region.trim() || undefined,
+        description: descParts.length ? descParts.join("\n") : undefined,
+        region: region.trim() || climateZone?.label_en || undefined,
         area_ha: areaHa ? Number(areaHa) : undefined,
         latitude: lat ?? undefined,
         longitude: lng ?? undefined,
@@ -89,11 +107,11 @@ export default function FarmWizardPage() {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {STEPS.map((s, i) => (
           <div
-            key={s}
-            className={`flex flex-1 items-center justify-center gap-1 rounded-full py-2 text-xs font-bold ${
+            key={`${s}-${i}`}
+            className={`flex min-w-[4.5rem] flex-1 items-center justify-center gap-1 rounded-full py-2 text-xs font-bold ${
               i === step
                 ? "bg-emerald-600 text-white"
                 : i < step
@@ -126,6 +144,7 @@ export default function FarmWizardPage() {
             <input
               value={region}
               onChange={(e) => setRegion(e.target.value)}
+              placeholder="اختیاری — یا از اقلیم در مرحله بعد"
               className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
             />
           </label>
@@ -153,6 +172,12 @@ export default function FarmWizardPage() {
       )}
 
       {step === 1 && (
+        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <ClimateZonePicker compact onChange={setClimateZone} value={climateZone?.id} />
+        </div>
+      )}
+
+      {step === 2 && (
         <div className="space-y-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
           <LeafletPicker lat={lat} lng={lng} onPick={(a, b) => { setLat(a); setLng(b); }} />
           <div className="flex flex-wrap gap-2">
@@ -197,7 +222,7 @@ export default function FarmWizardPage() {
         </div>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <div className="space-y-2 rounded-2xl border border-stone-200 bg-white p-5 text-sm shadow-sm">
           <p>
             <span className="text-stone-400">{tx("farm_name")}</span>{" "}
@@ -205,6 +230,13 @@ export default function FarmWizardPage() {
           </p>
           <p>
             <span className="text-stone-400">{tx("farm_region")}</span> {region || "—"}
+          </p>
+          <p>
+            <span className="text-stone-400">اقلیم</span>{" "}
+            <span className="font-bold">{climateZone?.label_fa || climateZone?.label_en || "—"}</span>
+            {climateZone?.id ? (
+              <span className="ml-1 font-mono text-xs text-stone-400">({climateZone.id})</span>
+            ) : null}
           </p>
           <p>
             <span className="text-stone-400">{tx("farm_area")}</span> {areaHa ? `${areaHa} ha` : "—"}
@@ -225,7 +257,7 @@ export default function FarmWizardPage() {
         >
           <ArrowLeft className="h-4 w-4" /> {tx("farm_back")}
         </button>
-        {step < 2 ? (
+        {step < 3 ? (
           <button
             type="button"
             disabled={!canNext}

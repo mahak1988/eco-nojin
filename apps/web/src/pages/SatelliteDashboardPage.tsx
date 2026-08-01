@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Satellite, Loader2, RefreshCw, LineChart, MapPinned, GitCompare } from "lucide-react";
+import { Satellite, Loader2, RefreshCw, LineChart, MapPinned, GitCompare, Radio } from "lucide-react";
 import { LeafletPicker } from "../components/maps/LeafletPicker";
 import { useLang } from "../components/eco/i18n";
 import { tExtra } from "../components/eco/i18n_extras";
 import { ndviHealth } from "../components/eco/i18n_phase_b5";
+import { getSatelliteCatalog, type SatellitePlatform } from "../lib/apiServices";
 
 const HEALTH_STYLE = {
   good: "bg-emerald-100 text-emerald-800 ring-emerald-200",
@@ -26,6 +27,14 @@ export default function SatelliteDashboardPage() {
   const [ndvi, setNdvi] = useState<Record<string, unknown> | null>(null);
   const [series, setSeries] = useState<Array<{ date: string; ndvi: number }>>([]);
   const [loading, setLoading] = useState(false);
+  const [platforms, setPlatforms] = useState<SatellitePlatform[]>([]);
+  const [recommended, setRecommended] = useState<string[]>([]);
+
+  async function loadCatalog() {
+    const res = await getSatelliteCatalog();
+    setPlatforms((res.data?.platforms as SatellitePlatform[]) || []);
+    setRecommended((res.data?.mrv_stack_recommended as string[]) || []);
+  }
 
   async function load(a = lat, b = lng) {
     setLoading(true);
@@ -46,6 +55,7 @@ export default function SatelliteDashboardPage() {
 
   useEffect(() => {
     void load();
+    void loadCatalog();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -94,6 +104,45 @@ export default function SatelliteDashboardPage() {
           </Link>
         ))}
       </div>
+
+      {/* EO / API catalog */}
+      <section className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/50 to-white p-5 shadow-sm">
+        <div className="mb-3 flex items-center gap-2">
+          <Radio className="h-4 w-4 text-indigo-600" />
+          <h2 className="font-display text-lg text-stone-800">پلتفرم‌های ماهواره‌ای و API</h2>
+        </div>
+        <p className="mb-3 text-xs text-stone-500">
+          کاتالوگ MRV · کلیدها فقط در env — بدون راز در ریپو. توصیه برای پشته پایش:{" "}
+          {recommended.length ? recommended.join(", ") : "—"}
+        </p>
+        {platforms.length === 0 ? (
+          <p className="text-sm text-stone-400">کاتالوگ در دسترس نیست — API را بررسی کنید.</p>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {platforms.map((p) => (
+              <article
+                key={p.id}
+                className={`rounded-2xl border p-3 ${
+                  p.priority_mrv ? "border-indigo-300 bg-white shadow-sm" : "border-stone-200 bg-stone-50/50"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-sm font-bold text-stone-800">{p.name}</h3>
+                  {p.priority_mrv && (
+                    <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-800">
+                      MRV
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-[11px] text-stone-500">{(p.domains || []).join(" · ")}</p>
+                <p className="mt-1 font-mono text-[10px] text-indigo-700">{(p.api || []).slice(0, 2).join(" · ")}</p>
+                <p className="mt-1 text-[10px] text-stone-400">{p.access}</p>
+                {p.notes_en && <p className="mt-2 text-[11px] leading-snug text-stone-600">{p.notes_en}</p>}
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
 
       <p className="text-xs text-stone-500">{tx("sat_pick")}</p>
 
