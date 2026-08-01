@@ -80,12 +80,12 @@ async def update_school(
     return AgricultureSchoolResponse.model_validate(school)
 
 
-@router.delete("/{school_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{school_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=None)
 async def delete_school(
     school_id: int,
     session: AsyncSession = Depends(get_db_session),
     _: None = Depends(require_write_auth),
-) -> None:
+):
     service = AgricultureSchoolService(session)
     try:
         await service.delete(school_id)
