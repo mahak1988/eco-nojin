@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Globe2, Loader2 } from "lucide-react";
-import { getClimateZones, type ClimateZone } from "../../lib/apiServices";
+import { getClimateZones, applyClimateZonePackage, type ClimateZone } from "../../lib/apiServices";
 
 const STORAGE_KEY = "econojin_climate_zone_id";
 
@@ -63,6 +63,8 @@ export function ClimateZonePicker({ value, onChange, compact, className }: Props
     storeClimateZoneId(id);
     const z = zones.find((x) => x.id === id) || null;
     onChange?.(z);
+    // Climate package: default models + risk triggers on decision support / monitors
+    void applyClimateZonePackage(id);
   }
 
   const current = zones.find((z) => z.id === selected) || null;
