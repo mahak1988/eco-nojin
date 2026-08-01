@@ -64,6 +64,7 @@ const WaterIrrigationPage = lazy(() => import("./pages/WaterIrrigationPage"));
 const PlantingCalendarPage = lazy(() => import("./pages/PlantingCalendarPage"));
 const TasksPage = lazy(() => import("./pages/TasksPage"));
 const InventoryPage = lazy(() => import("./pages/InventoryPage"));
+const CurrencySettingsPage = lazy(() => import("./pages/CurrencySettingsPage"));
 const WeatherPage = lazy(() => import("./pages/WeatherPage"));
 const MonitoringHubPage = lazy(() => import("./pages/MonitoringHubPage"));
 const MonitoringSoilPage = lazy(() => import("./pages/MonitoringSoilPage"));
@@ -157,6 +158,7 @@ export default function App() {
               <Route path="planting" element={<PlantingCalendarPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="inventory" element={<InventoryPage />} />
+              <Route path="currency" element={<CurrencySettingsPage />} />
               <Route path="weather" element={<WeatherPage />} />
               <Route path="monitoring" element={<MonitoringHubPage />} />
               <Route path="monitoring/soil" element={<MonitoringSoilPage />} />
