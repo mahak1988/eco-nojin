@@ -20,6 +20,7 @@ import {
   postRothC,
   postSwat,
 } from "../lib/apiServices";
+import { ClimateZonePicker } from "../components/science/ClimateZonePicker";
 import {
   BarChart,
   DataTable,
@@ -249,6 +250,10 @@ export default function SciencePage() {
           </div>
         </div>
       </header>
+
+      <section className="sci-panel-enter rounded-3xl border border-emerald-200 bg-white p-5 shadow-sm">
+        <ClimateZonePicker />
+      </section>
 
       <ScienceMonitorPanel lat={lat} lon={lon} days={days} />
       <ScienceMLPanel lat={lat} lon={lon} days={days} />
