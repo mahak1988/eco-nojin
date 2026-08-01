@@ -1,6 +1,7 @@
 """Phase 3 scientific APIs — no Celery import at module load.
 
-Public compute: aquacrop-advanced (no auth). Other write paths keep RBAC.
+AquaCrop advanced lives in apps.api.routes.science (loose schema, public).
+This router keeps SWAT / scenarios / pipeline / climate helpers.
 """
 
 from __future__ import annotations
@@ -8,7 +9,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
@@ -18,13 +19,14 @@ from apps.simulation.climate_etl import fetch_climate_series
 from apps.simulation.models_swat import run_swat_plus
 from apps.simulation.ndvi_canopy import fetch_ndvi_canopy_async
 from apps.simulation.run_store import get_run, list_runs, run_to_dict, save_run_async
-from apps.simulation.runners import run_aquacrop_advanced_local, run_swat_local
+from apps.simulation.runners import run_swat_local
 from apps.simulation.scenario_engine import run_scenarios
 
 router = APIRouter(prefix="/api/v1/science", tags=["Phase3 Science"])
 
 
 class SwatBody(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     area_km2: float = 25.0
     days: int = Field(365, ge=30, le=3660)
     precip_mm_year: float = 320.0
@@ -36,27 +38,6 @@ class SwatBody(BaseModel):
     farm_id: Optional[int] = None
     async_mode: bool = False
     persist: bool = True
-
-
-class AquaAdvBody(BaseModel):
-    area_ha: float = 1.0
-    days: int = Field(90, ge=7, le=365)
-    et0_mm_day: float = 4.5
-    kc: float = 1.1
-    rain_mm_day: float = 0.5
-    taw_mm: float = 100.0
-    ky: float = 1.15
-    y_potential_t_ha: float = 6.0
-    irrig_threshold_frac: float = 0.6
-    canopy_cover: Optional[list[float]] = None
-    lat: Optional[float] = None
-    lon: Optional[float] = None
-    use_live_climate: bool = False
-    use_ndvi_canopy: bool = False
-    farm_id: Optional[int] = None
-    async_mode: bool = False
-    persist: bool = False
-    crop: str = "wheat"
 
 
 class ScenarioBody(BaseModel):
@@ -92,20 +73,9 @@ async def science_status() -> dict[str, Any]:
         "wave": 2,
         "database": db_kind,
         "gee": {"available": gee_ok, "detail": gee_detail},
-        "models": [
-            "aquacrop_advanced",
-            "rothc_stub",
-            "swat_plus_proxy",
-            "coupling",
-            "scenario",
-        ],
-        "features": {
-            "simulation_runs_persist": True,
-            "celery_aquacrop_swat": True,
-            "ndvi_canopy_bridge": True,
-            "postgis_farm_index": True,
-        },
-        "auth": "aquacrop-advanced is public compute",
+        "models": ["aquacrop_advanced", "rothc", "swat_plus_proxy", "coupling", "scenario"],
+        "auth": "aquacrop-advanced is public (see apps.api.routes.science)",
+        "crop_library": "/api/v1/science/crop-library",
         "note": "SWAT+ is process proxy until official binary is installed",
     }
 
@@ -134,86 +104,6 @@ async def swat_run(
     if persist:
         try:
             row = await save_run_async(session, "swat_plus_proxy", params, result, farm_id=farm_id)
-            result["run_id"] = row.id
-        except Exception as e:
-            result["persist_error"] = str(e)[:120]
-    return result
-
-
-@router.post("/aquacrop-advanced", operation_id="phase3_aquacrop_adv")
-async def aquacrop_adv(
-    body: AquaAdvBody,
-    session: AsyncSession = Depends(get_db_session),
-) -> dict[str, Any]:
-    """Public conceptual AquaCrop — no login required."""
-    params = body.model_dump()
-    async_mode = params.pop("async_mode", False)
-    persist = params.pop("persist", False)
-    farm_id = params.pop("farm_id", None)
-    use_live = params.pop("use_live_climate", False)
-    use_ndvi = params.pop("use_ndvi_canopy", False)
-    lat, lon = params.get("lat"), params.get("lon")
-
-    if use_live and lat is not None and lon is not None:
-        clim = fetch_climate_series(float(lat), float(lon), days=min(int(params.get("days", 90)), 90))
-        drivers = clim.get("drivers") or {}
-        params["et0_mm_day"] = drivers.get("et0_mm_day", params["et0_mm_day"])
-        params["rain_mm_day"] = drivers.get("rain_mm_day", params["rain_mm_day"])
-
-    ndvi_meta = None
-    if use_ndvi and lat is not None and lon is not None and not params.get("canopy_cover"):
-        bridge = await fetch_ndvi_canopy_async(
-            float(lat), float(lon), days=int(params.get("days", 90))
-        )
-        params["canopy_cover"] = bridge["canopy_cover"]
-        ndvi_meta = {"provider": bridge["provider"], "count": bridge["count"]}
-
-    if async_mode:
-        try:
-            from apps.simulation.tasks_phase3 import task_aquacrop_advanced
-
-            celery_params = dict(params)
-            celery_params["farm_id"] = farm_id
-            celery_params["use_ndvi_canopy"] = False
-            task = task_aquacrop_advanced.delay(celery_params)
-            return {"status": "queued", "task_id": task.id, "model": "aquacrop_advanced"}
-        except Exception as e:
-            result = run_aquacrop_advanced_local(
-                {**params, "use_ndvi_canopy": False},
-                farm_id=farm_id,
-                persist=persist,
-            )
-            result["celery_error"] = str(e)[:120]
-            if ndvi_meta:
-                result["ndvi_meta"] = ndvi_meta
-            return result
-
-    model_params = {
-        k: v
-        for k, v in params.items()
-        if k
-        not in (
-            "lat",
-            "lon",
-            "use_live_climate",
-            "use_ndvi_canopy",
-            "async_mode",
-            "persist",
-            "farm_id",
-        )
-    }
-    result = run_aquacrop_advanced(model_params)
-    result["mode"] = "sync_local"
-    if ndvi_meta:
-        result["ndvi_meta"] = ndvi_meta
-        result["ndvi_calibrated"] = True
-    if use_live:
-        result["climate_attached"] = True
-    if persist:
-        try:
-            row = await save_run_async(
-                session, "aquacrop_advanced", model_params, result, farm_id=farm_id
-            )
             result["run_id"] = row.id
         except Exception as e:
             result["persist_error"] = str(e)[:120]
