@@ -1,24 +1,35 @@
 // apps/web/src/pages/PaymentsPage.tsx
-import { useMemo, useState } from "react";
-import { CreditCard, Download, Plus, Search, Check } from "lucide-react";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { CreditCard, Download, Plus, Search, Check, Link2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useLang } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { PaymentStats } from "../components/payments/PaymentStats";
 import { PaymentMethods } from "../components/payments/PaymentMethods";
 import { PaymentsTable } from "../components/payments/PaymentsTable";
 import { NewPaymentModal, type NewPaymentData } from "../components/payments/NewPaymentModal";
-import { PAY_STR, payText, statusText, methodText, unitOf, type PayLang } from "../components/payments/paymentsI18n";
+import { PAY_STR, statusText, methodText, unitOf, type PayLang } from "../components/payments/paymentsI18n";
 import {
-  INITIAL_PAYMENTS, INITIAL_METHODS, STATUS_FILTERS, METHOD_FILTERS, paymentsToCSV, downloadCSV,
+  STATUS_FILTERS, METHOD_FILTERS, paymentsToCSV, downloadCSV,
   type Payment, type PaymentMethod, type PaymentStatus, type PaymentMethodKind, type SortKey, type SortDir,
 } from "../components/payments/paymentsData";
+import {
+  readPayments, readMethods,
+  addPayment, updatePaymentStatus, removePayment,
+  setDefaultMethod, addCardMethod, removeMethod,
+} from "../lib/paymentsStore";
+import { RequirePermission } from "../components/rbac/RequirePermission";
+import { can, readDemoRole } from "../lib/rbacStore";
+import { readCurrencySettings, formatMoney } from "../lib/currencyStore";
 
-export default function PaymentsPage() {
+function PaymentsPageInner() {
   const { lang } = useLang();
   const s = PAY_STR[lang as PayLang];
+  const role = readDemoRole();
+  const canManage = can(role, "payments.manage");
 
-  const [payments, setPayments] = useState<Payment[]>(INITIAL_PAYMENTS);
-  const [methods, setMethods] = useState<PaymentMethod[]>(INITIAL_METHODS);
+  const [payments, setPayments] = useState<Payment[]>(() => readPayments());
+  const [methods, setMethods] = useState<PaymentMethod[]>(() => readMethods());
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | PaymentStatus>("all");
   const [methodFilter, setMethodFilter] = useState<"all" | PaymentMethodKind>("all");
@@ -26,6 +37,21 @@ export default function PaymentsPage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [modalOpen, setModalOpen] = useState(false);
   const [exported, setExported] = useState(false);
+  const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    const onStorage = () => {
+      setPayments(readPayments());
+      setMethods(readMethods());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2200);
+  }, []);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -39,23 +65,51 @@ export default function PaymentsPage() {
       return sortDir === "asc" ? cmp : -cmp;
     });
     return list;
-  }, [payments, statusFilter, methodFilter, search, sortKey, sortDir, lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [payments, statusFilter, methodFilter, search, sortKey, sortDir, s]);
 
   const onSort = (k: SortKey) => {
     if (k === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(k); setSortDir("desc"); }
   };
 
-  const createPayment = (d: NewPaymentData) =>
-    setPayments((prev) => [{ id: `p${Date.now()}`, method: d.method, amount: d.amount, status: "pending", date: new Date().toISOString(), reference: d.reference }, ...prev]);
+  const createPayment = (d: NewPaymentData) => {
+    const defaultCard = methods.find((m) => m.isDefault && m.kind === "credit_card");
+    const last4 = d.method === "credit_card" ? defaultCard?.last4 : undefined;
+    const next = addPayment({ ...d, last4 }, payments);
+    setPayments(next);
+    showToast(lang === "fa" ? "پرداخت ثبت شد" : lang === "ar" ? "تم تسجيل الدفعة" : "Payment recorded");
+  };
 
-  const setDefault = (id: string) =>
-    setMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === id ? true : (m.kind === "credit_card" || m.kind === "bank_transfer") ? false : m.isDefault })));
+  const onSetStatus = (id: string, status: PaymentStatus) => {
+    if (!canManage) return;
+    setPayments(updatePaymentStatus(id, status, payments));
+    showToast(statusText(s, status));
+  };
 
-  const addCard = (last4: string, holder: string) =>
-    setMethods((prev) => [...prev, { id: `m${Date.now()}`, kind: "credit_card", last4, holder, isDefault: false }]);
+  const onDeletePayment = (id: string) => {
+    if (!canManage) return;
+    setPayments(removePayment(id, payments));
+    showToast(lang === "fa" ? "حذف شد" : lang === "ar" ? "تم الحذف" : "Deleted");
+  };
 
-  const resolveRow = (p: Payment) => [p.id, methodText(s, p.method), String(p.amount), unitOf(p.method, lang), statusText(s, p.status), p.date.slice(0, 10), p.reference];
+  const setDefault = (id: string) => {
+    if (!canManage) return;
+    setMethods(setDefaultMethod(id, methods));
+  };
+
+  const addCard = (last4: string, holder: string) => {
+    if (!canManage) return;
+    setMethods(addCardMethod(last4, holder, methods));
+    showToast(lang === "fa" ? "کارت افزوده شد" : lang === "ar" ? "تمت إضافة البطاقة" : "Card added");
+  };
+
+  const onRemoveCard = (id: string) => {
+    if (!canManage) return;
+    setMethods(removeMethod(id, methods));
+    showToast(lang === "fa" ? "کارت حذف شد" : lang === "ar" ? "تم حذف البطاقة" : "Card removed");
+  };
+
+  const resolveRow = (p: Payment) => [p.id, methodText(s, p.method), String(p.amount), unitOf(p.method, lang as PayLang), statusText(s, p.status), p.date.slice(0, 10), p.reference];
   const headers = s.csvHeaders.split(",");
   const exportAll = () => {
     downloadCSV("payments.csv", paymentsToCSV(filtered, resolveRow, headers));
@@ -63,6 +117,11 @@ export default function PaymentsPage() {
   };
 
   const selectCls = "rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-bold text-stone-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/15";
+
+  const currencyHint = useMemo(() => {
+    const cs = readCurrencySettings();
+    return formatMoney(100, cs.primary, cs, lang === "fa" ? "fa-IR" : lang === "ar" ? "ar-EG" : "en-US");
+  }, [lang]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
@@ -75,21 +134,43 @@ export default function PaymentsPage() {
               <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link to="/accounting" className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-bold text-stone-600 hover:bg-stone-50">
+              <Link2 className="h-3.5 w-3.5" />{lang === "fa" ? "حسابداری" : lang === "ar" ? "المحاسبة" : "Accounting"}
+            </Link>
+            <Link to="/currency" className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-xs font-bold text-stone-600 hover:bg-stone-50">
+              {lang === "fa" ? "ارز" : lang === "ar" ? "العملة" : "Currency"} · {currencyHint}
+            </Link>
             <button onClick={exportAll} disabled={filtered.length === 0}
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 ${exported ? "bg-green-50 text-green-700" : "bg-white text-stone-700 hover:bg-stone-50 border border-stone-200"}`}>
               {exported ? <Check className="h-4 w-4" /> : <Download className="h-4 w-4" />}{s.exportAll}
             </button>
-            <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-700">
-              <Plus className="h-4 w-4" />{s.newPayment}
-            </button>
+            {canManage && (
+              <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-700">
+                <Plus className="h-4 w-4" />{s.newPayment}
+              </button>
+            )}
           </div>
         </div>
       </SectionReveal>
 
+      {toast && (
+        <div className="fixed bottom-6 start-1/2 z-[60] -translate-x-1/2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white shadow-lg" role="status">
+          {toast}
+        </div>
+      )}
+
       <PaymentStats payments={payments} strings={s} lang={lang as PayLang} />
 
-      <PaymentMethods methods={methods} strings={s} lang={lang as PayLang} onSetDefault={setDefault} onAddCard={addCard} />
+      <PaymentMethods
+        methods={methods}
+        strings={s}
+        lang={lang as PayLang}
+        onSetDefault={setDefault}
+        onAddCard={addCard}
+        onRemoveCard={canManage ? onRemoveCard : undefined}
+        canManage={canManage}
+      />
 
       <SectionReveal delay={100}>
         <div className="flex flex-wrap items-center gap-3">
@@ -120,10 +201,27 @@ export default function PaymentsPage() {
       </SectionReveal>
 
       <SectionReveal delay={120}>
-        <PaymentsTable payments={filtered} strings={s} lang={lang as PayLang} sortKey={sortKey} sortDir={sortDir} onSort={onSort} />
+        <PaymentsTable
+          payments={filtered}
+          strings={s}
+          lang={lang as PayLang}
+          sortKey={sortKey}
+          sortDir={sortDir}
+          onSort={onSort}
+          onSetStatus={canManage ? onSetStatus : undefined}
+          onDelete={canManage ? onDeletePayment : undefined}
+        />
       </SectionReveal>
 
-      <NewPaymentModal open={modalOpen} strings={s} lang={lang as PayLang} onClose={() => setModalOpen(false)} onCreate={createPayment} />
+      <NewPaymentModal open={modalOpen} strings={s} lang={lang as PayLang} onClose={() => setModalOpen(false)} onCreate={createPayment} methods={methods} />
     </div>
+  );
+}
+
+export default function PaymentsPage() {
+  return (
+    <RequirePermission perm="payments.view">
+      <PaymentsPageInner />
+    </RequirePermission>
   );
 }
