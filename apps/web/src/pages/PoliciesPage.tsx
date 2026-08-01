@@ -7,6 +7,7 @@ import { PolicyStats } from "../components/policies/PolicyStats";
 import { PolicyList, CATEGORY_ICON } from "../components/policies/PolicyList";
 import { PolicyDetailModal } from "../components/policies/PolicyDetailModal";
 import { POL_STR, polText, statusText, catText, localeOf, type PolLang } from "../components/policies/policiesI18n";
+import { RequirePermission } from "../components/rbac/RequirePermission";
 import {
   POLICIES, CATEGORY_ORDER, STATUS_FILTERS, countByCategory, compareVersion,
   formatDate, downloadText, downloadCSV, policiesToCSV,
@@ -41,7 +42,7 @@ export default function PoliciesPage() {
       return sortDir === "asc" ? cmp : -cmp;
     });
     return list;
-  }, [search, statusFilter, catFilter, sortKey, sortDir, lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [search, statusFilter, catFilter, sortKey, sortDir, lang]);
 
   const buildDoc = (p: Policy) =>
     [
@@ -55,15 +56,20 @@ export default function PoliciesPage() {
   const downloadOne = (p: Policy) => downloadText(`${p.id}-${p.version}.txt`, buildDoc(p));
   const exportAll = () => {
     const headers = s.csvHeaders.split(",");
-    const rows = filtered.map((p) => [p.id, polText(s, p.titleKey), catText(s, p.category), p.version, statusText(s, p.status), p.updated.slice(0, 10)]);
-    downloadCSV("policies.csv", policiesToCSV(filtered, () => [], headers).replace(/\n$/, "") === headers.join(",") ? [headers.join(",")].join("\n") : policiesToCSV(filtered, (p) => [p.id, polText(s, p.titleKey), catText(s, p.category), p.version, statusText(s, p.status), p.updated.slice(0, 10)], headers));
-    void rows;
-    setExported(true); setTimeout(() => setExported(false), 1800);
+    downloadCSV(
+      "policies.csv",
+      policiesToCSV(
+        filtered,
+        (p) => [p.id, polText(s, p.titleKey), catText(s, p.category), p.version, statusText(s, p.status), p.updated.slice(0, 10)],
+        headers,
+      ),
+    );
+    setExported(true);
+    setTimeout(() => setExported(false), 1800);
   };
 
-  const selectCls = "rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-bold text-stone-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/15";
-
   return (
+    <RequirePermission perm="policies.view">
     <div className="mx-auto max-w-6xl space-y-6 p-5 sm:p-8">
       <SectionReveal>
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -85,7 +91,6 @@ export default function PoliciesPage() {
 
       <PolicyStats policies={POLICIES} strings={s} />
 
-      {/* دسته‌بندی‌ها به‌عنوان فیلتر سریع */}
       <SectionReveal delay={90}>
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-stone-400">{s.categoriesTitle}</p>
@@ -110,7 +115,6 @@ export default function PoliciesPage() {
         </div>
       </SectionReveal>
 
-      {/* toolbar */}
       <SectionReveal delay={110}>
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[200px] flex-1">
@@ -128,7 +132,7 @@ export default function PoliciesPage() {
           </div>
           <select value={`${sortKey}-${sortDir}`}
             onChange={(e) => { const [k, dd] = e.target.value.split("-") as [SortKey, SortDir]; setSortKey(k); setSortDir(dd); }}
-            className={selectCls} aria-label={s.sortLabel}>
+            className="rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-bold text-stone-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/15" aria-label={s.sortLabel}>
             <option value="updated-desc">{s.sortUpdated} ↓</option>
             <option value="updated-asc">{s.sortUpdated} ↑</option>
             <option value="version-desc">{s.sortVersion} ↓</option>
@@ -144,5 +148,6 @@ export default function PoliciesPage() {
 
       <PolicyDetailModal policy={open} strings={s} lang={lang as PolLang} onClose={() => setOpen(null)} />
     </div>
+    </RequirePermission>
   );
 }
