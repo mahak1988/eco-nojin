@@ -26,6 +26,12 @@ export const RESOURCES: Resource[] = [
   { id: "r6", titleKey: "t6", summaryKey: "sum6", type: "video", category: "cat_training",      downloads: 940,  sizeKb: 36800, updated: daysAgo(2) },
   { id: "r7", titleKey: "t7", summaryKey: "sum7", type: "doc",   category: "cat_report",        downloads: 412,  sizeKb: 920,  updated: daysAgo(20) },
   { id: "r8", titleKey: "t8", summaryKey: "sum8", type: "audio", category: "cat_podcast",       downloads: 688,  sizeKb: 12400, updated: daysAgo(6) },
+  // C4 — five short articles from project preface / statement (no pilot site names)
+  { id: "r_c4_1", titleKey: "c4_t1", summaryKey: "c4_s1", type: "doc", category: "cat_documentation", downloads: 210, sizeKb: 48, updated: daysAgo(0) },
+  { id: "r_c4_2", titleKey: "c4_t2", summaryKey: "c4_s2", type: "doc", category: "cat_documentation", downloads: 185, sizeKb: 42, updated: daysAgo(0) },
+  { id: "r_c4_3", titleKey: "c4_t3", summaryKey: "c4_s3", type: "doc", category: "cat_guide",         downloads: 160, sizeKb: 36, updated: daysAgo(0) },
+  { id: "r_c4_4", titleKey: "c4_t4", summaryKey: "c4_s4", type: "doc", category: "cat_guide",         downloads: 142, sizeKb: 40, updated: daysAgo(0) },
+  { id: "r_c4_5", titleKey: "c4_t5", summaryKey: "c4_s5", type: "doc", category: "cat_report",        downloads: 128, sizeKb: 38, updated: daysAgo(0) },
 ];
 
 export const TYPE_FILTERS: ("all" | ResourceType)[] = ["all", "pdf", "video", "audio", "doc"];
