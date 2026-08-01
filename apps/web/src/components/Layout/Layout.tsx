@@ -1,8 +1,9 @@
-/** App shell: Header + main + Footer. Direction follows active language. */
+/** App shell: Header + main + Footer + global AI assistant. Direction follows active language. */
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useLang, getLanguageDir } from "../eco/i18n";
+import { GlobalAiAssistant } from "../ai/GlobalAiAssistant";
 
 export default function Layout() {
   const { lang } = useLang();
@@ -18,6 +19,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <GlobalAiAssistant />
     </div>
   );
 }
