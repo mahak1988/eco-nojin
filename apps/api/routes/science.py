@@ -1,4 +1,8 @@
-"""Science API — process models + soil + global SA + final reports."""
+"""Science API — process models + soil + global SA + final reports.
+
+Public (no auth) for pure compute: aquacrop-advanced, rothc, status, formulas.
+Write-heavy / admin paths keep RBAC where needed.
+"""
 
 from __future__ import annotations
 
@@ -55,7 +59,7 @@ class AquaBody(BaseModel):
     lon: Optional[float] = None
     use_ndvi_canopy: bool = False
     farm_id: Optional[int] = None
-    persist: bool = True
+    persist: bool = False
     crop: str = "wheat"
 
 
@@ -105,6 +109,7 @@ async def science_status() -> dict[str, Any]:
         "global_sa": ["rothc", "rusle", "ml"],
         "reports": ["rothc", "rusle", "aquacrop", "scs"],
         "ok": True,
+        "auth": "aquacrop-advanced and rothc are public compute endpoints",
         "notes_fa": "خروجی مدل‌ها: analysis + report نهایی؛ SA جهانی برای خاک و ML.",
         "notes_en": "Model outputs include analysis + final report; global SA for soil and ML.",
     }
@@ -140,13 +145,13 @@ async def swat_run(
 async def aquacrop_run(
     body: AquaBody,
     session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(_perm("simulation:write")),
 ) -> dict[str, Any]:
+    """Public conceptual AquaCrop run — no auth required (Phase B1 demo)."""
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
     from apps.simulation.report_builder import report_aquacrop
 
     params = body.model_dump()
-    persist = params.pop("persist", True)
+    persist = params.pop("persist", False)
     farm_id = params.pop("farm_id", None)
     use_ndvi = params.pop("use_ndvi_canopy", False)
     lat, lon = params.pop("lat", None), params.pop("lon", None)
@@ -254,8 +259,8 @@ async def rothc_run(
     clay_pct: float = Query(25.0),
     with_sa: bool = Query(False),
     session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(_perm("simulation:write")),
 ) -> dict[str, Any]:
+    """Public RothC run — no auth required."""
     from apps.simulation.report_builder import report_rothc
     from apps.simulation.rothc_model import run_rothc
 

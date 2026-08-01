@@ -1,4 +1,7 @@
-"""Phase 3 scientific APIs — no Celery import at module load."""
+"""Phase 3 scientific APIs — no Celery import at module load.
+
+Public compute: aquacrop-advanced (no auth). Other write paths keep RBAC.
+"""
 
 from __future__ import annotations
 
@@ -52,7 +55,8 @@ class AquaAdvBody(BaseModel):
     use_ndvi_canopy: bool = False
     farm_id: Optional[int] = None
     async_mode: bool = False
-    persist: bool = True
+    persist: bool = False
+    crop: str = "wheat"
 
 
 class ScenarioBody(BaseModel):
@@ -101,6 +105,7 @@ async def science_status() -> dict[str, Any]:
             "ndvi_canopy_bridge": True,
             "postgis_farm_index": True,
         },
+        "auth": "aquacrop-advanced is public compute",
         "note": "SWAT+ is process proxy until official binary is installed",
     }
 
@@ -139,11 +144,11 @@ async def swat_run(
 async def aquacrop_adv(
     body: AquaAdvBody,
     session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(require_permission("simulation:write")),
 ) -> dict[str, Any]:
+    """Public conceptual AquaCrop — no login required."""
     params = body.model_dump()
     async_mode = params.pop("async_mode", False)
-    persist = params.pop("persist", True)
+    persist = params.pop("persist", False)
     farm_id = params.pop("farm_id", None)
     use_live = params.pop("use_live_climate", False)
     use_ndvi = params.pop("use_ndvi_canopy", False)
@@ -169,7 +174,7 @@ async def aquacrop_adv(
 
             celery_params = dict(params)
             celery_params["farm_id"] = farm_id
-            celery_params["use_ndvi_canopy"] = False  # already resolved above
+            celery_params["use_ndvi_canopy"] = False
             task = task_aquacrop_advanced.delay(celery_params)
             return {"status": "queued", "task_id": task.id, "model": "aquacrop_advanced"}
         except Exception as e:
