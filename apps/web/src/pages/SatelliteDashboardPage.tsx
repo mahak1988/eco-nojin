@@ -22,6 +22,8 @@ const BAR = {
   poor: "from-rose-400 to-red-600",
 } as const;
 
+const T_SAT = 60_000;
+
 function extractNdvi(row: Record<string, unknown>): number {
   const v = Number(row.mean_ndvi ?? row.ndvi ?? row.value);
   return Number.isFinite(v) ? v : NaN;
@@ -55,9 +57,11 @@ export default function SatelliteDashboardPage() {
     setError(null);
     try {
       const [n, t, s] = await Promise.all([
-        apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${a}&lon=${b}`),
+        apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${a}&lon=${b}`, {}, T_SAT),
         apiFetch<{ data?: Array<Record<string, unknown>>; points?: Array<Record<string, unknown>>; timeseries?: Array<Record<string, unknown>> }>(
           `${v1("/satellite/timeseries")}?lat=${a}&lon=${b}&days=90`,
+          {},
+          T_SAT,
         ),
         fetchEoSensors(a, b, 60).catch(() => null),
       ]);
@@ -197,6 +201,7 @@ export default function SatelliteDashboardPage() {
         <div className="flex flex-col items-center gap-2 py-10">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
           <p className="text-sm text-stone-500">{tx("sat_loading")}</p>
+          <p className="text-[11px] text-amber-700">NDVI may take 20–45s on first Planetary hit</p>
         </div>
       )}
 
