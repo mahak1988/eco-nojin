@@ -28,6 +28,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.session import Base
+from apps.shared_core.timeutil import utc_now
 
 logger = logging.getLogger(__name__)
 
@@ -82,11 +83,9 @@ class Account(Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_system: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
 
     parent: Mapped[Optional["Account"]] = relationship(
@@ -106,7 +105,6 @@ class Account(Base):
 
     @property
     def balance(self) -> Decimal:
-        """Computed balance (set by AccountService after calculate_balance)."""
         return getattr(self, "_balance", Decimal("0.00"))
 
     @balance.setter
@@ -123,11 +121,9 @@ class JournalEntry(Base):
     reference: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     is_posted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
 
     items: Mapped[List["JournalItem"]] = relationship(
@@ -169,9 +165,7 @@ class JournalItem(Base):
     entry_type: Mapped[EntryType] = mapped_column(SQLEnum(EntryType), nullable=False)
     amount: Mapped[Decimal] = mapped_column(Numeric(15, 2), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
 
     entry: Mapped["JournalEntry"] = relationship("JournalEntry", back_populates="items")
     account: Mapped["Account"] = relationship("Account", back_populates="journal_items")
@@ -201,11 +195,9 @@ class Invoice(Base):
     journal_entry_id: Mapped[Optional[str]] = mapped_column(
         String(30), ForeignKey("journal_entries.id"), nullable=True
     )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
 
     items: Mapped[List["InvoiceItem"]] = relationship(
@@ -256,9 +248,7 @@ class Payment(Base):
     journal_entry_id: Mapped[Optional[str]] = mapped_column(
         String(30), ForeignKey("journal_entries.id"), nullable=True
     )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
 
     invoice: Mapped[Optional["Invoice"]] = relationship(
         "Invoice", back_populates="payments"
@@ -284,11 +274,9 @@ class Budget(Base):
     )
     variance: Mapped[Optional[Decimal]] = mapped_column(Numeric(15, 2), nullable=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
 
     def __repr__(self) -> str:
@@ -305,9 +293,7 @@ class BudgetAlert(Base):
     threshold_percent: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
     trigger_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
 
 
 class TaxRate(Base):
@@ -321,9 +307,7 @@ class TaxRate(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     effective_from: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     effective_to: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
 
     def __repr__(self) -> str:
         return f"<TaxRate({self.name} {self.rate}%)>"
@@ -350,11 +334,9 @@ class FixedAsset(Base):
     net_book_value: Mapped[Decimal] = mapped_column(Numeric(15, 2), nullable=False)
     account_id: Mapped[str] = mapped_column(String(20), ForeignKey("accounts.id"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
 
     def __repr__(self) -> str:
