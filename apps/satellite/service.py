@@ -1,4 +1,4 @@
-"""Satellite orchestration — cache → GEE → MPC → synthetic fallback."""
+"""Satellite orchestration — free-first: Planetary → GEE → synthetic fallback."""
 
 from __future__ import annotations
 
@@ -22,10 +22,10 @@ class SatelliteServiceError(Exception):
 
 class SatelliteService:
     """
-    Fallback order:
+    Fallback order (Phase 2 — zero cost preferred):
     1. Optional Redis cache
-    2. Google Earth Engine (if credentials)
-    3. Microsoft Planetary Computer (if pystac-client)
+    2. Microsoft Planetary Computer (free STAC; optional real raster NDVI)
+    3. Google Earth Engine (if credentials)
     4. Synthetic (always)
     Copernicus used for catalogue/availability when credentials present.
     """
@@ -35,7 +35,8 @@ class SatelliteService:
         self.copernicus = CopernicusProvider()
         self.planetary = PlanetaryComputerProvider()
         self.synthetic = SyntheticProvider()
-        self.ndvi_providers = [self.gee, self.planetary, self.synthetic]
+        # Free-first: Planetary before GEE
+        self.ndvi_providers = [self.planetary, self.gee, self.synthetic]
 
     def _redis(self):
         try:
@@ -103,7 +104,7 @@ class SatelliteService:
         self, bbox: BBox, start_date: date, end_date: date
     ) -> dict[str, Any]:
         out = []
-        for p in [self.gee, self.copernicus, self.planetary, self.synthetic]:
+        for p in [self.planetary, self.gee, self.copernicus, self.synthetic]:
             try:
                 if p.is_available or p is self.synthetic:
                     rows = await p.get_availability(bbox, start_date, end_date)
