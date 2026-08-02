@@ -12,6 +12,7 @@ import {
   Droplets,
   Sparkles,
   ArrowUpRight,
+  Mountain,
 } from "lucide-react";
 import { useLang, CONTENT } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
@@ -20,6 +21,13 @@ import { WeatherPanel } from "../components/eco/WeatherPanel";
 import { WorldMapBg } from "../components/eco/WorldMapBg";
 import { apiFetch, v1 } from "../api/http";
 import { farmsApi } from "../lib/farmsApi";
+import {
+  HYDROMA,
+  FOUR_PILLARS,
+  PILOTS,
+  ECO_MODULES,
+  SCIENCE_CHAIN,
+} from "../lib/hydromaContent";
 
 const STEP_COLORS = ["var(--v-green)", "var(--v-blue)", "var(--v-red)"];
 const MODULE_LINKS = [
@@ -32,16 +40,18 @@ const MODULE_LINKS = [
 ];
 
 const TOOLS = [
-  { to: "/satellite", icon: Satellite, titleFa: "ماهواره و NDVI", titleEn: "Satellite & NDVI", tone: "from-indigo-500 to-violet-600" },
+  { to: "/hydroma", icon: Mountain, titleFa: "هیدروما نوژین", titleEn: "Hydroma", tone: "from-teal-600 to-emerald-700" },
+  { to: "/danesh-yar", icon: BookOpen, titleFa: "دانش‌یار", titleEn: "Knowledge AI", tone: "from-sky-500 to-blue-600" },
+  { to: "/tasmim-yar", icon: Sparkles, titleFa: "تصمیم‌یار", titleEn: "Decision AI", tone: "from-violet-500 to-fuchsia-600" },
+  { to: "/watershed", icon: Droplets, titleFa: "آبخیزداری", titleEn: "Watershed", tone: "from-cyan-500 to-blue-500" },
+  { to: "/bio-fertilizer", icon: Leaf, titleFa: "کود زیستی", titleEn: "Bio-fertilizer", tone: "from-lime-500 to-green-700" },
+  { to: "/rangeland", icon: Mountain, titleFa: "مرتع", titleEn: "Rangeland", tone: "from-amber-600 to-orange-700" },
+  { to: "/satellite", icon: Satellite, titleFa: "ماهواره", titleEn: "Satellite", tone: "from-indigo-500 to-violet-600" },
   { to: "/farms/map", icon: MapPin, titleFa: "نقشه مزارع", titleEn: "Farm map", tone: "from-emerald-500 to-teal-600" },
   { to: "/simulators", icon: FlaskConical, titleFa: "شبیه‌سازها", titleEn: "Simulators", tone: "from-amber-500 to-orange-600" },
-  { to: "/science/e2e", icon: Sparkles, titleFa: "زنجیره علمی E2E", titleEn: "Science E2E", tone: "from-fuchsia-500 to-pink-600" },
-  { to: "/mrv", icon: ShieldCheck, titleFa: "MRV و اعتبار کربن", titleEn: "MRV & carbon", tone: "from-green-600 to-lime-600" },
+  { to: "/mrv", icon: ShieldCheck, titleFa: "MRV", titleEn: "MRV", tone: "from-green-600 to-lime-600" },
   { to: "/ecocoin", icon: Coins, titleFa: "اکوسکه", titleEn: "EcoCoin", tone: "from-yellow-500 to-amber-600" },
-  { to: "/education", icon: BookOpen, titleFa: "آموزش", titleEn: "Education", tone: "from-sky-500 to-blue-600" },
   { to: "/monitoring", icon: LineChart, titleFa: "پایش", titleEn: "Monitoring", tone: "from-slate-600 to-slate-800" },
-  { to: "/water", icon: Droplets, titleFa: "آب و آبیاری", titleEn: "Water", tone: "from-cyan-500 to-blue-500" },
-  { to: "/simulators/aquacrop", icon: Leaf, titleFa: "AquaCrop", titleEn: "AquaCrop", tone: "from-lime-500 to-green-700" },
 ];
 
 function CursorGlow() {
@@ -101,17 +111,10 @@ function ConceptExplorer() {
                 {st.i}
               </span>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] font-bold" style={{ color: STEP_COLORS[i] }}>
-                    0{i + 1}
-                  </span>
-                  <h4 className="font-bold" style={{ color: a === i ? STEP_COLORS[i] : "var(--text-3)" }}>
-                    {st.t}
-                  </h4>
-                </div>
-                {a === i && (
-                  <p className="mt-1.5 text-sm font-medium leading-relaxed text-[var(--text-2)]">{st.d}</p>
-                )}
+                <h4 className="font-bold" style={{ color: a === i ? STEP_COLORS[i] : "var(--text-3)" }}>
+                  {st.t}
+                </h4>
+                {a === i && <p className="mt-1.5 text-sm text-[var(--text-2)]">{st.d}</p>}
               </div>
             </div>
           </button>
@@ -120,17 +123,13 @@ function ConceptExplorer() {
       <div
         key={a}
         style={{ "--step": STEP_COLORS[a] } as CSSProperties}
-        className="step-show relative flex flex-col justify-center overflow-hidden rounded-[var(--r-xl)] p-8 sm:p-10"
+        className="step-show relative flex flex-col justify-center overflow-hidden rounded-[var(--r-xl)] p-8"
       >
-        <div
-          className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl"
-          style={{ background: STEP_COLORS[a], animation: "float 8s ease-in-out infinite" }}
-        />
-        <span className="relative mb-6 block text-6xl">{s.i}</span>
-        <h3 className="relative mb-3 font-display text-3xl" style={{ color: STEP_COLORS[a] }}>
+        <span className="mb-6 text-6xl">{s.i}</span>
+        <h3 className="font-display text-3xl" style={{ color: STEP_COLORS[a] }}>
           {s.t}
         </h3>
-        <p className="relative mb-6 max-w-md font-medium leading-relaxed text-[var(--text-2)]">{s.d}</p>
+        <p className="mt-3 max-w-md text-[var(--text-2)]">{s.d}</p>
       </div>
     </div>
   );
@@ -144,23 +143,13 @@ function LiveTrustBar() {
 
   useEffect(() => {
     let cancelled = false;
-    // Health fast — never block on Planetary NDVI
     apiFetch<Record<string, unknown>>("/health", {}, 12_000)
-      .then((h) => {
-        if (!cancelled) setHealth(h);
-      })
-      .catch(() => {
-        if (!cancelled) setHealth(null);
-      });
+      .then((h) => !cancelled && setHealth(h))
+      .catch(() => !cancelled && setHealth(null));
     farmsApi
       .list(1, 1)
-      .then((f) => {
-        if (!cancelled) setFarmCount(f?.meta?.total ?? f?.data?.length ?? 0);
-      })
-      .catch(() => {
-        if (!cancelled) setFarmCount(null);
-      });
-    // NDVI can take 15–40s on first Planetary hit
+      .then((f) => !cancelled && setFarmCount(f?.meta?.total ?? f?.data?.length ?? 0))
+      .catch(() => !cancelled && setFarmCount(null));
     apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=32.65&lon=51.67`, {}, 45_000)
       .then((n) => {
         if (cancelled) return;
@@ -168,48 +157,39 @@ function LiveTrustBar() {
         setNdvi(Number.isFinite(v) ? v : null);
         setProvider(String(n.provider ?? n.source ?? ""));
       })
-      .catch(() => {
-        /* optional */
-      });
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, []);
 
+  const status = health ? String(health.status ?? "ok") : "…";
+  const db = health ? String(health.database ?? "—") : "…";
   const routers = Array.isArray(health?.loaded_routers)
     ? (health!.loaded_routers as string[]).length
     : null;
-  const status = health ? String(health.status ?? "ok") : "…";
-  const db = health ? String(health.database ?? "—") : "…";
 
   return (
-    <section className="relative overflow-hidden border-b border-[var(--border-subtle)] bg-[var(--surface-raised)] py-14">
+    <section className="relative border-b border-[var(--border-subtle)] bg-[var(--surface-raised)] py-14">
       <WorldMapBg variant="light" />
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
-        <SectionReveal className="mb-9 text-center">
-          <h2 className="font-display text-2xl txt-ink">وضعیت زنده پلتفرم</h2>
-          <p className="mt-2 text-sm text-stone-500">داده از API — بدون شمارندهٔ آزمایشی</p>
-        </SectionReveal>
+      <div className="relative mx-auto max-w-6xl px-5">
+        <h2 className="mb-8 text-center font-display text-2xl">وضعیت زنده پلتفرم</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            { l: "API", v: status, glow: "shadow-emerald-200" },
-            { l: "Database", v: db, glow: "" },
-            { l: "Routers", v: routers != null ? String(routers) : "—", glow: "" },
-            { l: "Farms", v: farmCount != null ? String(farmCount) : "—", glow: "" },
-          ].map((s, i) => (
-            <div
-              key={s.l}
-              className={`rounded-2xl border border-stone-200/80 bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md ${s.glow}`}
-              style={{ animation: `fade-up .5s var(--ease-out) ${i * 80}ms both` }}
-            >
-              <div className="mb-1 font-display text-3xl tabular-nums text-emerald-800">{s.v}</div>
-              <p className="text-sm font-bold text-[var(--text-2)]">{s.l}</p>
+            { l: "API", v: status },
+            { l: "Database", v: db },
+            { l: "Routers", v: routers != null ? String(routers) : "—" },
+            { l: "Farms", v: farmCount != null ? String(farmCount) : "—" },
+          ].map((s) => (
+            <div key={s.l} className="rounded-2xl border bg-white p-5 text-center shadow-sm">
+              <div className="font-display text-3xl text-emerald-800">{s.v}</div>
+              <p className="text-sm font-bold text-stone-600">{s.l}</p>
             </div>
           ))}
         </div>
         {ndvi != null && (
-          <p className="mt-6 text-center text-sm text-stone-600" style={{ animation: "fade-in .6s ease both" }}>
-            NDVI نمونه (اصفهان): <strong className="tabular-nums">{ndvi.toFixed(3)}</strong>
+          <p className="mt-6 text-center text-sm text-stone-600">
+            NDVI نمونه: <strong>{ndvi.toFixed(3)}</strong>
             {provider ? ` · ${provider}` : ""}
           </p>
         )}
@@ -218,38 +198,126 @@ function LiveTrustBar() {
   );
 }
 
+function HydromaBanner() {
+  return (
+    <section className="relative overflow-hidden border-b border-emerald-900/10 bg-gradient-to-br from-emerald-900 via-teal-900 to-stone-900 px-5 py-16 text-white sm:px-8">
+      <div className="relative mx-auto max-w-6xl">
+        <SectionReveal>
+          <p className="text-xs font-bold uppercase tracking-widest text-emerald-200/80">{HYDROMA.company}</p>
+          <h2 className="mt-2 font-display text-3xl sm:text-4xl">{HYDROMA.brand}</h2>
+          <p className="mt-3 max-w-2xl text-emerald-50/90">{HYDROMA.taglineFa}</p>
+          <p className="mt-2 text-sm font-medium text-amber-200">{HYDROMA.sloganFa}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/hydroma" className="rounded-full bg-white px-6 py-2.5 text-sm font-bold text-emerald-900">
+              ورود به هیدروما
+            </Link>
+            <Link to="/danesh-yar" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
+              دانش‌یار
+            </Link>
+            <Link to="/tasmim-yar" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
+              تصمیم‌یار
+            </Link>
+          </div>
+        </SectionReveal>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {FOUR_PILLARS.map((p, i) => (
+            <div
+              key={p.id}
+              className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
+              style={{ animation: `fade-up .5s ease ${i * 70}ms both` }}
+            >
+              <span className="text-xl">{p.icon}</span>
+              <h3 className="mt-2 text-sm font-bold">{p.titleFa}</h3>
+              <p className="mt-1 text-xs text-emerald-100/70 line-clamp-3">{p.descFa}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PilotsStrip() {
+  return (
+    <section className="px-5 py-16 sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <h2 className="mb-2 text-center font-display text-2xl">پایلوت‌های چهارگانه</h2>
+        <p className="mb-8 text-center text-sm text-stone-500">طیف اقلیمی ایران از کوهستان خشک تا جنگل هیرکانی</p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {PILOTS.map((p) => (
+            <Link
+              key={p.id}
+              to="/pilots"
+              className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md"
+            >
+              <h3 className="font-bold text-emerald-900">{p.nameFa}</h3>
+              <p className="text-xs text-stone-500">
+                {p.regionFa} · {p.typeFa}
+              </p>
+              <p className="mt-2 text-xs text-stone-600">{p.focusFa}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          {SCIENCE_CHAIN.map((m) => (
+            <Link key={m} to="/simulators" className="rounded-full bg-stone-900 px-3 py-1 text-[11px] font-bold text-white">
+              {m}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DualEngine() {
+  return (
+    <section className="border-y border-stone-200 bg-stone-50 px-5 py-14 sm:px-8">
+      <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2">
+        <div className="rounded-3xl border border-teal-200 bg-white p-8 shadow-sm">
+          <h3 className="font-display text-2xl text-teal-900">{HYDROMA.brand}</h3>
+          <p className="mt-2 text-sm text-stone-600">احیای فیزیکی — ۱۲ بسته مهندسی HP</p>
+          <Link to="/hydroma" className="mt-4 inline-block text-sm font-bold text-teal-700 underline">
+            جزئیات مهندسی →
+          </Link>
+        </div>
+        <div className="rounded-3xl border border-violet-200 bg-white p-8 shadow-sm">
+          <h3 className="font-display text-2xl text-violet-900">{HYDROMA.eco}</h3>
+          <p className="mt-2 text-sm text-stone-600">پلتفرم نرم‌افزاری — MRV، دانش‌یار، تصمیم‌یار</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {ECO_MODULES.slice(0, 4).map((m) => (
+              <Link key={m.slug} to={m.path} className="rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-800">
+                {m.titleFa}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ToolsLauncher({ lang }: { lang: string }) {
   const fa = lang === "fa" || lang === "ar";
   return (
-    <section className="relative overflow-hidden px-5 py-20 sm:px-8">
-      <WorldMapBg variant="light" />
-      <div className="relative mx-auto max-w-6xl">
-        <SectionReveal className="mb-10 text-center">
-          <span className="font-mono text-xs font-bold text-emerald-700">TOOLS</span>
-          <h2 className="mt-2 font-display text-3xl txt-ink sm:text-4xl">
-            {fa ? "ابزارهای سریع" : "Quick tools"}
-          </h2>
-          <p className="mt-2 text-sm text-stone-500">
-            {fa ? "کارت‌های تعاملی — هر کارت یک مسیر واقعی" : "Interactive cards — each opens a real route"}
-          </p>
-        </SectionReveal>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <section className="px-5 py-20 sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <h2 className="mb-2 text-center font-display text-3xl">{fa ? "ابزارهای سریع" : "Quick tools"}</h2>
+        <p className="mb-10 text-center text-sm text-stone-500">هیدروما + اکو نوژین</p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TOOLS.map((tool, i) => (
-            <SectionReveal key={tool.to} delay={i * 50}>
+            <SectionReveal key={tool.to + tool.titleFa} delay={i * 40}>
               <Link
                 to={tool.to}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:-translate-y-2 hover:shadow-xl"
               >
                 <div
-                  className={`mb-3 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${tool.tone} text-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
+                  className={`mb-3 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${tool.tone} text-white`}
                 >
                   <tool.icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-sm font-bold text-stone-800">{fa ? tool.titleFa : tool.titleEn}</h3>
-                <ArrowUpRight className="absolute end-3 top-3 h-4 w-4 text-stone-300 transition group-hover:text-emerald-600" />
-                <div
-                  className={`pointer-events-none absolute -bottom-8 -end-8 h-24 w-24 rounded-full bg-gradient-to-br ${tool.tone} opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-20`}
-                />
+                <h3 className="text-sm font-bold">{fa ? tool.titleFa : tool.titleEn}</h3>
+                <ArrowUpRight className="absolute end-3 top-3 h-4 w-4 text-stone-300 group-hover:text-emerald-600" />
               </Link>
             </SectionReveal>
           ))}
@@ -275,54 +343,50 @@ export function Home() {
     <div id="top" className="overflow-hidden">
       <section
         ref={heroRef}
-        className="relative overflow-hidden px-5 pb-24 pt-12 sm:px-8 sm:pb-28 sm:pt-16"
+        className="relative overflow-hidden px-5 pb-24 pt-12 sm:px-8 sm:pt-16"
         style={{
           background: "radial-gradient(125% 95% at 78% 0%, #eef3e9 0%, #faf7f1 48%, #f6efe1 100%)",
         }}
       >
         <WorldMapBg variant="light" />
         <CursorGlow />
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-14">
+        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
           <div>
             <SectionReveal>
-              <span className="mb-7 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-bold txt-green">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--v-green)]" />
-                Live API
+              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-bold txt-green">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-600" />
+                {HYDROMA.sloganFa}
               </span>
             </SectionReveal>
-            <SectionReveal delay={90}>
-              <h1 className="mb-6 text-balance font-display text-4xl leading-[1.2] sm:text-5xl lg:text-[3.6rem]">
-                <span className="txt-ink">{t.heroT1}</span>
-                <span className="gradient-text">{t.heroGrad}</span>
-                <span className="txt-ink">{t.heroT2}</span>
+            <SectionReveal delay={80}>
+              <h1 className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
+                <span className="txt-ink">{HYDROMA.brand}</span>
+                <span className="mx-2 text-stone-400">×</span>
+                <span className="gradient-text">{HYDROMA.eco}</span>
               </h1>
             </SectionReveal>
-            <SectionReveal delay={170}>
-              <p className="mb-9 max-w-xl text-lg font-medium leading-relaxed text-[var(--text-2)]">{t.heroLede}</p>
+            <SectionReveal delay={140}>
+              <p className="mb-8 max-w-xl text-lg text-stone-600">{HYDROMA.taglineFa}</p>
             </SectionReveal>
-            <SectionReveal delay={250}>
-              <div className="flex flex-wrap items-center gap-4">
+            <SectionReveal delay={200}>
+              <div className="flex flex-wrap gap-3">
                 <Link
-                  to="/farms/map"
-                  className="rounded-full bg-[var(--v-green)] px-8 py-3.5 font-bold text-white shadow-[var(--shadow-md)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-700)]"
-                  style={{ animation: "pulse-glow 3s ease-in-out infinite" }}
+                  to="/hydroma"
+                  className="rounded-full bg-emerald-700 px-8 py-3.5 font-bold text-white shadow-md"
                 >
-                  ثبت مزرعه روی نقشه
+                  طرح هیدروما
                 </Link>
-                <Link
-                  to="/satellite"
-                  className="rounded-full border-2 border-[var(--v-amber)] px-8 py-3.5 font-bold txt-amber transition-all hover:-translate-y-0.5 hover:bg-orange-700/10"
-                >
-                  داده ماهواره‌ای
+                <Link to="/farms/map" className="rounded-full border-2 border-amber-600 px-8 py-3.5 font-bold text-amber-800">
+                  ثبت مزرعه
+                </Link>
+                <Link to="/satellite" className="rounded-full border border-stone-300 px-8 py-3.5 font-bold">
+                  ماهواره
                 </Link>
               </div>
             </SectionReveal>
           </div>
-          <SectionReveal delay={300}>
-            <div
-              className="grid gap-4 sm:grid-cols-2"
-              style={{ transform: "translateY(calc(var(--sy,0px) * -0.05))" }}
-            >
+          <SectionReveal delay={280}>
+            <div className="grid gap-4 sm:grid-cols-2">
               <SatellitePanel />
               <WeatherPanel />
             </div>
@@ -330,94 +394,56 @@ export function Home() {
         </div>
       </section>
 
+      <HydromaBanner />
+      <DualEngine />
       <LiveTrustBar />
       <ToolsLauncher lang={lang} />
+      <PilotsStrip />
 
-      <section
-        id="how"
-        className="relative overflow-hidden px-5 py-24 sm:px-8 sm:py-28"
-        style={{ background: "linear-gradient(180deg, var(--surface-raised), var(--surface))" }}
-      >
-        <WorldMapBg variant="light" />
-        <div className="relative mx-auto max-w-6xl">
+      <section className="px-5 py-24 sm:px-8" style={{ background: "linear-gradient(180deg, var(--surface-raised), var(--surface))" }}>
+        <div className="mx-auto max-w-6xl">
           <SectionReveal className="mb-12 max-w-2xl">
             <span className="font-mono text-xs font-bold txt-blue">{t.howK}</span>
-            <h2 className="mt-3 mb-3 text-balance font-display text-3xl txt-ink sm:text-4xl">{t.howT}</h2>
-            <p className="font-medium text-[var(--text-2)]">{t.howS}</p>
+            <h2 className="mt-3 font-display text-3xl">{t.howT}</h2>
           </SectionReveal>
-          <SectionReveal delay={120}>
-            <ConceptExplorer />
-          </SectionReveal>
+          <ConceptExplorer />
         </div>
       </section>
 
-      <section id="modules" className="relative overflow-hidden px-5 py-24 sm:px-8">
-        <WorldMapBg variant="light" />
-        <div className="relative mx-auto max-w-6xl">
-          <SectionReveal className="mb-12">
-            <span className="font-mono text-xs font-bold txt-green">{t.modK}</span>
-            <h2 className="mt-2 text-balance font-display text-3xl txt-ink sm:text-4xl">{t.modT}</h2>
-          </SectionReveal>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4 sm:auto-rows-[180px]">
-            {t.modules.map((m, i) => {
-              const warm = i % 3 === 2;
-              const g = warm
-                ? "from-amber-500/20 to-rose-500/10"
-                : i % 3 === 1
-                  ? "from-sky-500/20 to-cyan-500/10"
-                  : "from-emerald-500/20 to-teal-500/10";
-              const tc = warm ? "txt-amber" : i % 3 === 1 ? "txt-blue" : "txt-green";
-              return (
-                <SectionReveal
-                  key={m.n}
-                  delay={i * 70}
-                  className={i === 0 ? "sm:col-span-2 sm:row-span-2" : i === 5 ? "sm:col-span-2" : ""}
+      <section className="px-5 py-24 sm:px-8">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-10 font-display text-3xl">{t.modT}</h2>
+          <div className="grid gap-4 sm:grid-cols-4 sm:auto-rows-[180px]">
+            {t.modules.map((m, i) => (
+              <SectionReveal key={m.n} delay={i * 60} className={i === 0 ? "sm:col-span-2 sm:row-span-2" : ""}>
+                <Link
+                  to={MODULE_LINKS[i] ?? "/sitemap"}
+                  className="card-hover flex h-full min-h-[160px] flex-col justify-between rounded-[var(--r-lg)] border bg-gradient-to-br from-emerald-500/15 to-teal-500/5 p-6"
                 >
-                  <Link
-                    to={MODULE_LINKS[i] ?? "/sitemap"}
-                    className={`group relative flex h-full min-h-[160px] flex-col justify-between overflow-hidden rounded-[var(--r-lg)] border border-[var(--border-subtle)] bg-gradient-to-br ${g} p-6 card-hover`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <span className="text-3xl transition-transform duration-300 group-hover:scale-125">{m.i}</span>
-                      <span className={`font-mono text-[10px] font-bold ${tc}`}>{m.n}</span>
-                    </div>
-                    <div>
-                      <h3 className={`mb-1 text-base font-bold ${tc}`}>{m.t}</h3>
-                      <p className="text-sm font-medium leading-relaxed text-[var(--text-2)]">{m.d}</p>
-                    </div>
-                  </Link>
-                </SectionReveal>
-              );
-            })}
+                  <span className="text-3xl">{m.i}</span>
+                  <div>
+                    <h3 className="font-bold txt-green">{m.t}</h3>
+                    <p className="text-sm text-stone-600">{m.d}</p>
+                  </div>
+                </Link>
+              </SectionReveal>
+            ))}
           </div>
         </div>
       </section>
 
-      <section id="cta" className="relative overflow-hidden px-5 pb-24 sm:px-8">
-        <SectionReveal className="mx-auto max-w-4xl">
-          <div
-            className="relative overflow-hidden rounded-[var(--r-xl)] border border-[var(--border-subtle)] p-12 text-center sm:p-16"
-            style={{ background: "linear-gradient(135deg, #eef3e9, #faf7f1 50%, #f6efe1)" }}
-          >
-            <div className="pointer-events-none absolute inset-0 opacity-40" style={{ animation: "gradient-shift 12s ease infinite", backgroundSize: "200% 200%", backgroundImage: "linear-gradient(120deg,#eef3e9,#f6efe1,#e0f2fe,#eef3e9)" }} />
-            <h2 className="relative mb-4 text-balance font-display text-3xl txt-ink sm:text-4xl">{t.ctaT}</h2>
-            <p className="relative mx-auto mb-9 max-w-lg font-medium text-[var(--text-2)]">{t.ctaS}</p>
-            <div className="relative flex flex-wrap justify-center gap-3">
-              <Link
-                to="/register"
-                className="inline-block rounded-full bg-[var(--v-green)] px-10 py-4 text-lg font-bold text-white shadow-[var(--shadow-md)]"
-              >
-                {t.ctaB}
-              </Link>
-              <Link
-                to="/farms/map"
-                className="inline-block rounded-full border-2 border-emerald-700 px-10 py-4 text-lg font-bold text-emerald-800"
-              >
-                نقشه مزارع
-              </Link>
-            </div>
+      <section className="px-5 pb-24 sm:px-8">
+        <div className="mx-auto max-w-4xl rounded-[var(--r-xl)] border p-12 text-center" style={{ background: "linear-gradient(135deg,#eef3e9,#faf7f1)" }}>
+          <h2 className="font-display text-3xl">{HYDROMA.missionFa}</h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link to="/register" className="rounded-full bg-emerald-700 px-10 py-4 font-bold text-white">
+              {t.ctaB}
+            </Link>
+            <Link to="/hydroma" className="rounded-full border-2 border-emerald-800 px-10 py-4 font-bold text-emerald-900">
+              هیدروما نوژین
+            </Link>
           </div>
-        </SectionReveal>
+        </div>
       </section>
     </div>
   );
