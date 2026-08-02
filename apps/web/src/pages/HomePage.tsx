@@ -29,6 +29,7 @@ import {
   PILOTS,
   ECO_MODULES,
   SCIENCE_CHAIN,
+  MODULE_IMAGES,
 } from "../lib/hydromaContent";
 
 const STEP_COLORS = ["var(--v-green)", "var(--v-blue)", "var(--v-red)"];
@@ -253,23 +254,57 @@ function HydromaBanner() {
 }
 
 function PilotsStrip() {
+  const { lang } = useLang();
+  const name = (p: (typeof PILOTS)[0]) =>
+    lang === "en" ? p.nameEn : lang === "ar" ? p.nameAr : p.nameFa;
+  const type = (p: (typeof PILOTS)[0]) =>
+    lang === "en" ? p.typeEn : lang === "ar" ? p.typeAr : p.typeFa;
+  const focus = (p: (typeof PILOTS)[0]) => (lang === "en" ? p.focusEn : p.focusFa);
+  const region = (p: (typeof PILOTS)[0]) => (lang === "en" ? p.regionEn : p.regionFa);
+
   return (
     <section className="px-5 py-16 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className="mb-2 text-center font-display text-2xl">پایلوت‌های چهارگانه</h2>
-        <p className="mb-8 text-center text-sm text-stone-500">طیف اقلیمی ایران از کوهستان خشک تا جنگل هیرکانی</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {PILOTS.map((p) => (
+        <h2 className="mb-2 text-center font-display text-2xl">
+          {lang === "en"
+            ? "MENAP climate spectrum pilots"
+            : lang === "ar"
+              ? "طيار المناخ عبر ميناب"
+              : "پایلوت‌های طیف اقلیمی مناپ"}
+        </h2>
+        <p className="mb-8 text-center text-sm text-stone-500">
+          {lang === "en"
+            ? "From dry mountains to humid forests, hyper-arid oases and irrigated deltas — Iran core + MENAP expansion"
+            : lang === "ar"
+              ? "من الجبال الجافة إلى الغابات الرطبة والواحات والسهول المروية"
+              : "از کوهستان خشک تا جنگل هیرکانی، واحه فوق‌خشک و دلتای آبیاری — ایران + گسترش مناپ"}
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {PILOTS.map((p, i) => (
             <Link
               key={p.id}
-              to="/pilots"
-              className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md"
+              to={`/pilots/ndvi?lat=${p.lat}&lon=${p.lon}`}
+              className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg"
+              style={{ animation: `fade-up .45s ease ${i * 40}ms both` }}
             >
-              <h3 className="font-bold text-emerald-900">{p.nameFa}</h3>
-              <p className="text-xs text-stone-500">
-                {p.regionFa} · {p.typeFa}
-              </p>
-              <p className="mt-2 text-xs text-stone-600">{p.focusFa}</p>
+              <div className="relative h-28 overflow-hidden bg-stone-100">
+                <img
+                  src={p.image}
+                  alt=""
+                  loading="lazy"
+                  className="pilot-card-img h-full w-full object-cover"
+                />
+                <span className="absolute bottom-2 start-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                  {p.country}
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-emerald-900">{name(p)}</h3>
+                <p className="text-xs text-stone-500">
+                  {region(p)} · {type(p)}
+                </p>
+                <p className="mt-2 line-clamp-2 text-xs text-stone-600">{focus(p)}</p>
+              </div>
             </Link>
           ))}
         </div>
@@ -282,8 +317,8 @@ function PilotsStrip() {
           <Link to="/eo" className="rounded-full bg-indigo-700 px-3 py-1 text-[11px] font-bold text-white">
             EO Hub
           </Link>
-          <Link to="/pilots/ndvi" className="rounded-full bg-sky-700 px-3 py-1 text-[11px] font-bold text-white">
-            Pilots NDVI
+          <Link to="/pilots" className="rounded-full bg-emerald-700 px-3 py-1 text-[11px] font-bold text-white">
+            {lang === "en" ? "All pilots" : "همه پایلوت‌ها"}
           </Link>
         </div>
       </div>
@@ -374,7 +409,7 @@ export function Home() {
       >
         <WorldMapBg variant="light" />
         <CursorGlow />
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
+        <div className="relative z-10 mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-[1.05fr_minmax(280px,0.95fr)]">
           <div>
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-bold txt-green">
@@ -394,10 +429,7 @@ export function Home() {
             </SectionReveal>
             <SectionReveal delay={200}>
               <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/hydroma"
-                  className="rounded-full bg-emerald-700 px-8 py-3.5 font-bold text-white shadow-md"
-                >
+                <Link to="/hydroma" className="rounded-full bg-emerald-700 px-8 py-3.5 font-bold text-white shadow-md">
                   طرح هیدروما
                 </Link>
                 <Link to="/farms/map" className="rounded-full border-2 border-amber-600 px-8 py-3.5 font-bold text-amber-800">
@@ -409,10 +441,22 @@ export function Home() {
               </div>
             </SectionReveal>
           </div>
-          <SectionReveal delay={280}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <SatellitePanel />
-              <WeatherPanel />
+
+          {/* Side-by-side live panels — no overlap */}
+          <SectionReveal delay={200}>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              <div className="hero-panel-slot">
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-emerald-700">
+                  {lang === "en" ? "Live satellite" : lang === "ar" ? "قمر حي" : "ماهواره زنده"}
+                </p>
+                <SatellitePanel />
+              </div>
+              <div className="hero-panel-slot">
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-sky-700">
+                  {lang === "en" ? "Live weather" : lang === "ar" ? "طقس حي" : "هوای زنده"}
+                </p>
+                <WeatherPanel />
+              </div>
             </div>
           </SectionReveal>
         </div>
@@ -437,17 +481,30 @@ export function Home() {
       <section className="px-5 py-24 sm:px-8">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-10 font-display text-3xl">{t.modT}</h2>
-          <div className="grid gap-4 sm:grid-cols-4 sm:auto-rows-[180px]">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {t.modules.map((m, i) => (
-              <SectionReveal key={m.n} delay={i * 60} className={i === 0 ? "sm:col-span-2 sm:row-span-2" : ""}>
+              <SectionReveal key={m.n} delay={i * 50}>
                 <Link
                   to={MODULE_LINKS[i] ?? "/sitemap"}
-                  className="card-hover flex h-full min-h-[160px] flex-col justify-between rounded-[var(--r-lg)] border bg-gradient-to-br from-emerald-500/15 to-teal-500/5 p-6"
+                  className="group card-hover flex h-full min-h-[200px] flex-col overflow-hidden rounded-[var(--r-lg)] border bg-white shadow-sm"
                 >
-                  <span className="text-3xl">{m.i}</span>
-                  <div>
-                    <h3 className="font-bold txt-green">{m.t}</h3>
-                    <p className="text-sm text-stone-600">{m.d}</p>
+                  <div className="relative h-28 overflow-hidden">
+                    <img
+                      src={MODULE_IMAGES[i % MODULE_IMAGES.length]}
+                      alt=""
+                      loading="lazy"
+                      className="pilot-card-img h-full w-full object-cover"
+                    />
+                    <span className="absolute start-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-xs font-bold text-emerald-800">
+                      {m.n}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col justify-between p-5">
+                    <div>
+                      <span className="text-2xl">{m.i}</span>
+                      <h3 className="mt-1 font-bold txt-green">{m.t}</h3>
+                      <p className="mt-1 text-sm text-stone-600">{m.d}</p>
+                    </div>
                   </div>
                 </Link>
               </SectionReveal>
