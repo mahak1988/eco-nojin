@@ -1,10 +1,11 @@
-/** App shell: Header + main + Footer + global AI assistant + demo RoleSwitcher. */
+/** App shell: Header + main + Footer + API status. */
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useLang, getLanguageDir } from "../eco/i18n";
 import { GlobalAiAssistant } from "../ai/GlobalAiAssistant";
 import { RoleSwitcher } from "../rbac/RoleSwitcher";
+import { ApiStatusBanner } from "../ApiStatusBanner";
 
 export default function Layout() {
   const { lang } = useLang();
@@ -16,7 +17,8 @@ export default function Layout() {
       dir={dir}
     >
       <Header />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-20 md:px-8">
+      <ApiStatusBanner />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-4 md:px-8">
         <Outlet />
       </main>
       <Footer />

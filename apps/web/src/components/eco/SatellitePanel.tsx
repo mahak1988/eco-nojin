@@ -5,7 +5,7 @@ import { useLang, CONTENT } from "./i18n";
 import { tr } from "./i18n_extras";
 import { apiFetch, v1 } from "../../api/http";
 
-/** Live NDVI from backend (Planetary / chain) — no hardcoded values. */
+/** Live NDVI — short timeout so Home stays responsive if API is down. */
 export function SatellitePanel({ lat = 32.65, lon = 51.67 }: { lat?: number; lon?: number }) {
   const { lang } = useLang();
   const pack = (CONTENT[lang] ?? CONTENT.fa) as unknown as Record<string, unknown>;
@@ -18,7 +18,7 @@ export function SatellitePanel({ lat = 32.65, lon = 51.67 }: { lat?: number; lon
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${lat}&lon=${lon}`)
+    apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${lat}&lon=${lon}`, {}, 4000)
       .then((j) => {
         if (cancelled) return;
         const v = Number(j.mean_ndvi ?? j.ndvi ?? j.value);
@@ -59,8 +59,8 @@ export function SatellitePanel({ lat = 32.65, lon = 51.67 }: { lat?: number; lon
         <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       ) : error ? (
         <>
-          <p className="text-sm font-bold text-rose-600">Offline</p>
-          <p className="mt-1 text-xs text-stone-500">{error}</p>
+          <p className="text-sm font-bold text-amber-700">API offline</p>
+          <p className="mt-1 line-clamp-2 text-xs text-stone-500">{error}</p>
         </>
       ) : (
         <>

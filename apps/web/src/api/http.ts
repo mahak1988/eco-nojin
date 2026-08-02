@@ -1,6 +1,6 @@
 /**
- * Shared fetch helper (R19: no axios).
- * R5: credentials include for HttpOnly cookies; localStorage bearer is fallback only.
+ * Shared fetch helper. Uses same-origin paths so Vite proxy reaches FastAPI.
+ * Keep timeouts short so a down API does not freeze the UI.
  */
 
 function readEnv(key: string): string | undefined {
@@ -11,6 +11,7 @@ function readEnv(key: string): string | undefined {
   }
 }
 
+/** Leave empty in local dev → relative /api → Vite proxy → :8000 */
 export const API_BASE =
   readEnv("VITE_API_BASE_URL") ||
   readEnv("VITE_API_BASE") ||
@@ -43,7 +44,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Prefer cookie session; optional Bearer for mobile/legacy. */
 function authHeader(): Record<string, string> {
   try {
     const token =
@@ -61,10 +61,11 @@ export function buildUrl(path: string): string {
   return `${API_BASE.replace(/\/$/, "")}${p}`;
 }
 
+/** Default 8s — do not block navigation when backend is offline. */
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
-  timeoutMs = 12000,
+  timeoutMs = 8000,
 ): Promise<T> {
   const url = buildUrl(path);
   const ctrl = new AbortController();
@@ -106,6 +107,18 @@ export async function apiFetch<T>(
       throw new ApiError(String(msg), res.status, requestId, data, errObj?.error?.code);
     }
     return data as T;
+  } catch (e) {
+    if (e instanceof ApiError) throw e;
+    if (e instanceof Error && e.name === "AbortError") {
+      throw new ApiError(`Timeout after ${timeoutMs}ms — is API on :8000?`, 408);
+    }
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new ApiError(
+      msg.includes("Failed to fetch")
+        ? "Cannot reach API (start uvicorn on :8000 or check Vite proxy)"
+        : msg,
+      0,
+    );
   } finally {
     clearTimeout(timer);
   }
@@ -116,7 +129,6 @@ export function v1(path: string): string {
   return `${API_V1}${p}`;
 }
 
-/** Clear legacy localStorage tokens after cookie-based logout. */
 export function clearLegacyTokens(): void {
   try {
     localStorage.removeItem("access_token");
