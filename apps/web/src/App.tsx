@@ -42,6 +42,7 @@ const SatelliteDashboardPage = lazy(() => import("./pages/SatelliteDashboardPage
 const SatelliteTimeseriesPage = lazy(() => import("./pages/SatelliteTimeseriesPage"));
 const SatelliteChangePage = lazy(() => import("./pages/SatelliteChangePage"));
 const SatelliteFieldMapPage = lazy(() => import("./pages/SatelliteFieldMapPage"));
+const EoHubPage = lazy(() => import("./pages/EoHubPage"));
 const SimulatorsPage = lazy(() => import("./pages/SimulatorsPage"));
 const AquaCropRunPage = lazy(() => import("./pages/AquaCropRunPage"));
 const RothCRunPage = lazy(() => import("./pages/RothCRunPage"));
@@ -193,6 +194,7 @@ export default function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="sitemap" element={<SiteMapPage />} />
               <Route path="free-stack" element={<FreeStackPage />} />
+              <Route path="eo" element={<EoHubPage />} />
               <Route path="hydroma" element={<HydromaHubPage />} />
               <Route path="danesh-yar" element={<DaneshYarPage />} />
               <Route path="tasmim-yar" element={<TasmimYarPage />} />
@@ -265,6 +267,7 @@ export default function App() {
               <Route path="pilots/ndvi" element={<PilotNdviPage />} />
               <Route path="regional" element={<RegionalPage />} />
               <Route path="satellite" element={<SatelliteDashboardPage />} />
+              <Route path="satellite/eo" element={<EoHubPage />} />
               <Route path="satellite/timeseries" element={<SatelliteTimeseriesPage />} />
               <Route path="satellite/change" element={<SatelliteChangePage />} />
               <Route path="satellite/fields" element={<SatelliteFieldMapPage />} />
