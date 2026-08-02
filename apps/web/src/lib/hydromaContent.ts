@@ -1,25 +1,47 @@
 /**
  * Single source of truth for Hydroma Nojin × Eco Nojin messaging.
- * Derived from the technical business plan (کشت و صنعت دشت امید نارون).
  */
 
 export const HYDROMA = {
-  brand: "هیدروما نوژین",
-  brandEn: "Hydroma Nojin",
-  eco: "اکو نوژین",
-  ecoEn: "Eco Nojin",
-  company: "کشت و صنعت دشت امید نارون",
-  taglineFa:
-    "مدیریت هوشمند منظر برای احیای آب، خاک و معیشت در ایران و منطقه منا / مناپ",
-  taglineEn:
-    "Smart landscape management for restoring water, soil and livelihoods across Iran & MENAP",
-  taglineAr:
-    "إدارة المشهد الذكية لاستعادة المياه والتربة وسبل العيش في إيران ومنطقة مينا/ميناب",
-  missionFa:
-    "ارائه راه‌حل‌های دانش‌بنیان، کم‌هزینه و بومی برای بازسازی همزمان منابع آب، خاک و معیشت در مناطق خشک",
-  sloganFa: "بازآفرینی منظر · بازسازی معیشت · بازگشت به تعادل",
-  investmentSparkFa: "سرمایه‌گذاری ۵۰۰ میلیون دلار: جرقه تحول ملی در احیای آب، خاک و امنیت غذایی",
+  brand: { fa: "هیدروما نوژین", en: "Hydroma Nojin", ar: "هيدرومـا نوجين" },
+  eco: { fa: "اکو نوژین", en: "Eco Nojin", ar: "إكو نوجين" },
+  company: {
+    fa: "کشت و صنعت دشت امید نارون",
+    en: "Dasht Omid Naroon Agri-Industry",
+    ar: "زراعة وصناعة دشت أميد نارون",
+  },
+  tagline: {
+    fa: "مدیریت هوشمند منظر برای احیای آب، خاک و معیشت در ایران و منطقه منا / مناپ",
+    en: "Smart landscape management for restoring water, soil and livelihoods across Iran & MENAP",
+    ar: "إدارة المشهد الذكية لاستعادة المياه والتربة وسبل العيش في إيران ومنطقة مينا/ميناب",
+  },
+  mission: {
+    fa: "ارائه راه‌حل‌های دانش‌بنیان، کم‌هزینه و بومی برای بازسازی همزمان منابع آب، خاک و معیشت در مناطق خشک",
+    en: "Knowledge-based, low-cost, local solutions to restore water, soil and livelihoods in drylands",
+    ar: "حلول معرفية منخفضة التكلفة ومحلية لإعادة تأهيل المياه والتربة وسبل العيش في المناطق الجافة",
+  },
+  slogan: {
+    fa: "بازآفرینی منظر · بازسازی معیشت · بازگشت به تعادل",
+    en: "Restore landscape · Rebuild livelihoods · Return to balance",
+    ar: "إعادة المشهد · إعادة سبل العيش · العودة إلى التوازن",
+  },
+  investmentSpark: {
+    fa: "سرمایه‌گذاری ۵۰۰ میلیون دلار: جرقه تحول ملی در احیای آب، خاک و امنیت غذایی",
+    en: "$500M investment spark for national water, soil and food-security transformation",
+    ar: "استثمار 500 مليون دولار: شرارة تحول وطني في المياه والتربة والأمن الغذائي",
+  },
 } as const;
+
+export type UiLang = "fa" | "en" | "ar";
+
+export function hx(
+  field: { fa: string; en: string; ar: string },
+  lang: string,
+): string {
+  if (lang === "en") return field.en;
+  if (lang === "ar") return field.ar;
+  return field.fa;
+}
 
 export const FOUR_PILLARS = [
   {
@@ -29,6 +51,8 @@ export const FOUR_PILLARS = [
     titleAr: "التحكم في الجريان من المصدر",
     descFa:
       "هر قطره باران در همان نقطه برخورد فرصت نفوذ پیدا کند: کانال مارپیچ، چاهک نفوذ، بندک سنگ‌آهکی، چاله‌های زای و هلالی.",
+    descEn: "Every raindrop should infiltrate at impact: spiral channels, infiltration pits, limestone check structures.",
+    descAr: "يجب أن تتسرب كل قطرة مطر عند نقطة السقوط: قنوات حلزونية وآبار تسرب وسدود حجرية.",
     icon: "💧",
   },
   {
@@ -36,8 +60,9 @@ export const FOUR_PILLARS = [
     titleFa: "افزایش زمان ماند هیدرولیکی",
     titleEn: "Longer hydraulic residence",
     titleAr: "زيادة زمن المكوث الهيدروليكي",
-    descFa:
-      "افزایش زبری بستر، مسیر مارپیچ ارشمیدس (۳ تا ۵ برابر طول)، شیب ملایم روی خطوط تراز.",
+    descFa: "افزایش زبری بستر، مسیر مارپیچ ارشمیدس (۳ تا ۵ برابر طول)، شیب ملایم روی خطوط تراز.",
+    descEn: "Increase bed roughness and Archimedes-spiral path length (3–5×) along contour lines.",
+    descAr: "زيادة خشونة القاع ومسار حلزوني أرخميدس (٣–٥ أضعاف الطول) على خطوط الكنتور.",
     icon: "⏱️",
   },
   {
@@ -45,8 +70,9 @@ export const FOUR_PILLARS = [
     titleFa: "بستن حلقه مواد آلی",
     titleEn: "Close the organic loop",
     titleAr: "إغلاق حلقة المواد العضوية",
-    descFa:
-      "بیوچار شارژشده، ورمی‌کمپوست، کنسرسیوم میکروبی بومی؛ حذف کود شیمیایی و سم.",
+    descFa: "بیوچار شارژشده، ورمی‌کمپوست، کنسرسیوم میکروبی بومی؛ حذف کود شیمیایی و سم.",
+    descEn: "Charged biochar, vermicompost, native microbial consortium — phase out chemical fertiliser and pesticide.",
+    descAr: "فحم حيوي مشحون ودود الكمبوست وكونسورتيوم ميكروبي محلي بدون أسمدة ومبيدات كيميائية.",
     icon: "♻️",
   },
   {
@@ -54,16 +80,13 @@ export const FOUR_PILLARS = [
     titleFa: "دانش بومی + مهندسی مدرن",
     titleEn: "Indigenous knowledge + modern engineering",
     titleAr: "معرفة أصيلة + هندسة حديثة",
-    descFa:
-      "بندسار، زای، هلالی، چکدم با مدل‌سازی، GIS و استانداردهای بین‌المللی بهینه‌سازی می‌شوند.",
+    descFa: "بندسار، زای، هلالی، چکدم با مدل‌سازی، GIS و استانداردهای بین‌المللی بهینه‌سازی می‌شوند.",
+    descEn: "Bandsar, zay, crescent bunds and check dams optimised with modelling, GIS and international standards.",
+    descAr: "بندسار وزاي وهلال وسدود تحقق تُحسَّن بالنمذجة ونظم المعلومات الجغرافية والمعايير الدولية.",
     icon: "🧭",
   },
 ] as const;
 
-/**
- * Climate spectrum for Hydroma impact — Iran core + MENAP expansion.
- * image: free Unsplash landscape (CDN) for card visuals.
- */
 export type ClimatePilot = {
   id: string;
   nameFa: string;
@@ -275,7 +298,7 @@ export const PILOTS: ClimatePilot[] = [
     typeFa: "کوهپایه خشک",
     typeEn: "Dry foothills",
     typeAr: "سفوح جافة",
-    focusFa: "کاريز، مرتع، گندم دیم، FFS",
+    focusFa: "کاریز، مرتع، گندم دیم، FFS",
     focusEn: "Karez, rangeland, rainfed wheat, FFS",
     lat: 34.35,
     lon: 62.2,
@@ -312,14 +335,14 @@ export const SCIENCE_CHAIN = [
 ] as const;
 
 export const ECO_MODULES = [
-  { slug: "mrv", titleFa: "MRV سه‌سطحی", path: "/mrv" },
-  { slug: "danesh", titleFa: "دانش‌یار", path: "/danesh-yar" },
-  { slug: "tasmim", titleFa: "تصمیم‌یار", path: "/tasmim-yar" },
-  { slug: "consult", titleFa: "مشاوره شغلی / روانشناسی", path: "/hub/extension" },
-  { slug: "accounting", titleFa: "حسابداری", path: "/accounting" },
-  { slug: "carbon", titleFa: "تسهیل اعتبار کربن", path: "/mrv/claim" },
-  { slug: "shop", titleFa: "فروشگاه هوشمند", path: "/hub/market-prices" },
-  { slug: "library", titleFa: "کتابخانه", path: "/library" },
+  { slug: "mrv", titleFa: "MRV سه‌سطحی", titleEn: "3-tier MRV", titleAr: "MRV ثلاثي", path: "/mrv" },
+  { slug: "danesh", titleFa: "دانش‌یار", titleEn: "Knowledge AI", titleAr: "مساعد المعرفة", path: "/danesh-yar" },
+  { slug: "tasmim", titleFa: "تصمیم‌یار", titleEn: "Decision AI", titleAr: "مساعد القرار", path: "/tasmim-yar" },
+  { slug: "consult", titleFa: "مشاوره", titleEn: "Advisory", titleAr: "استشارة", path: "/hub/extension" },
+  { slug: "accounting", titleFa: "حسابداری", titleEn: "Accounting", titleAr: "محاسبة", path: "/accounting" },
+  { slug: "carbon", titleFa: "اعتبار کربن", titleEn: "Carbon credit", titleAr: "ائتمان كربون", path: "/mrv/claim" },
+  { slug: "shop", titleFa: "فروشگاه", titleEn: "Market", titleAr: "سوق", path: "/hub/market-prices" },
+  { slug: "library", titleFa: "کتابخانه", titleEn: "Library", titleAr: "مكتبة", path: "/library" },
 ] as const;
 
 export const BIO_INPUTS = [
@@ -371,3 +394,16 @@ export const MODULE_IMAGES = [
   "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
   "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80",
 ] as const;
+
+/** Backward-compat aliases used by older pages */
+export const HYDROMA_LEGACY = {
+  brand: HYDROMA.brand.fa,
+  brandEn: HYDROMA.brand.en,
+  eco: HYDROMA.eco.fa,
+  ecoEn: HYDROMA.eco.en,
+  company: HYDROMA.company.fa,
+  taglineFa: HYDROMA.tagline.fa,
+  taglineEn: HYDROMA.tagline.en,
+  sloganFa: HYDROMA.slogan.fa,
+  missionFa: HYDROMA.mission.fa,
+};
