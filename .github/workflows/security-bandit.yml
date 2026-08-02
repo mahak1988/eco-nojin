@@ -2,7 +2,7 @@ name: Security Bandit
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, feature/free-science-stack]
   pull_request:
     branches: [main]
 
@@ -16,6 +16,20 @@ jobs:
           python-version: "3.12"
       - name: Install bandit
         run: pip install bandit
-      - name: Run bandit (medium+)
-        run: bandit -r apps/ -ll --skip B101 -f txt || true
-        # || true keeps signal without hard-fail until baseline stabilizes; raise gate in phase 7
+      - name: Run bandit (medium+, apps/)
+        run: |
+          bandit -r apps/ -c bandit.yaml -ll -f txt -o bandit-report.txt || true
+          bandit -r apps/ -c bandit.yaml -ll -f json -o bandit-report.json || true
+          echo "## Bandit (medium+)" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f bandit-report.txt ]; then
+            tail -n 40 bandit-report.txt >> "$GITHUB_STEP_SUMMARY" || true
+          fi
+      - name: Upload bandit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: |
+            bandit-report.txt
+            bandit-report.json
+          retention-days: 30

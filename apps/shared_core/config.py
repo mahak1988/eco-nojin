@@ -11,6 +11,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
 
+_WEAK_SECRET_MARKERS = (
+    "local-dev",
+    "change-me",
+    "changeme",
+    "secret",
+    "password",
+    "123456",
+    "econojin",
+)
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -53,10 +63,8 @@ class Settings(BaseSettings):
 
     REQUIRE_AUTH_FOR_WRITES: bool = Field(default=False)
 
-    # Phase 1 security toggles (local-friendly defaults)
     ENABLE_RATE_LIMIT: bool = Field(default=True)
     ENABLE_AUDIT_LOG: bool = Field(default=True)
-    # SpiderGuard blocks aggressive bots; off by default in local (curl/dev tools)
     ENABLE_SPIDERGUARD: bool = Field(default=False)
     SPIDERGUARD_MAX_REQUESTS: int = Field(default=120)
     SPIDERGUARD_WINDOW_SECONDS: int = Field(default=60)
@@ -94,17 +102,35 @@ class Settings(BaseSettings):
     def jwt_secret(self) -> str:
         return self.JWT_SECRET_KEY or self.SECRET_KEY
 
+    def _is_weak_secret(self, value: str) -> bool:
+        v = (value or "").strip().lower()
+        if len(v) < 32:
+            return True
+        return any(m in v for m in _WEAK_SECRET_MARKERS)
+
     @model_validator(mode="after")
     def validate_production_settings(self) -> Settings:
         if self.ENVIRONMENT == "production":
-            if len(self.SECRET_KEY) < 32 or self.SECRET_KEY.startswith("local-dev"):
-                raise ValueError("SECRET_KEY must be a strong random value in production")
+            if self._is_weak_secret(self.SECRET_KEY):
+                raise ValueError(
+                    "SECRET_KEY must be a strong random value (>=32 chars, not a dev placeholder) "
+                    "when ENVIRONMENT=production. Generate: python -c \"import secrets; print(secrets.token_urlsafe(48))\""
+                )
+            if self.JWT_SECRET_KEY and self._is_weak_secret(self.JWT_SECRET_KEY):
+                raise ValueError("JWT_SECRET_KEY is too weak for production")
             if self.ALGORITHM.upper().startswith("HS"):
                 logger.warning("Production still on HS* — prefer RS256 with mounted keys")
             if self.REQUIRE_AUTH_FOR_WRITES is False:
                 logger.warning("REQUIRE_AUTH_FOR_WRITES is False in production")
             if not self.ENABLE_RATE_LIMIT:
                 logger.warning("ENABLE_RATE_LIMIT is False in production")
+            if not self.COOKIE_SECURE:
+                logger.warning("COOKIE_SECURE is False in production — set true behind HTTPS")
+            if self.BACKEND_WALLET_PRIVATE_KEY:
+                logger.info("BACKEND_WALLET_PRIVATE_KEY is set (ensure it comes from a secret store)")
+        elif self.ENVIRONMENT == "staging":
+            if self._is_weak_secret(self.SECRET_KEY):
+                logger.warning("Staging uses a weak SECRET_KEY placeholder — rotate before shared demos")
         return self
 
 

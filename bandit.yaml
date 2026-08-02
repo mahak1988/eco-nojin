@@ -1,0 +1,19 @@
+# Bandit SAST config — Phase 4
+skips:
+  - B101  # assert_used — common in tests; tests path also excluded
+  - B104  # hardcoded_bind_all_interfaces — local uvicorn 0.0.0.0
+  - B311  # random — non-crypto uses in demos/simulators
+
+exclude_dirs:
+  - .venv
+  - venv
+  - node_modules
+  - .git
+  - dist
+  - build
+  - tests
+  - apps/api/tests
+  - contracts
+  - .pnpm-store
+
+# Report medium and above in CI; local script can use -ll

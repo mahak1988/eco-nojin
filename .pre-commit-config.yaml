@@ -9,6 +9,17 @@ repos:
         always_run: true
         stages: [pre-commit]
 
+      - id: bandit-apps
+        name: bandit (apps, medium+)
+        entry: bandit
+        language: system
+        types: [python]
+        args: ["-c", "bandit.yaml", "-ll", "-q"]
+        files: ^apps/
+        exclude: (^apps/api/tests/|/tests/)
+        stages: [pre-commit]
+        pass_filenames: true
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
     hooks:
@@ -33,6 +44,8 @@ repos:
         args: ["--maxkb=5000"]
         stages: [pre-commit]
       - id: check-merge-conflict
+        stages: [pre-commit]
+      - id: detect-private-key
         stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
