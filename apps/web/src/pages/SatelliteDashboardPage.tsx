@@ -7,6 +7,8 @@ import { tExtra } from "../components/eco/i18n_extras";
 import { ndviHealth } from "../components/eco/i18n_phase_b5";
 import { getSatelliteCatalog, type SatellitePlatform } from "../lib/apiServices";
 import { apiFetch, v1 } from "../api/http";
+import { EoLiveStrip } from "../components/eo/EoLiveStrip";
+import { fetchEoSensors, type EoSensors } from "../lib/eoApi";
 
 const HEALTH_STYLE = {
   good: "bg-emerald-100 text-emerald-800 ring-emerald-200",
@@ -35,6 +37,7 @@ export default function SatelliteDashboardPage() {
   const [loading, setLoading] = useState(false);
   const [platforms, setPlatforms] = useState<SatellitePlatform[]>([]);
   const [recommended, setRecommended] = useState<string[]>([]);
+  const [sensors, setSensors] = useState<EoSensors | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadCatalog() {
@@ -51,14 +54,16 @@ export default function SatelliteDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const [n, t] = await Promise.all([
+      const [n, t, s] = await Promise.all([
         apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${a}&lon=${b}`),
-        apiFetch<{ data?: Array<Record<string, unknown>>; points?: Array<Record<string, unknown>>; provider?: string }>(
+        apiFetch<{ data?: Array<Record<string, unknown>>; points?: Array<Record<string, unknown>>; timeseries?: Array<Record<string, unknown>> }>(
           `${v1("/satellite/timeseries")}?lat=${a}&lon=${b}&days=90`,
         ),
+        fetchEoSensors(a, b, 60).catch(() => null),
       ]);
       setNdvi(n);
-      const rows = (t.data || t.points || []) as Array<Record<string, unknown>>;
+      if (s) setSensors(s);
+      const rows = (t.data || t.points || t.timeseries || []) as Array<Record<string, unknown>>;
       setSeries(
         rows
           .map((r) => ({
@@ -94,7 +99,7 @@ export default function SatelliteDashboardPage() {
           </div>
           <div>
             <h1 className="font-display text-3xl text-stone-800">{tx("sat_title")}</h1>
-            <p className="text-sm text-stone-500">Live EO from API · map + satellite basemap</p>
+            <p className="text-sm text-stone-500">Live EO · Sentinel-2 + free multi-sensor stack</p>
           </div>
         </div>
         <button
@@ -113,10 +118,10 @@ export default function SatelliteDashboardPage() {
       )}
 
       <div className="flex flex-wrap gap-2">
-        <Link
-          to="/farms/map"
-          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 ring-1 ring-emerald-100"
-        >
+        <Link to="/eo" className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-900 ring-1 ring-sky-100">
+          EO Hub · full stack
+        </Link>
+        <Link to="/farms/map" className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 ring-1 ring-emerald-100">
           <MapPinned className="h-3.5 w-3.5" /> Register farm on map
         </Link>
         {(
@@ -124,6 +129,7 @@ export default function SatelliteDashboardPage() {
             ["/satellite/timeseries", "sat_link_ts", LineChart],
             ["/satellite/change", "sat_link_change", GitCompare],
             ["/satellite/fields", "sat_link_fields", MapPinned],
+            ["/pilots/ndvi", "Pilots NDVI", Radio],
           ] as const
         ).map(([to, key, Icon]) => (
           <Link
@@ -132,22 +138,35 @@ export default function SatelliteDashboardPage() {
             className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800 ring-1 ring-indigo-100 hover:bg-indigo-100"
           >
             <Icon className="h-3.5 w-3.5" />
-            {tx(key)}
+            {typeof key === "string" && key.startsWith("sat_") ? tx(key) : key}
           </Link>
         ))}
       </div>
 
+      <EoLiveStrip lat={lat} lon={lng} />
+
       <section className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/50 to-white p-5 shadow-sm">
         <div className="mb-3 flex items-center gap-2">
           <Radio className="h-4 w-4 text-indigo-600" />
-          <h2 className="font-display text-lg text-stone-800">پلتفرم‌های ماهواره‌ای</h2>
+          <h2 className="font-display text-lg text-stone-800">پلتفرم‌های ماهواره‌ای (رایگان)</h2>
         </div>
         <p className="mb-3 text-xs text-stone-500">
-          Recommended: {recommended.length ? recommended.join(", ") : "Planetary Computer (free)"}
+          Recommended: {recommended.length ? recommended.join(", ") : "Planetary Computer + Open-Meteo"}
         </p>
-        {platforms.length === 0 ? (
-          <p className="text-sm text-stone-400">Catalog optional — NDVI still loads from /api/v1/satellite</p>
-        ) : (
+        {sensors?.sensors?.length ? (
+          <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {sensors.sensors.map((s) => (
+              <article key={s.collection} className="rounded-2xl border border-stone-200 bg-white p-3">
+                <h3 className="text-sm font-bold text-stone-800">{s.collection}</h3>
+                <p className="mt-1 text-[11px] text-stone-500">{s.family}</p>
+                <p className="mt-2 font-display text-xl font-black text-indigo-700">{s.count} scenes</p>
+              </article>
+            ))}
+          </div>
+        ) : null}
+        {platforms.length === 0 && !sensors?.sensors?.length ? (
+          <p className="text-sm text-stone-400">Catalog optional — NDVI loads from /api/v1/satellite</p>
+        ) : platforms.length > 0 ? (
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {platforms.map((p) => (
               <article key={p.id} className="rounded-2xl border border-stone-200 bg-white p-3">
@@ -156,7 +175,7 @@ export default function SatelliteDashboardPage() {
               </article>
             ))}
           </div>
-        )}
+        ) : null}
       </section>
 
       <div className="overflow-hidden rounded-3xl border border-stone-200/80 bg-white shadow-sm">
