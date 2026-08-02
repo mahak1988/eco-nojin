@@ -47,6 +47,12 @@ const RothCRunPage = lazy(() => import("./pages/RothCRunPage"));
 const SciencePage = lazy(() => import("./pages/SciencePage"));
 const ScienceE2EPage = lazy(() => import("./pages/ScienceE2EPage"));
 const FreeStackPage = lazy(() => import("./pages/FreeStackPage"));
+const HydromaHubPage = lazy(() => import("./pages/HydromaHubPage"));
+const DaneshYarPage = lazy(() => import("./pages/DaneshYarPage"));
+const TasmimYarPage = lazy(() => import("./pages/TasmimYarPage"));
+const BioFertilizerPage = lazy(() => import("./pages/BioFertilizerPage"));
+const WatershedPage = lazy(() => import("./pages/WatershedPage"));
+const RangelandPage = lazy(() => import("./pages/RangelandPage"));
 const EconomicsPage = lazy(() => import("./pages/EconomicsPage"));
 const SiteMapPage = lazy(() => import("./pages/SiteMapPage"));
 const HubPage = lazy(() => import("./pages/hub/HubPage"));
@@ -187,6 +193,12 @@ export default function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="sitemap" element={<SiteMapPage />} />
               <Route path="free-stack" element={<FreeStackPage />} />
+              <Route path="hydroma" element={<HydromaHubPage />} />
+              <Route path="danesh-yar" element={<DaneshYarPage />} />
+              <Route path="tasmim-yar" element={<TasmimYarPage />} />
+              <Route path="bio-fertilizer" element={<BioFertilizerPage />} />
+              <Route path="watershed" element={<WatershedPage />} />
+              <Route path="rangeland" element={<RangelandPage />} />
               <Route path="economics" element={<EconomicsPage />} />
               <Route path="hub/:slug" element={<HubPage />} />
               <Route path="farms" element={<FarmsPage />} />
