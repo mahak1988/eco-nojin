@@ -333,6 +333,12 @@ _include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlis
 _include("satellite", lambda: __import__("apps.satellite.router", fromlist=["router"]).router)
 _include("simulation_jobs", lambda: __import__("apps.simulation.jobs_router", fromlist=["router"]).router)
 _include("websocket", lambda: __import__("apps.shared_core.websocket.router", fromlist=["router"]).router)
+_include(
+    "economics",
+    lambda: __import__("apps.economics", fromlist=["router"]).router,
+    prefix=f"{settings.API_V1_STR}/economics",
+    tags=["Economics"],
+)
 
 
 @app.get("/", tags=["Root"])
