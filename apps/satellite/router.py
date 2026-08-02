@@ -8,6 +8,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
 
+from apps.satellite.fast_ndvi import fast_timeseries
 from apps.satellite.gee_status import probe_gee
 from apps.satellite.mrv_bridge import mrv_from_bands, mrv_from_location, mrv_from_ndvi
 from apps.satellite.processors.indices import indices_from_mean_reflectance
@@ -19,7 +20,6 @@ from apps.simulation.rothc_mrv import rothc_to_mrv
 
 router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
 
-# Default high-impact pilot centroids (MENA/MENAP) — keep in sync with frontend catalog
 DEFAULT_PILOT_POINTS: list[dict[str, Any]] = [
     {"id": "dishmok", "code": "IR-DIS", "lat": 31.2, "lon": 50.4},
     {"id": "behbehan", "code": "IR-BEH", "lat": 30.6, "lon": 50.24},
@@ -47,8 +47,8 @@ DEFAULT_PILOT_POINTS: list[dict[str, Any]] = [
 
 
 class BandsRequest(BaseModel):
-    red: float = Field(..., ge=0, le=1, description="Sentinel-2 B04 reflectance")
-    nir: float = Field(..., ge=0, le=1, description="Sentinel-2 B08 reflectance")
+    red: float = Field(..., ge=0, le=1)
+    nir: float = Field(..., ge=0, le=1)
     green: Optional[float] = Field(None, ge=0, le=1)
     blue: Optional[float] = Field(None, ge=0, le=1)
     swir1: Optional[float] = Field(None, ge=0, le=1)
@@ -72,7 +72,7 @@ class MrvBridgeRequest(BaseModel):
 
 
 class AquaCropMrvRequest(BaseModel):
-    crop: str = Field("wheat", description="wheat|maize|rice|...")
+    crop: str = Field("wheat")
     days: int = Field(90, ge=30, le=200)
     area_ha: float = Field(1.0, gt=0, le=10000)
     et0_mm_day: Optional[float] = Field(None, ge=0, le=15)
@@ -125,7 +125,26 @@ async def timeseries(
     lon: float = Query(51.67),
     days: int = Query(90, ge=7, le=365),
     farm_id: int = Query(0),
+    raster: int = Query(0, ge=0, le=3, description="0=fast metadata; 1-3=COG raster budget"),
 ) -> dict[str, Any]:
+    if raster == 0:
+        out = await fast_timeseries(lat, lon, days, raster_budget=0)
+        return {
+            "lat": lat,
+            "lon": lon,
+            "count": out.get("count", 0),
+            "provider": out.get("provider"),
+            "data": out.get("timeseries", []),
+            "vci": [
+                {"ndvi": t.get("mean_ndvi"), "vci": t.get("vci"), "label": t.get("drought_label")}
+                for t in out.get("timeseries", [])
+            ],
+            "anomaly": [
+                {"ndvi": t.get("mean_ndvi"), "anomaly": t.get("anomaly"), "signal": t.get("signal")}
+                for t in out.get("timeseries", [])
+            ],
+            "mode": out.get("mode"),
+        }
     end = date.today()
     start = end - timedelta(days=days)
     bbox = BBox.from_point(lat, lon, delta=0.05)
@@ -147,87 +166,55 @@ async def timeseries(
 async def vci_endpoint(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
-    days: int = Query(120, ge=14, le=365),
+    days: int = Query(60, ge=14, le=365),
+    raster: int = Query(0, ge=0, le=2, description="0=fast STAC metadata (default); 1-2=download COGs"),
 ) -> dict[str, Any]:
-    """NDVI timeseries + VCI + anomaly for one point (Planetary stack)."""
-    end = date.today()
-    start = end - timedelta(days=days)
-    bbox = BBox.from_point(lat, lon, delta=0.05)
-    svc = get_satellite_service()
-    rows = await svc.get_ndvi_timeseries(0, bbox, start, end)
-    means = [r.mean_ndvi for r in rows]
-    vci = compute_vci_series(means)
-    anom = compute_anomaly(means)
-    latest_vci = vci[-1] if vci else None
-    return {
-        "lat": lat,
-        "lon": lon,
-        "start": start.isoformat(),
-        "end": end.isoformat(),
-        "count": len(rows),
-        "provider": rows[0].provider if rows else None,
-        "timeseries": [
-            {
-                **r.to_dict(),
-                "vci": vci[i]["vci"] if i < len(vci) else None,
-                "anomaly": anom[i]["anomaly"] if i < len(anom) else None,
-                "signal": anom[i]["signal"] if i < len(anom) else None,
-                "drought_label": vci[i]["label"] if i < len(vci) else None,
-            }
-            for i, r in enumerate(rows)
-        ],
-        "latest_vci": latest_vci,
-        "interpretation": {
-            "vci_ge_40": "no_drought",
-            "vci_30_40": "mild",
-            "vci_20_30": "moderate",
-            "vci_10_20": "severe",
-            "vci_lt_10": "extreme",
-            "anomaly_gt_0.05": "greening",
-            "anomaly_lt_-0.05": "browning",
-        },
-    }
+    """NDVI + VCI + anomaly. Default is metadata-fast to avoid client timeouts."""
+    return await fast_timeseries(lat, lon, days, raster_budget=raster)
 
 
 @router.get("/pilots-ndvi-batch")
 async def pilots_ndvi_batch(
-    days: int = Query(90, ge=14, le=180),
-    limit: int = Query(12, ge=1, le=24),
+    days: int = Query(60, ge=14, le=180),
+    limit: int = Query(6, ge=1, le=24),
+    raster: int = Query(0, ge=0, le=1),
 ) -> dict[str, Any]:
-    """Batch NDVI+VCI for priority pilot centroids (capped for latency)."""
+    """Batch pilot NDVI+VCI — default metadata-only for speed."""
     end = date.today()
     start = end - timedelta(days=days)
-    svc = get_satellite_service()
     results: list[dict[str, Any]] = []
     for pt in DEFAULT_PILOT_POINTS[:limit]:
         try:
-            bbox = BBox.from_point(float(pt["lat"]), float(pt["lon"]), delta=0.04)
-            rows = await svc.get_ndvi_timeseries(0, bbox, start, end)
-            means = [r.mean_ndvi for r in rows]
-            vci = compute_vci_series(means)
-            anom = compute_anomaly(means)
-            last = rows[-1] if rows else None
+            out = await fast_timeseries(
+                float(pt["lat"]),
+                float(pt["lon"]),
+                days,
+                raster_budget=raster,
+            )
+            ts = out.get("timeseries") or []
+            last = ts[-1] if ts else {}
             results.append(
                 {
                     "id": pt["id"],
                     "code": pt["code"],
                     "lat": pt["lat"],
                     "lon": pt["lon"],
-                    "count": len(rows),
-                    "latest_ndvi": last.mean_ndvi if last else None,
-                    "latest_date": last.date.isoformat() if last and last.date else None,
-                    "latest_vci": vci[-1]["vci"] if vci else None,
-                    "latest_anomaly": anom[-1]["anomaly"] if anom else None,
-                    "drought_label": vci[-1]["label"] if vci else None,
-                    "provider": last.provider if last else None,
+                    "count": out.get("count", 0),
+                    "latest_ndvi": last.get("mean_ndvi"),
+                    "latest_date": last.get("date"),
+                    "latest_vci": last.get("vci"),
+                    "latest_anomaly": last.get("anomaly"),
+                    "drought_label": last.get("drought_label"),
+                    "provider": out.get("provider"),
+                    "mode": out.get("mode"),
                     "series": [
                         {
-                            "date": r.date.isoformat() if r.date else None,
-                            "mean_ndvi": r.mean_ndvi,
-                            "vci": vci[i]["vci"] if i < len(vci) else None,
-                            "anomaly": anom[i]["anomaly"] if i < len(anom) else None,
+                            "date": t.get("date"),
+                            "mean_ndvi": t.get("mean_ndvi"),
+                            "vci": t.get("vci"),
+                            "anomaly": t.get("anomaly"),
                         }
-                        for i, r in enumerate(rows[-8:])  # last up to 8 points for chart
+                        for t in ts[-8:]
                     ],
                 }
             )
@@ -247,7 +234,7 @@ async def pilots_ndvi_batch(
         "start": start.isoformat(),
         "end": end.isoformat(),
         "pilots": results,
-        "note": "Planetary-first NDVI; VCI relative to window min/max; anomaly vs window mean",
+        "note": "Default mode=metadata_fast (no COG). Pass raster=1 for real raster stats (slower).",
     }
 
 
@@ -283,25 +270,13 @@ async def indices(
             "data": [r.__dict__ if hasattr(r, "__dict__") else r for r in rows],
         }
     except Exception as e:
-        return {
-            "lat": lat,
-            "lon": lon,
-            "count": 0,
-            "error": str(e)[:200],
-            "data": [],
-        }
+        return {"lat": lat, "lon": lon, "count": 0, "error": str(e)[:200], "data": []}
 
 
 @router.post("/indices/from-bands")
 async def indices_from_bands(req: BandsRequest) -> dict[str, Any]:
     return indices_from_mean_reflectance(
-        {
-            "red": req.red,
-            "nir": req.nir,
-            "green": req.green,
-            "blue": req.blue,
-            "swir1": req.swir1,
-        }
+        {"red": req.red, "nir": req.nir, "green": req.green, "blue": req.blue, "swir1": req.swir1}
     )
 
 
@@ -309,47 +284,26 @@ async def indices_from_bands(req: BandsRequest) -> dict[str, Any]:
 async def mrv_bridge(req: MrvBridgeRequest) -> dict[str, Any]:
     if req.red is not None and req.nir is not None:
         return mrv_from_bands(
-            req.red,
-            req.nir,
-            green=req.green,
-            blue=req.blue,
-            ndvi_expected=req.ndvi_expected,
-            model_yield_t_ha=req.model_yield_t_ha,
-            field_yield_t_ha=req.field_yield_t_ha,
-            credit_type=req.credit_type,
-            measured_value=req.measured_value,
-            region_multiplier=req.region_multiplier,
+            req.red, req.nir, green=req.green, blue=req.blue,
+            ndvi_expected=req.ndvi_expected, model_yield_t_ha=req.model_yield_t_ha,
+            field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type,
+            measured_value=req.measured_value, region_multiplier=req.region_multiplier,
         )
     if req.ndvi_observed is not None:
         return mrv_from_ndvi(
-            req.ndvi_observed,
-            req.ndvi_expected,
-            model_yield_t_ha=req.model_yield_t_ha,
-            field_yield_t_ha=req.field_yield_t_ha,
-            credit_type=req.credit_type,
-            measured_value=req.measured_value,
+            req.ndvi_observed, req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha, field_yield_t_ha=req.field_yield_t_ha,
+            credit_type=req.credit_type, measured_value=req.measured_value,
             region_multiplier=req.region_multiplier,
         )
     if req.lat is not None and req.lon is not None:
         return await mrv_from_location(
-            req.lat,
-            req.lon,
-            days=req.days,
-            ndvi_expected=req.ndvi_expected,
-            model_yield_t_ha=req.model_yield_t_ha,
-            field_yield_t_ha=req.field_yield_t_ha,
-            credit_type=req.credit_type,
-            measured_value=req.measured_value,
+            req.lat, req.lon, days=req.days, ndvi_expected=req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha, field_yield_t_ha=req.field_yield_t_ha,
+            credit_type=req.credit_type, measured_value=req.measured_value,
             region_multiplier=req.region_multiplier,
         )
-    return {
-        "error": "provide red+nir, or ndvi_observed, or lat+lon",
-        "examples": {
-            "bands": {"red": 0.08, "nir": 0.35},
-            "ndvi": {"ndvi_observed": 0.72, "ndvi_expected": 0.75},
-            "location": {"lat": 32.65, "lon": 51.67, "days": 30},
-        },
-    }
+    return {"error": "provide red+nir, or ndvi_observed, or lat+lon"}
 
 
 @router.get("/mrv-bridge")
@@ -360,40 +314,22 @@ async def mrv_bridge_get(
     measured_value: float = Query(40.0, gt=0),
     credit_type: int = Query(0, ge=0, le=3),
 ) -> dict[str, Any]:
-    return await mrv_from_location(
-        lat,
-        lon,
-        days=days,
-        measured_value=measured_value,
-        credit_type=credit_type,
-    )
+    return await mrv_from_location(lat, lon, days=days, measured_value=measured_value, credit_type=credit_type)
 
 
 @router.post("/aquacrop-mrv")
 async def aquacrop_mrv_post(req: AquaCropMrvRequest) -> dict[str, Any]:
     if req.lat is not None and req.lon is not None:
         return await aquacrop_mrv_from_location(
-            req.lat,
-            req.lon,
-            crop=req.crop,
-            days=req.days,
-            field_yield_t_ha=req.field_yield_t_ha,
-            credit_type=req.credit_type,
-            measured_value=req.measured_value,
-            region_multiplier=req.region_multiplier,
+            req.lat, req.lon, crop=req.crop, days=req.days,
+            field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type,
+            measured_value=req.measured_value, region_multiplier=req.region_multiplier,
         )
     return aquacrop_to_mrv(
-        crop=req.crop,
-        days=req.days,
-        area_ha=req.area_ha,
-        et0_mm_day=req.et0_mm_day,
-        rain_mm_day=req.rain_mm_day,
-        taw_mm=req.taw_mm,
-        ndvi_values=req.ndvi_values,
-        ndvi_observed=req.ndvi_observed,
-        field_yield_t_ha=req.field_yield_t_ha,
-        credit_type=req.credit_type,
-        measured_value=req.measured_value,
+        crop=req.crop, days=req.days, area_ha=req.area_ha, et0_mm_day=req.et0_mm_day,
+        rain_mm_day=req.rain_mm_day, taw_mm=req.taw_mm, ndvi_values=req.ndvi_values,
+        ndvi_observed=req.ndvi_observed, field_yield_t_ha=req.field_yield_t_ha,
+        credit_type=req.credit_type, measured_value=req.measured_value,
         region_multiplier=req.region_multiplier,
     )
 
@@ -408,34 +344,17 @@ async def aquacrop_mrv_get(
     lon: Optional[float] = Query(None),
 ) -> dict[str, Any]:
     if lat is not None and lon is not None:
-        return await aquacrop_mrv_from_location(
-            lat,
-            lon,
-            crop=crop,
-            days=days,
-            measured_value=measured_value,
-            credit_type=credit_type,
-        )
-    return aquacrop_to_mrv(
-        crop=crop,
-        days=days,
-        measured_value=measured_value,
-        credit_type=credit_type,
-    )
+        return await aquacrop_mrv_from_location(lat, lon, crop=crop, days=days, measured_value=measured_value, credit_type=credit_type)
+    return aquacrop_to_mrv(crop=crop, days=days, measured_value=measured_value, credit_type=credit_type)
 
 
 @router.post("/rothc-mrv")
 async def rothc_mrv_post(req: RothcMrvRequest) -> dict[str, Any]:
     return rothc_to_mrv(
-        years=req.years,
-        clay_pct=req.clay_pct,
-        temp_c=req.temp_c,
-        rain_mm_year=req.rain_mm_year,
-        et_mm_year=req.et_mm_year,
-        c_input_t_ha_y=req.c_input_t_ha_y,
-        soc_t_ha=req.soc_t_ha,
-        plant_cover=req.plant_cover,
-        lab_soc_final_t_ha=req.lab_soc_final_t_ha,
+        years=req.years, clay_pct=req.clay_pct, temp_c=req.temp_c,
+        rain_mm_year=req.rain_mm_year, et_mm_year=req.et_mm_year,
+        c_input_t_ha_y=req.c_input_t_ha_y, soc_t_ha=req.soc_t_ha,
+        plant_cover=req.plant_cover, lab_soc_final_t_ha=req.lab_soc_final_t_ha,
         region_multiplier=req.region_multiplier,
     )
 
@@ -447,12 +366,7 @@ async def rothc_mrv_get(
     clay_pct: float = Query(25.0, ge=0, le=80),
     soc_t_ha: float = Query(40.0, ge=1, le=200),
 ) -> dict[str, Any]:
-    return rothc_to_mrv(
-        years=years,
-        c_input_t_ha_y=c_input_t_ha_y,
-        clay_pct=clay_pct,
-        soc_t_ha=soc_t_ha,
-    )
+    return rothc_to_mrv(years=years, c_input_t_ha_y=c_input_t_ha_y, clay_pct=clay_pct, soc_t_ha=soc_t_ha)
 
 
 @router.post("/change-detection")
@@ -461,40 +375,23 @@ async def change_detection(
     lon: float = Query(51.67),
     days: int = Query(120, ge=30, le=365),
 ) -> dict[str, Any]:
-    end = date.today()
-    mid = end - timedelta(days=days // 2)
-    start = end - timedelta(days=days)
-    bbox = BBox.from_point(lat, lon, delta=0.05)
-    svc = get_satellite_service()
-    a = await svc.get_ndvi_timeseries(0, bbox, start, mid)
-    b = await svc.get_ndvi_timeseries(0, bbox, mid, end)
-    ma = sum(r.mean_ndvi for r in a) / max(len(a), 1) if a else 0.0
-    mb = sum(r.mean_ndvi for r in b) / max(len(b), 1) if b else 0.0
+    a = await fast_timeseries(lat, lon, days // 2, raster_budget=0)
+    b = await fast_timeseries(lat, lon, days, raster_budget=0)
+    ta = a.get("timeseries") or []
+    tb = b.get("timeseries") or []
+    mid = len(tb) // 2
+    ma = sum(t.get("mean_ndvi") or 0 for t in tb[:mid]) / max(mid, 1)
+    mb = sum(t.get("mean_ndvi") or 0 for t in tb[mid:]) / max(len(tb) - mid, 1)
     delta = mb - ma
     return {
-        "period_a": {
-            "start": start.isoformat(),
-            "end": mid.isoformat(),
-            "mean_ndvi": round(ma, 4),
-        },
-        "period_b": {
-            "start": mid.isoformat(),
-            "end": end.isoformat(),
-            "mean_ndvi": round(mb, 4),
-        },
+        "period_a": {"mean_ndvi": round(ma, 4)},
+        "period_b": {"mean_ndvi": round(mb, 4)},
         "delta_ndvi": round(delta, 4),
-        "signal": (
-            "greening"
-            if delta > 0.05
-            else ("browning" if delta < -0.05 else "stable")
-        ),
+        "signal": "greening" if delta > 0.05 else ("browning" if delta < -0.05 else "stable"),
+        "mode": "metadata_fast",
     }
 
 
 @router.get("/fields")
 async def fields_stub(farm_id: Optional[int] = None) -> dict[str, Any]:
-    return {
-        "data": [],
-        "farm_id": farm_id,
-        "message": "Link farm GeoJSON via /api/v1/farms/:id/geojson",
-    }
+    return {"data": [], "farm_id": farm_id, "message": "Link farm GeoJSON via /api/v1/farms/:id/geojson"}
