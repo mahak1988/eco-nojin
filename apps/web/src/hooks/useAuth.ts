@@ -34,7 +34,8 @@ export function useAuth() {
           setSession(token || "cookie", mapUser(me as never));
         }
       } catch {
-        /* not logged in */
+        // 401 = not logged in — normal, not an app error
+        if (!cancelled) clearSession();
       } finally {
         if (!cancelled) setBooting(false);
       }
@@ -42,7 +43,7 @@ export function useAuth() {
     return () => {
       cancelled = true;
     };
-  }, [hydrate, setSession, token]);
+  }, [hydrate, setSession, clearSession, token]);
 
   const setSessionFromAuth = useCallback(
     (tok: string, u?: unknown) => {
@@ -63,7 +64,7 @@ export function useAuth() {
       else if (tok) setSession(tok);
       return res;
     },
-    [setSession, setSessionFromAuth]
+    [setSession, setSessionFromAuth],
   );
 
   const register = useCallback(
@@ -81,19 +82,20 @@ export function useAuth() {
         email,
         password,
         full_name: extra?.full_name,
-        locale: "en-US" // Adding default locale for registration
+        locale: "en-US",
       });
-      
-      // After registration, login to get the token
-      const loginResult = await login(email, password);
-      
+      await login(email, password);
       return res;
     },
-    [setSession, setSessionFromAuth],
+    [login],
   );
 
   const logout = useCallback(async () => {
-    await authApi.logout();
+    try {
+      await authApi.logout();
+    } catch {
+      /* ignore */
+    }
     clearSession();
   }, [clearSession]);
 
