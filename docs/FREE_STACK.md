@@ -1,58 +1,32 @@
-# استک رایگان Econojin
+# Phase 7 — Free runtime stack & monitoring
 
-## هاست و استقرار
+## Runtime
 
-| سرویس | کاربرد | لینک |
-|--------|--------|------|
-| **Vercel** | فرانت Next.js (`apps/web`) | https://vercel.com |
-| **Render** | API FastAPI (free tier) | https://render.com |
-| **Railway** | API + Redis | https://railway.app |
-| **Fly.io** | API container | https://fly.io |
-| **GitHub Pages** | مستندات استاتیک | https://pages.github.com |
+- API: FastAPI + SQLite (local) or Neon Postgres (cloud free)
+- Science: conceptual models always; OSPy/pyRothC optional
+- Satellite: Planetary Computer → synthetic
+- Weather: Open-Meteo (no key)
 
-## دیتابیس رایگان
+## Health
 
-| سرویس | نوع | لینک |
-|--------|-----|------|
-| **Neon** | PostgreSQL serverless | https://neon.tech |
-| **Supabase** | Postgres + Auth | https://supabase.com |
-| **Turso** | SQLite edge | https://turso.tech |
-| **MongoDB Atlas** | NoSQL (اختیاری) | https://www.mongodb.com/atlas |
+`GET /health` reports:
 
-تنظیم production:
-```env
-DATABASE_URL=postgresql+asyncpg://user:pass@ep-xxx.neon.tech/econojin
-```
+- database ok/fail
+- security toggles
+- loaded routers (incl. `science_e2e`)
 
-## SMS / OTP (تولید)
+## Monitoring (free)
 
-| سرویس | یادداشت |
-|--------|---------|
-| **Twilio** | trial رایگان محدود |
-| **Kavenegar** | پنل ایران — tier رایگان محدود |
-| **حالت dev** | `OTP_DEV_MODE=true` کد در پاسخ API |
+| Tool | Use |
+|------|-----|
+| Sentry free tier | Optional `SENTRY_DSN` |
+| Platform logs | Render/Fly logs |
+| `/health` + uptime robot | UptimeRobot free |
 
-## CI/CD
+## Local smoke
 
-- GitHub Actions: `.github/workflows/econojin-apps-ci.yml`
-- Docker محلی: `docker compose -f docker-compose.apps.yml up`
-
-## CDN / تصاویر
-
-- Unsplash (تصاویر هیرو — فعلی)
-- OpenStreetMap tiles (GIS — رایگان)
-
-## متغیرهای Vercel
-
-```
-NEXT_PUBLIC_API_URL=https://your-api.onrender.com
-```
-
-## متغیرهای Render (API)
-
-```
-JWT_SECRET=<random-64>
-DATABASE_URL=<neon-url>
-OTP_DEV_MODE=false
-REQUIRE_AUTH_FOR_WRITES=true
+```powershell
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/api/v1/science/status
+curl http://127.0.0.1:8000/api/v1/science/e2e-mrv/isfahan-wheat
 ```
