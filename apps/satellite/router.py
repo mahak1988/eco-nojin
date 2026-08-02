@@ -125,7 +125,7 @@ async def timeseries(
     lon: float = Query(51.67),
     days: int = Query(90, ge=7, le=365),
     farm_id: int = Query(0),
-    raster: int = Query(0, ge=0, le=3, description="0=fast metadata; 1-3=COG raster budget"),
+    raster: int = Query(0, ge=0, le=3),
 ) -> dict[str, Any]:
     if raster == 0:
         out = await fast_timeseries(lat, lon, days, raster_budget=0)
@@ -167,9 +167,8 @@ async def vci_endpoint(
     lat: float = Query(32.65),
     lon: float = Query(51.67),
     days: int = Query(60, ge=14, le=365),
-    raster: int = Query(0, ge=0, le=2, description="0=fast STAC metadata (default); 1-2=download COGs"),
+    raster: int = Query(0, ge=0, le=2),
 ) -> dict[str, Any]:
-    """NDVI + VCI + anomaly. Default is metadata-fast to avoid client timeouts."""
     return await fast_timeseries(lat, lon, days, raster_budget=raster)
 
 
@@ -179,70 +178,34 @@ async def pilots_ndvi_batch(
     limit: int = Query(6, ge=1, le=24),
     raster: int = Query(0, ge=0, le=1),
 ) -> dict[str, Any]:
-    """Batch pilot NDVI+VCI — default metadata-only for speed."""
     end = date.today()
     start = end - timedelta(days=days)
     results: list[dict[str, Any]] = []
     for pt in DEFAULT_PILOT_POINTS[:limit]:
         try:
-            out = await fast_timeseries(
-                float(pt["lat"]),
-                float(pt["lon"]),
-                days,
-                raster_budget=raster,
-            )
+            out = await fast_timeseries(float(pt["lat"]), float(pt["lon"]), days, raster_budget=raster)
             ts = out.get("timeseries") or []
             last = ts[-1] if ts else {}
-            results.append(
-                {
-                    "id": pt["id"],
-                    "code": pt["code"],
-                    "lat": pt["lat"],
-                    "lon": pt["lon"],
-                    "count": out.get("count", 0),
-                    "latest_ndvi": last.get("mean_ndvi"),
-                    "latest_date": last.get("date"),
-                    "latest_vci": last.get("vci"),
-                    "latest_anomaly": last.get("anomaly"),
-                    "drought_label": last.get("drought_label"),
-                    "provider": out.get("provider"),
-                    "mode": out.get("mode"),
-                    "series": [
-                        {
-                            "date": t.get("date"),
-                            "mean_ndvi": t.get("mean_ndvi"),
-                            "vci": t.get("vci"),
-                            "anomaly": t.get("anomaly"),
-                        }
-                        for t in ts[-8:]
-                    ],
-                }
-            )
+            results.append({
+                "id": pt["id"], "code": pt["code"], "lat": pt["lat"], "lon": pt["lon"],
+                "count": out.get("count", 0),
+                "latest_ndvi": last.get("mean_ndvi"),
+                "latest_date": last.get("date"),
+                "latest_vci": last.get("vci"),
+                "latest_anomaly": last.get("anomaly"),
+                "drought_label": last.get("drought_label"),
+                "provider": out.get("provider"),
+                "mode": out.get("mode"),
+                "series": [{"date": t.get("date"), "mean_ndvi": t.get("mean_ndvi"), "vci": t.get("vci"), "anomaly": t.get("anomaly")} for t in ts[-8:]],
+            })
         except Exception as e:
-            results.append(
-                {
-                    "id": pt["id"],
-                    "code": pt["code"],
-                    "lat": pt["lat"],
-                    "lon": pt["lon"],
-                    "error": str(e)[:160],
-                    "count": 0,
-                }
-            )
-    return {
-        "days": days,
-        "start": start.isoformat(),
-        "end": end.isoformat(),
-        "pilots": results,
-        "note": "Default mode=metadata_fast (no COG). Pass raster=1 for real raster stats (slower).",
-    }
+            results.append({"id": pt["id"], "code": pt["code"], "lat": pt["lat"], "lon": pt["lon"], "error": str(e)[:160], "count": 0})
+    return {"days": days, "start": start.isoformat(), "end": end.isoformat(), "pilots": results,
+            "note": "Default mode=metadata_fast. Pass raster=1 for COG stats."}
 
 
 @router.get("/ndvi")
-async def ndvi_point(
-    lat: float = Query(32.65),
-    lon: float = Query(51.67),
-) -> dict[str, Any]:
+async def ndvi_point(lat: float = Query(32.65), lon: float = Query(51.67)) -> dict[str, Any]:
     bbox = BBox.from_point(lat, lon, delta=0.02)
     svc = get_satellite_service()
     row = await svc.get_ndvi_image(bbox, date.today() - timedelta(days=15))
@@ -250,99 +213,62 @@ async def ndvi_point(
 
 
 @router.get("/indices")
-async def indices(
-    lat: float = Query(32.65),
-    lon: float = Query(51.67),
-    days: int = Query(60, ge=7, le=365),
-) -> dict[str, Any]:
+async def indices(lat: float = Query(32.65), lon: float = Query(51.67), days: int = Query(60, ge=7, le=365)) -> dict[str, Any]:
     try:
         from apps.satellite.fetchers.sentinel2_fetcher import fetch_indices
-
         end = date.today()
         start = end - timedelta(days=days)
         rows = fetch_indices(lat, lon, start, end)
-        return {
-            "lat": lat,
-            "lon": lon,
-            "start": start.isoformat(),
-            "end": end.isoformat(),
-            "count": len(rows),
-            "data": [r.__dict__ if hasattr(r, "__dict__") else r for r in rows],
-        }
+        return {"lat": lat, "lon": lon, "start": start.isoformat(), "end": end.isoformat(), "count": len(rows),
+                "data": [r.__dict__ if hasattr(r, "__dict__") else r for r in rows]}
     except Exception as e:
         return {"lat": lat, "lon": lon, "count": 0, "error": str(e)[:200], "data": []}
 
 
 @router.post("/indices/from-bands")
 async def indices_from_bands(req: BandsRequest) -> dict[str, Any]:
-    return indices_from_mean_reflectance(
-        {"red": req.red, "nir": req.nir, "green": req.green, "blue": req.blue, "swir1": req.swir1}
-    )
+    return indices_from_mean_reflectance({"red": req.red, "nir": req.nir, "green": req.green, "blue": req.blue, "swir1": req.swir1})
 
 
 @router.post("/mrv-bridge")
 async def mrv_bridge(req: MrvBridgeRequest) -> dict[str, Any]:
     if req.red is not None and req.nir is not None:
-        return mrv_from_bands(
-            req.red, req.nir, green=req.green, blue=req.blue,
-            ndvi_expected=req.ndvi_expected, model_yield_t_ha=req.model_yield_t_ha,
-            field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type,
-            measured_value=req.measured_value, region_multiplier=req.region_multiplier,
-        )
+        return mrv_from_bands(req.red, req.nir, green=req.green, blue=req.blue, ndvi_expected=req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha, field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type,
+            measured_value=req.measured_value, region_multiplier=req.region_multiplier)
     if req.ndvi_observed is not None:
-        return mrv_from_ndvi(
-            req.ndvi_observed, req.ndvi_expected,
-            model_yield_t_ha=req.model_yield_t_ha, field_yield_t_ha=req.field_yield_t_ha,
-            credit_type=req.credit_type, measured_value=req.measured_value,
-            region_multiplier=req.region_multiplier,
-        )
+        return mrv_from_ndvi(req.ndvi_observed, req.ndvi_expected, model_yield_t_ha=req.model_yield_t_ha,
+            field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type, measured_value=req.measured_value,
+            region_multiplier=req.region_multiplier)
     if req.lat is not None and req.lon is not None:
-        return await mrv_from_location(
-            req.lat, req.lon, days=req.days, ndvi_expected=req.ndvi_expected,
-            model_yield_t_ha=req.model_yield_t_ha, field_yield_t_ha=req.field_yield_t_ha,
-            credit_type=req.credit_type, measured_value=req.measured_value,
-            region_multiplier=req.region_multiplier,
-        )
+        return await mrv_from_location(req.lat, req.lon, days=req.days, ndvi_expected=req.ndvi_expected,
+            model_yield_t_ha=req.model_yield_t_ha, field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type,
+            measured_value=req.measured_value, region_multiplier=req.region_multiplier)
     return {"error": "provide red+nir, or ndvi_observed, or lat+lon"}
 
 
 @router.get("/mrv-bridge")
-async def mrv_bridge_get(
-    lat: float = Query(32.65),
-    lon: float = Query(51.67),
-    days: int = Query(30, ge=7, le=365),
-    measured_value: float = Query(40.0, gt=0),
-    credit_type: int = Query(0, ge=0, le=3),
-) -> dict[str, Any]:
+async def mrv_bridge_get(lat: float = Query(32.65), lon: float = Query(51.67), days: int = Query(30, ge=7, le=365),
+    measured_value: float = Query(40.0, gt=0), credit_type: int = Query(0, ge=0, le=3)) -> dict[str, Any]:
     return await mrv_from_location(lat, lon, days=days, measured_value=measured_value, credit_type=credit_type)
 
 
 @router.post("/aquacrop-mrv")
 async def aquacrop_mrv_post(req: AquaCropMrvRequest) -> dict[str, Any]:
     if req.lat is not None and req.lon is not None:
-        return await aquacrop_mrv_from_location(
-            req.lat, req.lon, crop=req.crop, days=req.days,
-            field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type,
-            measured_value=req.measured_value, region_multiplier=req.region_multiplier,
-        )
-    return aquacrop_to_mrv(
-        crop=req.crop, days=req.days, area_ha=req.area_ha, et0_mm_day=req.et0_mm_day,
-        rain_mm_day=req.rain_mm_day, taw_mm=req.taw_mm, ndvi_values=req.ndvi_values,
-        ndvi_observed=req.ndvi_observed, field_yield_t_ha=req.field_yield_t_ha,
-        credit_type=req.credit_type, measured_value=req.measured_value,
-        region_multiplier=req.region_multiplier,
-    )
+        return await aquacrop_mrv_from_location(req.lat, req.lon, crop=req.crop, days=req.days,
+            field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type, measured_value=req.measured_value,
+            region_multiplier=req.region_multiplier)
+    return aquacrop_to_mrv(crop=req.crop, days=req.days, area_ha=req.area_ha, et0_mm_day=req.et0_mm_day,
+        rain_mm_day=req.rain_mm_day, taw_mm=req.taw_mm, ndvi_values=req.ndvi_values, ndvi_observed=req.ndvi_observed,
+        field_yield_t_ha=req.field_yield_t_ha, credit_type=req.credit_type, measured_value=req.measured_value,
+        region_multiplier=req.region_multiplier)
 
 
 @router.get("/aquacrop-mrv")
-async def aquacrop_mrv_get(
-    crop: str = Query("wheat"),
-    days: int = Query(90, ge=30, le=200),
-    measured_value: float = Query(40.0, gt=0),
-    credit_type: int = Query(0, ge=0, le=3),
-    lat: Optional[float] = Query(None),
-    lon: Optional[float] = Query(None),
-) -> dict[str, Any]:
+async def aquacrop_mrv_get(crop: str = Query("wheat"), days: int = Query(90, ge=30, le=200),
+    measured_value: float = Query(40.0, gt=0), credit_type: int = Query(0, ge=0, le=3),
+    lat: Optional[float] = Query(None), lon: Optional[float] = Query(None)) -> dict[str, Any]:
     if lat is not None and lon is not None:
         return await aquacrop_mrv_from_location(lat, lon, crop=crop, days=days, measured_value=measured_value, credit_type=credit_type)
     return aquacrop_to_mrv(crop=crop, days=days, measured_value=measured_value, credit_type=credit_type)
@@ -350,48 +276,36 @@ async def aquacrop_mrv_get(
 
 @router.post("/rothc-mrv")
 async def rothc_mrv_post(req: RothcMrvRequest) -> dict[str, Any]:
-    return rothc_to_mrv(
-        years=req.years, clay_pct=req.clay_pct, temp_c=req.temp_c,
-        rain_mm_year=req.rain_mm_year, et_mm_year=req.et_mm_year,
-        c_input_t_ha_y=req.c_input_t_ha_y, soc_t_ha=req.soc_t_ha,
-        plant_cover=req.plant_cover, lab_soc_final_t_ha=req.lab_soc_final_t_ha,
-        region_multiplier=req.region_multiplier,
-    )
+    return rothc_to_mrv(years=req.years, clay_pct=req.clay_pct, temp_c=req.temp_c, rain_mm_year=req.rain_mm_year,
+        et_mm_year=req.et_mm_year, c_input_t_ha_y=req.c_input_t_ha_y, soc_t_ha=req.soc_t_ha, plant_cover=req.plant_cover,
+        lab_soc_final_t_ha=req.lab_soc_final_t_ha, region_multiplier=req.region_multiplier)
 
 
 @router.get("/rothc-mrv")
-async def rothc_mrv_get(
-    years: int = Query(10, ge=1, le=100),
-    c_input_t_ha_y: float = Query(1.5, ge=0, le=20),
-    clay_pct: float = Query(25.0, ge=0, le=80),
-    soc_t_ha: float = Query(40.0, ge=1, le=200),
-) -> dict[str, Any]:
+async def rothc_mrv_get(years: int = Query(10, ge=1, le=100), c_input_t_ha_y: float = Query(1.5, ge=0, le=20),
+    clay_pct: float = Query(25.0, ge=0, le=80), soc_t_ha: float = Query(40.0, ge=1, le=200)) -> dict[str, Any]:
     return rothc_to_mrv(years=years, c_input_t_ha_y=c_input_t_ha_y, clay_pct=clay_pct, soc_t_ha=soc_t_ha)
 
 
 @router.post("/change-detection")
-async def change_detection(
-    lat: float = Query(32.65),
-    lon: float = Query(51.67),
-    days: int = Query(120, ge=30, le=365),
-) -> dict[str, Any]:
-    a = await fast_timeseries(lat, lon, days // 2, raster_budget=0)
+async def change_detection(lat: float = Query(32.65), lon: float = Query(51.67), days: int = Query(120, ge=30, le=365)) -> dict[str, Any]:
     b = await fast_timeseries(lat, lon, days, raster_budget=0)
-    ta = a.get("timeseries") or []
     tb = b.get("timeseries") or []
     mid = len(tb) // 2
     ma = sum(t.get("mean_ndvi") or 0 for t in tb[:mid]) / max(mid, 1)
     mb = sum(t.get("mean_ndvi") or 0 for t in tb[mid:]) / max(len(tb) - mid, 1)
     delta = mb - ma
-    return {
-        "period_a": {"mean_ndvi": round(ma, 4)},
-        "period_b": {"mean_ndvi": round(mb, 4)},
-        "delta_ndvi": round(delta, 4),
-        "signal": "greening" if delta > 0.05 else ("browning" if delta < -0.05 else "stable"),
-        "mode": "metadata_fast",
-    }
+    return {"period_a": {"mean_ndvi": round(ma, 4)}, "period_b": {"mean_ndvi": round(mb, 4)},
+            "delta_ndvi": round(delta, 4),
+            "signal": "greening" if delta > 0.05 else ("browning" if delta < -0.05 else "stable"), "mode": "metadata_fast"}
 
 
 @router.get("/fields")
 async def fields_stub(farm_id: Optional[int] = None) -> dict[str, Any]:
     return {"data": [], "farm_id": farm_id, "message": "Link farm GeoJSON via /api/v1/farms/:id/geojson"}
+
+
+# Free EO stack: Sentinel suite + NASA/MODIS/Landsat + DEM + erosion + climate
+from apps.satellite.eo_routes_attach import attach_eo_routes  # noqa: E402
+
+attach_eo_routes(router)
