@@ -1,4 +1,4 @@
-"""Satellite API routes — EO + AquaCrop + RothC → EcoCoin MRV."""
+"""Satellite API routes — EO + AquaCrop + RothC → EcoCoin MRV + VCI/anomaly."""
 
 from __future__ import annotations
 
@@ -13,10 +13,37 @@ from apps.satellite.mrv_bridge import mrv_from_bands, mrv_from_location, mrv_fro
 from apps.satellite.processors.indices import indices_from_mean_reflectance
 from apps.satellite.providers.base import BBox
 from apps.satellite.service import get_satellite_service
+from apps.satellite.vci import compute_anomaly, compute_vci_series
 from apps.simulation.aquacrop_mrv import aquacrop_mrv_from_location, aquacrop_to_mrv
 from apps.simulation.rothc_mrv import rothc_to_mrv
 
 router = APIRouter(prefix="/api/v1/satellite", tags=["Satellite"])
+
+# Default high-impact pilot centroids (MENA/MENAP) — keep in sync with frontend catalog
+DEFAULT_PILOT_POINTS: list[dict[str, Any]] = [
+    {"id": "dishmok", "code": "IR-DIS", "lat": 31.2, "lon": 50.4},
+    {"id": "behbehan", "code": "IR-BEH", "lat": 30.6, "lon": 50.24},
+    {"id": "tales", "code": "IR-TAL", "lat": 37.8, "lon": 48.9},
+    {"id": "yasuj", "code": "IR-YAS", "lat": 30.67, "lon": 51.59},
+    {"id": "isfahan-zayandeh", "code": "IR-ISF", "lat": 32.65, "lon": 51.67},
+    {"id": "kerman-jiroft", "code": "IR-JIR", "lat": 28.68, "lon": 57.74},
+    {"id": "afg-herat", "code": "AF-HER", "lat": 34.35, "lon": 62.2},
+    {"id": "iq-basra", "code": "IQ-BAS", "lat": 30.5, "lon": 47.8},
+    {"id": "jo-jordan-valley", "code": "JO-JRV", "lat": 32.0, "lon": 35.55},
+    {"id": "tn-kairouan", "code": "TN-KAI", "lat": 35.68, "lon": 10.1},
+    {"id": "ma-souss", "code": "MA-SOU", "lat": 30.4, "lon": -9.6},
+    {"id": "eg-fayoum", "code": "EG-FAY", "lat": 29.31, "lon": 30.84},
+    {"id": "sa-asir", "code": "SA-ASR", "lat": 18.2, "lon": 42.5},
+    {"id": "lb-bekaa", "code": "LB-BEK", "lat": 33.85, "lon": 36.0},
+    {"id": "sy-aleppo", "code": "SY-ALP", "lat": 36.2, "lon": 37.15},
+    {"id": "ye-sanaa", "code": "YE-SAN", "lat": 15.35, "lon": 44.2},
+    {"id": "sd-gezira", "code": "SD-GEZ", "lat": 14.4, "lon": 33.5},
+    {"id": "dz-constantine", "code": "DZ-CON", "lat": 36.35, "lon": 6.6},
+    {"id": "ly-jefara", "code": "LY-JEF", "lat": 32.8, "lon": 13.0},
+    {"id": "om-dhofar", "code": "OM-DHO", "lat": 17.0, "lon": 54.1},
+    {"id": "pk-baloch", "code": "PK-BAL", "lat": 30.2, "lon": 67.0},
+    {"id": "tr-konya", "code": "TR-KON", "lat": 37.87, "lon": 32.48},
+]
 
 
 class BandsRequest(BaseModel):
@@ -104,12 +131,123 @@ async def timeseries(
     bbox = BBox.from_point(lat, lon, delta=0.05)
     svc = get_satellite_service()
     rows = await svc.get_ndvi_timeseries(farm_id, bbox, start, end)
+    means = [r.mean_ndvi for r in rows]
     return {
         "lat": lat,
         "lon": lon,
         "count": len(rows),
         "provider": rows[0].provider if rows else None,
         "data": [r.to_dict() for r in rows],
+        "vci": compute_vci_series(means),
+        "anomaly": compute_anomaly(means),
+    }
+
+
+@router.get("/vci")
+async def vci_endpoint(
+    lat: float = Query(32.65),
+    lon: float = Query(51.67),
+    days: int = Query(120, ge=14, le=365),
+) -> dict[str, Any]:
+    """NDVI timeseries + VCI + anomaly for one point (Planetary stack)."""
+    end = date.today()
+    start = end - timedelta(days=days)
+    bbox = BBox.from_point(lat, lon, delta=0.05)
+    svc = get_satellite_service()
+    rows = await svc.get_ndvi_timeseries(0, bbox, start, end)
+    means = [r.mean_ndvi for r in rows]
+    vci = compute_vci_series(means)
+    anom = compute_anomaly(means)
+    latest_vci = vci[-1] if vci else None
+    return {
+        "lat": lat,
+        "lon": lon,
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "count": len(rows),
+        "provider": rows[0].provider if rows else None,
+        "timeseries": [
+            {
+                **r.to_dict(),
+                "vci": vci[i]["vci"] if i < len(vci) else None,
+                "anomaly": anom[i]["anomaly"] if i < len(anom) else None,
+                "signal": anom[i]["signal"] if i < len(anom) else None,
+                "drought_label": vci[i]["label"] if i < len(vci) else None,
+            }
+            for i, r in enumerate(rows)
+        ],
+        "latest_vci": latest_vci,
+        "interpretation": {
+            "vci_ge_40": "no_drought",
+            "vci_30_40": "mild",
+            "vci_20_30": "moderate",
+            "vci_10_20": "severe",
+            "vci_lt_10": "extreme",
+            "anomaly_gt_0.05": "greening",
+            "anomaly_lt_-0.05": "browning",
+        },
+    }
+
+
+@router.get("/pilots-ndvi-batch")
+async def pilots_ndvi_batch(
+    days: int = Query(90, ge=14, le=180),
+    limit: int = Query(12, ge=1, le=24),
+) -> dict[str, Any]:
+    """Batch NDVI+VCI for priority pilot centroids (capped for latency)."""
+    end = date.today()
+    start = end - timedelta(days=days)
+    svc = get_satellite_service()
+    results: list[dict[str, Any]] = []
+    for pt in DEFAULT_PILOT_POINTS[:limit]:
+        try:
+            bbox = BBox.from_point(float(pt["lat"]), float(pt["lon"]), delta=0.04)
+            rows = await svc.get_ndvi_timeseries(0, bbox, start, end)
+            means = [r.mean_ndvi for r in rows]
+            vci = compute_vci_series(means)
+            anom = compute_anomaly(means)
+            last = rows[-1] if rows else None
+            results.append(
+                {
+                    "id": pt["id"],
+                    "code": pt["code"],
+                    "lat": pt["lat"],
+                    "lon": pt["lon"],
+                    "count": len(rows),
+                    "latest_ndvi": last.mean_ndvi if last else None,
+                    "latest_date": last.date.isoformat() if last and last.date else None,
+                    "latest_vci": vci[-1]["vci"] if vci else None,
+                    "latest_anomaly": anom[-1]["anomaly"] if anom else None,
+                    "drought_label": vci[-1]["label"] if vci else None,
+                    "provider": last.provider if last else None,
+                    "series": [
+                        {
+                            "date": r.date.isoformat() if r.date else None,
+                            "mean_ndvi": r.mean_ndvi,
+                            "vci": vci[i]["vci"] if i < len(vci) else None,
+                            "anomaly": anom[i]["anomaly"] if i < len(anom) else None,
+                        }
+                        for i, r in enumerate(rows[-8:])  # last up to 8 points for chart
+                    ],
+                }
+            )
+        except Exception as e:
+            results.append(
+                {
+                    "id": pt["id"],
+                    "code": pt["code"],
+                    "lat": pt["lat"],
+                    "lon": pt["lon"],
+                    "error": str(e)[:160],
+                    "count": 0,
+                }
+            )
+    return {
+        "days": days,
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "pilots": results,
+        "note": "Planetary-first NDVI; VCI relative to window min/max; anomaly vs window mean",
     }
 
 
@@ -288,7 +426,6 @@ async def aquacrop_mrv_get(
 
 @router.post("/rothc-mrv")
 async def rothc_mrv_post(req: RothcMrvRequest) -> dict[str, Any]:
-    """Phase C: RothC ΔSOC → soil_soc (credit_type=2) mint preview."""
     return rothc_to_mrv(
         years=req.years,
         clay_pct=req.clay_pct,
