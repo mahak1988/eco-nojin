@@ -5,25 +5,25 @@ import { useLang, CONTENT } from "./i18n";
 import { tr } from "./i18n_extras";
 import { apiFetch, v1 } from "../../api/http";
 
-/** Live NDVI — short timeout so Home stays responsive if API is down. */
+/** Live NDVI — long timeout for Planetary Computer first hit. */
 export function SatellitePanel({ lat = 32.65, lon = 51.67 }: { lat?: number; lon?: number }) {
   const { lang } = useLang();
   const pack = (CONTENT[lang] ?? CONTENT.fa) as unknown as Record<string, unknown>;
   const t = (key: string) => tr(pack, lang, key);
   const [ndvi, setNdvi] = useState<number | null>(null);
-  const [provider, setProvider] = useState<string>("");
+  const [provider, setProvider] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${lat}&lon=${lon}`, {}, 4000)
+    apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${lat}&lon=${lon}`, {}, 45_000)
       .then((j) => {
         if (cancelled) return;
         const v = Number(j.mean_ndvi ?? j.ndvi ?? j.value);
         setNdvi(Number.isFinite(v) ? v : null);
-        setProvider(String(j.provider ?? ""));
+        setProvider(String(j.provider ?? j.source ?? ""));
         setError(null);
       })
       .catch((e) => {
@@ -56,10 +56,13 @@ export function SatellitePanel({ lat = 32.65, lon = 51.67 }: { lat?: number; lon
         <ArrowUpRight className="h-3.5 w-3.5 text-[var(--text-3)] opacity-0 transition-opacity group-hover:opacity-100" />
       </div>
       {loading ? (
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+        <div className="space-y-2">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+          <p className="text-[11px] text-stone-400">Planetary Computer…</p>
+        </div>
       ) : error ? (
         <>
-          <p className="text-sm font-bold text-amber-700">API offline</p>
+          <p className="text-sm font-bold text-amber-700">Slow / retry</p>
           <p className="mt-1 line-clamp-2 text-xs text-stone-500">{error}</p>
         </>
       ) : (
@@ -72,7 +75,10 @@ export function SatellitePanel({ lat = 32.65, lon = 51.67 }: { lat?: number; lon
             {t("panel_ndvi_sub")}
           </p>
           <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-stone-100">
-            <div className="h-full rounded-full bg-green-600 transition-all duration-700" style={{ width: `${pct}%` }} />
+            <div
+              className="h-full rounded-full bg-green-600 transition-all duration-700"
+              style={{ width: `${pct}%` }}
+            />
           </div>
         </>
       )}

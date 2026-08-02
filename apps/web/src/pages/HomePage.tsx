@@ -1,5 +1,18 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
+import {
+  Satellite,
+  MapPin,
+  FlaskConical,
+  ShieldCheck,
+  Coins,
+  Leaf,
+  BookOpen,
+  LineChart,
+  Droplets,
+  Sparkles,
+  ArrowUpRight,
+} from "lucide-react";
 import { useLang, CONTENT } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { SatellitePanel } from "../components/eco/SatellitePanel";
@@ -9,11 +22,31 @@ import { apiFetch, v1 } from "../api/http";
 import { farmsApi } from "../lib/farmsApi";
 
 const STEP_COLORS = ["var(--v-green)", "var(--v-blue)", "var(--v-red)"];
-const MODULE_LINKS = ["/satellite", "/simulators/aquacrop", "/simulators/rothc", "/science/e2e", "/mrv", "/farms/map"];
+const MODULE_LINKS = [
+  "/satellite",
+  "/simulators/aquacrop",
+  "/simulators/rothc",
+  "/science/e2e",
+  "/mrv",
+  "/farms/map",
+];
+
+const TOOLS = [
+  { to: "/satellite", icon: Satellite, titleFa: "ماهواره و NDVI", titleEn: "Satellite & NDVI", tone: "from-indigo-500 to-violet-600" },
+  { to: "/farms/map", icon: MapPin, titleFa: "نقشه مزارع", titleEn: "Farm map", tone: "from-emerald-500 to-teal-600" },
+  { to: "/simulators", icon: FlaskConical, titleFa: "شبیه‌سازها", titleEn: "Simulators", tone: "from-amber-500 to-orange-600" },
+  { to: "/science/e2e", icon: Sparkles, titleFa: "زنجیره علمی E2E", titleEn: "Science E2E", tone: "from-fuchsia-500 to-pink-600" },
+  { to: "/mrv", icon: ShieldCheck, titleFa: "MRV و اعتبار کربن", titleEn: "MRV & carbon", tone: "from-green-600 to-lime-600" },
+  { to: "/ecocoin", icon: Coins, titleFa: "اکوسکه", titleEn: "EcoCoin", tone: "from-yellow-500 to-amber-600" },
+  { to: "/education", icon: BookOpen, titleFa: "آموزش", titleEn: "Education", tone: "from-sky-500 to-blue-600" },
+  { to: "/monitoring", icon: LineChart, titleFa: "پایش", titleEn: "Monitoring", tone: "from-slate-600 to-slate-800" },
+  { to: "/water", icon: Droplets, titleFa: "آب و آبیاری", titleEn: "Water", tone: "from-cyan-500 to-blue-500" },
+  { to: "/simulators/aquacrop", icon: Leaf, titleFa: "AquaCrop", titleEn: "AquaCrop", tone: "from-lime-500 to-green-700" },
+];
 
 function CursorGlow() {
   const ref = useRef<HTMLDivElement>(null);
-  const raf = useRef<number>(0);
+  const raf = useRef(0);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -36,7 +69,7 @@ function CursorGlow() {
   return (
     <div
       ref={ref}
-      aria-hidden="true"
+      aria-hidden
       className="pointer-events-none absolute inset-0 opacity-80"
       style={{
         background:
@@ -76,7 +109,9 @@ function ConceptExplorer() {
                     {st.t}
                   </h4>
                 </div>
-                {a === i && <p className="mt-1.5 text-sm font-medium leading-relaxed text-[var(--text-2)]">{st.d}</p>}
+                {a === i && (
+                  <p className="mt-1.5 text-sm font-medium leading-relaxed text-[var(--text-2)]">{st.d}</p>
+                )}
               </div>
             </div>
           </button>
@@ -87,6 +122,10 @@ function ConceptExplorer() {
         style={{ "--step": STEP_COLORS[a] } as CSSProperties}
         className="step-show relative flex flex-col justify-center overflow-hidden rounded-[var(--r-xl)] p-8 sm:p-10"
       >
+        <div
+          className="pointer-events-none absolute -end-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl"
+          style={{ background: STEP_COLORS[a], animation: "float 8s ease-in-out infinite" }}
+        />
         <span className="relative mb-6 block text-6xl">{s.i}</span>
         <h3 className="relative mb-3 font-display text-3xl" style={{ color: STEP_COLORS[a] }}>
           {s.t}
@@ -97,79 +136,123 @@ function ConceptExplorer() {
   );
 }
 
-/** Live platform metrics from API — never invent demo numbers. */
 function LiveTrustBar() {
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
   const [farmCount, setFarmCount] = useState<number | null>(null);
   const [ndvi, setNdvi] = useState<number | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const [provider, setProvider] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const [h, farms, n] = await Promise.all([
-          apiFetch<Record<string, unknown>>("/health"),
-          farmsApi.list(1, 1).catch(() => null),
-          apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=32.65&lon=51.67`).catch(() => null),
-        ]);
+    // Health fast — never block on Planetary NDVI
+    apiFetch<Record<string, unknown>>("/health", {}, 12_000)
+      .then((h) => {
+        if (!cancelled) setHealth(h);
+      })
+      .catch(() => {
+        if (!cancelled) setHealth(null);
+      });
+    farmsApi
+      .list(1, 1)
+      .then((f) => {
+        if (!cancelled) setFarmCount(f?.meta?.total ?? f?.data?.length ?? 0);
+      })
+      .catch(() => {
+        if (!cancelled) setFarmCount(null);
+      });
+    // NDVI can take 15–40s on first Planetary hit
+    apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=32.65&lon=51.67`, {}, 45_000)
+      .then((n) => {
         if (cancelled) return;
-        setHealth(h);
-        setFarmCount(farms?.meta?.total ?? farms?.data?.length ?? null);
-        if (n) {
-          const v = Number(n.mean_ndvi ?? n.ndvi);
-          setNdvi(Number.isFinite(v) ? v : null);
-        }
-      } catch (e) {
-        if (!cancelled) setErr(e instanceof Error ? e.message : "API unavailable");
-      }
-    })();
+        const v = Number(n.mean_ndvi ?? n.ndvi);
+        setNdvi(Number.isFinite(v) ? v : null);
+        setProvider(String(n.provider ?? n.source ?? ""));
+      })
+      .catch(() => {
+        /* optional */
+      });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const routers = Array.isArray(health?.loaded_routers) ? (health!.loaded_routers as string[]).length : null;
-  const status = String(health?.status ?? "—");
-  const db = String(health?.database ?? "—");
+  const routers = Array.isArray(health?.loaded_routers)
+    ? (health!.loaded_routers as string[]).length
+    : null;
+  const status = health ? String(health.status ?? "ok") : "…";
+  const db = health ? String(health.database ?? "—") : "…";
 
   return (
     <section className="relative overflow-hidden border-b border-[var(--border-subtle)] bg-[var(--surface-raised)] py-14">
       <WorldMapBg variant="light" />
       <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
         <SectionReveal className="mb-9 text-center">
-          <h2 className="font-display text-2xl txt-ink">Live platform status · وضعیت زنده</h2>
-          <p className="mt-2 text-sm text-stone-500">Connected to backend — no demo counters</p>
-          {err && <p className="mt-2 text-sm text-rose-600">{err}</p>}
+          <h2 className="font-display text-2xl txt-ink">وضعیت زنده پلتفرم</h2>
+          <p className="mt-2 text-sm text-stone-500">داده از API — بدون شمارندهٔ آزمایشی</p>
         </SectionReveal>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            { l: "API", v: status },
-            { l: "Database", v: db },
-            { l: "Routers", v: routers != null ? String(routers) : "—" },
-            { l: "Farms", v: farmCount != null ? String(farmCount) : "—" },
-          ].map((s) => (
-            <div key={s.l} className="text-center">
+            { l: "API", v: status, glow: "shadow-emerald-200" },
+            { l: "Database", v: db, glow: "" },
+            { l: "Routers", v: routers != null ? String(routers) : "—", glow: "" },
+            { l: "Farms", v: farmCount != null ? String(farmCount) : "—", glow: "" },
+          ].map((s, i) => (
+            <div
+              key={s.l}
+              className={`rounded-2xl border border-stone-200/80 bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md ${s.glow}`}
+              style={{ animation: `fade-up .5s var(--ease-out) ${i * 80}ms both` }}
+            >
               <div className="mb-1 font-display text-3xl tabular-nums text-emerald-800">{s.v}</div>
               <p className="text-sm font-bold text-[var(--text-2)]">{s.l}</p>
             </div>
           ))}
         </div>
         {ndvi != null && (
-          <p className="mt-6 text-center text-sm text-stone-600">
-            Sample NDVI (Isfahan query): <strong className="tabular-nums">{ndvi.toFixed(3)}</strong> from satellite API
+          <p className="mt-6 text-center text-sm text-stone-600" style={{ animation: "fade-in .6s ease both" }}>
+            NDVI نمونه (اصفهان): <strong className="tabular-nums">{ndvi.toFixed(3)}</strong>
+            {provider ? ` · ${provider}` : ""}
           </p>
         )}
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/satellite" className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-bold text-white">
-            Satellite map
-          </Link>
-          <Link to="/farms/map" className="rounded-full border border-stone-300 px-5 py-2 text-sm font-bold">
-            Register farm on map
-          </Link>
-          <Link to="/science/e2e" className="rounded-full border border-stone-300 px-5 py-2 text-sm font-bold">
-            Science E2E
-          </Link>
+      </div>
+    </section>
+  );
+}
+
+function ToolsLauncher({ lang }: { lang: string }) {
+  const fa = lang === "fa" || lang === "ar";
+  return (
+    <section className="relative overflow-hidden px-5 py-20 sm:px-8">
+      <WorldMapBg variant="light" />
+      <div className="relative mx-auto max-w-6xl">
+        <SectionReveal className="mb-10 text-center">
+          <span className="font-mono text-xs font-bold text-emerald-700">TOOLS</span>
+          <h2 className="mt-2 font-display text-3xl txt-ink sm:text-4xl">
+            {fa ? "ابزارهای سریع" : "Quick tools"}
+          </h2>
+          <p className="mt-2 text-sm text-stone-500">
+            {fa ? "کارت‌های تعاملی — هر کارت یک مسیر واقعی" : "Interactive cards — each opens a real route"}
+          </p>
+        </SectionReveal>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {TOOLS.map((tool, i) => (
+            <SectionReveal key={tool.to} delay={i * 50}>
+              <Link
+                to={tool.to}
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              >
+                <div
+                  className={`mb-3 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${tool.tone} text-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
+                >
+                  <tool.icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-sm font-bold text-stone-800">{fa ? tool.titleFa : tool.titleEn}</h3>
+                <ArrowUpRight className="absolute end-3 top-3 h-4 w-4 text-stone-300 transition group-hover:text-emerald-600" />
+                <div
+                  className={`pointer-events-none absolute -bottom-8 -end-8 h-24 w-24 rounded-full bg-gradient-to-br ${tool.tone} opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-20`}
+                />
+              </Link>
+            </SectionReveal>
+          ))}
         </div>
       </div>
     </section>
@@ -204,7 +287,7 @@ export function Home() {
             <SectionReveal>
               <span className="mb-7 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-bold txt-green">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--v-green)]" />
-                Live · connected to API
+                Live API
               </span>
             </SectionReveal>
             <SectionReveal delay={90}>
@@ -222,6 +305,7 @@ export function Home() {
                 <Link
                   to="/farms/map"
                   className="rounded-full bg-[var(--v-green)] px-8 py-3.5 font-bold text-white shadow-[var(--shadow-md)] transition-all hover:-translate-y-0.5 hover:bg-[var(--brand-700)]"
+                  style={{ animation: "pulse-glow 3s ease-in-out infinite" }}
                 >
                   ثبت مزرعه روی نقشه
                 </Link>
@@ -235,7 +319,10 @@ export function Home() {
             </SectionReveal>
           </div>
           <SectionReveal delay={300}>
-            <div className="grid gap-4 sm:grid-cols-2" style={{ transform: "translateY(calc(var(--sy,0px) * -0.05))" }}>
+            <div
+              className="grid gap-4 sm:grid-cols-2"
+              style={{ transform: "translateY(calc(var(--sy,0px) * -0.05))" }}
+            >
               <SatellitePanel />
               <WeatherPanel />
             </div>
@@ -244,6 +331,7 @@ export function Home() {
       </section>
 
       <LiveTrustBar />
+      <ToolsLauncher lang={lang} />
 
       <section
         id="how"
@@ -266,11 +354,9 @@ export function Home() {
       <section id="modules" className="relative overflow-hidden px-5 py-24 sm:px-8">
         <WorldMapBg variant="light" />
         <div className="relative mx-auto max-w-6xl">
-          <SectionReveal className="mb-12 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <span className="font-mono text-xs font-bold txt-green">{t.modK}</span>
-              <h2 className="mt-2 text-balance font-display text-3xl txt-ink sm:text-4xl">{t.modT}</h2>
-            </div>
+          <SectionReveal className="mb-12">
+            <span className="font-mono text-xs font-bold txt-green">{t.modK}</span>
+            <h2 className="mt-2 text-balance font-display text-3xl txt-ink sm:text-4xl">{t.modT}</h2>
           </SectionReveal>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-4 sm:auto-rows-[180px]">
             {t.modules.map((m, i) => {
@@ -289,10 +375,10 @@ export function Home() {
                 >
                   <Link
                     to={MODULE_LINKS[i] ?? "/sitemap"}
-                    className={`group relative flex h-full min-h-[160px] cursor-pointer flex-col justify-between overflow-hidden rounded-[var(--r-lg)] border border-[var(--border-subtle)] bg-gradient-to-br ${g} p-6 card-hover`}
+                    className={`group relative flex h-full min-h-[160px] flex-col justify-between overflow-hidden rounded-[var(--r-lg)] border border-[var(--border-subtle)] bg-gradient-to-br ${g} p-6 card-hover`}
                   >
                     <div className="flex items-start justify-between">
-                      <span className="text-3xl">{m.i}</span>
+                      <span className="text-3xl transition-transform duration-300 group-hover:scale-125">{m.i}</span>
                       <span className={`font-mono text-[10px] font-bold ${tc}`}>{m.n}</span>
                     </div>
                     <div>
@@ -313,6 +399,7 @@ export function Home() {
             className="relative overflow-hidden rounded-[var(--r-xl)] border border-[var(--border-subtle)] p-12 text-center sm:p-16"
             style={{ background: "linear-gradient(135deg, #eef3e9, #faf7f1 50%, #f6efe1)" }}
           >
+            <div className="pointer-events-none absolute inset-0 opacity-40" style={{ animation: "gradient-shift 12s ease infinite", backgroundSize: "200% 200%", backgroundImage: "linear-gradient(120deg,#eef3e9,#f6efe1,#e0f2fe,#eef3e9)" }} />
             <h2 className="relative mb-4 text-balance font-display text-3xl txt-ink sm:text-4xl">{t.ctaT}</h2>
             <p className="relative mx-auto mb-9 max-w-lg font-medium text-[var(--text-2)]">{t.ctaS}</p>
             <div className="relative flex flex-wrap justify-center gap-3">
@@ -322,7 +409,10 @@ export function Home() {
               >
                 {t.ctaB}
               </Link>
-              <Link to="/farms/map" className="inline-block rounded-full border-2 border-emerald-700 px-10 py-4 text-lg font-bold text-emerald-800">
+              <Link
+                to="/farms/map"
+                className="inline-block rounded-full border-2 border-emerald-700 px-10 py-4 text-lg font-bold text-emerald-800"
+              >
                 نقشه مزارع
               </Link>
             </div>
