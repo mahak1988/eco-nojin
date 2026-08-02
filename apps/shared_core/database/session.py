@@ -62,21 +62,27 @@ def _resolve_database_url() -> str:
                 )
             logger.info("asyncpg not installed — local SQLite")
             return DEFAULT_SQLITE
-        # Phase 3: allow Postgres on local when forced OR when asyncpg present and URL is explicit async
         if _force_postgres():
-            logger.info("FORCE_POSTGRES=1 — using Postgres: %s", url.split("@")[-1] if "@" in url else url)
+            logger.info(
+                "FORCE_POSTGRES=1 — using Postgres: %s",
+                url.split("@")[-1] if "@" in url else url,
+            )
             return url
         try:
             from apps.shared_core.config import settings
 
             if settings.ENVIRONMENT == "local" and not _force_postgres():
-                # keep SQLite for zero-friction local unless user opts in
-                if os.getenv("DATABASE_URL", "").strip() and _has_asyncpg() and "+asyncpg" in url:
-                    # Explicit async Postgres URL in env → honor it
+                if (
+                    os.getenv("DATABASE_URL", "").strip()
+                    and _has_asyncpg()
+                    and "+asyncpg" in url
+                ):
                     if "localhost" in url or "127.0.0.1" in url or "postgres:" in url:
                         logger.info("Local Postgres URL detected with asyncpg — using Postgres")
                         return url
-                logger.info("Local without FORCE_POSTGRES — SQLite (set FORCE_POSTGRES=1 to use PG)")
+                logger.info(
+                    "Local without FORCE_POSTGRES — SQLite (set FORCE_POSTGRES=1 to use PG)"
+                )
                 return DEFAULT_SQLITE
         except Exception:
             if not _force_postgres():
@@ -159,6 +165,12 @@ async def _sqlite_schema_patches(conn) -> None:
         await _add_col(conn, "users", "organization", "organization VARCHAR(255)", users)
         await _add_col(conn, "users", "role", "role VARCHAR(40) DEFAULT 'farmer'", users)
 
+    courses = await _table_cols(conn, "courses")
+    if courses:
+        await _add_col(conn, "courses", "instructor_id", "instructor_id VARCHAR(50)", courses)
+        await _add_col(conn, "courses", "instructor", "instructor VARCHAR(255)", courses)
+        await _add_col(conn, "courses", "is_active", "is_active BOOLEAN DEFAULT 1", courses)
+
     crops = await _table_cols(conn, "crops")
     if crops:
         crop_cols = [
@@ -191,10 +203,14 @@ async def init_db() -> None:
         from apps.shared_core.config import settings
 
         if settings.ENVIRONMENT != "local" and not _force_postgres():
-            logger.info("Skipping create_all (ENVIRONMENT=%s); use Alembic", settings.ENVIRONMENT)
+            logger.info(
+                "Skipping create_all (ENVIRONMENT=%s); use Alembic", settings.ENVIRONMENT
+            )
             return
         if settings.ENVIRONMENT != "local" and "postgres" in DATABASE_URL:
-            logger.info("Skipping create_all on Postgres staging/prod — use alembic upgrade head")
+            logger.info(
+                "Skipping create_all on Postgres staging/prod — use alembic upgrade head"
+            )
             return
     except Exception:
         pass
