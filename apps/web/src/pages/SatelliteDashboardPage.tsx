@@ -6,6 +6,7 @@ import { useLang } from "../components/eco/i18n";
 import { tExtra } from "../components/eco/i18n_extras";
 import { ndviHealth } from "../components/eco/i18n_phase_b5";
 import { getSatelliteCatalog, type SatellitePlatform } from "../lib/apiServices";
+import { apiFetch, v1 } from "../api/http";
 
 const HEALTH_STYLE = {
   good: "bg-emerald-100 text-emerald-800 ring-emerald-200",
@@ -19,6 +20,11 @@ const BAR = {
   poor: "from-rose-400 to-red-600",
 } as const;
 
+function extractNdvi(row: Record<string, unknown>): number {
+  const v = Number(row.mean_ndvi ?? row.ndvi ?? row.value);
+  return Number.isFinite(v) ? v : NaN;
+}
+
 export default function SatelliteDashboardPage() {
   const { lang } = useLang();
   const tx = (k: string) => tExtra(lang, k);
@@ -29,25 +35,42 @@ export default function SatelliteDashboardPage() {
   const [loading, setLoading] = useState(false);
   const [platforms, setPlatforms] = useState<SatellitePlatform[]>([]);
   const [recommended, setRecommended] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   async function loadCatalog() {
-    const res = await getSatelliteCatalog();
-    setPlatforms((res.data?.platforms as SatellitePlatform[]) || []);
-    setRecommended((res.data?.mrv_stack_recommended as string[]) || []);
+    try {
+      const res = await getSatelliteCatalog();
+      setPlatforms((res.data?.platforms as SatellitePlatform[]) || []);
+      setRecommended((res.data?.mrv_stack_recommended as string[]) || []);
+    } catch {
+      setPlatforms([]);
+    }
   }
 
   async function load(a = lat, b = lng) {
     setLoading(true);
+    setError(null);
     try {
       const [n, t] = await Promise.all([
-        fetch(`/api/v1/satellite/ndvi?lat=${a}&lon=${b}`, { credentials: "include" }).then((r) => r.json()),
-        fetch(`/api/v1/satellite/timeseries?lat=${a}&lon=${b}`, { credentials: "include" }).then((r) => r.json()),
+        apiFetch<Record<string, unknown>>(`${v1("/satellite/ndvi")}?lat=${a}&lon=${b}`),
+        apiFetch<{ data?: Array<Record<string, unknown>>; points?: Array<Record<string, unknown>>; provider?: string }>(
+          `${v1("/satellite/timeseries")}?lat=${a}&lon=${b}&days=90`,
+        ),
       ]);
       setNdvi(n);
-      setSeries(t.points || []);
-    } catch {
+      const rows = (t.data || t.points || []) as Array<Record<string, unknown>>;
+      setSeries(
+        rows
+          .map((r) => ({
+            date: String(r.date ?? r.acquisition_date ?? ""),
+            ndvi: extractNdvi(r),
+          }))
+          .filter((p) => Number.isFinite(p.ndvi)),
+      );
+    } catch (e) {
       setNdvi(null);
       setSeries([]);
+      setError(e instanceof Error ? e.message : "API error");
     } finally {
       setLoading(false);
     }
@@ -59,7 +82,7 @@ export default function SatelliteDashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const ndviVal = ndvi != null ? Number(ndvi.ndvi) : NaN;
+  const ndviVal = ndvi != null ? extractNdvi(ndvi) : NaN;
   const health = Number.isFinite(ndviVal) ? ndviHealth(ndviVal) : "mid";
 
   return (
@@ -71,7 +94,7 @@ export default function SatelliteDashboardPage() {
           </div>
           <div>
             <h1 className="font-display text-3xl text-stone-800">{tx("sat_title")}</h1>
-            <p className="text-sm text-stone-500">{tx("sat_sub")}</p>
+            <p className="text-sm text-stone-500">Live EO from API · map + satellite basemap</p>
           </div>
         </div>
         <button
@@ -85,8 +108,17 @@ export default function SatelliteDashboardPage() {
         </button>
       </div>
 
+      {error && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</div>
+      )}
+
       <div className="flex flex-wrap gap-2">
-        <span className="text-xs font-bold text-stone-400">{tx("sat_links")}:</span>
+        <Link
+          to="/farms/map"
+          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800 ring-1 ring-emerald-100"
+        >
+          <MapPinned className="h-3.5 w-3.5" /> Register farm on map
+        </Link>
         {(
           [
             ["/satellite/timeseries", "sat_link_ts", LineChart],
@@ -105,51 +137,35 @@ export default function SatelliteDashboardPage() {
         ))}
       </div>
 
-      {/* EO / API catalog */}
       <section className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/50 to-white p-5 shadow-sm">
         <div className="mb-3 flex items-center gap-2">
           <Radio className="h-4 w-4 text-indigo-600" />
-          <h2 className="font-display text-lg text-stone-800">پلتفرم‌های ماهواره‌ای و API</h2>
+          <h2 className="font-display text-lg text-stone-800">پلتفرم‌های ماهواره‌ای</h2>
         </div>
         <p className="mb-3 text-xs text-stone-500">
-          کاتالوگ MRV · کلیدها فقط در env — بدون راز در ریپو. توصیه برای پشته پایش:{" "}
-          {recommended.length ? recommended.join(", ") : "—"}
+          Recommended: {recommended.length ? recommended.join(", ") : "Planetary Computer (free)"}
         </p>
         {platforms.length === 0 ? (
-          <p className="text-sm text-stone-400">کاتالوگ در دسترس نیست — API را بررسی کنید.</p>
+          <p className="text-sm text-stone-400">Catalog optional — NDVI still loads from /api/v1/satellite</p>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {platforms.map((p) => (
-              <article
-                key={p.id}
-                className={`rounded-2xl border p-3 ${
-                  p.priority_mrv ? "border-indigo-300 bg-white shadow-sm" : "border-stone-200 bg-stone-50/50"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-sm font-bold text-stone-800">{p.name}</h3>
-                  {p.priority_mrv && (
-                    <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-800">
-                      MRV
-                    </span>
-                  )}
-                </div>
+              <article key={p.id} className="rounded-2xl border border-stone-200 bg-white p-3">
+                <h3 className="text-sm font-bold text-stone-800">{p.name}</h3>
                 <p className="mt-1 text-[11px] text-stone-500">{(p.domains || []).join(" · ")}</p>
-                <p className="mt-1 font-mono text-[10px] text-indigo-700">{(p.api || []).slice(0, 2).join(" · ")}</p>
-                <p className="mt-1 text-[10px] text-stone-400">{p.access}</p>
-                {p.notes_en && <p className="mt-2 text-[11px] leading-snug text-stone-600">{p.notes_en}</p>}
               </article>
             ))}
           </div>
         )}
       </section>
 
-      <p className="text-xs text-stone-500">{tx("sat_pick")}</p>
-
       <div className="overflow-hidden rounded-3xl border border-stone-200/80 bg-white shadow-sm">
         <LeafletPicker
           lat={lat}
           lng={lng}
+          height={360}
+          showSatellite
+          enableGeolocate
           onPick={(a, b) => {
             setLat(a);
             setLng(b);
@@ -167,7 +183,7 @@ export default function SatelliteDashboardPage() {
 
       {ndvi && !loading && (
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="card-hover rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm sm:col-span-1">
+          <div className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm">
             <p className="text-xs font-bold uppercase text-stone-400">{tx("sat_ndvi")}</p>
             <p className="mt-1 font-display text-4xl font-black tabular-nums text-indigo-800">
               {Number.isFinite(ndviVal) ? ndviVal.toFixed(3) : "—"}
@@ -179,7 +195,7 @@ export default function SatelliteDashboardPage() {
               />
             </div>
           </div>
-          <div className="card-hover rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm">
+          <div className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm">
             <p className="text-xs font-bold uppercase text-stone-400">{tx("sat_health")}</p>
             <span className={`mt-2 inline-block rounded-full px-3 py-1 text-sm font-bold ring-1 ${HEALTH_STYLE[health]}`}>
               {tx(`sat_health_${health}`)}
@@ -188,9 +204,9 @@ export default function SatelliteDashboardPage() {
               {tx("sat_provider")}: {String(ndvi.provider ?? "—")}
             </p>
           </div>
-          <div className="card-hover rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm">
+          <div className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-sm">
             <p className="text-xs font-bold uppercase text-stone-400">{tx("sat_date")}</p>
-            <p className="mt-2 font-bold text-stone-800">{String(ndvi.date ?? "—")}</p>
+            <p className="mt-2 font-bold text-stone-800">{String(ndvi.date ?? ndvi.acquisition_date ?? "—")}</p>
             <p className="mt-2 text-xs tabular-nums text-stone-500">
               {lat.toFixed(4)}, {lng.toFixed(4)}
             </p>
@@ -206,12 +222,12 @@ export default function SatelliteDashboardPage() {
           </div>
         ) : (
           <div className="flex h-36 items-end gap-0.5">
-            {series.map((p) => (
+            {series.map((p, i) => (
               <div
-                key={p.date}
+                key={`${p.date}-${i}`}
                 title={`${p.date}: ${p.ndvi}`}
                 className="flex-1 rounded-t bg-gradient-to-t from-indigo-600 to-violet-400/80 transition hover:opacity-90"
-                style={{ height: `${Math.max(8, p.ndvi * 100)}%` }}
+                style={{ height: `${Math.max(8, Math.min(100, p.ndvi * 100))}%` }}
               />
             ))}
           </div>
