@@ -15,10 +15,10 @@ from sqlalchemy import String, Integer, Float, DateTime, Boolean, Text, ForeignK
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.base import Base
+from apps.shared_core.timeutil import utc_now
 
 
 class AnalysisType(str, PyEnum):
-    """Type of economic analysis."""
     COST_BENEFIT = "cost_benefit"
     ROI = "roi"
     NPV = "npv"
@@ -27,7 +27,6 @@ class AnalysisType(str, PyEnum):
 
 
 class Currency(str, PyEnum):
-    """Supported currencies."""
     USD = "USD"
     EUR = "EUR"
     IRR = "IRR"
@@ -37,8 +36,6 @@ class Currency(str, PyEnum):
 
 
 class EconomicAnalysis(Base):
-    """Economic analysis record for a farm or project."""
-
     __tablename__ = "economic_analyses"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -59,12 +56,11 @@ class EconomicAnalysis(Base):
     time_horizon_years: Mapped[int] = mapped_column(Integer, default=5, nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
 
-    # Relationships
     cost_items: Mapped[list["CostItem"]] = relationship(
         "CostItem", back_populates="analysis", cascade="all, delete-orphan"
     )
@@ -77,8 +73,6 @@ class EconomicAnalysis(Base):
 
 
 class CostItem(Base):
-    """Individual cost line item in an economic analysis."""
-
     __tablename__ = "economic_cost_items"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -97,8 +91,6 @@ class CostItem(Base):
 
 
 class BenefitItem(Base):
-    """Individual benefit/revenue line item in an economic analysis."""
-
     __tablename__ = "economic_benefit_items"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

@@ -9,6 +9,7 @@ from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from apps.shared_core.database.session import Base
+from apps.shared_core.timeutil import utc_now
 
 
 class Farm(Base):
@@ -26,9 +27,9 @@ class Farm(Base):
     geojson: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )
     created_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     updated_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)

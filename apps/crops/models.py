@@ -9,6 +9,7 @@ from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from apps.shared_core.database.session import Base
+from apps.shared_core.timeutil import utc_now
 
 
 class Crop(Base):
@@ -23,7 +24,6 @@ class Crop(Base):
     water_need_mm: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     growth_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    # Agronomy
     planting_method: Mapped[Optional[str]] = mapped_column(String(80), nullable=True)
     row_spacing_cm: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     plant_spacing_cm: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -31,7 +31,7 @@ class Crop(Base):
     seed_rate_kg_ha: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     irrigation_method: Mapped[Optional[str]] = mapped_column(String(80), nullable=True)
     irrigation_interval_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    kc_mid: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # crop coefficient
+    kc_mid: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     fertilizer_n_kg_ha: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     fertilizer_p_kg_ha: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     fertilizer_k_kg_ha: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -44,7 +44,7 @@ class Crop(Base):
     care_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now, onupdate=utc_now, nullable=False
     )

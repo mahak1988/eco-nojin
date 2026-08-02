@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
 from typing import Any, Optional
 
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.shared_core.timeutil import utc_now
 from apps.simulation.models_runs import ScienceRun
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ def save_run_sync(
             result_json=json.dumps(result, default=str),
             task_id=task_id,
             farm_id=farm_id,
-            created_at=datetime.utcnow(),
+            created_at=utc_now(),
         )
         session.add(row)
         session.commit()
@@ -109,7 +109,6 @@ async def save_run_async(
         await ensure_science_runs_table(session)
     except Exception as e:
         logger.debug("ensure table: %s", e)
-    # strip bulky nested analysis for storage size if needed — keep full
     row = ScienceRun(
         model=model,
         status=status,
@@ -117,7 +116,7 @@ async def save_run_async(
         result_json=json.dumps(result, default=str),
         task_id=task_id,
         farm_id=farm_id,
-        created_at=datetime.utcnow(),
+        created_at=utc_now(),
     )
     session.add(row)
     await session.commit()
