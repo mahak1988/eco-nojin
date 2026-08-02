@@ -32,3 +32,11 @@ sentry-sdk[fastapi]>=2.18.0
 
 pytest>=8.3.0
 pytest-asyncio>=0.24.0
+
+# Optional free science / EO stack (Phase 1) — safe to install; engines fall back if missing
+# aquacrop          # AquaCrop-OSPy pure Python
+# pyRothC           # RothC-26.3 pure Python
+# planetary-computer
+# pystac-client
+# rioxarray
+# rasterio

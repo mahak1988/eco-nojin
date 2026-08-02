@@ -1,4 +1,8 @@
-"""Celery tasks — real process models (AquaCrop conceptual + RothC-26.3) + export."""
+"""Celery tasks — real process models (AquaCrop conceptual + RothC-26.3) + export.
+
+Optional free engines (AquaCrop-OSPy / pyRothC) via engine=ospy|pyrothc|free;
+default path remains conceptual models so existing tests stay green.
+"""
 
 from __future__ import annotations
 
@@ -11,8 +15,8 @@ from pathlib import Path
 from typing import Any
 
 from apps.shared_core.celery_app import celery_app
-from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
-from apps.simulation.rothc_model import run_rothc as rothc_simulate
+from apps.simulation.aquacrop_ospy_engine import run_aquacrop_with_optional_ospy
+from apps.simulation.rothc_pyrothc_engine import run_rothc_with_optional_pyrothc
 
 logger = logging.getLogger(__name__)
 EXPORT_DIR = Path("artifacts/simulation_exports")
@@ -20,11 +24,11 @@ EXPORT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _run_aquacrop_sync(params: dict[str, Any]) -> dict[str, Any]:
-    return run_aquacrop_advanced(params)
+    return run_aquacrop_with_optional_ospy(params)
 
 
 def _run_rothc_sync(params: dict[str, Any]) -> dict[str, Any]:
-    return rothc_simulate(params)
+    return run_rothc_with_optional_pyrothc(params)
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -85,7 +89,7 @@ def run_aquacrop(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
         csv_path,
         [{"metric": k, "value": v} for k, v in result.items() if not isinstance(v, (list, dict))],
     )
-    _write_pdf_stub(pdf_path, "AquaCrop Conceptual Report", result)
+    _write_pdf_stub(pdf_path, "AquaCrop Report", result)
     result["export_csv"] = str(csv_path)
     result["export_pdf"] = str(pdf_path)
     result["task_id"] = run_id
@@ -118,7 +122,7 @@ def run_aquacrop_local(params: dict[str, Any] | None = None) -> dict[str, Any]:
         csv_path,
         [{"metric": k, "value": v} for k, v in result.items() if not isinstance(v, (list, dict))],
     )
-    _write_pdf_stub(pdf_path, "AquaCrop Conceptual Report", result)
+    _write_pdf_stub(pdf_path, "AquaCrop Report", result)
     result["export_csv"] = str(csv_path)
     result["export_pdf"] = str(pdf_path)
     result["task_id"] = run_id
