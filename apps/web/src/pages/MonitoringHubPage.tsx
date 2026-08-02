@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import { Activity, Loader2, Radio, AlertCircle, RefreshCw } from "lucide-react";
 import { useLang } from "../components/eco/i18n";
 import { tExtra } from "../components/eco/i18n_extras";
+import { EoLiveStrip } from "../components/eo/EoLiveStrip";
+
+const DEFAULT_LAT = 32.65;
+const DEFAULT_LON = 51.67;
 
 export default function MonitoringHubPage() {
   const { lang } = useLang();
@@ -67,6 +71,11 @@ export default function MonitoringHubPage() {
           <RefreshCw className="h-4 w-4" />
           {tx("state_retry") !== "state_retry" ? tx("state_retry") : "Retry"}
         </button>
+        <div className="pt-6 text-start">
+          <p className="mb-2 text-xs font-bold text-stone-500">Live EO (independent of monitoring API)</p>
+          <EoLiveStrip lat={DEFAULT_LAT} lon={DEFAULT_LON} compact />
+          <Link to="/eo" className="mt-2 inline-block text-xs font-bold text-indigo-700 underline">EO Hub →</Link>
+        </div>
       </div>
     );
 
@@ -91,6 +100,19 @@ export default function MonitoringHubPage() {
           Refresh
         </button>
       </div>
+
+      <section className="space-y-2 rounded-3xl border border-sky-100 bg-sky-50/40 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-bold text-stone-800">
+            {lang === "fa" ? "پایش ماهواره‌ای رایگان (Sentinel / DEM / فرسایش)" : "Free satellite monitoring"}
+          </h2>
+          <div className="flex gap-3 text-xs font-bold">
+            <Link to="/eo" className="text-indigo-700 underline">EO Hub</Link>
+            <Link to="/satellite" className="text-indigo-700 underline">Satellite</Link>
+          </div>
+        </div>
+        <EoLiveStrip lat={DEFAULT_LAT} lon={DEFAULT_LON} />
+      </section>
 
       <div className="grid grid-cols-3 gap-3">
         {[
@@ -127,6 +149,7 @@ export default function MonitoringHubPage() {
             <Link to="/monitoring/rules">Rules</Link>
             <Link to="/monitoring/soil">Soil</Link>
             <Link to="/monitoring/map">Map</Link>
+            <Link to="/eo">EO Hub</Link>
           </div>
         </section>
         <section className="rounded-2xl border bg-white p-4">

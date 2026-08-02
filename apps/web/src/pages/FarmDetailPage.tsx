@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Layers, Beef, Sprout, ListTodo, Package, Users, Shie
 import { useLang } from "../components/eco/i18n";
 import { PageAiPanel } from "../components/ai/PageAiPanel";
 import { getFarm, KIND_LABEL, readFields, readLivestock, readTasks } from "../lib/farmsStore";
+import { EoLiveStrip } from "../components/eo/EoLiveStrip";
 
 export default function FarmDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,9 @@ export default function FarmDetailPage() {
   const fields = readFields(farm.id);
   const live = readLivestock(farm.id);
   const tasks = readTasks(farm.id);
+  const lat = farm.lat != null ? Number(farm.lat) : 32.65;
+  const lon = farm.lon != null ? Number(farm.lon) : 51.67;
+  const hasCoords = farm.lat != null && farm.lon != null;
 
   const links = [
     { to: `/farms/${farm.id}/fields`, icon: Layers, fa: "قطعات / پادوک", en: "Fields / paddocks", n: fields.length },
@@ -48,8 +52,8 @@ export default function FarmDetailPage() {
               <span className="rounded-full bg-stone-100 px-2 py-0.5">{farm.areaHa} ha</span>
               <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-800">{farm.regionCode}</span>
               <span className="rounded-full bg-violet-50 px-2 py-0.5 text-violet-800">{farm.status}</span>
-              {farm.lat != null && farm.lon != null && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-sky-800"><MapPin className="h-3 w-3" />{farm.lat.toFixed(3)}, {farm.lon.toFixed(3)}</span>
+              {hasCoords && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-sky-800"><MapPin className="h-3 w-3" />{lat.toFixed(3)}, {lon.toFixed(3)}</span>
               )}
             </div>
           </div>
@@ -59,6 +63,24 @@ export default function FarmDetailPage() {
           <p className="font-display text-3xl font-black">{farm.hydromaScore}%</p>
         </div>
       </div>
+
+      <section className="space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-bold text-stone-700">
+            {lang === "fa" ? "داده ماهواره‌ای زنده (مزرعه)" : "Live EO at farm"}
+          </h2>
+          <Link to="/eo" className="text-xs font-bold text-indigo-700 underline">EO Hub →</Link>
+        </div>
+        {!hasCoords && (
+          <p className="text-xs text-amber-800">
+            {lang === "fa"
+              ? "مختصات مزرعه ثبت نشده — نمایش نمونه اصفهان. از نقشه مزرعه lat/lon ذخیره کنید."
+              : "No farm coords — showing Isfahan sample. Save lat/lon on farm map."}
+          </p>
+        )}
+        <EoLiveStrip lat={lat} lon={lon} />
+      </section>
+
       <PageAiPanel lang={lang} pageKey={`farm:${farm.id}`} />
       <div className="grid gap-3 sm:grid-cols-2">
         {links.map((l) => (
