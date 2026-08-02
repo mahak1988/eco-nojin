@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, MapPin } from "lucide-react";
 import { farmsApi } from "../lib/farmsApi";
+import { LeafletPicker } from "../components/maps/LeafletPicker";
 import { useLang } from "../components/eco/i18n";
 import { tExtra } from "../components/eco/i18n_extras";
 
@@ -13,8 +14,8 @@ export default function FarmNewPage() {
   const [description, setDescription] = useState("");
   const [region, setRegion] = useState("");
   const [areaHa, setAreaHa] = useState("");
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,8 +29,8 @@ export default function FarmNewPage() {
         description: description.trim() || undefined,
         region: region.trim() || undefined,
         area_ha: areaHa ? Number(areaHa) : undefined,
-        latitude: lat ? Number(lat) : undefined,
-        longitude: lng ? Number(lng) : undefined,
+        latitude: lat ?? undefined,
+        longitude: lng ?? undefined,
       });
       navigate(`/farms/${farm.id}`, { replace: true });
     } catch (err) {
@@ -40,7 +41,7 @@ export default function FarmNewPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-6 p-5 sm:p-8">
+    <div className="mx-auto max-w-3xl space-y-6 p-5 sm:p-8">
       <Link to="/farms" className="inline-flex items-center gap-1 text-sm font-bold text-stone-500 hover:text-stone-800">
         <ArrowLeft className="h-4 w-4" />
         {tx("farm_all")}
@@ -52,9 +53,21 @@ export default function FarmNewPage() {
         </div>
         <div>
           <h1 className="font-display text-2xl text-stone-800">{tx("farm_new_title")}</h1>
-          <p className="text-sm text-stone-500">{tx("farm_new_sub")}</p>
+          <p className="text-sm text-stone-500">Pick location on satellite map or use My location</p>
         </div>
       </div>
+
+      <LeafletPicker
+        lat={lat}
+        lng={lng}
+        height={280}
+        showSatellite
+        enableGeolocate
+        onPick={(a, b) => {
+          setLat(a);
+          setLng(b);
+        }}
+      />
 
       <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         {error && (
@@ -84,7 +97,7 @@ export default function FarmNewPage() {
             <input
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
+              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500"
             />
           </label>
           <label className="block text-sm">
@@ -95,7 +108,7 @@ export default function FarmNewPage() {
               step="0.1"
               value={areaHa}
               onChange={(e) => setAreaHa(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
+              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500"
             />
           </label>
           <label className="block text-sm">
@@ -103,9 +116,9 @@ export default function FarmNewPage() {
             <input
               type="number"
               step="any"
-              value={lat}
-              onChange={(e) => setLat(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
+              value={lat ?? ""}
+              onChange={(e) => setLat(e.target.value ? Number(e.target.value) : null)}
+              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500"
             />
           </label>
           <label className="block text-sm">
@@ -113,9 +126,9 @@ export default function FarmNewPage() {
             <input
               type="number"
               step="any"
-              value={lng}
-              onChange={(e) => setLng(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
+              value={lng ?? ""}
+              onChange={(e) => setLng(e.target.value ? Number(e.target.value) : null)}
+              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2.5 outline-none focus:border-emerald-500"
             />
           </label>
         </div>
