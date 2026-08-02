@@ -36,6 +36,7 @@ const MrvBufferPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ de
 const MrvFarmLinkPage = lazy(() => import("./pages/MrvHubPages").then((m) => ({ default: m.MrvFarmLinkPage })));
 const NewsPage = lazy(() => import("./pages/NewsPage"));
 const PilotsPage = lazy(() => import("./pages/PilotsPage"));
+const PilotNdviPage = lazy(() => import("./pages/PilotNdviPage"));
 const RegionalPage = lazy(() => import("./pages/RegionalPage"));
 const SatelliteDashboardPage = lazy(() => import("./pages/SatelliteDashboardPage"));
 const SatelliteTimeseriesPage = lazy(() => import("./pages/SatelliteTimeseriesPage"));
@@ -66,7 +67,6 @@ const PaymentsPage = lazy(() => import("./pages/PaymentsPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const PaymentCancelPage = lazy(() => import("./pages/PaymentCancelPage"));
 const EducationPage = lazy(() => import("./pages/EducationPage"));
-const EducationMethodsIndexPage = lazy(() => import("./pages/EducationMethodsIndexPage"));
 const EducationMethodPage = lazy(() => import("./pages/EducationMethodPage"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
@@ -262,6 +262,7 @@ export default function App() {
               <Route path="mrv/farm-link" element={<MrvFarmLinkPage />} />
               <Route path="news" element={<NewsPage />} />
               <Route path="pilots" element={<PilotsPage />} />
+              <Route path="pilots/ndvi" element={<PilotNdviPage />} />
               <Route path="regional" element={<RegionalPage />} />
               <Route path="satellite" element={<SatelliteDashboardPage />} />
               <Route path="satellite/timeseries" element={<SatelliteTimeseriesPage />} />
