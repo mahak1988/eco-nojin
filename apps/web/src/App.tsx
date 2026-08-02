@@ -1,6 +1,6 @@
 // apps/web/src/App.tsx
 import { lazy, Suspense, Component, useEffect, type ReactNode, type ErrorInfo } from "react";
-import { Routes, Route, useLocation, Link } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
 import Layout from "./components/Layout/Layout";
 import { AdminShell } from "./features/admin/AdminShell";
@@ -86,7 +86,7 @@ const FarmInputsPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ 
 const FarmTeamPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmTeamPage })));
 const FarmSustainabilityPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmSustainabilityPage })));
 const FarmMonitoringPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmMonitoringPage })));
-const FarmsMapPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmsMapPage })));
+const FarmsMapPage = lazy(() => import("./pages/FarmMapPage"));
 const FarmsPolicyPage = lazy(() => import("./pages/FarmSubPages").then((m) => ({ default: m.FarmsPolicyPage })));
 const CropsPage = lazy(() => import("./pages/CropsPage"));
 const CropDetailPage = lazy(() => import("./pages/CropDetailPage"));
@@ -152,29 +152,10 @@ class ErrorBoundary extends Component<EBProps, EBState> {
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
           <p className="font-display text-2xl text-stone-800">Something went wrong</p>
           <p className="max-w-lg text-sm text-stone-600">{this.state.message}</p>
-          <p className="text-xs text-stone-400">Open DevTools console for stack. Try sitemap if a route chunk failed.</p>
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => this.setState({ hasError: false, message: "" })}
-              className="rounded-xl border border-stone-300 px-6 py-2.5 text-sm font-bold"
-            >
-              Try again
-            </button>
-            <button
-              type="button"
-              onClick={() => window.location.assign("/sitemap")}
-              className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white"
-            >
-              Site map
-            </button>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="rounded-xl bg-stone-800 px-6 py-2.5 text-sm font-bold text-white"
-            >
-              Reload
-            </button>
+            <button type="button" onClick={() => this.setState({ hasError: false, message: "" })} className="rounded-xl border border-stone-300 px-6 py-2.5 text-sm font-bold">Try again</button>
+            <button type="button" onClick={() => window.location.assign("/sitemap")} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white">Site map</button>
+            <button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-stone-800 px-6 py-2.5 text-sm font-bold text-white">Reload</button>
           </div>
         </div>
       );
@@ -291,7 +272,7 @@ export default function App() {
               <Route path="payments/success" element={<PaymentSuccessPage />} />
               <Route path="payments/cancel" element={<PaymentCancelPage />} />
               <Route path="education" element={<EducationPage />} />
-              <Route path="education/methods" element={<EducationMethodsIndexPage />} />
+              <Route path="education/methods" element={<EducationMethodPage />} />
               <Route path="education/methods/:slug" element={<EducationMethodPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="reports" element={<ReportsPage />} />
