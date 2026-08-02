@@ -1,63 +1,61 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Send } from "lucide-react";
+import { BookOpen, Send, Layers } from "lucide-react";
 import { SectionReveal } from "../components/eco/SectionReveal";
-import { HP_PACKAGES_SUMMARY, BIO_INPUTS, PILOTS } from "../lib/hydromaContent";
+import { HP_SOPS, searchSops, formatSopAnswer } from "../lib/hydromaSops";
 import { apiFetch, v1 } from "../api/http";
-
-const FAQ = [
-  {
-    q: "کانال مارپیچ چیست؟",
-    a: "مسیر جریان با الگوی ارشمیدس که طول مسیر را ۳ تا ۵ برابر می‌کند تا زمان ماند و نفوذ افزایش یابد.",
-  },
-  {
-    q: "کنسرسیوم میکروبی شامل چیست؟",
-    a: "IMO + AMF + PGPR + Trichoderma — چهار گروه بومی برای سلامت خاک بدون سم شیمیایی.",
-  },
-  {
-    q: "FFS چیست؟",
-    a: "مدارس مزرعه‌ای سه‌سطحی (مقدماتی، پیشرفته، مربیگری) با گزارش آفلاین KoboToolbox.",
-  },
-];
 
 export default function DaneshYarPage() {
   const [q, setQ] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
+  const [matchedCodes, setMatchedCodes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState<"sop" | "ai+sop" | null>(null);
 
-  async function ask() {
-    if (!q.trim()) return;
+  const catalog = useMemo(() => HP_SOPS, []);
+
+  async function ask(query?: string) {
+    const text = (query ?? q).trim();
+    if (!text) return;
+    setQ(text);
     setLoading(true);
     setAnswer(null);
+    const hits = searchSops(text, 3);
+    setMatchedCodes(hits.map((h) => h.code));
+
+    let body = "";
+    if (hits.length) {
+      body = hits.map(formatSopAnswer).join("\n\n---\n\n");
+      setSource("sop");
+    } else {
+      body =
+        "در فهرست ۱۲ بسته HP موردی با این کلیدواژه پیدا نشد. از کارت‌های زیر یک بسته را انتخاب کنید یا واژه‌هایی مانند «کانال مارپیچ»، «زای»، «بیوچار»، «FFS» را امتحان کنید.";
+      setSource("sop");
+    }
+
+    // Optional AI enrichment — never blocks SOP answer
     try {
       const res = await apiFetch<{ reply?: string; message?: string; answer?: string }>(
         v1("/ai/chat"),
         {
           method: "POST",
           body: JSON.stringify({
-            message: `[دانش‌یار هیدروما] ${q.trim()}\nContext: HP packages, biofertilizer, pilots Iran drylands`,
+            message: `خلاصه کوتاه فارسی برای کشاورز بر اساس این SOP:\n${body.slice(0, 2000)}\n\nپرسش: ${text}`,
           }),
         },
-        20_000,
+        12_000,
       ).catch(() => null);
-      const text =
-        res?.reply ||
-        res?.answer ||
-        res?.message ||
-        localFallback(q);
-      setAnswer(text);
-    } finally {
-      setLoading(false);
+      const ai = res?.reply || res?.answer || res?.message;
+      if (ai && hits.length) {
+        body = `${body}\n\n— تکمیل دانش‌یار AI —\n${ai}`;
+        setSource("ai+sop");
+      }
+    } catch {
+      /* SOP-only is enough */
     }
-  }
 
-  function localFallback(query: string) {
-    const hit = FAQ.find((f) => query.includes(f.q.slice(0, 6)) || f.q.includes(query.slice(0, 4)));
-    if (hit) return hit.a;
-    return (
-      "پاسخ کامل پس از اتصال مدل AI در فاز ۲ فعال می‌شود. فعلاً از فهرست بسته‌های HP، کود زیستی و پایلوت‌ها در همین صفحه استفاده کنید. " +
-      `پرسش شما ثبت مفهومی شد: «${query.slice(0, 120)}»`
-    );
+    setAnswer(body);
+    setLoading(false);
   }
 
   return (
@@ -68,8 +66,10 @@ export default function DaneshYarPage() {
             <BookOpen className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-display text-3xl text-stone-900">دانش‌یار</h1>
-            <p className="text-sm text-stone-600">راهنمای بسته‌های هیدروما، SOP و آموزش مزرعه‌ای</p>
+            <h1 className="font-display text-3xl text-stone-900">دانش‌یار هیدروما</h1>
+            <p className="text-sm text-stone-600">
+              پاسخ بر اساس SOP واقعی ۱۲ بسته فنی-مهندسی (HP) — رایگان و آفلاین‌پذیر
+            </p>
           </div>
         </div>
       </SectionReveal>
@@ -80,13 +80,13 @@ export default function DaneshYarPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && ask()}
-            placeholder="مثلاً: چاهک نفوذ چگونه اجرا می‌شود؟"
+            onKeyDown={(e) => e.key === "Enter" && void ask()}
+            placeholder="مثلاً: کانال مارپیچ چگونه اجرا می‌شود؟"
             className="flex-1 rounded-xl border border-stone-200 px-3 py-2.5 text-sm outline-none focus:border-sky-500"
           />
           <button
             type="button"
-            onClick={ask}
+            onClick={() => void ask()}
             disabled={loading}
             className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
           >
@@ -94,49 +94,51 @@ export default function DaneshYarPage() {
             {loading ? "…" : "بپرس"}
           </button>
         </div>
+        {source && (
+          <p className="mt-2 text-[11px] text-stone-400">
+            منبع: {source === "sop" ? "پایگاه SOP محلی" : "SOP + تکمیل AI"}
+            {matchedCodes.length > 0 ? ` · ${matchedCodes.join(", ")}` : ""}
+          </p>
+        )}
         {answer && (
-          <div className="mt-4 rounded-xl bg-sky-50 p-4 text-sm leading-relaxed text-stone-800">{answer}</div>
+          <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-sky-50 p-4 text-sm leading-relaxed text-stone-800 font-sans">
+            {answer}
+          </pre>
         )}
       </div>
 
       <section>
-        <h2 className="mb-3 font-bold text-stone-800">پرسش‌های پرتکرار</h2>
-        <ul className="space-y-2">
-          {FAQ.map((f) => (
-            <li key={f.q} className="rounded-xl border border-stone-100 bg-stone-50 p-3 text-sm">
-              <button type="button" className="w-full text-start font-bold text-sky-900" onClick={() => setQ(f.q)}>
-                {f.q}
-              </button>
-              <p className="mt-1 text-stone-600">{f.a}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h2 className="mb-3 font-bold">مرجع بسته‌های HP</h2>
-        <div className="flex flex-wrap gap-2">
-          {HP_PACKAGES_SUMMARY.map((h) => (
-            <span key={h} className="rounded-full border border-stone-200 px-3 py-1 text-xs">
-              {h}
-            </span>
+        <div className="mb-3 flex items-center gap-2">
+          <Layers className="h-4 w-4 text-emerald-700" />
+          <h2 className="font-bold text-stone-800">کاتالوگ ۱۲ بسته HP</h2>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {catalog.map((sop) => (
+            <button
+              key={sop.id}
+              type="button"
+              onClick={() => void ask(sop.titleFa)}
+              className="rounded-xl border border-stone-200 bg-white p-3 text-start text-sm transition hover:border-sky-400 hover:bg-sky-50"
+            >
+              <span className="font-mono text-[10px] font-bold text-sky-700">{sop.code}</span>
+              <div className="font-bold text-stone-800">{sop.titleFa}</div>
+              <p className="mt-1 line-clamp-2 text-xs text-stone-500">{sop.purposeFa}</p>
+            </button>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        {BIO_INPUTS.map((b) => (
-          <Link key={b.id} to="/bio-fertilizer" className="rounded-xl border p-3 text-sm hover:border-emerald-400">
-            <strong>{b.titleFa}</strong>
-            <p className="mt-1 text-xs text-stone-500">{b.descFa}</p>
-          </Link>
-        ))}
-      </section>
-
       <p className="text-xs text-stone-400">
-        پایلوت‌ها: {PILOTS.map((p) => p.nameFa).join(" · ")} —{" "}
         <Link to="/hydroma" className="underline">
-          بازگشت به هیدروما
+          هاب هیدروما
+        </Link>
+        {" · "}
+        <Link to="/watershed" className="underline">
+          آبخیزداری
+        </Link>
+        {" · "}
+        <Link to="/bio-fertilizer" className="underline">
+          کود زیستی
         </Link>
       </p>
     </div>
