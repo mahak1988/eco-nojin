@@ -13,12 +13,14 @@ import {
   Sparkles,
   ArrowUpRight,
   Mountain,
+  Radio,
 } from "lucide-react";
 import { useLang, CONTENT } from "../components/eco/i18n";
 import { SectionReveal } from "../components/eco/SectionReveal";
 import { SatellitePanel } from "../components/eco/SatellitePanel";
 import { WeatherPanel } from "../components/eco/WeatherPanel";
 import { WorldMapBg } from "../components/eco/WorldMapBg";
+import { EoLiveStrip } from "../components/eo/EoLiveStrip";
 import { apiFetch, v1 } from "../api/http";
 import { farmsApi } from "../lib/farmsApi";
 import {
@@ -43,6 +45,7 @@ const TOOLS = [
   { to: "/hydroma", icon: Mountain, titleFa: "هیدروما نوژین", titleEn: "Hydroma", tone: "from-teal-600 to-emerald-700" },
   { to: "/danesh-yar", icon: BookOpen, titleFa: "دانش‌یار", titleEn: "Knowledge AI", tone: "from-sky-500 to-blue-600" },
   { to: "/tasmim-yar", icon: Sparkles, titleFa: "تصمیم‌یار", titleEn: "Decision AI", tone: "from-violet-500 to-fuchsia-600" },
+  { to: "/eo", icon: Radio, titleFa: "EO Hub ماهواره", titleEn: "EO Hub", tone: "from-sky-600 to-indigo-700" },
   { to: "/watershed", icon: Droplets, titleFa: "آبخیزداری", titleEn: "Watershed", tone: "from-cyan-500 to-blue-500" },
   { to: "/bio-fertilizer", icon: Leaf, titleFa: "کود زیستی", titleEn: "Bio-fertilizer", tone: "from-lime-500 to-green-700" },
   { to: "/rangeland", icon: Mountain, titleFa: "مرتع", titleEn: "Rangeland", tone: "from-amber-600 to-orange-700" },
@@ -193,6 +196,15 @@ function LiveTrustBar() {
             {provider ? ` · ${provider}` : ""}
           </p>
         )}
+        <div className="mt-10 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-lg text-stone-800">داده ماهواره‌ای زنده · EO</h3>
+            <Link to="/eo" className="text-xs font-bold text-indigo-700 underline">
+              EO Hub کامل →
+            </Link>
+          </div>
+          <EoLiveStrip lat={32.65} lon={51.67} />
+        </div>
       </div>
     </section>
   );
@@ -216,6 +228,9 @@ function HydromaBanner() {
             </Link>
             <Link to="/tasmim-yar" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
               تصمیم‌یار
+            </Link>
+            <Link to="/eo" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
+              EO Hub
             </Link>
           </div>
         </SectionReveal>
@@ -264,6 +279,12 @@ function PilotsStrip() {
               {m}
             </Link>
           ))}
+          <Link to="/eo" className="rounded-full bg-indigo-700 px-3 py-1 text-[11px] font-bold text-white">
+            EO Hub
+          </Link>
+          <Link to="/pilots/ndvi" className="rounded-full bg-sky-700 px-3 py-1 text-[11px] font-bold text-white">
+            Pilots NDVI
+          </Link>
         </div>
       </div>
     </section>
@@ -283,13 +304,16 @@ function DualEngine() {
         </div>
         <div className="rounded-3xl border border-violet-200 bg-white p-8 shadow-sm">
           <h3 className="font-display text-2xl text-violet-900">{HYDROMA.eco}</h3>
-          <p className="mt-2 text-sm text-stone-600">پلتفرم نرم‌افزاری — MRV، دانش‌یار، تصمیم‌یار</p>
+          <p className="mt-2 text-sm text-stone-600">پلتفرم نرم‌افزاری — MRV، دانش‌یار، تصمیم‌یار، EO</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {ECO_MODULES.slice(0, 4).map((m) => (
               <Link key={m.slug} to={m.path} className="rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-800">
                 {m.titleFa}
               </Link>
             ))}
+            <Link to="/eo" className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800">
+              EO Hub
+            </Link>
           </div>
         </div>
       </div>
@@ -303,7 +327,7 @@ function ToolsLauncher({ lang }: { lang: string }) {
     <section className="px-5 py-20 sm:px-8">
       <div className="mx-auto max-w-6xl">
         <h2 className="mb-2 text-center font-display text-3xl">{fa ? "ابزارهای سریع" : "Quick tools"}</h2>
-        <p className="mb-10 text-center text-sm text-stone-500">هیدروما + اکو نوژین</p>
+        <p className="mb-10 text-center text-sm text-stone-500">هیدروما + اکو نوژین + EO رایگان</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TOOLS.map((tool, i) => (
             <SectionReveal key={tool.to + tool.titleFa} delay={i * 40}>
@@ -379,8 +403,8 @@ export function Home() {
                 <Link to="/farms/map" className="rounded-full border-2 border-amber-600 px-8 py-3.5 font-bold text-amber-800">
                   ثبت مزرعه
                 </Link>
-                <Link to="/satellite" className="rounded-full border border-stone-300 px-8 py-3.5 font-bold">
-                  ماهواره
+                <Link to="/eo" className="rounded-full border border-stone-300 px-8 py-3.5 font-bold">
+                  EO Hub
                 </Link>
               </div>
             </SectionReveal>
