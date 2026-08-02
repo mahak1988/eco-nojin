@@ -25,6 +25,7 @@ import { apiFetch, v1 } from "../api/http";
 import { farmsApi } from "../lib/farmsApi";
 import {
   HYDROMA,
+  hx,
   FOUR_PILLARS,
   PILOTS,
   ECO_MODULES,
@@ -43,20 +44,38 @@ const MODULE_LINKS = [
 ];
 
 const TOOLS = [
-  { to: "/hydroma", icon: Mountain, titleFa: "هیدروما نوژین", titleEn: "Hydroma", tone: "from-teal-600 to-emerald-700" },
-  { to: "/danesh-yar", icon: BookOpen, titleFa: "دانش‌یار", titleEn: "Knowledge AI", tone: "from-sky-500 to-blue-600" },
-  { to: "/tasmim-yar", icon: Sparkles, titleFa: "تصمیم‌یار", titleEn: "Decision AI", tone: "from-violet-500 to-fuchsia-600" },
-  { to: "/eo", icon: Radio, titleFa: "EO Hub ماهواره", titleEn: "EO Hub", tone: "from-sky-600 to-indigo-700" },
-  { to: "/watershed", icon: Droplets, titleFa: "آبخیزداری", titleEn: "Watershed", tone: "from-cyan-500 to-blue-500" },
-  { to: "/bio-fertilizer", icon: Leaf, titleFa: "کود زیستی", titleEn: "Bio-fertilizer", tone: "from-lime-500 to-green-700" },
-  { to: "/rangeland", icon: Mountain, titleFa: "مرتع", titleEn: "Rangeland", tone: "from-amber-600 to-orange-700" },
-  { to: "/satellite", icon: Satellite, titleFa: "ماهواره", titleEn: "Satellite", tone: "from-indigo-500 to-violet-600" },
-  { to: "/farms/map", icon: MapPin, titleFa: "نقشه مزارع", titleEn: "Farm map", tone: "from-emerald-500 to-teal-600" },
-  { to: "/simulators", icon: FlaskConical, titleFa: "شبیه‌سازها", titleEn: "Simulators", tone: "from-amber-500 to-orange-600" },
-  { to: "/mrv", icon: ShieldCheck, titleFa: "MRV", titleEn: "MRV", tone: "from-green-600 to-lime-600" },
-  { to: "/ecocoin", icon: Coins, titleFa: "اکوسکه", titleEn: "EcoCoin", tone: "from-yellow-500 to-amber-600" },
-  { to: "/monitoring", icon: LineChart, titleFa: "پایش", titleEn: "Monitoring", tone: "from-slate-600 to-slate-800" },
+  { to: "/hydroma", icon: Mountain, titleFa: "هیدروما نوژین", titleEn: "Hydroma", titleAr: "هيدرومـا" },
+  { to: "/danesh-yar", icon: BookOpen, titleFa: "دانش‌یار", titleEn: "Knowledge AI", titleAr: "مساعد المعرفة" },
+  { to: "/tasmim-yar", icon: Sparkles, titleFa: "تصمیم‌یار", titleEn: "Decision AI", titleAr: "مساعد القرار" },
+  { to: "/eo", icon: Radio, titleFa: "EO Hub", titleEn: "EO Hub", titleAr: "مركز EO" },
+  { to: "/watershed", icon: Droplets, titleFa: "آبخیزداری", titleEn: "Watershed", titleAr: "أحواض" },
+  { to: "/bio-fertilizer", icon: Leaf, titleFa: "کود زیستی", titleEn: "Bio-fertilizer", titleAr: "سماد حيوي" },
+  { to: "/rangeland", icon: Mountain, titleFa: "مرتع", titleEn: "Rangeland", titleAr: "مراعٍ" },
+  { to: "/satellite", icon: Satellite, titleFa: "ماهواره", titleEn: "Satellite", titleAr: "الأقمار" },
+  { to: "/farms/map", icon: MapPin, titleFa: "نقشه مزارع", titleEn: "Farm map", titleAr: "خريطة المزارع" },
+  { to: "/simulators", icon: FlaskConical, titleFa: "شبیه‌سازها", titleEn: "Simulators", titleAr: "المحاكيات" },
+  { to: "/mrv", icon: ShieldCheck, titleFa: "MRV", titleEn: "MRV", titleAr: "MRV" },
+  { to: "/ecocoin", icon: Coins, titleFa: "اکوسکه", titleEn: "EcoCoin", titleAr: "إيكو كوين" },
+  { to: "/monitoring", icon: LineChart, titleFa: "پایش", titleEn: "Monitoring", titleAr: "المراقبة" },
 ];
+
+function toolTitle(tool: (typeof TOOLS)[0], lang: string) {
+  if (lang === "en") return tool.titleEn;
+  if (lang === "ar") return tool.titleAr;
+  return tool.titleFa;
+}
+
+function pillarTitle(p: (typeof FOUR_PILLARS)[number], lang: string) {
+  if (lang === "en") return p.titleEn;
+  if (lang === "ar") return p.titleAr;
+  return p.titleFa;
+}
+
+function pillarDesc(p: (typeof FOUR_PILLARS)[number], lang: string) {
+  if (lang === "en") return p.descEn;
+  if (lang === "ar") return p.descAr;
+  return p.descFa;
+}
 
 function CursorGlow() {
   const ref = useRef<HTMLDivElement>(null);
@@ -140,6 +159,7 @@ function ConceptExplorer() {
 }
 
 function LiveTrustBar() {
+  const { lang } = useLang();
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
   const [farmCount, setFarmCount] = useState<number | null>(null);
   const [ndvi, setNdvi] = useState<number | null>(null);
@@ -173,11 +193,16 @@ function LiveTrustBar() {
     ? (health!.loaded_routers as string[]).length
     : null;
 
+  const title =
+    lang === "en" ? "Live platform status" : lang === "ar" ? "حالة المنصة المباشرة" : "وضعیت زنده پلتفرم";
+  const eoTitle =
+    lang === "en" ? "Live satellite · EO" : lang === "ar" ? "بيانات الأقمار الحية" : "داده ماهواره‌ای زنده · EO";
+
   return (
     <section className="relative border-b border-[var(--border-subtle)] bg-[var(--surface-raised)] py-14">
       <WorldMapBg variant="light" />
       <div className="relative mx-auto max-w-6xl px-5">
-        <h2 className="mb-8 text-center font-display text-2xl">وضعیت زنده پلتفرم</h2>
+        <h2 className="mb-8 text-center font-display text-2xl">{title}</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
             { l: "API", v: status },
@@ -193,15 +218,15 @@ function LiveTrustBar() {
         </div>
         {ndvi != null && (
           <p className="mt-6 text-center text-sm text-stone-600">
-            NDVI نمونه: <strong>{ndvi.toFixed(3)}</strong>
+            NDVI: <strong>{ndvi.toFixed(3)}</strong>
             {provider ? ` · ${provider}` : ""}
           </p>
         )}
         <div className="mt-10 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-display text-lg text-stone-800">داده ماهواره‌ای زنده · EO</h3>
+            <h3 className="font-display text-lg text-stone-800">{eoTitle}</h3>
             <Link to="/eo" className="text-xs font-bold text-indigo-700 underline">
-              EO Hub کامل →
+              EO Hub →
             </Link>
           </div>
           <EoLiveStrip lat={32.65} lon={51.67} />
@@ -212,23 +237,24 @@ function LiveTrustBar() {
 }
 
 function HydromaBanner() {
+  const { lang } = useLang();
   return (
     <section className="relative overflow-hidden border-b border-emerald-900/10 bg-gradient-to-br from-emerald-900 via-teal-900 to-stone-900 px-5 py-16 text-white sm:px-8">
       <div className="relative mx-auto max-w-6xl">
         <SectionReveal>
-          <p className="text-xs font-bold uppercase tracking-widest text-emerald-200/80">{HYDROMA.company}</p>
-          <h2 className="mt-2 font-display text-3xl sm:text-4xl">{HYDROMA.brand}</h2>
-          <p className="mt-3 max-w-2xl text-emerald-50/90">{HYDROMA.taglineFa}</p>
-          <p className="mt-2 text-sm font-medium text-amber-200">{HYDROMA.sloganFa}</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-emerald-200/80">{hx(HYDROMA.company, lang)}</p>
+          <h2 className="mt-2 font-display text-3xl sm:text-4xl">{hx(HYDROMA.brand, lang)}</h2>
+          <p className="mt-3 max-w-2xl text-emerald-50/90">{hx(HYDROMA.tagline, lang)}</p>
+          <p className="mt-2 text-sm font-medium text-amber-200">{hx(HYDROMA.slogan, lang)}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/hydroma" className="rounded-full bg-white px-6 py-2.5 text-sm font-bold text-emerald-900">
-              ورود به هیدروما
+              {lang === "en" ? "Enter Hydroma" : lang === "ar" ? "دخول هيدرومـا" : "ورود به هیدروما"}
             </Link>
             <Link to="/danesh-yar" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
-              دانش‌یار
+              {lang === "en" ? "Knowledge AI" : lang === "ar" ? "مساعد المعرفة" : "دانش‌یار"}
             </Link>
             <Link to="/tasmim-yar" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
-              تصمیم‌یار
+              {lang === "en" ? "Decision AI" : lang === "ar" ? "مساعد القرار" : "تصمیم‌یار"}
             </Link>
             <Link to="/eo" className="rounded-full border border-white/40 px-6 py-2.5 text-sm font-bold">
               EO Hub
@@ -243,8 +269,8 @@ function HydromaBanner() {
               style={{ animation: `fade-up .5s ease ${i * 70}ms both` }}
             >
               <span className="text-xl">{p.icon}</span>
-              <h3 className="mt-2 text-sm font-bold">{p.titleFa}</h3>
-              <p className="mt-1 text-xs text-emerald-100/70 line-clamp-3">{p.descFa}</p>
+              <h3 className="mt-2 text-sm font-bold">{pillarTitle(p, lang)}</h3>
+              <p className="mt-1 line-clamp-3 text-xs text-emerald-100/70">{pillarDesc(p, lang)}</p>
             </div>
           ))}
         </div>
@@ -274,10 +300,10 @@ function PilotsStrip() {
         </h2>
         <p className="mb-8 text-center text-sm text-stone-500">
           {lang === "en"
-            ? "From dry mountains to humid forests, hyper-arid oases and irrigated deltas — Iran core + MENAP expansion"
+            ? "From dry mountains to humid forests, hyper-arid oases and irrigated deltas"
             : lang === "ar"
               ? "من الجبال الجافة إلى الغابات الرطبة والواحات والسهول المروية"
-              : "از کوهستان خشک تا جنگل هیرکانی، واحه فوق‌خشک و دلتای آبیاری — ایران + گسترش مناپ"}
+              : "از کوهستان خشک تا جنگل هیرکانی، واحه فوق‌خشک و دلتای آبیاری"}
         </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {PILOTS.map((p, i) => (
@@ -288,12 +314,7 @@ function PilotsStrip() {
               style={{ animation: `fade-up .45s ease ${i * 40}ms both` }}
             >
               <div className="relative h-28 overflow-hidden bg-stone-100">
-                <img
-                  src={p.image}
-                  alt=""
-                  loading="lazy"
-                  className="pilot-card-img h-full w-full object-cover"
-                />
+                <img src={p.image} alt="" loading="lazy" className="pilot-card-img h-full w-full object-cover" />
                 <span className="absolute bottom-2 start-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
                   {p.country}
                 </span>
@@ -314,11 +335,8 @@ function PilotsStrip() {
               {m}
             </Link>
           ))}
-          <Link to="/eo" className="rounded-full bg-indigo-700 px-3 py-1 text-[11px] font-bold text-white">
-            EO Hub
-          </Link>
           <Link to="/pilots" className="rounded-full bg-emerald-700 px-3 py-1 text-[11px] font-bold text-white">
-            {lang === "en" ? "All pilots" : "همه پایلوت‌ها"}
+            {lang === "en" ? "All pilots" : lang === "ar" ? "كل الطيار" : "همه پایلوت‌ها"}
           </Link>
         </div>
       </div>
@@ -327,28 +345,40 @@ function PilotsStrip() {
 }
 
 function DualEngine() {
+  const { lang } = useLang();
+  const modTitle = (m: (typeof ECO_MODULES)[number]) =>
+    lang === "en" ? m.titleEn : lang === "ar" ? m.titleAr : m.titleFa;
   return (
     <section className="border-y border-stone-200 bg-stone-50 px-5 py-14 sm:px-8">
       <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2">
         <div className="rounded-3xl border border-teal-200 bg-white p-8 shadow-sm">
-          <h3 className="font-display text-2xl text-teal-900">{HYDROMA.brand}</h3>
-          <p className="mt-2 text-sm text-stone-600">احیای فیزیکی — ۱۲ بسته مهندسی HP</p>
+          <h3 className="font-display text-2xl text-teal-900">{hx(HYDROMA.brand, lang)}</h3>
+          <p className="mt-2 text-sm text-stone-600">
+            {lang === "en"
+              ? "Physical restoration — 12 HP engineering packages"
+              : lang === "ar"
+                ? "إحياء فيزيائي — ١٢ حزمة هندسية"
+                : "احیای فیزیکی — ۱۲ بسته مهندسی HP"}
+          </p>
           <Link to="/hydroma" className="mt-4 inline-block text-sm font-bold text-teal-700 underline">
-            جزئیات مهندسی →
+            {lang === "en" ? "Engineering details →" : "جزئیات مهندسی →"}
           </Link>
         </div>
         <div className="rounded-3xl border border-violet-200 bg-white p-8 shadow-sm">
-          <h3 className="font-display text-2xl text-violet-900">{HYDROMA.eco}</h3>
-          <p className="mt-2 text-sm text-stone-600">پلتفرم نرم‌افزاری — MRV، دانش‌یار، تصمیم‌یار، EO</p>
+          <h3 className="font-display text-2xl text-violet-900">{hx(HYDROMA.eco, lang)}</h3>
+          <p className="mt-2 text-sm text-stone-600">
+            {lang === "en"
+              ? "Software platform — MRV, Knowledge AI, Decision AI, EO"
+              : lang === "ar"
+                ? "منصة برمجية — MRV والمساعدات وEO"
+                : "پلتفرم نرم‌افزاری — MRV، دانش‌یار، تصمیم‌یار، EO"}
+          </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {ECO_MODULES.slice(0, 4).map((m) => (
               <Link key={m.slug} to={m.path} className="rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-800">
-                {m.titleFa}
+                {modTitle(m)}
               </Link>
             ))}
-            <Link to="/eo" className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800">
-              EO Hub
-            </Link>
           </div>
         </div>
       </div>
@@ -357,12 +387,15 @@ function DualEngine() {
 }
 
 function ToolsLauncher({ lang }: { lang: string }) {
-  const fa = lang === "fa" || lang === "ar";
   return (
     <section className="px-5 py-20 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className="mb-2 text-center font-display text-3xl">{fa ? "ابزارهای سریع" : "Quick tools"}</h2>
-        <p className="mb-10 text-center text-sm text-stone-500">هیدروما + اکو نوژین + EO رایگان</p>
+        <h2 className="mb-2 text-center font-display text-3xl">
+          {lang === "en" ? "Quick tools" : lang === "ar" ? "أدوات سريعة" : "ابزارهای سریع"}
+        </h2>
+        <p className="mb-10 text-center text-sm text-stone-500">
+          {lang === "en" ? "Hydroma + Eco Nojin + free EO" : "هیدروما + اکو نوژین + EO"}
+        </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TOOLS.map((tool, i) => (
             <SectionReveal key={tool.to + tool.titleFa} delay={i * 40}>
@@ -370,12 +403,10 @@ function ToolsLauncher({ lang }: { lang: string }) {
                 to={tool.to}
                 className="group relative flex flex-col overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:-translate-y-2 hover:shadow-xl"
               >
-                <div
-                  className={`mb-3 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${tool.tone} text-white`}
-                >
+                <div className="mb-3 grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white">
                   <tool.icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-sm font-bold">{fa ? tool.titleFa : tool.titleEn}</h3>
+                <h3 className="text-sm font-bold">{toolTitle(tool, lang)}</h3>
                 <ArrowUpRight className="absolute end-3 top-3 h-4 w-4 text-stone-300 group-hover:text-emerald-600" />
               </Link>
             </SectionReveal>
@@ -399,7 +430,7 @@ export function Home() {
   }, []);
 
   return (
-    <div id="top" className="overflow-hidden">
+    <div id="top" className="overflow-hidden" key={lang}>
       <section
         ref={heroRef}
         className="relative overflow-hidden px-5 pb-24 pt-12 sm:px-8 sm:pt-16"
@@ -414,26 +445,26 @@ export function Home() {
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-bold txt-green">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-600" />
-                {HYDROMA.sloganFa}
+                {hx(HYDROMA.slogan, lang)}
               </span>
             </SectionReveal>
             <SectionReveal delay={80}>
               <h1 className="mb-4 font-display text-4xl leading-tight sm:text-5xl">
-                <span className="txt-ink">{HYDROMA.brand}</span>
+                <span className="txt-ink">{hx(HYDROMA.brand, lang)}</span>
                 <span className="mx-2 text-stone-400">×</span>
-                <span className="gradient-text">{HYDROMA.eco}</span>
+                <span className="gradient-text">{hx(HYDROMA.eco, lang)}</span>
               </h1>
             </SectionReveal>
             <SectionReveal delay={140}>
-              <p className="mb-8 max-w-xl text-lg text-stone-600">{HYDROMA.taglineFa}</p>
+              <p className="mb-8 max-w-xl text-lg text-stone-600">{hx(HYDROMA.tagline, lang)}</p>
             </SectionReveal>
             <SectionReveal delay={200}>
               <div className="flex flex-wrap gap-3">
                 <Link to="/hydroma" className="rounded-full bg-emerald-700 px-8 py-3.5 font-bold text-white shadow-md">
-                  طرح هیدروما
+                  {lang === "en" ? "Hydroma plan" : lang === "ar" ? "خطة هيدرومـا" : "طرح هیدروما"}
                 </Link>
                 <Link to="/farms/map" className="rounded-full border-2 border-amber-600 px-8 py-3.5 font-bold text-amber-800">
-                  ثبت مزرعه
+                  {lang === "en" ? "Register farm" : lang === "ar" ? "تسجيل مزرعة" : "ثبت مزرعه"}
                 </Link>
                 <Link to="/eo" className="rounded-full border border-stone-300 px-8 py-3.5 font-bold">
                   EO Hub
@@ -442,7 +473,6 @@ export function Home() {
             </SectionReveal>
           </div>
 
-          {/* Side-by-side live panels — no overlap */}
           <SectionReveal delay={200}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               <div className="hero-panel-slot">
@@ -483,7 +513,7 @@ export function Home() {
           <h2 className="mb-10 font-display text-3xl">{t.modT}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {t.modules.map((m, i) => (
-              <SectionReveal key={m.n} delay={i * 50}>
+              <SectionReveal key={m.n + lang} delay={i * 50}>
                 <Link
                   to={MODULE_LINKS[i] ?? "/sitemap"}
                   className="group card-hover flex h-full min-h-[200px] flex-col overflow-hidden rounded-[var(--r-lg)] border bg-white shadow-sm"
@@ -514,14 +544,17 @@ export function Home() {
       </section>
 
       <section className="px-5 pb-24 sm:px-8">
-        <div className="mx-auto max-w-4xl rounded-[var(--r-xl)] border p-12 text-center" style={{ background: "linear-gradient(135deg,#eef3e9,#faf7f1)" }}>
-          <h2 className="font-display text-3xl">{HYDROMA.missionFa}</h2>
+        <div
+          className="mx-auto max-w-4xl rounded-[var(--r-xl)] border p-12 text-center"
+          style={{ background: "linear-gradient(135deg,#eef3e9,#faf7f1)" }}
+        >
+          <h2 className="font-display text-3xl">{hx(HYDROMA.mission, lang)}</h2>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/register" className="rounded-full bg-emerald-700 px-10 py-4 font-bold text-white">
               {t.ctaB}
             </Link>
             <Link to="/hydroma" className="rounded-full border-2 border-emerald-800 px-10 py-4 font-bold text-emerald-900">
-              هیدروما نوژین
+              {hx(HYDROMA.brand, lang)}
             </Link>
           </div>
         </div>
