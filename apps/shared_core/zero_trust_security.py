@@ -22,11 +22,9 @@ class SecurityLevel(Enum):
 class ZeroTrustConfig:
     """Zero Trust Security Configuration — Never Trust, Always Verify
 
-    Public science compute endpoints are intentionally open for demo/DSS
-    (AquaCrop conceptual, RothC, status). Writes that mutate user data stay protected.
+    Public science compute endpoints are intentionally open for demo/DSS.
     """
 
-    # In local/dev, do not require token on every route (see authenticate_request)
     REQUIRE_AUTH_ALL_ENDPOINTS = True
 
     PUBLIC_ENDPOINTS: Set[str] = {
@@ -41,7 +39,6 @@ class ZeroTrustConfig:
         "/api/v1/auth/refresh",
         "/api/v1/auth/forgot-password",
         "/api/v1/debug/routers",
-        # Science public compute (Phase B1)
         "/api/v1/science/status",
         "/api/v1/science/aquacrop-advanced",
         "/api/v1/science/rothc",
@@ -52,15 +49,19 @@ class ZeroTrustConfig:
         "/api/v1/science/sensitivity/rothc",
         "/api/v1/science/sensitivity/rusle",
         "/api/v1/science/soil/profile",
+        "/api/v1/science/e2e-mrv",
+        "/api/v1/science/e2e-mrv/isfahan-wheat",
+        "/api/v1/science/coupled-run",
     }
 
-    # Prefix match (trailing paths / query-free path startswith)
     PUBLIC_PREFIXES: tuple[str, ...] = (
         "/api/v1/auth/",
         "/api/v1/science/status",
         "/api/v1/science/aquacrop",
         "/api/v1/science/rothc",
         "/api/v1/science/ndvi",
+        "/api/v1/science/e2e",
+        "/api/v1/science/coupled",
         "/api/v1/science/formulas",
         "/api/v1/science/climate",
         "/api/v1/science/sensitivity",
@@ -97,8 +98,6 @@ class ZeroTrustConfig:
 
 
 class SupplyChainSecurity:
-    """Supply chain security measures to ensure software integrity"""
-
     def __init__(self):
         self.known_good_hashes = {}
         self.trusted_sources = set(
@@ -141,8 +140,6 @@ class SupplyChainSecurity:
 
 
 class EnhancedSecurityManager:
-    """Main security manager that combines all security features"""
-
     def __init__(self):
         self.zero_trust_config = ZeroTrustConfig()
         self.supply_chain_security = SupplyChainSecurity()
@@ -160,11 +157,9 @@ class EnhancedSecurityManager:
         return False
 
     def _is_local_soft_open(self) -> bool:
-        """Local/dev: do not block unauthenticated browser calls."""
         env = (os.getenv("ENVIRONMENT") or os.getenv("APP_ENV") or "local").lower()
         if env in ("local", "development", "dev", "test"):
             return True
-        # settings may set REQUIRE_AUTH_FOR_WRITES=false
         if (os.getenv("REQUIRE_AUTH_FOR_WRITES") or "").lower() in ("0", "false", "no"):
             return True
         return False
@@ -176,12 +171,9 @@ class EnhancedSecurityManager:
         client_ip: str,
         user_agent: str,
     ) -> bool:
-        """Authenticate a request based on Zero Trust principles"""
-
         if self._is_public(endpoint):
             return True
 
-        # Local development soft-open (still logs access)
         if self._is_local_soft_open():
             return True
 
@@ -238,26 +230,22 @@ class EnhancedSecurityManager:
     def _record_failed_attempt(self, client_ip: str):
         self.failed_attempts[client_ip] += 1
 
-        if self.failed_attempts[client_ip] >= self.zero_trust_config.AUTO_LOCKOUT_THRESHOLD:
-            pass
-
     def log_access_event(
         self, client_ip: str, endpoint: str, success: bool, user_agent: str = ""
     ):
         if not self.zero_trust_config.LOG_ALL_ACCESS:
             return
 
-        timestamp = datetime.now(timezone.utc).isoformat()
-        event = {
-            "timestamp": timestamp,
-            "client_ip": client_ip,
-            "endpoint": endpoint,
-            "success": success,
-            "user_agent": user_agent,
-        }
-
         if self.zero_trust_config.ANOMALY_DETECTION:
-            self._check_for_anomalies(event)
+            self._check_for_anomalies(
+                {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "client_ip": client_ip,
+                    "endpoint": endpoint,
+                    "success": success,
+                    "user_agent": user_agent,
+                }
+            )
 
     def _check_for_anomalies(self, event: Dict):
         client_ip = event["client_ip"]
@@ -274,7 +262,6 @@ class EnhancedSecurityManager:
         return secrets.token_urlsafe(length)
 
     def cleanup_expired_sessions(self):
-        now = datetime.now(timezone.utc)
         expired_sessions = []
 
         for session_key, session_info in self.active_sessions.items():

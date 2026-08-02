@@ -290,6 +290,12 @@ _include(
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
 _include(
+    "science_e2e",
+    lambda: __import__("apps.api.routes.science_e2e_patch", fromlist=["router"]).router,
+    prefix=f"{settings.API_V1_STR}/science",
+    tags=["Phase5 E2E MRV"],
+)
+_include(
     "science_catalog",
     lambda: __import__("apps.api.routes.science_catalog_routes", fromlist=["router"]).router,
 )
@@ -383,6 +389,7 @@ async def health() -> dict[str, Any]:
             "algorithm": settings.ALGORITHM,
         },
         "science_loaded": "science" in _loaded_routers,
+        "science_e2e_loaded": "science_e2e" in _loaded_routers,
         "monitors_loaded": "science_monitors" in _loaded_routers,
         "ml_loaded": "ml" in _loaded_routers,
         "payments_loaded": "payments" in _loaded_routers,
