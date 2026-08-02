@@ -1,6 +1,6 @@
 // apps/web/src/components/eco/i18n.tsx
 import {
-  createContext, useContext, useState, useEffect, useCallback,
+  createContext, useContext, useState, useEffect, useCallback, useMemo,
   type ReactNode,
 } from "react";
 
@@ -22,13 +22,9 @@ export const LANGS: LangDef[] = [
   { code: "ar", label: "العربية", nativeName: "العربية", name: "Arabic", flag: "🇸🇦", dir: "rtl" },
 ];
 
-// ── CONTENT: دیکشنری کامل، سازمان‌یافته و همگام‌شده (Base: FA & EN) ──
 const FA = {
-  // ── App & Meta ──
   appName: "اکونوژین",
   tagline: "پلتفرم پایداری و نوآوری",
-  
-  // ── Navigation (Header) ──
   nav_home: "خانه",
   nav_dashboard: "داشبورد",
   nav_satellite: "ماهواره",
@@ -55,8 +51,6 @@ const FA = {
   nav_account: "حساب من",
   nav_policies: "سیاست‌ها",
   nav_settings: "تنظیمات",
-
-  // ── Common UI ──
   search_placeholder: "جست‌وجو…",
   notifications: "اعلان‌ها",
   profile: "نمایه",
@@ -72,14 +66,10 @@ const FA = {
   view_all: "مشاهدهٔ همه",
   trend_up: "رشد",
   trend_down: "کاهش",
-
-  // ── Footer ──
   footer_text: "اکونوژین — پلتفرم پایداری و نوآوری",
   footer_privacy: "حریم خصوصی",
   footer_terms: "شرایط استفاده",
   footer_contact: "تماس با ما",
-
-  // ── HomePage ──
   badge: "پلتفرم پایداری نسل جدید",
   heroT1: "زمین را با ",
   heroGrad: "دانش و نوآوری",
@@ -132,8 +122,6 @@ const FA = {
   ctaT: "آماده‌اید تفاوت ایجاد کنید؟",
   ctaS: "به شبکهٔ اکونوژین بپیوندید و در حفاظت از زمین مشارکت کنید.",
   ctaB: "همین الان شروع کنید",
-
-  // ── DashboardPage ──
   dash_title: "داشبورد",
   dash_subtitle: "نمای کلی عملکرد پلتفرم اکونوژین",
   dash_kpi_users: "کاربران فعال",
@@ -164,11 +152,8 @@ const FA = {
 export type ContentStrings = typeof FA;
 
 const EN: ContentStrings = {
-  // ── App & Meta ──
   appName: "EcoNojin",
   tagline: "Sustainability & Innovation Platform",
-  
-  // ── Navigation (Header) ──
   nav_home: "Home",
   nav_dashboard: "Dashboard",
   nav_satellite: "Satellite",
@@ -195,8 +180,6 @@ const EN: ContentStrings = {
   nav_account: "My Account",
   nav_policies: "Policies",
   nav_settings: "Settings",
-
-  // ── Common UI ──
   search_placeholder: "Search…",
   notifications: "Notifications",
   profile: "Profile",
@@ -212,14 +195,10 @@ const EN: ContentStrings = {
   view_all: "View all",
   trend_up: "Growth",
   trend_down: "Decline",
-
-  // ── Footer ──
   footer_text: "EcoNojin — Sustainability & Innovation Platform",
   footer_privacy: "Privacy",
   footer_terms: "Terms",
   footer_contact: "Contact",
-
-  // ── HomePage ──
   badge: "Next-gen sustainability platform",
   heroT1: "Keep the Earth ",
   heroGrad: "sustainable",
@@ -272,8 +251,6 @@ const EN: ContentStrings = {
   ctaT: "Ready to make a difference?",
   ctaS: "Join the EcoNojin network and participate in protecting the Earth.",
   ctaB: "Start Now",
-
-  // ── DashboardPage ──
   dash_title: "Dashboard",
   dash_subtitle: "EcoNojin platform performance overview",
   dash_kpi_users: "Active Users",
@@ -302,11 +279,8 @@ const EN: ContentStrings = {
 };
 
 const AR: ContentStrings = {
-  // ── App & Meta ──
   appName: "إكونوجين",
   tagline: "منصة الاستدامة والابتكار",
-  
-  // ── Navigation (Header) ──
   nav_home: "الرئيسية",
   nav_dashboard: "لوحة التحكم",
   nav_satellite: "الأقمار",
@@ -333,8 +307,6 @@ const AR: ContentStrings = {
   nav_account: "حسابي",
   nav_policies: "السياسات",
   nav_settings: "الإعدادات",
-
-  // ── Common UI ──
   search_placeholder: "بحث…",
   notifications: "الإشعارات",
   profile: "الملف الشخصي",
@@ -350,14 +322,10 @@ const AR: ContentStrings = {
   view_all: "عرض الكل",
   trend_up: "نمو",
   trend_down: "انخفاض",
-
-  // ── Footer ──
   footer_text: "إكونوجين — منصة الاستدامة والابتكار",
   footer_privacy: "الخصوصية",
   footer_terms: "الشروط",
   footer_contact: "اتصل بنا",
-
-  // ── HomePage ──
   badge: "منصة الاستدامة من الجيل التالي",
   heroT1: "حافظ على الأرض ",
   heroGrad: "مستدامة",
@@ -410,8 +378,6 @@ const AR: ContentStrings = {
   ctaT: "مستعد لإحداث فرق؟",
   ctaS: "انضم إلى شبكة إكونوجين وشارك في حماية الأرض.",
   ctaB: "ابدأ الآن",
-
-  // ── DashboardPage ──
   dash_title: "لوحة التحكم",
   dash_subtitle: "نظرة عامة على أداء منصة إكونوجين",
   dash_kpi_users: "المستخدمون النشطون",
@@ -441,33 +407,64 @@ const AR: ContentStrings = {
 
 export const CONTENT: Record<Lang, ContentStrings> = { fa: FA, en: EN, ar: AR };
 
-// ── Context + Provider + Hook ──
-interface LangContextValue { lang: Lang; setLang: (l: Lang) => void; }
-const LangContext = createContext<LangContextValue>({ lang: "fa", setLang: () => {} });
+interface LangContextValue {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: ContentStrings;
+}
+
+const LangContext = createContext<LangContextValue>({
+  lang: "fa",
+  setLang: () => {},
+  t: FA,
+});
 
 function getInitialLang(): Lang {
   if (typeof window === "undefined") return "fa";
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored === "fa" || stored === "en" || stored === "ar") return stored as Lang;
-  } catch {}
+  } catch {
+    /* ignore */
+  }
   const nav = (navigator.language || "fa").slice(0, 2);
   if (nav === "en") return "en";
   if (nav === "ar") return "ar";
   return "fa";
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(getInitialLang);
-  const setLang = useCallback((l: Lang) => {
-    setLangState(l);
-    try { window.localStorage.setItem(STORAGE_KEY, l); } catch {}
-  }, []);
-  useEffect(() => {
-    document.documentElement.dir = getLanguageDir(lang);
-    document.documentElement.lang = lang;
-  }, [lang]);
-  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>;
+function applyDocumentLang(l: Lang) {
+  if (typeof document === "undefined") return;
+  document.documentElement.dir = getLanguageDir(l);
+  document.documentElement.lang = l;
+  document.documentElement.setAttribute("data-lang", l);
 }
 
-export function useLang(): LangContextValue { return useContext(LangContext); }
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(getInitialLang);
+
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    applyDocumentLang(l);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, l);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    applyDocumentLang(lang);
+  }, [lang]);
+
+  const value = useMemo(
+    () => ({ lang, setLang, t: CONTENT[lang] ?? FA }),
+    [lang, setLang],
+  );
+
+  return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
+}
+
+export function useLang(): LangContextValue {
+  return useContext(LangContext);
+}
