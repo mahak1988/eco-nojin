@@ -1,6 +1,6 @@
 // apps/web/src/App.tsx
-import { lazy, Suspense, Component, useEffect, type ReactNode } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { lazy, Suspense, Component, useEffect, type ReactNode, type ErrorInfo } from "react";
+import { Routes, Route, useLocation, Link } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
 import Layout from "./components/Layout/Layout";
 import { AdminShell } from "./features/admin/AdminShell";
@@ -45,6 +45,11 @@ const SimulatorsPage = lazy(() => import("./pages/SimulatorsPage"));
 const AquaCropRunPage = lazy(() => import("./pages/AquaCropRunPage"));
 const RothCRunPage = lazy(() => import("./pages/RothCRunPage"));
 const SciencePage = lazy(() => import("./pages/SciencePage"));
+const ScienceE2EPage = lazy(() => import("./pages/ScienceE2EPage"));
+const FreeStackPage = lazy(() => import("./pages/FreeStackPage"));
+const EconomicsPage = lazy(() => import("./pages/EconomicsPage"));
+const SiteMapPage = lazy(() => import("./pages/SiteMapPage"));
+const HubPage = lazy(() => import("./pages/hub/HubPage"));
 const TourismPage = lazy(() => import("./pages/TourismPage"));
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const AccountingPage = lazy(() => import("./pages/AccountingPage"));
@@ -108,20 +113,71 @@ const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); }, [pathname]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
   return null;
 }
+
 function PageLoader() {
-  return (<div className="flex min-h-[50vh] items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-emerald-600" /></div>);
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-200 border-t-emerald-600" />
+    </div>
+  );
 }
-interface EBProps { children: ReactNode; }
-interface EBState { hasError: boolean; }
+
+interface EBProps {
+  children: ReactNode;
+}
+interface EBState {
+  hasError: boolean;
+  message: string;
+}
+
 class ErrorBoundary extends Component<EBProps, EBState> {
-  constructor(props: EBProps) { super(props); this.state = { hasError: false }; }
-  static getDerivedStateFromError(): EBState { return { hasError: true }; }
+  constructor(props: EBProps) {
+    super(props);
+    this.state = { hasError: false, message: "" };
+  }
+  static getDerivedStateFromError(error: Error): EBState {
+    return { hasError: true, message: error?.message || String(error) };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("[App ErrorBoundary]", error, info?.componentStack);
+  }
   render() {
     if (this.state.hasError) {
-      return (<div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center"><p className="font-display text-2xl text-stone-800">Something went wrong</p><button type="button" onClick={() => window.location.reload()} className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white">Reload</button></div>);
+      return (
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
+          <p className="font-display text-2xl text-stone-800">Something went wrong</p>
+          <p className="max-w-lg text-sm text-stone-600">{this.state.message}</p>
+          <p className="text-xs text-stone-400">Open DevTools console for stack. Try sitemap if a route chunk failed.</p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => this.setState({ hasError: false, message: "" })}
+              className="rounded-xl border border-stone-300 px-6 py-2.5 text-sm font-bold"
+            >
+              Try again
+            </button>
+            <button
+              type="button"
+              onClick={() => window.location.assign("/sitemap")}
+              className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white"
+            >
+              Site map
+            </button>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-xl bg-stone-800 px-6 py-2.5 text-sm font-bold text-white"
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      );
     }
     return this.props.children;
   }
@@ -148,6 +204,10 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="sitemap" element={<SiteMapPage />} />
+              <Route path="free-stack" element={<FreeStackPage />} />
+              <Route path="economics" element={<EconomicsPage />} />
+              <Route path="hub/:slug" element={<HubPage />} />
               <Route path="farms" element={<FarmsPage />} />
               <Route path="farms/new" element={<FarmNewPage />} />
               <Route path="farms/wizard" element={<FarmWizardPage />} />
@@ -218,6 +278,7 @@ export default function App() {
               <Route path="simulators/aquacrop" element={<AquaCropRunPage />} />
               <Route path="simulators/rothc" element={<RothCRunPage />} />
               <Route path="science" element={<SciencePage />} />
+              <Route path="science/e2e" element={<ScienceE2EPage />} />
               <Route path="simulators/:id" element={<SimulatorDetailPage />} />
               <Route path="my-simulations" element={<MySimulationsPage />} />
               <Route path="comparison" element={<ComparisonDashboard />} />
