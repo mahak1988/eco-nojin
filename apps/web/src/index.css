@@ -73,9 +73,25 @@
     background:color-mix(in srgb, var(--step) 7%, var(--surface-raised));
     border:1px solid color-mix(in srgb, var(--step) 32%, transparent);
     box-shadow:var(--shadow-lg); }
+  .hero-panel-slot {
+    position: relative;
+    z-index: 1;
+    min-height: 180px;
+    isolation: isolate;
+  }
+  .pilot-card-img {
+    transition: transform 0.7s var(--ease-out);
+  }
+  .group:hover .pilot-card-img {
+    transform: scale(1.06);
+  }
+  .float-soft {
+    animation: float 5s ease-in-out infinite;
+  }
   @media (prefers-reduced-motion:reduce) {
     html { scroll-behavior:auto; }
     .card-hover:hover { transform:none; }
+    .float-soft { animation: none; }
   }
 }
 
