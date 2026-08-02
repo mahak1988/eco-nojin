@@ -1,4 +1,4 @@
-/** App shell: Header + main + Footer + API status. */
+/** App shell: Header + main + Footer + API status. Re-mount page body on language change. */
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -15,11 +15,14 @@ export default function Layout() {
     <div
       className="flex min-h-screen flex-col bg-stone-50 text-stone-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100"
       dir={dir}
+      lang={lang}
+      data-lang={lang}
     >
       <Header />
       <ApiStatusBanner />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 pt-4 md:px-8">
-        <Outlet />
+        {/* key forces children to re-render with new language packs */}
+        <Outlet key={lang} />
       </main>
       <Footer />
       <GlobalAiAssistant />

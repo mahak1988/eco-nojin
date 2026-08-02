@@ -34,10 +34,17 @@ import { tr } from "../eco/i18n_extras";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../../hooks/useAuth";
 
-type NavItem = { key: string; to: string; icon: LucideIcon; labelFa?: string; labelEn?: string };
+type NavItem = {
+  key: string;
+  to: string;
+  icon: LucideIcon;
+  labelFa?: string;
+  labelEn?: string;
+  labelAr?: string;
+};
 
 const MAIN_NAV: NavItem[] = [
-  { key: "nav_hydroma", to: "/hydroma", icon: Mountain, labelFa: "هیدروما", labelEn: "Hydroma" },
+  { key: "nav_hydroma", to: "/hydroma", icon: Mountain, labelFa: "هیدروما", labelEn: "Hydroma", labelAr: "هيدرومـا" },
   { key: "nav_dashboard", to: "/dashboard", icon: LayoutDashboard },
   { key: "nav_farms", to: "/farms", icon: Wheat },
   { key: "nav_education", to: "/education", icon: BookOpen },
@@ -50,9 +57,9 @@ const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
   {
     labelKey: "nav_group_monitoring",
     items: [
-      { key: "nav_danesh", to: "/danesh-yar", icon: BookOpen, labelFa: "دانش‌یار", labelEn: "Knowledge" },
-      { key: "nav_tasmim", to: "/tasmim-yar", icon: TrendingUp, labelFa: "تصمیم‌یار", labelEn: "Decision" },
-      { key: "nav_watershed", to: "/watershed", icon: MapPin, labelFa: "آبخیزداری", labelEn: "Watershed" },
+      { key: "nav_danesh", to: "/danesh-yar", icon: BookOpen, labelFa: "دانش‌یار", labelEn: "Knowledge", labelAr: "المعرفة" },
+      { key: "nav_tasmim", to: "/tasmim-yar", icon: TrendingUp, labelFa: "تصمیم‌یار", labelEn: "Decision", labelAr: "القرار" },
+      { key: "nav_watershed", to: "/watershed", icon: MapPin, labelFa: "آبخیزداری", labelEn: "Watershed", labelAr: "أحواض" },
       { key: "nav_analytics", to: "/analytics", icon: TrendingUp },
       { key: "nav_alerts", to: "/alerts", icon: ShieldAlert },
       { key: "nav_risks", to: "/risks", icon: ShieldAlert },
@@ -84,8 +91,8 @@ const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
       { key: "nav_regional", to: "/regional", icon: MapPin },
       { key: "nav_pilots", to: "/pilots", icon: FlaskConical },
       { key: "nav_tourism", to: "/tourism", icon: Plane },
-      { key: "nav_rangeland", to: "/rangeland", icon: Mountain, labelFa: "مرتع", labelEn: "Rangeland" },
-      { key: "nav_bio", to: "/bio-fertilizer", icon: Leaf, labelFa: "کود زیستی", labelEn: "Bio-fertilizer" },
+      { key: "nav_rangeland", to: "/rangeland", icon: Mountain, labelFa: "مرتع", labelEn: "Rangeland", labelAr: "مراعٍ" },
+      { key: "nav_bio", to: "/bio-fertilizer", icon: Leaf, labelFa: "کود زیستی", labelEn: "Bio-fertilizer", labelAr: "سماد حيوي" },
     ],
   },
   {
@@ -112,16 +119,17 @@ export function Header() {
   const canGoBack = location.pathname !== "/";
 
   const labelOf = (item: NavItem) => {
-    if (item.labelFa && (lang === "fa" || lang === "ar")) return item.labelFa;
-    if (item.labelEn && lang === "en") return item.labelEn;
-    if (item.labelFa) return item.labelFa;
+    if (lang === "en" && item.labelEn) return item.labelEn;
+    if (lang === "ar" && item.labelAr) return item.labelAr;
+    if (lang === "fa" && item.labelFa) return item.labelFa;
+    if (item.labelFa && lang === "ar" && !item.labelAr) return item.labelFa;
     return t(item.key);
   };
 
   useEffect(() => {
     setMobileOpen(false);
     setMoreOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, lang]);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -323,35 +331,19 @@ export function Header() {
             <div className="flex gap-2 border-t border-slate-100 pt-3">
               {isAuthenticated ? (
                 <>
-                  <Link
-                    to="/account"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex-1 rounded-xl border py-2 text-center text-sm font-bold"
-                  >
+                  <Link to="/account" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
                     {t("profile")}
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => void onLogout()}
-                    className="flex-1 rounded-xl bg-slate-900 py-2 text-sm font-bold text-white"
-                  >
+                  <button type="button" onClick={() => void onLogout()} className="flex-1 rounded-xl bg-slate-900 py-2 text-sm font-bold text-white">
                     {t("logout")}
                   </button>
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex-1 rounded-xl border py-2 text-center text-sm font-bold"
-                  >
+                  <Link to="/login" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl border py-2 text-center text-sm font-bold">
                     {t("auth_signin")}
                   </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white"
-                  >
+                  <Link to="/register" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white">
                     {t("auth_register")}
                   </Link>
                 </>
