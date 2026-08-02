@@ -26,6 +26,7 @@ import {
   LogOut,
   UserRound,
   Wheat,
+  Mountain,
   type LucideIcon,
 } from "lucide-react";
 import { useLang, CONTENT } from "../eco/i18n";
@@ -33,9 +34,10 @@ import { tr } from "../eco/i18n_extras";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../../hooks/useAuth";
 
-type NavItem = { key: string; to: string; icon: LucideIcon };
+type NavItem = { key: string; to: string; icon: LucideIcon; labelFa?: string; labelEn?: string };
 
 const MAIN_NAV: NavItem[] = [
+  { key: "nav_hydroma", to: "/hydroma", icon: Mountain, labelFa: "هیدروما", labelEn: "Hydroma" },
   { key: "nav_dashboard", to: "/dashboard", icon: LayoutDashboard },
   { key: "nav_farms", to: "/farms", icon: Wheat },
   { key: "nav_education", to: "/education", icon: BookOpen },
@@ -48,6 +50,9 @@ const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
   {
     labelKey: "nav_group_monitoring",
     items: [
+      { key: "nav_danesh", to: "/danesh-yar", icon: BookOpen, labelFa: "دانش‌یار", labelEn: "Knowledge" },
+      { key: "nav_tasmim", to: "/tasmim-yar", icon: TrendingUp, labelFa: "تصمیم‌یار", labelEn: "Decision" },
+      { key: "nav_watershed", to: "/watershed", icon: MapPin, labelFa: "آبخیزداری", labelEn: "Watershed" },
       { key: "nav_analytics", to: "/analytics", icon: TrendingUp },
       { key: "nav_alerts", to: "/alerts", icon: ShieldAlert },
       { key: "nav_risks", to: "/risks", icon: ShieldAlert },
@@ -79,6 +84,8 @@ const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
       { key: "nav_regional", to: "/regional", icon: MapPin },
       { key: "nav_pilots", to: "/pilots", icon: FlaskConical },
       { key: "nav_tourism", to: "/tourism", icon: Plane },
+      { key: "nav_rangeland", to: "/rangeland", icon: Mountain, labelFa: "مرتع", labelEn: "Rangeland" },
+      { key: "nav_bio", to: "/bio-fertilizer", icon: Leaf, labelFa: "کود زیستی", labelEn: "Bio-fertilizer" },
     ],
   },
   {
@@ -103,6 +110,13 @@ export function Header() {
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
   const canGoBack = location.pathname !== "/";
+
+  const labelOf = (item: NavItem) => {
+    if (item.labelFa && (lang === "fa" || lang === "ar")) return item.labelFa;
+    if (item.labelEn && lang === "en") return item.labelEn;
+    if (item.labelFa) return item.labelFa;
+    return t(item.key);
+  };
 
   useEffect(() => {
     setMobileOpen(false);
@@ -167,7 +181,7 @@ export function Header() {
           {MAIN_NAV.map((item) => (
             <Link key={item.key} to={item.to} className={navLinkCls(item.to)}>
               <item.icon className="h-4 w-4" />
-              <span>{t(item.key)}</span>
+              <span>{labelOf(item)}</span>
             </Link>
           ))}
 
@@ -209,7 +223,7 @@ export function Header() {
                           }`}
                         >
                           <item.icon className="h-4 w-4 opacity-70" />
-                          {t(item.key)}
+                          {labelOf(item)}
                         </Link>
                       ))}
                     </div>
@@ -284,15 +298,13 @@ export function Header() {
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
-                  {t(item.key)}
+                  {labelOf(item)}
                 </Link>
               ))}
             </div>
             {MORE_GROUPS.map((group) => (
               <div key={group.labelKey}>
-                <p className="mb-1 px-2 text-[11px] font-bold uppercase text-slate-400">
-                  {t(group.labelKey)}
-                </p>
+                <p className="mb-1 px-2 text-[11px] font-bold uppercase text-slate-400">{t(group.labelKey)}</p>
                 <div className="grid grid-cols-2 gap-1">
                   {group.items.map((item) => (
                     <Link
@@ -302,7 +314,7 @@ export function Header() {
                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
                     >
                       <item.icon className="h-4 w-4 opacity-70" />
-                      {t(item.key)}
+                      {labelOf(item)}
                     </Link>
                   ))}
                 </div>
