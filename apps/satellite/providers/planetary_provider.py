@@ -3,6 +3,9 @@
 Phase 2: attempt real Sentinel-2 L2A NDVI from signed COG assets when
 planetary-computer + rioxarray + rasterio are installed; otherwise metadata
 cloud-weighted estimates so the chain never hard-fails.
+
+Hardening: at most MAX_RASTER_SCENES full COG reads per request to avoid
+Windows client disconnects / long hangs on slow networks.
 """
 
 from __future__ import annotations
@@ -14,6 +17,9 @@ from typing import Any
 from apps.satellite.providers.base import BBox, NDVIResult, SatelliteProvider, SatelliteSource
 
 logger = logging.getLogger(__name__)
+
+# Full COG download is expensive; cap per request
+MAX_RASTER_SCENES = 3
 
 
 def _sign_item(item: Any) -> Any:
@@ -30,7 +36,7 @@ def _ndvi_from_item_raster(item: Any, bbox: BBox) -> tuple[float, float, float, 
     try:
         import numpy as np
         import rioxarray  # noqa: F401
-        import xarray as xr
+        import xarray as xr  # noqa: F401
     except ImportError:
         return None
 
@@ -41,15 +47,16 @@ def _ndvi_from_item_raster(item: Any, bbox: BBox) -> tuple[float, float, float, 
         nir_href = None
         for key, asset in assets.items():
             k = key.lower()
-            href = getattr(asset, "href", None) or (asset.get("href") if isinstance(asset, dict) else None)
+            href = getattr(asset, "href", None) or (
+                asset.get("href") if isinstance(asset, dict) else None
+            )
             if not href:
                 continue
-            if k in ("b04", "red", "visual") or "b04" in k:
-                if red_href is None and k != "visual":
+            if k in ("b04", "red") or "b04" in k:
+                if red_href is None:
                     red_href = href
             if k in ("b08", "nir") or "b08" in k:
                 nir_href = href
-        # Common S2 asset names on MPC
         if red_href is None and "B04" in assets:
             red_href = getattr(assets["B04"], "href", None)
         if nir_href is None and "B08" in assets:
@@ -57,9 +64,12 @@ def _ndvi_from_item_raster(item: Any, bbox: BBox) -> tuple[float, float, float, 
         if not red_href or not nir_href:
             return None
 
-        red = rioxarray.open_rasterio(red_href, masked=True).squeeze(drop=True)
-        nir = rioxarray.open_rasterio(nir_href, masked=True).squeeze(drop=True)
-        # Clip to bbox (WGS84 → match CRS)
+        red = rioxarray.open_rasterio(red_href, masked=True, overview_level=2).squeeze(
+            drop=True
+        )
+        nir = rioxarray.open_rasterio(nir_href, masked=True, overview_level=2).squeeze(
+            drop=True
+        )
         try:
             red = red.rio.clip_box(
                 minx=bbox.min_lng,
@@ -80,7 +90,6 @@ def _ndvi_from_item_raster(item: Any, bbox: BBox) -> tuple[float, float, float, 
 
         red_a = np.asarray(red.values, dtype=float)
         nir_a = np.asarray(nir.values, dtype=float)
-        # Scale if digital numbers
         if np.nanmax(red_a) > 2.0:
             red_a = red_a / 10000.0
             nir_a = nir_a / 10000.0
@@ -131,7 +140,13 @@ class PlanetaryComputerProvider(SatelliteProvider):
         self, bbox: BBox, start_date: date, end_date: date
     ) -> list[dict[str, Any]]:
         if not self.is_available:
-            return [{"provider": self.name, "available": False, "reason": "pystac-client missing"}]
+            return [
+                {
+                    "provider": self.name,
+                    "available": False,
+                    "reason": "pystac-client missing",
+                }
+            ]
         try:
             catalog = self._open_catalog()
             search = catalog.search(
@@ -162,8 +177,10 @@ class PlanetaryComputerProvider(SatelliteProvider):
         start_date: date,
         end_date: date,
         cloud_max: int = 20,
+        *,
+        raster_budget: int = MAX_RASTER_SCENES,
     ) -> list[NDVIResult]:
-        """STAC search → prefer real raster NDVI; else cloud-weighted metadata estimate."""
+        """STAC search → prefer real raster NDVI (capped); else cloud-weighted metadata."""
         if not self.is_available:
             raise RuntimeError("Planetary Computer client not installed")
 
@@ -173,29 +190,44 @@ class PlanetaryComputerProvider(SatelliteProvider):
             bbox=bbox.to_list(),
             datetime=f"{start_date.isoformat()}/{end_date.isoformat()}",
             query={"eo:cloud_cover": {"lt": cloud_max}},
-            max_items=24,
+            max_items=16,
         )
         items = list(search.items())
         if not items:
             return []
 
+        # Prefer lowest cloud first for raster attempts
+        def cloud_of(it: Any) -> float:
+            return float((it.properties or {}).get("eo:cloud_cover") or 99)
+
+        items_sorted = sorted(items, key=cloud_of)
+
         results: list[NDVIResult] = []
         raster_ok = 0
-        for it in items:
+        raster_left = max(0, int(raster_budget))
+
+        for it in items_sorted:
             d = it.datetime.date() if it.datetime else start_date
-            cloud = float((it.properties or {}).get("eo:cloud_cover") or 0)
-            stats = _ndvi_from_item_raster(it, bbox)
+            cloud = cloud_of(it)
+            stats = None
+            mode = "metadata"
+            if raster_left > 0:
+                stats = _ndvi_from_item_raster(it, bbox)
+                if stats is not None:
+                    raster_ok += 1
+                    raster_left -= 1
+                    mode = "raster"
+                else:
+                    # Failed download still costs time — reduce budget
+                    raster_left -= 1
+
             if stats is not None:
                 mean, mx, mn, std = stats
-                raster_ok += 1
-                mode = "raster"
             else:
-                # Metadata fallback (free, no download) — cloud-weighted proxy
                 mean = max(0.1, min(0.85, 0.55 - cloud / 200))
                 mx = min(0.95, mean + 0.1)
                 mn = max(0.0, mean - 0.1)
                 std = 0.05
-                mode = "metadata"
 
             results.append(
                 NDVIResult(
@@ -211,14 +243,19 @@ class PlanetaryComputerProvider(SatelliteProvider):
             )
 
         if raster_ok:
-            logger.info("MPC NDVI: %s/%s scenes with raster stats", raster_ok, len(items))
+            logger.info("MPC NDVI: %s raster / %s scenes", raster_ok, len(items))
         return sorted(results, key=lambda r: r.date)
 
     async def get_ndvi_image(
         self, bbox: BBox, target_date: date, cloud_max: int = 20
     ) -> NDVIResult:
+        # Single-point: allow up to 2 raster tries in ±10 day window
         rows = await self.get_ndvi_timeseries(
-            bbox, target_date - timedelta(days=7), target_date + timedelta(days=7), cloud_max
+            bbox,
+            target_date - timedelta(days=10),
+            target_date + timedelta(days=10),
+            cloud_max,
+            raster_budget=2,
         )
         if not rows:
             raise RuntimeError("No MPC items")
