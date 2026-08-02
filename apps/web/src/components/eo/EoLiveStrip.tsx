@@ -2,7 +2,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, Mountain, Leaf, Thermometer, AlertTriangle } from "lucide-react";
-import { fetchEoDem, fetchEoErosion, fetchNdvi, fetchVci, type NdviPoint, type EoDem, type EoErosion, type VciPack } from "../../lib/eoApi";
+import {
+  fetchEoDem,
+  fetchEoErosion,
+  fetchNdvi,
+  fetchVci,
+  type NdviPoint,
+  type EoDem,
+  type EoErosion,
+  type VciPack,
+} from "../../lib/eoApi";
 
 type Props = {
   lat?: number;
@@ -16,45 +25,73 @@ export function EoLiveStrip({ lat = 32.65, lon = 51.67, compact = false }: Props
   const [dem, setDem] = useState<EoDem | null>(null);
   const [eros, setEros] = useState<EoErosion | null>(null);
   const [loading, setLoading] = useState(true);
+  const [slow, setSlow] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    const slowTimer = window.setTimeout(() => {
+      if (!cancelled) setSlow(true);
+    }, 12_000);
+
     (async () => {
       setLoading(true);
       setErr(null);
+      setSlow(false);
       try {
-        const [n, v, d, e] = await Promise.all([
-          fetchNdvi(lat, lon),
-          fetchVci(lat, lon, 60, 0),
-          fetchEoDem(lat, lon),
-          fetchEoErosion(lat, lon),
+        // Fast paths first (Open-Meteo DEM) so UI is not blank while NDVI runs
+        const d = await fetchEoDem(lat, lon).catch(() => null);
+        if (cancelled) return;
+        if (d) setDem(d);
+
+        const [n, v, e] = await Promise.all([
+          fetchNdvi(lat, lon).catch((ex) => {
+            console.warn("[EoLiveStrip] NDVI", ex);
+            return null;
+          }),
+          fetchVci(lat, lon, 60, 0).catch((ex) => {
+            console.warn("[EoLiveStrip] VCI", ex);
+            return null;
+          }),
+          fetchEoErosion(lat, lon).catch(() => null),
         ]);
         if (cancelled) return;
-        setNdvi(n);
-        setVci(v);
-        setDem(d);
-        setEros(e);
+        if (n) setNdvi(n);
+        if (v) setVci(v);
+        if (e) setEros(e);
+        if (!n && !v && !d && !e) {
+          setErr("EO timeout — wait for Planetary or refresh");
+        }
       } catch (ex) {
         if (!cancelled) setErr(ex instanceof Error ? ex.message : "EO offline");
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
+      window.clearTimeout(slowTimer);
     };
   }, [lat, lon]);
 
-  if (loading) {
+  if (loading && !dem && !ndvi) {
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-500">
-        <Loader2 className="h-4 w-4 animate-spin text-indigo-600" /> Live EO loading…
+      <div className="flex flex-col gap-1 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-500">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+          Live EO loading…
+        </div>
+        {slow && (
+          <p className="text-[11px] text-amber-700">
+            Sentinel NDVI may take 20–45s (Planetary Computer). API is still working.
+          </p>
+        )}
       </div>
     );
   }
 
-  if (err) {
+  if (err && !ndvi && !dem) {
     return (
       <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
         {err} · <Link className="font-bold underline" to="/eo">EO Hub</Link>
@@ -67,10 +104,30 @@ export function EoLiveStrip({ lat = 32.65, lon = 51.67, compact = false }: Props
 
   return (
     <div className={`grid gap-3 ${compact ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
-      <Card icon={<Leaf className="h-4 w-4" />} title="NDVI" value={ndvi?.mean_ndvi != null ? Number(ndvi.mean_ndvi).toFixed(3) : "—"} sub={String(ndvi?.provider ?? "Sentinel-2")} />
-      <Card icon={<Thermometer className="h-4 w-4" />} title="VCI" value={vci?.latest_vci?.vci != null ? String(vci.latest_vci.vci) : "—"} sub={vci?.mode ?? "metadata_fast"} />
-      <Card icon={<Mountain className="h-4 w-4" />} title="Elevation" value={elev != null ? `${elev} m` : "—"} sub={dem?.elevation_source ?? "Open-Meteo"} />
-      <Card icon={<AlertTriangle className="h-4 w-4" />} title="Erosion" value={risk} sub={eros?.erosion?.risk_score_0_100 != null ? `score ${eros.erosion.risk_score_0_100}` : "RUSLE-lite"} />
+      <Card
+        icon={<Leaf className="h-4 w-4" />}
+        title="NDVI"
+        value={ndvi?.mean_ndvi != null ? Number(ndvi.mean_ndvi).toFixed(3) : loading ? "…" : "—"}
+        sub={String(ndvi?.provider ?? (loading ? "fetching…" : "Sentinel-2"))}
+      />
+      <Card
+        icon={<Thermometer className="h-4 w-4" />}
+        title="VCI"
+        value={vci?.latest_vci?.vci != null ? String(vci.latest_vci.vci) : loading ? "…" : "—"}
+        sub={vci?.mode ?? "metadata_fast"}
+      />
+      <Card
+        icon={<Mountain className="h-4 w-4" />}
+        title="Elevation"
+        value={elev != null ? `${elev} m` : "—"}
+        sub={dem?.elevation_source ?? "Open-Meteo"}
+      />
+      <Card
+        icon={<AlertTriangle className="h-4 w-4" />}
+        title="Erosion"
+        value={risk}
+        sub={eros?.erosion?.risk_score_0_100 != null ? `score ${eros.erosion.risk_score_0_100}` : "RUSLE-lite"}
+      />
     </div>
   );
 }

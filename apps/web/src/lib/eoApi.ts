@@ -78,43 +78,48 @@ export type VciPack = {
   timeseries?: Array<Record<string, unknown>>;
 };
 
+/** Planetary raster NDVI often needs 20–45s on first cold hit. */
+const T_FAST = 20_000;
+const T_NDVI = 60_000;
+const T_BATCH = 90_000;
+
 const q = (lat: number, lon: number, extra = "") =>
   `?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}${extra}`;
 
 export async function fetchEoCatalog() {
-  return apiFetch<EoCatalog>(v1("/satellite/eo/catalog"));
+  return apiFetch<EoCatalog>(v1("/satellite/eo/catalog"), {}, T_FAST);
 }
 
 export async function fetchEoSensors(lat: number, lon: number, days = 60) {
-  return apiFetch<EoSensors>(v1(`/satellite/eo/sensors${q(lat, lon, `&days=${days}`)}`));
+  return apiFetch<EoSensors>(v1(`/satellite/eo/sensors${q(lat, lon, `&days=${days}`)}`), {}, T_BATCH);
 }
 
 export async function fetchEoVegetation(lat: number, lon: number, days = 60) {
-  return apiFetch<Record<string, unknown>>(v1(`/satellite/eo/vegetation${q(lat, lon, `&days=${days}`)}`));
+  return apiFetch<Record<string, unknown>>(v1(`/satellite/eo/vegetation${q(lat, lon, `&days=${days}`)}`), {}, T_BATCH);
 }
 
 export async function fetchEoDem(lat: number, lon: number) {
-  return apiFetch<EoDem>(v1(`/satellite/eo/dem${q(lat, lon)}`));
+  return apiFetch<EoDem>(v1(`/satellite/eo/dem${q(lat, lon)}`), {}, T_FAST);
 }
 
 export async function fetchEoErosion(lat: number, lon: number, days = 30) {
-  return apiFetch<EoErosion>(v1(`/satellite/eo/erosion${q(lat, lon, `&days=${days}`)}`));
+  return apiFetch<EoErosion>(v1(`/satellite/eo/erosion${q(lat, lon, `&days=${days}`)}`), {}, T_NDVI);
 }
 
 export async function fetchEoClimate(lat: number, lon: number) {
-  return apiFetch<EoClimate>(v1(`/satellite/eo/climate${q(lat, lon)}`));
+  return apiFetch<EoClimate>(v1(`/satellite/eo/climate${q(lat, lon)}`), {}, T_FAST);
 }
 
 export async function fetchEoSummary(lat: number, lon: number) {
-  return apiFetch<EoSummary>(v1(`/satellite/eo/summary${q(lat, lon)}`));
+  return apiFetch<EoSummary>(v1(`/satellite/eo/summary${q(lat, lon)}`), {}, T_BATCH);
 }
 
 export async function fetchNdvi(lat: number, lon: number) {
-  return apiFetch<NdviPoint>(v1(`/satellite/ndvi${q(lat, lon)}`));
+  return apiFetch<NdviPoint>(v1(`/satellite/ndvi${q(lat, lon)}`), {}, T_NDVI);
 }
 
 export async function fetchVci(lat: number, lon: number, days = 60, raster = 0) {
-  return apiFetch<VciPack>(v1(`/satellite/vci${q(lat, lon, `&days=${days}&raster=${raster}`)}`));
+  return apiFetch<VciPack>(v1(`/satellite/vci${q(lat, lon, `&days=${days}&raster=${raster}`)}`), {}, T_BATCH);
 }
 
 export async function fetchEoScenes(
@@ -125,5 +130,7 @@ export async function fetchEoScenes(
 ) {
   return apiFetch<Record<string, unknown>>(
     v1(`/satellite/eo/scenes${q(lat, lon, `&collection=${encodeURIComponent(collection)}&days=${days}`)}`),
+    {},
+    T_BATCH,
   );
 }
