@@ -1,0 +1,173 @@
+﻿/* apps/web/src/styles/animations.css — General animation library for Econojin */
+
+/* -- Fade In --------------------------------------------------------------------------- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* -- Slide Up -------------------------------------------------------------------------- */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slideUp 0.7s ease-out forwards;
+}
+
+/* -- Slide In Right -------------------------------------------------------------------- */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+/* -- Slide In Left --------------------------------------------------------------------- */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+/* -- Scale In -------------------------------------------------------------------------- */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+/* -- Pulse ----------------------------------------------------------------------------- */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+.animate-pulse-subtle {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* -- Shimmer / Skeleton ----------------------------------------------------------------- */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* -- Bounce ---------------------------------------------------------------------------- */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.animate-bounce-custom {
+  animation: bounce 0.8s ease-in-out infinite;
+}
+
+/* -- Shake ----------------------------------------------------------------------------- */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* -- Float ----------------------------------------------------------------------------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* -- Rotate slow ----------------------------------------------------------------------- */
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-rotate-slow {
+  animation: rotateSlow 20s linear infinite;
+}
+
+/* -- Gradient text --------------------------------------------------------------------- */
+.animate-gradient-text {
+  background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6, #10b981);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease-in-out infinite;
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* -- Stagger items (used with style="--i:N") ------------------------------------------- */
+.stagger-item {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+/* -- Glow ring on hover ---------------------------------------------------------------- */
+.glow-ring {
+  transition: box-shadow 0.3s ease;
+}
+.glow-ring:hover {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4);
+}
+
+/* -- RTL slide helpers ------------------------------------------------------------------ */
+[dir="rtl"] .animate-slide-in-right {
+  animation-name: slideInLeft;
+}
+[dir="rtl"] .animate-slide-in-left {
+  animation-name: slideInRight;
+}
+
+/* -- Scroll-triggered visibility ------------------------------------------------------- */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* -- Reduced motion support ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-in-right,
+  .animate-slide-in-left,
+  .animate-scale-in,
+  .animate-pulse-subtle,
+  .animate-shimmer,
+  .animate-bounce-custom,
+  .animate-shake,
+  .animate-float,
+  .animate-rotate-slow,
+  .stagger-item,
+  .reveal-on-scroll {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

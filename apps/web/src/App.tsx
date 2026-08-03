@@ -1,4 +1,4 @@
-// apps/web/src/App.tsx
+﻿// apps/web/src/App.tsx
 import { lazy, Suspense, Component, useEffect, type ReactNode, type ErrorInfo } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
@@ -73,6 +73,22 @@ const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const ReportsPage = lazy(() => import("./pages/ReportsPage"));
 const RisksPage = lazy(() => import("./pages/RisksPage"));
 const PoliciesPage = lazy(() => import("./pages/PoliciesPage"));
+
+// Tourism subpages
+const DestinationsPage = lazy(() => import("./pages/tourism/DestinationsPage"));
+const TourBookingPage = lazy(() => import("./pages/tourism/TourBookingPage"));
+const EcoLodgesPage = lazy(() => import("./pages/tourism/EcoLodgesPage"));
+const TourismGalleryPage = lazy(() => import("./pages/tourism/TourismGalleryPage"));
+
+// Inventory subpages
+const StockOutPage = lazy(() => import("./pages/inventory/StockOutPage"));
+const StockReportPage = lazy(() => import("./pages/inventory/StockReportPage"));
+
+// Accounting subpages
+const BalanceSheetPage = lazy(() => import("./pages/accounting/BalanceSheetPage"));
+const ProfitLossPage = lazy(() => import("./pages/accounting/ProfitLossPage"));
+const LedgerPage = lazy(() => import("./pages/accounting/LedgerPage"));
+const ExpenseCategoriesPage = lazy(() => import("./pages/accounting/ExpenseCategoriesPage"));
 const SimulatorDetailPage = lazy(() => import("./pages/SimulatorDetailPage"));
 const MySimulationsPage = lazy(() => import("./pages/MySimulationsPage"));
 const ComparisonDashboard = lazy(() => import("./pages/ComparisonDashboard"));
@@ -224,7 +240,9 @@ export default function App() {
               <Route path="water/irrigation" element={<WaterIrrigationPage />} />
               <Route path="planting" element={<PlantingCalendarPage />} />
               <Route path="tasks" element={<TasksPage />} />
-              <Route path="inventory" element={<InventoryPage />} />
+                            <Route path="inventory" element={<InventoryPage />} />
+              <Route path="inventory/stock-out" element={<StockOutPage />} />
+              <Route path="inventory/report" element={<StockReportPage />} />
               <Route path="currency" element={<CurrencySettingsPage />} />
               <Route path="weather" element={<WeatherPage />} />
               <Route path="monitoring" element={<MonitoringHubPage />} />
@@ -279,9 +297,17 @@ export default function App() {
               <Route path="simulators/:id" element={<SimulatorDetailPage />} />
               <Route path="my-simulations" element={<MySimulationsPage />} />
               <Route path="comparison" element={<ComparisonDashboard />} />
-              <Route path="tourism" element={<TourismPage />} />
+                            <Route path="tourism" element={<TourismPage />} />
+              <Route path="tourism/destinations" element={<DestinationsPage />} />
+              <Route path="tourism/booking" element={<TourBookingPage />} />
+              <Route path="tourism/eco-lodges" element={<EcoLodgesPage />} />
+              <Route path="tourism/gallery" element={<TourismGalleryPage />} />
               <Route path="users" element={<UsersPage />} />
-              <Route path="accounting" element={<AccountingPage />} />
+                            <Route path="accounting" element={<AccountingPage />} />
+              <Route path="accounting/balance-sheet" element={<BalanceSheetPage />} />
+              <Route path="accounting/profit-loss" element={<ProfitLossPage />} />
+              <Route path="accounting/ledger" element={<LedgerPage />} />
+              <Route path="accounting/expenses" element={<ExpenseCategoriesPage />} />
               <Route path="invoices" element={<InvoicesPage />} />
               <Route path="journal" element={<JournalEntriesPage />} />
               <Route path="payments" element={<PaymentsPage />} />

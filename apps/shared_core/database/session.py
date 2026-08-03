@@ -1,24 +1,36 @@
-"""Async SQLAlchemy session — Postgres preferred when forced/available."""
+﻿"""Async SQLAlchemy session — PostgreSQL + PostGIS preferred with SQLite fallback."""
 
 from __future__ import annotations
 
 import logging
 import os
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_SQLITE = "sqlite+aiosqlite:///./apps/econojin.db"
 
+# ---------------------------------------------------------------------------
+# Engine configuration values — configurable via env
+# ---------------------------------------------------------------------------
+_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "20"))
+_MAX_OVERFLOW = int(os.getenv("DB_MAX_OVERFLOW", "40"))
+_POOL_TIMEOUT = int(os.getenv("DB_POOL_TIMEOUT", "30"))
+_POOL_RECYCLE = int(os.getenv("DB_POOL_RECYCLE", "3600"))  # 1 hour
+
 
 def _has_asyncpg() -> bool:
     try:
         import asyncpg  # noqa: F401
-
         return True
     except ImportError:
         return False
@@ -30,6 +42,7 @@ def _force_postgres() -> bool:
 
 
 def _to_async_postgres(url: str) -> str:
+    """Normalize a postgres:// URL to postgresql+asyncpg://."""
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
     if url.startswith("postgresql://") and "+asyncpg" not in url:
@@ -38,67 +51,129 @@ def _to_async_postgres(url: str) -> str:
 
 
 def _resolve_database_url() -> str:
-    raw = None
+    """Resolve DATABASE_URL with PostgreSQL priority.
+
+    Priority:
+    1. FORCE_POSTGRES=1   → requires asyncpg, raises if missing
+    2. DATABASE_URL from settings/env with postgres in URL → use PostgreSQL
+    3. ENVIRONMENT=production/staging with Postgres in URL → use PostgreSQL
+    4. Local environment     → PostgreSQL if URL explicitly postgres, else SQLite
+    5. Fallback              → SQLite
+    """
+    raw: Optional[str] = None
+
+    # Try pydantic settings first
     try:
         from apps.shared_core.config import settings
-
         raw = settings.DATABASE_URL
     except Exception:
         raw = os.getenv("DATABASE_URL")
 
+    # Empty/masked URL → SQLite
     if not raw or "***" in str(raw) or not str(raw).strip():
-        logger.info("DATABASE_URL unset — using local SQLite")
+        logger.info("DATABASE_URL unset or masked → using local SQLite")
         return DEFAULT_SQLITE
 
     url = str(raw).strip()
 
+    # PostgreSQL path
     if "postgres" in url.lower():
         url = _to_async_postgres(url)
-        if "+asyncpg" in url and not _has_asyncpg():
+
+        # Check asyncpg availability
+        if not _has_asyncpg():
             if _force_postgres():
                 raise RuntimeError(
                     "FORCE_POSTGRES=1 but asyncpg is not installed. "
-                    "pip install asyncpg"
+                    "Install: pip install asyncpg"
                 )
-            logger.info("asyncpg not installed — local SQLite")
+            logger.info("asyncpg not installed → falling back to SQLite")
             return DEFAULT_SQLITE
+
+        # Force Postgres → always use it
         if _force_postgres():
             logger.info(
-                "FORCE_POSTGRES=1 — using Postgres: %s",
+                "FORCE_POSTGRES=1 → using PostgreSQL: %s",
                 url.split("@")[-1] if "@" in url else url,
             )
             return url
+
+        # Check environment context
         try:
             from apps.shared_core.config import settings
 
-            if settings.ENVIRONMENT == "local" and not _force_postgres():
-                if (
-                    os.getenv("DATABASE_URL", "").strip()
-                    and _has_asyncpg()
-                    and "+asyncpg" in url
-                ):
-                    if "localhost" in url or "127.0.0.1" in url or "postgres:" in url:
-                        logger.info("Local Postgres URL detected with asyncpg — using Postgres")
-                        return url
+            if settings.ENVIRONMENT in ("production", "staging"):
                 logger.info(
-                    "Local without FORCE_POSTGRES — SQLite (set FORCE_POSTGRES=1 to use PG)"
+                    "PostgreSQL selected for %s environment", settings.ENVIRONMENT
+                )
+                return url
+
+            if settings.ENVIRONMENT == "local":
+                # Local: use PostgreSQL if explicitly configured with a non-localhost URL
+                # (implies intent to connect to a container or remote PG)
+                if "localhost" in url or "127.0.0.1" in url:
+                    logger.info(
+                        "Local environment with local PostgreSQL URL → using PostgreSQL"
+                    )
+                    return url
+                logger.info(
+                    "Local environment → SQLite fallback (set FORCE_POSTGRES=1 to use PG)"
                 )
                 return DEFAULT_SQLITE
         except Exception:
-            if not _force_postgres():
-                return DEFAULT_SQLITE
+            # If settings aren't available, trust the URL if it's clearly PostgreSQL
+            if "+asyncpg" in url:
+                return url
+            return DEFAULT_SQLITE
 
+    # SQLite path
     if url.startswith("sqlite://") and "+aiosqlite" not in url:
         url = url.replace("sqlite://", "sqlite+aiosqlite://", 1)
 
     return url
 
 
+# ---------------------------------------------------------------------------
+# Engine creation
+# ---------------------------------------------------------------------------
 DATABASE_URL = _resolve_database_url()
 
-_engine_kwargs: dict = {"echo": False, "pool_pre_ping": True}
-if "sqlite" not in DATABASE_URL:
-    _engine_kwargs.update({"pool_size": 5, "max_overflow": 10})
+_IS_POSTGRES = "postgresql" in DATABASE_URL
+_IS_SQLITE = "sqlite" in DATABASE_URL
+
+_engine_kwargs: dict = {
+    "echo": os.getenv("DB_ECHO", "").lower() in ("1", "true", "yes"),
+    "pool_pre_ping": True,
+}
+
+if _IS_POSTGRES:
+    _engine_kwargs.update({
+        "pool_size": _POOL_SIZE,
+        "max_overflow": _MAX_OVERFLOW,
+        "pool_timeout": _POOL_TIMEOUT,
+        "pool_recycle": _POOL_RECYCLE,
+        # PostgreSQL‑specific: wait for connections instead of failing fast
+        "pool_pre_ping": True,
+        # Connection arguments for production
+        "connect_args": {
+            "server_settings": {
+                "application_name": "econojin",
+                "timezone": "UTC",
+            },
+        },
+    })
+elif _IS_SQLITE:
+    _engine_kwargs.update({
+        "connect_args": {"check_same_thread": False},
+    })
+
+logger.info(
+    "Database engine: %s (pool=%s overflow=%s timeout=%ss)",
+    "PostgreSQL" if _IS_POSTGRES else "SQLite",
+    _engine_kwargs.get("pool_size", "N/A"),
+    _engine_kwargs.get("max_overflow", "N/A"),
+    _engine_kwargs.get("pool_timeout", "N/A"),
+)
 
 engine: AsyncEngine = create_async_engine(DATABASE_URL, **_engine_kwargs)
 
@@ -106,6 +181,7 @@ async_session_maker = async_sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
+    autoflush=False,
 )
 
 
@@ -117,7 +193,13 @@ def get_engine() -> AsyncEngine:
     return engine
 
 
+def is_postgres() -> bool:
+    """Check if the current database is PostgreSQL."""
+    return _IS_POSTGRES
+
+
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Yield an async database session with automatic commit/rollback."""
     async with async_session_maker() as session:
         try:
             yield session
@@ -133,9 +215,12 @@ def _import_models() -> None:
     from apps.shared_core.database.model_registry import import_all_models
 
     loaded = import_all_models()
-    logger.info("ORM models registered: %s", len(loaded))
+    logger.info("ORM models registered: %d", len(loaded))
 
 
+# ---------------------------------------------------------------------------
+# SQLite schema patches (zero-downtime additions for development)
+# ---------------------------------------------------------------------------
 async def _table_cols(conn, table: str) -> set[str]:
     try:
         rows = await conn.execute(text(f"PRAGMA table_info({table})"))
@@ -156,7 +241,8 @@ async def _add_col(conn, table: str, name: str, ddl: str, existing: set[str]) ->
 
 
 async def _sqlite_schema_patches(conn) -> None:
-    if "sqlite" not in str(engine.url):
+    """Apply runtime schema patches for SQLite dev environments."""
+    if not _IS_SQLITE:
         return
 
     users = await _table_cols(conn, "users")
@@ -197,30 +283,35 @@ async def _sqlite_schema_patches(conn) -> None:
             await _add_col(conn, "crops", name, ddl, crops)
 
 
+# ---------------------------------------------------------------------------
+# Database initialization
+# ---------------------------------------------------------------------------
 async def init_db() -> None:
     _import_models()
-    try:
-        from apps.shared_core.config import settings
 
-        if settings.ENVIRONMENT != "local" and not _force_postgres():
-            logger.info(
-                "Skipping create_all (ENVIRONMENT=%s); use Alembic", settings.ENVIRONMENT
-            )
-            return
-        if settings.ENVIRONMENT != "local" and "postgres" in DATABASE_URL:
-            logger.info(
-                "Skipping create_all on Postgres staging/prod — use alembic upgrade head"
-            )
-            return
-    except Exception:
-        pass
+    # For PostgreSQL production/staging, skip auto-create (use Alembic)
+    if _IS_POSTGRES:
+        try:
+            from apps.shared_core.config import settings
+            if settings.ENVIRONMENT in ("production", "staging"):
+                logger.info(
+                    "Skipping create_all (ENVIRONMENT=%s on PostgreSQL) — use Alembic migrations",
+                    settings.ENVIRONMENT,
+                )
+                return
+        except Exception:
+            pass
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        await _sqlite_schema_patches(conn)
+        if _IS_SQLITE:
+            await _sqlite_schema_patches(conn)
 
 
 async def close_db() -> None:
     await engine.dispose()
+    logger.info("Database engine disposed")
 
 
+# Alias for backward compatibility
 get_db = get_db_session

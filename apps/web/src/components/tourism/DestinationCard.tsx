@@ -1,45 +1,50 @@
-// apps/web/src/components/tourism/DestinationCard.tsx
-import { useState } from "react";
-import { MapPin, Users } from "lucide-react";
-import type { Destination } from "./tourismData";
-import { formatRating } from "./tourismData";
-import { StarBar } from "./DestinationHero";
-import { tourText, localeOf, type TourismStrings, type TourLang } from "./tourismI18n";
+﻿import { MapPin, Star, Clock, Users } from 'lucide-react';
 
-function SmartImg({ src, alt, fallback, className }: { src: string; alt: string; fallback: string; className?: string }) {
-  const [err, setErr] = useState(false);
-  if (err) return <div className={className} style={{ background: fallback }} />;
-  return <img src={src} alt={alt} loading="lazy" decoding="async" onError={() => setErr(true)} className={className} />;
+interface DestinationCardProps {
+  name: string; nameFa: string; region: string; regionFa: string;
+  rating: number; reviews: number; duration: string; price: string;
+  tags: string[]; description: string;
+  altitude: string; difficulty: 'easy' | 'moderate' | 'challenging';
+  groupSize: string; onView?: () => void;
 }
 
-interface Props {
-  destination: Destination;
-  selected: boolean;
-  strings: TourismStrings;
-  lang: TourLang;
-  onSelect: (id: string) => void;
-}
+const DIFFICULTY = {
+  easy: { color: 'bg-emerald-100 text-emerald-700', label: 'آسان' },
+  moderate: { color: 'bg-amber-100 text-amber-700', label: 'متوسط' },
+  challenging: { color: 'bg-red-100 text-red-700', label: 'چالش‌برانگیز' },
+};
 
-export function DestinationCard({ destination: d, selected, strings: s, lang, onSelect }: Props) {
-  const locale = localeOf(lang);
+export default function DestinationCard(props: DestinationCardProps) {
   return (
-    <button onClick={() => onSelect(d.id)} aria-pressed={selected}
-      className={`flex w-full items-center gap-3 rounded-2xl border p-2.5 text-start transition-all hover:-translate-y-0.5 hover:shadow-sm ${
-        selected ? "border-green-500 bg-green-50/60 ring-1 ring-green-600/20" : "border-stone-200 bg-white"
-      }`}>
-      <SmartImg src={d.image} alt={tourText(s, d.nameKey)} fallback={d.accent}
-        className="h-14 w-14 shrink-0 rounded-xl object-cover" />
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-semibold text-stone-800">{tourText(s, d.nameKey)}</span>
-        <span className="mt-0.5 flex items-center gap-1 text-[11px] text-stone-500"><MapPin className="h-3 w-3" />{tourText(s, d.regionKey)}</span>
-        <span className="mt-1 flex items-center gap-2">
-          <StarBar rating={d.rating} />
-          <span className="text-[11px] font-bold tabular-nums text-amber-700">{formatRating(d.rating, locale)}</span>
-        </span>
-      </span>
-      <span className="shrink-0 text-end">
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-stone-500"><Users className="h-3 w-3" />{d.visitors.toLocaleString(locale)}</span>
-      </span>
-    </button>
+    <div className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-stone-100 hover:border-emerald-200">
+      <div className="h-48 bg-gradient-to-br from-emerald-400 to-teal-600 relative">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+          <span className="text-white/80 text-sm">{props.regionFa}</span>
+        </div>
+      </div>
+      <div className="p-5">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-lg font-bold text-stone-800">{props.nameFa}</h3>
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <span className="text-sm font-medium">{props.rating}</span>
+          </div>
+        </div>
+        <p className="text-sm text-stone-600 mb-3 line-clamp-2">{props.description}</p>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {props.tags.map(t => <span key={t} className="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">{t}</span>)}
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-xs text-stone-500 mb-4">
+          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{props.duration}</span>
+          <span className="flex items-center gap-1"><Users className="w-3 h-3" />{props.groupSize}</span>
+          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{props.altitude}</span>
+          <span className={'px-2 py-0.5 rounded-full text-xs ' + DIFFICULTY[props.difficulty].color}>{DIFFICULTY[props.difficulty].label}</span>
+        </div>
+        <div className="flex items-center justify-between pt-3 border-t border-stone-100">
+          <span className="text-emerald-700 font-bold">{props.price} تومان</span>
+          <button onClick={props.onView} className="text-sm font-medium text-emerald-600 hover:text-emerald-700">مشاهده تور</button>
+        </div>
+      </div>
+    </div>
   );
 }

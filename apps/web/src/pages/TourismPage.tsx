@@ -1,178 +1,129 @@
-// Eco-tourism — visit request + AI panel
-import { useMemo, useState } from "react";
-import { Compass, Search, Download, Check, CalendarPlus } from "lucide-react";
-import { useLang } from "../components/eco/i18n";
-import { SectionReveal } from "../components/eco/SectionReveal";
-import { TourismStats } from "../components/tourism/TourismStats";
-import { DestinationHero } from "../components/tourism/DestinationHero";
-import { DestinationCard } from "../components/tourism/DestinationCard";
-import { DestinationDetail } from "../components/tourism/DestinationDetail";
-import { TOUR_STR, tourText, localeOf, type TourLang } from "../components/tourism/tourismI18n";
-import { DESTINATIONS, REGIONS, downloadCSV, type SortKey, type SortDir } from "../components/tourism/tourismData";
-import { submitTourRequest, readTourRequests, type TourismRequest } from "../lib/tourismStore";
-import { PageAiPanel } from "../components/ai/PageAiPanel";
+﻿import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { Mountain, Building2, Waves, Trees, Compass, Palmtree, Tent, Landmark, Map, Heart, ArrowRight, Star } from 'lucide-react';
+
+const TOURISM_SECTIONS = [
+  { id: 'destinations', title: 'مقاصد گردشگری', desc: 'کشف زیبایی‌های طبیعی، تاریخی و فرهنگی ایران', icon: Compass, path: '/tourism/destinations', color: 'from-emerald-500 to-teal-600', bg: 'bg-emerald-50', count: '۲۵+', countLabel: 'مقصد' },
+  { id: 'lodges', title: 'اقامتگاه‌های بوم‌گردی', desc: 'اقامت در دل طبیعت با حفظ محیط زیست', icon: Tent, path: '/tourism/eco-lodges', color: 'from-teal-500 to-cyan-600', bg: 'bg-teal-50', count: '۵۰+', countLabel: 'اقامتگاه' },
+  { id: 'booking', title: 'رزرو تور', desc: 'برنامه‌ریزی سفر با راهنمایان محلی', icon: Map, path: '/tourism/booking', color: 'from-cyan-500 to-blue-600', bg: 'bg-cyan-50', count: '۱۵+', countLabel: 'تور فعال' },
+  { id: 'gallery', title: 'گالری تصاویر', desc: 'تماشای زیبایی‌های ایران در قاب تصویر', icon: Heart, path: '/tourism/gallery', color: 'from-rose-500 to-pink-600', bg: 'bg-rose-50', count: '۲۰۰+', countLabel: 'تصویر' },
+];
+
+const HIGHLIGHTS = [
+  { icon: Mountain, text: 'کوهستان و طبیعت‌گردی' },
+  { icon: Waves, text: 'دریا و سواحل' },
+  { icon: Trees, text: 'جنگل و منابع طبیعی' },
+  { icon: Palmtree, text: 'کویر و نجوم' },
+  { icon: Building2, text: 'بناهای تاریخی' },
+  { icon: Landmark, text: 'میراث فرهنگی' },
+];
 
 export default function TourismPage() {
-  const { lang } = useLang();
-  const s = TOUR_STR[lang as TourLang];
-  const [selectedId, setSelectedId] = useState(DESTINATIONS[0].id);
-  const [search, setSearch] = useState("");
-  const [regionFilter, setRegionFilter] = useState("all");
-  const [sortKey, setSortKey] = useState<SortKey>("rating");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [exported, setExported] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const [reqs, setReqs] = useState<TourismRequest[]>(() => readTourRequests());
-  const [toast, setToast] = useState("");
-  const [form, setForm] = useState({ visitorName: "", email: "", partySize: "2", date: "", interests: "nature, conservation" });
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    const list = DESTINATIONS.filter((d) =>
-      (regionFilter === "all" || d.regionKey === regionFilter) &&
-      (q === "" || tourText(s, d.nameKey).toLowerCase().includes(q) || tourText(s, d.regionKey).toLowerCase().includes(q))
-    );
-    list.sort((a, b) => {
-      let cmp = 0;
-      if (sortKey === "rating") cmp = a.rating - b.rating;
-      else if (sortKey === "visitors") cmp = a.visitors - b.visitors;
-      else cmp = tourText(s, a.nameKey).localeCompare(tourText(s, b.nameKey));
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-    return list;
-  }, [search, regionFilter, sortKey, sortDir, lang]); // eslint-disable-line
-
-  const selected = DESTINATIONS.find((d) => d.id === selectedId) ?? DESTINATIONS[0];
-
-  const exportAll = () => {
-    const header = s.csvHeaders.split(",");
-    const rows = filtered.map((d) =>
-      [d.id, tourText(s, d.nameKey), tourText(s, d.regionKey), String(d.rating), String(d.visitors), d.conservation, d.accessibility]
-        .map((c) => `"${c.replace(/"/g, '""')}"`).join(",")
-    );
-    downloadCSV("eco-tourism.csv", [header.join(","), ...rows].join("\n"));
-    setExported(true); setTimeout(() => setExported(false), 1800);
-  };
-
-  const onRequestVisit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.visitorName.trim() || !form.email.trim()) return;
-    setReqs(submitTourRequest({
-      destinationId: selected.id,
-      destinationName: tourText(s, selected.nameKey),
-      visitorName: form.visitorName,
-      email: form.email,
-      partySize: parseInt(form.partySize, 10) || 1,
-      date: form.date || new Date().toISOString().slice(0, 10),
-      interests: form.interests,
-    }));
-    setFormOpen(false);
-    setToast(lang === "fa" ? "درخواست بازدید ثبت شد" : "Visit request submitted");
-    setTimeout(() => setToast(""), 2500);
-  };
-
-  const selectCls = "rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-bold text-stone-700 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/15";
-  const tourScenarios = [
-    { id: "t1", title_fa: "ظرفیت تحمل بازدید", title_en: "Visitor carrying capacity", title_ar: "القدرة الاستيعابية",
-      body_fa: "حد روزانه بازدیدکننده، مسیرهای مشخص، ممنوعیت برداشت گیاه.", body_en: "Daily visitor cap, marked trails, no plant collection.", body_ar: "حد يومي للزوار ومسارات محددة." },
-    { id: "t2", title_fa: "استاندارد GSTC", title_en: "GSTC alignment", title_ar: "توافق GSTC",
-      body_fa: "حفاظت، جامعه محلی، تجربه فرهنگی پایدار.", body_en: "Conservation, local community, sustainable cultural experience.", body_ar: "حفظ ومجتمع محلي وتجربة مستدامة." },
-  ];
-
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
-      <SectionReveal>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-green-50 ring-1 ring-green-600/15"><Compass className="h-5 w-5 text-green-700" /></div>
-            <div>
-              <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
-              <p className="mt-0.5 text-stone-600">{s.subtitle}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => setFormOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-teal-700">
-              <CalendarPlus className="h-4 w-4" />{lang === "fa" ? "درخواست بازدید" : "Request visit"}
-            </button>
-            <button type="button" onClick={exportAll} disabled={filtered.length === 0}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm disabled:opacity-50 ${exported ? "bg-green-50 text-green-700" : "bg-green-600 text-white hover:bg-green-700"}`}>
-              {exported ? <Check className="h-4 w-4" /> : <Download className="h-4 w-4" />}{s.exportAll}
-            </button>
+    <div className="min-h-screen bg-gradient-to-b from-stone-50 to-emerald-50">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-br from-emerald-800 via-teal-700 to-emerald-600 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-300 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-20 w-96 h-96 bg-teal-300 rounded-full blur-3xl" />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-4 py-24 text-center">
+          <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 animate-fade-in-down">
+            اکوتوریسم ایران
+          </h1>
+          <p className="text-xl text-emerald-100 max-w-3xl mx-auto mb-8">
+            سفر به قلب طبیعت ایران | گردشگری پایدار با احترام به محیط زیست و فرهنگ‌های محلی
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link to="/tourism/destinations" className="px-8 py-4 bg-white text-emerald-700 rounded-2xl font-bold text-lg hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+              مقاصد گردشگری <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link to="/tourism/booking" className="px-8 py-4 bg-emerald-900/30 text-white border-2 border-white/30 rounded-2xl font-bold text-lg hover:bg-emerald-900/50 transition-all flex items-center gap-2 backdrop-blur-sm">
+              رزرو تور <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
-      </SectionReveal>
-
-      {toast && <div className="fixed bottom-6 start-1/2 z-[60] -translate-x-1/2 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-bold text-white" role="status">{toast}</div>}
-
-      <PageAiPanel lang={lang} pageKey="tourism" scenarios={tourScenarios} />
-      <TourismStats destinations={DESTINATIONS} strings={s} lang={lang as TourLang} />
-
-      {reqs.length > 0 && (
-        <div className="rounded-2xl border border-teal-200 bg-teal-50/40 p-4 text-sm">
-          <p className="font-bold text-teal-900">{lang === "fa" ? "درخواست‌های شما" : "Your requests"}: {reqs.length}</p>
-          <ul className="mt-2 space-y-1">{reqs.slice(0, 3).map((r) => (
-            <li key={r.id} className="text-xs text-stone-700">{r.destinationName} · {r.date} · {r.status} · {r.partySize} pax</li>
-          ))}</ul>
-        </div>
-      )}
-
-      <DestinationHero destination={selected} strings={s} lang={lang as TourLang} />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <SectionReveal delay={110} className="lg:col-span-2">
-          <DestinationDetail destination={selected} strings={s} lang={lang as TourLang} />
-        </SectionReveal>
-        <SectionReveal delay={130}>
-          <div className="space-y-3 rounded-2xl border border-stone-200/80 bg-white p-4 shadow-sm">
-            <h3 className="font-display text-base text-stone-800">{s.selectDest}</h3>
-            <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2 text-stone-400" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={s.searchPlaceholder}
-                className="w-full rounded-xl border border-stone-200 py-2 ps-9 pe-3 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/15" />
-            </div>
-            <select value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)} className={`${selectCls} w-full`}>
-              <option value="all">{s.filterAll}</option>
-              {REGIONS.map((r) => <option key={r} value={r}>{tourText(s, r)}</option>)}
-            </select>
-            <select value={`${sortKey}-${sortDir}`} onChange={(e) => { const [k, dd] = e.target.value.split("-") as [SortKey, SortDir]; setSortKey(k); setSortDir(dd); }} className={`${selectCls} w-full`}>
-              <option value="rating-desc">{s.sortRating} ↓</option>
-              <option value="visitors-desc">{s.sortVisitors} ↓</option>
-              <option value="name-asc">{s.sortName} ↑</option>
-            </select>
-            {filtered.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-stone-300 py-10 text-center">
-                <Compass className="h-8 w-8 text-stone-300" /><p className="text-sm text-stone-500">{s.noDest}</p>
-              </div>
-            ) : (
-              <div className="space-y-2">{filtered.map((d) => (
-                <DestinationCard key={d.id} destination={d} selected={d.id === selectedId} strings={s} lang={lang as TourLang} onSelect={setSelectedId} />
-              ))}</div>
-            )}
-          </div>
-        </SectionReveal>
       </div>
 
-      {formOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-stone-900/40" onClick={() => setFormOpen(false)} />
-          <form onSubmit={onRequestVisit} className="relative w-full max-w-md space-y-3 rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="font-display text-xl">{lang === "fa" ? "درخواست بازدید اکوتوریسم" : "Eco-tourism visit request"}</h2>
-            <p className="text-xs text-stone-500">{tourText(s, selected.nameKey)}</p>
-            <input required value={form.visitorName} onChange={(e) => setForm({ ...form, visitorName: e.target.value })} placeholder={lang === "fa" ? "نام" : "Name"} className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-teal-500" />
-            <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-teal-500" />
-            <div className="grid grid-cols-2 gap-2">
-              <input value={form.partySize} onChange={(e) => setForm({ ...form, partySize: e.target.value })} placeholder="Party size" className="rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-teal-500" />
-              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-teal-500" />
-            </div>
-            <input value={form.interests} onChange={(e) => setForm({ ...form, interests: e.target.value })} placeholder={lang === "fa" ? "علایق" : "Interests"} className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none focus:border-teal-500" />
-            <div className="flex gap-2">
-              <button type="button" onClick={() => setFormOpen(false)} className="flex-1 rounded-xl border py-2.5 text-sm font-bold">Cancel</button>
-              <button type="submit" className="flex-1 rounded-xl bg-teal-600 py-2.5 text-sm font-bold text-white">{lang === "fa" ? "ارسال" : "Submit"}</button>
-            </div>
-          </form>
+      {/* Highlights */}
+      <div className="max-w-6xl mx-auto px-4 -mt-10 pb-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+          {HIGHLIGHTS.map((h, i) => {
+            const Icon = h.icon;
+            return (
+              <div key={i} className="bg-white rounded-2xl shadow-lg p-4 text-center hover:shadow-xl transition-all hover:-translate-y-1">
+                <Icon className="w-8 h-8 mx-auto mb-2 text-emerald-600" />
+                <p className="text-xs font-medium text-stone-600">{h.text}</p>
+              </div>
+            );
+          })}
         </div>
-      )}
+      </div>
+
+      {/* Main Sections */}
+      <div className="max-w-6xl mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-stone-800 mb-3">خدمات گردشگری ما</h2>
+          <p className="text-stone-500 max-w-2xl mx-auto">از برنامه‌ریزی سفر تا اقامت، همه چیز برای یک تجربه بی‌نظیر اکوتوریسم</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {TOURISM_SECTIONS.map(section => {
+            const Icon = section.icon;
+            return (
+              <Link key={section.id} to={section.path} className="group block">
+                <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-stone-100">
+                  <div className={'bg-gradient-to-r ' + section.color + ' p-8 flex items-center justify-between'}>
+                    <Icon className="w-14 h-14 text-white/90" />
+                    <div className="text-right">
+                      <span className="text-3xl font-bold text-white">{section.count}</span>
+                      <p className="text-white/70 text-sm">{section.countLabel}</p>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-stone-800 mb-2 group-hover:text-emerald-600 transition-colors">{section.title}</h3>
+                    <p className="text-stone-500 text-sm mb-4">{section.desc}</p>
+                    <span className="inline-flex items-center gap-1 text-emerald-600 font-medium text-sm group-hover:gap-2 transition-all">
+                      مشاهده <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="bg-white py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-stone-800 mb-3">چرا اکوتوریسم با Econojin؟</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center p-6">
+              <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Star className="w-7 h-7 text-emerald-600" />
+              </div>
+              <h3 className="font-bold text-stone-800 mb-2">گردشگری پایدار</h3>
+              <p className="text-sm text-stone-500">حفظ محیط زیست و حمایت از جوامع محلی</p>
+            </div>
+            <div className="text-center p-6">
+              <div className="w-14 h-14 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Compass className="w-7 h-7 text-teal-600" />
+              </div>
+              <h3 className="font-bold text-stone-800 mb-2">راهنمایان محلی</h3>
+              <p className="text-sm text-stone-500">تجربه اصیل با راهنمایان بومی و متخصص</p>
+            </div>
+            <div className="text-center p-6">
+              <div className="w-14 h-14 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-7 h-7 text-cyan-600" />
+              </div>
+              <h3 className="font-bold text-stone-800 mb-2">تجربه‌های منحصربه‌فرد</h3>
+              <p className="text-sm text-stone-500">از کویر تا جنگل، از دریا تا کوهستان</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

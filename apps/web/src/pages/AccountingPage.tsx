@@ -1,219 +1,246 @@
-// apps/web/src/pages/AccountingPage.tsx
-import { useMemo, useState, useEffect } from "react";
+﻿// apps/web/src/pages/AccountingPage.tsx — Modern Financial Dashboard
+import { useState, type ReactNode } from "react";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import {
-  DollarSign, CreditCard, TrendingUp, BarChart3,
-  Calendar, Plus, Receipt, Download, Wallet,
+  Calculator, FileText, ArrowUpDown, Tag,
+  TrendingUp, TrendingDown, DollarSign,
+  Wallet, ChevronRight,
 } from "lucide-react";
-import { getAccountingSummary, getAccountingAccounts } from "../lib/apiServices";
-import { mapApiSummaryToUi, mapApiAccountToUi, extractAccountList } from "../lib/mappers/accounting";
+import { motion } from "framer-motion";
 import { useLang } from "../components/eco/i18n";
-import { SectionReveal } from "../components/eco/SectionReveal";
-import { StatCard, type StatColor } from "../components/finance/StatCard";
-import { CashFlowChart } from "../components/finance/CashFlowChart";
-import { TransactionsTable } from "../components/finance/TransactionsTable";
-import { DataSourceBadge } from "../components/ui/DataSourceBadge";
-import { FIN_STR, periodText, accountText, type FinLang } from "../components/finance/financeI18n";
-import {
-  SUMMARY_BY_PERIOD, CASHFLOW_BY_PERIOD, ACCOUNTS, TRANSACTIONS,
-  type Period, type TxType, type Summary, type Account,
-} from "../components/finance/financeData";
-import type { DataSource } from "../types/common";
+import AnimatedSection from "../components/animation/AnimatedSection";
+import AccountCard from "../components/accounting/AccountCard";
+import TransactionList from "../components/accounting/TransactionList";
+import FinancialChart from "../components/accounting/FinancialChart";
+import { FIN_STR, type FinLang } from "../components/finance/financeI18n";
+import { cn } from "../lib/cn";
 
-const PERIODS: Period[] = ["7d", "30d", "90d", "1y"];
-const TYPE_FILTERS: ("all" | TxType)[] = ["all", "income", "expense"];
+/* ------------------------------------------------------------------ */
+/* Lazy sub-page imports                                                */
+/* ------------------------------------------------------------------ */
+import BalanceSheetPage from "./accounting/BalanceSheetPage";
+import ProfitLossPage from "./accounting/ProfitLossPage";
+import LedgerPage from "./accounting/LedgerPage";
+import ExpenseCategoriesPage from "./accounting/ExpenseCategoriesPage";
 
-export default function AccountingPage() {
-  const [apiSource, setApiSource] = useState<DataSource>("mock");
-  const [liveSummary, setLiveSummary] = useState<Summary | null>(null);
-  const [liveAccounts, setLiveAccounts] = useState<Account[] | null>(null);
+/* ------------------------------------------------------------------ */
+/* Quick links for dashboard                                             */
+/* ------------------------------------------------------------------ */
+interface QuickLink {
+  path: string;
+  label: string;
+  labelFa: string;
+  icon: ReactNode;
+  color: string;
+  description: string;
+  descriptionFa: string;
+}
+
+const QUICK_LINKS: QuickLink[] = [
+  {
+    path: "balance-sheet",
+    label: "Balance Sheet",
+    labelFa: "ترازنامه",
+    icon: <Calculator className="h-5 w-5" />,
+    color: "from-blue-500 to-indigo-600",
+    description: "Assets, liabilities & equity overview",
+    descriptionFa: "نمای کلی دارایی‌ها، بدهی‌ها و سرمایه",
+  },
+  {
+    path: "profit-loss",
+    label: "Profit & Loss",
+    labelFa: "صورت سود و زیان",
+    icon: <TrendingUp className="h-5 w-5" />,
+    color: "from-emerald-500 to-teal-600",
+    description: "Revenue, expenses & net profit analysis",
+    descriptionFa: "تحلیل درآمد، هزینه و سود خالص",
+  },
+  {
+    path: "ledger",
+    label: "General Ledger",
+    labelFa: "گردش حساب",
+    icon: <FileText className="h-5 w-5" />,
+    color: "from-purple-500 to-pink-600",
+    description: "All journal entries & account movements",
+    descriptionFa: "کلیه ثبت‌های حسابداری و گردش حساب‌ها",
+  },
+  {
+    path: "expense-categories",
+    label: "Expense Categories",
+    labelFa: "دسته‌بندی هزینه‌ها",
+    icon: <Tag className="h-5 w-5" />,
+    color: "from-orange-500 to-red-600",
+    description: "Budget management & expense breakdown",
+    descriptionFa: "مدیریت بودجه و تجزیه هزینه‌ها",
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/* Mock transactions                                                     */
+/* ------------------------------------------------------------------ */
+const RECENT_TX = [
+  { id: "tx1", type: "income" as const, amount: 85_000_000, description: "Carbon credit sale", descriptionFa: "فروش اعتبار کربنی", date: "2026-08-01", category: "Revenue", categoryFa: "درآمد" },
+  { id: "tx2", type: "expense" as const, amount: 42_000_000, description: "Equipment purchase", descriptionFa: "خرید تجهیزات", date: "2026-08-01", category: "Equipment", categoryFa: "تجهیزات" },
+  { id: "tx3", type: "income" as const, amount: 35_000_000, description: "Consulting fees", descriptionFa: "حق‌الزحمه مشاوره", date: "2026-07-31", category: "Revenue", categoryFa: "درآمد" },
+  { id: "tx4", type: "expense" as const, amount: 120_000_000, description: "Salary payments", descriptionFa: "پرداخت حقوق", date: "2026-07-30", category: "Salaries", categoryFa: "حقوق" },
+  { id: "tx5", type: "transfer" as const, amount: 50_000_000, description: "Savings transfer", descriptionFa: "انتقال به پس‌انداز", date: "2026-07-29", category: "Savings", categoryFa: "پس‌انداز" },
+];
+
+/* ------------------------------------------------------------------ */
+/* Chart data                                                            */
+/* ------------------------------------------------------------------ */
+const CHART_DATA = [
+  { month: "Apr", revenue: 420, expenses: 310, profit: 110 },
+  { month: "May", revenue: 480, expenses: 340, profit: 140 },
+  { month: "Jun", revenue: 510, expenses: 380, profit: 130 },
+  { month: "Jul", revenue: 560, expenses: 400, profit: 160 },
+  { month: "Aug", revenue: 530, expenses: 390, profit: 140 },
+];
+
+/* ------------------------------------------------------------------ */
+/* Dashboard Component                                                    */
+/* ------------------------------------------------------------------ */
+function AccountingDashboard() {
   const { lang } = useLang();
-  const s = FIN_STR[lang as FinLang];
 
-  const [period, setPeriod] = useState<Period>("30d");
-  const [typeFilter, setTypeFilter] = useState<"all" | TxType>("all");
+  const format = (n: number) =>
+    new Intl.NumberFormat(lang === "fa" ? "fa-IR" : "en-US", {
+      style: "decimal",
+      maximumFractionDigits: 0,
+    }).format(n);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const [sumRes, accRes] = await Promise.all([
-        getAccountingSummary(),
-        getAccountingAccounts(),
-      ]);
-      if (cancelled) return;
-
-      if (sumRes.source === "api") {
-        setLiveSummary(mapApiSummaryToUi(sumRes.data as never, SUMMARY_BY_PERIOD["30d"]));
-        setApiSource("api");
-      } else {
-        setApiSource("mock");
-      }
-
-      if (accRes.source === "api") {
-        const list = extractAccountList(accRes.data);
-        if (list.length) {
-          setLiveAccounts(list.slice(0, 6).map((a, i) => mapApiAccountToUi(a, i)));
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const summary = liveSummary ?? SUMMARY_BY_PERIOD[period];
-  const accounts = liveAccounts ?? ACCOUNTS;
-  const cashflow = CASHFLOW_BY_PERIOD[period];
-
-  const filteredTx = useMemo(
-    () => (typeFilter === "all" ? TRANSACTIONS : TRANSACTIONS.filter((t) => t.type === typeFilter)),
-    [typeFilter],
-  );
-
-  const cards: {
-    icon: typeof DollarSign;
-    label: string;
-    value: number;
-    color: StatColor;
-    trend: number;
-    goodWhenUp: boolean;
-  }[] = [
-    { icon: TrendingUp, label: s.revenue, value: summary.revenue, color: "green", trend: summary.revenueTrend, goodWhenUp: true },
-    { icon: DollarSign, label: s.expenses, value: summary.expenses, color: "red", trend: summary.expenseTrend, goodWhenUp: false },
-    { icon: BarChart3, label: s.profit, value: summary.profit, color: "blue", trend: summary.profitTrend, goodWhenUp: true },
-    { icon: Wallet, label: s.balance, value: summary.balance, color: "amber", trend: summary.balanceTrend, goodWhenUp: true },
-  ];
+  const totalRevenue = CHART_DATA.reduce((s, m) => s + m.revenue * 1_000_000, 0);
+  const totalExpenses = CHART_DATA.reduce((s, m) => s + m.expenses * 1_000_000, 0);
+  const netProfit = totalRevenue - totalExpenses;
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-5 sm:p-8">
-      <SectionReveal>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-display text-3xl text-stone-800">{s.title}</h1>
-              <DataSourceBadge source={apiSource} />
+    <div className="space-y-8">
+      {/* Hero */}
+      <AnimatedSection>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 p-8 md:p-10 shadow-xl">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white" />
+            <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-white" />
+          </div>
+          <div className="relative z-10">
+            <h1 className="font-display text-3xl font-bold text-white md:text-4xl">
+              {lang === "fa" ? "داشبورد مالی" : "Financial Dashboard"}
+            </h1>
+            <p className="mt-2 max-w-xl text-white/80">
+              {lang === "fa"
+                ? "مدیریت کامل امور مالی، حسابداری و گزارش‌گیری"
+                : "Complete financial management, accounting & reporting"}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {QUICK_LINKS.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="inline-flex items-center gap-2 rounded-xl bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
+                >
+                  {link.icon}
+                  {lang === "fa" ? link.labelFa : link.label}
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              ))}
             </div>
-            <p className="mt-1 text-stone-600">{s.subtitle}</p>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-stone-200 bg-white p-1 shadow-sm">
-            {PERIODS.map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                disabled={Boolean(liveSummary)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${
-                  period === p ? "bg-green-600 text-white shadow-sm" : "text-stone-600 hover:bg-stone-100"
-                } disabled:opacity-50`}
-              >
-                {periodText(s, p)}
-              </button>
-            ))}
           </div>
         </div>
-      </SectionReveal>
+      </AnimatedSection>
 
-      <SectionReveal delay={80}>
-        <div className="flex flex-wrap gap-2.5">
-          <button className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-700">
-            <Plus className="h-4 w-4" />
-            {s.newInvoice}
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-bold text-blue-700 transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50">
-            <CreditCard className="h-4 w-4" />
-            {s.processPayment}
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-bold text-stone-700 transition-all hover:-translate-y-0.5 hover:bg-stone-50">
-            <BarChart3 className="h-4 w-4" />
-            {s.viewReports}
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-bold text-stone-700 transition-all hover:-translate-y-0.5 hover:bg-stone-50">
-            <Download className="h-4 w-4" />
-            {s.exportCsv}
-          </button>
-        </div>
-      </SectionReveal>
+      {/* KPI Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <AnimatedSection delay={0.05}>
+          <AccountCard title="Total Assets" titleFa="کل دارایی‌ها" value={7_850_000_000} trend="up" trendValue="+12%" icon={Wallet} color="emerald" />
+        </AnimatedSection>
+        <AnimatedSection delay={0.1}>
+          <AccountCard title="Total Liabilities" titleFa="کل بدهی‌ها" value={3_080_000_000} trend="down" trendValue="-3%" icon={TrendingDown} color="red" />
+        </AnimatedSection>
+        <AnimatedSection delay={0.15}>
+          <AccountCard title="Revenue (YTD)" titleFa="درآمد (سال)" value={totalRevenue} trend="up" trendValue="+8%" icon={TrendingUp} color="blue" />
+        </AnimatedSection>
+        <AnimatedSection delay={0.2}>
+          <AccountCard title="Net Profit" titleFa="سود خالص" value={netProfit} trend="up" trendValue="+15%" icon={DollarSign} color="purple" />
+        </AnimatedSection>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((c, i) => (
-          <StatCard
-            key={c.label}
-            icon={c.icon}
-            label={c.label}
-            value={c.value}
-            color={c.color}
-            trend={c.trend}
-            goodWhenUp={c.goodWhenUp}
-            delay={i * 70}
+      {/* Chart */}
+      <AnimatedSection delay={0.15}>
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <h3 className="mb-4 font-bold text-stone-900 dark:text-stone-100">
+            {lang === "fa" ? "روند مالی (میلیون ریال)" : "Financial Trend (M IRR)"}
+          </h3>
+          <FinancialChart
+            data={CHART_DATA}
+            xKey="month"
+            type="area"
+            series={[
+              { key: "revenue", color: "#10b981", label: "Revenue", labelFa: "درآمد" },
+              { key: "expenses", color: "#f59e0b", label: "Expenses", labelFa: "هزینه" },
+              { key: "profit", color: "#3b82f6", label: "Profit", labelFa: "سود" },
+            ]}
+            height={280}
           />
+        </div>
+      </AnimatedSection>
+
+      {/* Quick Links Grid */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {QUICK_LINKS.map((link, i) => (
+          <AnimatedSection key={link.path} delay={0.1 + i * 0.08}>
+            <Link to={link.path}>
+              <motion.div
+                whileHover={{ y: -5, scale: 1.02 }}
+                className="group rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-lg dark:border-slate-700 dark:bg-slate-800"
+              >
+                <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", link.color)}>
+                  <span className="text-white">{link.icon}</span>
+                </div>
+                <h3 className="font-bold text-stone-900 dark:text-stone-100">
+                  {lang === "fa" ? link.labelFa : link.label}
+                </h3>
+                <p className="mt-1 text-xs text-stone-500">
+                  {lang === "fa" ? link.descriptionFa : link.description}
+                </p>
+                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-emerald-600 opacity-0 transition-opacity group-hover:opacity-100">
+                  {lang === "fa" ? "مشاهده" : "View"}
+                  <ChevronRight className="h-3 w-3" />
+                </div>
+              </motion.div>
+            </Link>
+          </AnimatedSection>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <SectionReveal delay={120} className="lg:col-span-2">
-          <div className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-stone-500" />
-              <h2 className="font-display text-xl text-stone-800">{s.cashflow}</h2>
-            </div>
-            <CashFlowChart data={cashflow} period={period} incomeLabel={s.income} expenseLabel={s.expense} />
+      {/* Recent Transactions */}
+      <AnimatedSection delay={0.2}>
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-bold text-stone-900 dark:text-stone-100">
+              {lang === "fa" ? "تراکنش‌های اخیر" : "Recent Transactions"}
+            </h3>
+            <Link to="ledger" className="text-sm font-medium text-emerald-600 hover:underline">
+              {lang === "fa" ? "مشاهده همه" : "View all"}
+            </Link>
           </div>
-        </SectionReveal>
-
-        <SectionReveal delay={180}>
-          <div className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center gap-2">
-              <Wallet className="h-4 w-4 text-stone-500" />
-              <h2 className="font-display text-xl text-stone-800">{s.accounts}</h2>
-            </div>
-            <div className="space-y-3">
-              {accounts.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-center justify-between rounded-xl border border-stone-200 p-3.5 transition-colors hover:border-green-300 hover:bg-green-50/40"
-                >
-                  <div>
-                    <p className="font-semibold text-stone-800">{accountText(s, a.key)}</p>
-                    <span
-                      className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                        a.status === "active" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
-                      }`}
-                    >
-                      {a.status === "active" ? s.accActive : s.accPending}
-                    </span>
-                  </div>
-                  <p className="text-lg font-black tabular-nums text-stone-800">
-                    ${a.balance.toLocaleString(lang === "fa" ? "fa-IR" : "en-US")}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </SectionReveal>
-      </div>
-
-      <SectionReveal delay={120}>
-        <div className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Receipt className="h-4 w-4 text-stone-500" />
-              <h2 className="font-display text-xl text-stone-800">{s.transactions}</h2>
-            </div>
-            <div className="flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 p-1">
-              {TYPE_FILTERS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setTypeFilter(f)}
-                  className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${
-                    typeFilter === f ? "bg-white text-stone-800 shadow-sm" : "text-stone-500 hover:text-stone-700"
-                  }`}
-                >
-                  {f === "all" ? s.filterAll : f === "income" ? s.income : s.expense}
-                </button>
-              ))}
-            </div>
-          </div>
-          <TransactionsTable transactions={filteredTx} emptyText={s.empty} />
+          <TransactionList transactions={RECENT_TX} limit={5} />
         </div>
-      </SectionReveal>
+      </AnimatedSection>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* AccountingPage — Router Wrapper                                       */
+/* ------------------------------------------------------------------ */
+export default function AccountingPage() {
+  return (
+    <Routes>
+      <Route index element={<AccountingDashboard />} />
+      <Route path="balance-sheet" element={<BalanceSheetPage />} />
+      <Route path="profit-loss" element={<ProfitLossPage />} />
+      <Route path="ledger" element={<LedgerPage />} />
+      <Route path="expense-categories" element={<ExpenseCategoriesPage />} />
+    </Routes>
   );
 }

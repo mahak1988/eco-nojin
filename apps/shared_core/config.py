@@ -1,4 +1,4 @@
-"""Central settings (Pydantic v2)."""
+﻿"""Central settings (Pydantic v2)."""
 
 from __future__ import annotations
 
@@ -43,10 +43,27 @@ class Settings(BaseSettings):
     def all_cors_origins(self) -> List[str]:
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
 
+    # -----------------------------------------------------------------------
+    # Database — PostgreSQL priority with SQLite fallback
+    # -----------------------------------------------------------------------
     DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./apps/econojin.db")
     DB_ECHO: bool = Field(default=False)
     FORCE_POSTGRES: bool = Field(default=False)
 
+    # PostgreSQL connection pool tuning
+    DB_POOL_SIZE: int = Field(default=20)
+    DB_MAX_OVERFLOW: int = Field(default=40)
+    DB_POOL_TIMEOUT: int = Field(default=30)
+    DB_POOL_RECYCLE: int = Field(default=3600)
+
+    @property
+    def is_postgres(self) -> bool:
+        """Check if configured DATABASE_URL uses PostgreSQL."""
+        return "postgres" in self.DATABASE_URL.lower()
+
+    # -----------------------------------------------------------------------
+    # Security
+    # -----------------------------------------------------------------------
     SECRET_KEY: str = Field(default="local-dev-only-change-me-use-secrets-token-urlsafe-48")
     JWT_SECRET_KEY: Optional[str] = Field(default=None)
     ALGORITHM: str = Field(default="HS256")
@@ -71,21 +88,34 @@ class Settings(BaseSettings):
     AUTH_RATE_LIMIT_MAX: int = Field(default=10)
     AUTH_RATE_LIMIT_WINDOW_SECONDS: int = Field(default=60)
 
+    # -----------------------------------------------------------------------
+    # Redis / Celery
+    # -----------------------------------------------------------------------
     REDIS_URL: str = Field(default="redis://localhost:6379/0")
     CELERY_BROKER_URL: Optional[str] = Field(default=None)
+    CELERY_RESULT_BACKEND: Optional[str] = Field(default=None)
 
+    # -----------------------------------------------------------------------
+    # Earth observation
+    # -----------------------------------------------------------------------
     GEE_SERVICE_ACCOUNT: Optional[str] = Field(default=None)
     GEE_CREDENTIALS_FILE: Optional[str] = Field(default=None)
     GEE_PROJECT_ID: Optional[str] = Field(default=None)
     COPERNICUS_USERNAME: Optional[str] = Field(default=None)
     COPERNICUS_PASSWORD: Optional[str] = Field(default=None)
 
+    # -----------------------------------------------------------------------
+    # Blockchain
+    # -----------------------------------------------------------------------
     BLOCKCHAIN_RPC_URL: str = Field(default="https://rpc-amoy.polygon.technology/")
     BLOCKCHAIN_CHAIN_ID: int = Field(default=80002)
     ECOCONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000001")
     ORACLE_CONTRACT_ADDRESS: str = Field(default="0x0000000000000000000000000000000000000002")
     BACKEND_WALLET_PRIVATE_KEY: Optional[str] = Field(default=None)
 
+    # -----------------------------------------------------------------------
+    # AI / LLM
+    # -----------------------------------------------------------------------
     LLM_PROVIDER: Literal["groq", "openai", "gemini", "openrouter", "ollama", "fake"] = Field(
         default="fake"
     )
@@ -93,14 +123,35 @@ class Settings(BaseSettings):
     LLM_MODEL: str = Field(default="llama3-8b-8192")
     OLLAMA_BASE_URL: str = Field(default="http://localhost:11434")
 
+    # -----------------------------------------------------------------------
+    # External APIs
+    # -----------------------------------------------------------------------
     OPEN_METEO_URL: str = Field(default="https://api.open-meteo.com/v1")
     FAO_API_KEY: Optional[str] = Field(default=None)
     OPENWEATHER_API_KEY: Optional[str] = Field(default=None)
     SENTRY_DSN: Optional[str] = Field(default=None)
 
+    # -----------------------------------------------------------------------
+    # Logging
+    # -----------------------------------------------------------------------
+    LOG_LEVEL: str = Field(default="INFO")
+    LOG_FORMAT: Literal["text", "json"] = Field(default="json")
+    LOG_FILE: Optional[str] = Field(default=None)
+
+    # -----------------------------------------------------------------------
+    # Derived properties
+    # -----------------------------------------------------------------------
     @property
     def jwt_secret(self) -> str:
         return self.JWT_SECRET_KEY or self.SECRET_KEY
+
+    @property
+    def celery_broker(self) -> str:
+        return self.CELERY_BROKER_URL or self.REDIS_URL
+
+    @property
+    def celery_backend(self) -> str:
+        return self.CELERY_RESULT_BACKEND or self.REDIS_URL
 
     def _is_weak_secret(self, value: str) -> bool:
         v = (value or "").strip().lower()
@@ -109,7 +160,7 @@ class Settings(BaseSettings):
         return any(m in v for m in _WEAK_SECRET_MARKERS)
 
     @model_validator(mode="after")
-    def validate_production_settings(self) -> Settings:
+    def validate_production_settings(self) -> "Settings":
         if self.ENVIRONMENT == "production":
             if self._is_weak_secret(self.SECRET_KEY):
                 raise ValueError(
@@ -119,18 +170,22 @@ class Settings(BaseSettings):
             if self.JWT_SECRET_KEY and self._is_weak_secret(self.JWT_SECRET_KEY):
                 raise ValueError("JWT_SECRET_KEY is too weak for production")
             if self.ALGORITHM.upper().startswith("HS"):
-                logger.warning("Production still on HS* — prefer RS256 with mounted keys")
+                logger.warning("Production still on HS* - prefer RS256 with mounted keys")
             if self.REQUIRE_AUTH_FOR_WRITES is False:
                 logger.warning("REQUIRE_AUTH_FOR_WRITES is False in production")
             if not self.ENABLE_RATE_LIMIT:
                 logger.warning("ENABLE_RATE_LIMIT is False in production")
             if not self.COOKIE_SECURE:
-                logger.warning("COOKIE_SECURE is False in production — set true behind HTTPS")
+                logger.warning("COOKIE_SECURE is False in production - set true behind HTTPS")
+            if not self.is_postgres:
+                logger.warning("Production database is not PostgreSQL - SQLite is NOT recommended")
             if self.BACKEND_WALLET_PRIVATE_KEY:
                 logger.info("BACKEND_WALLET_PRIVATE_KEY is set (ensure it comes from a secret store)")
         elif self.ENVIRONMENT == "staging":
             if self._is_weak_secret(self.SECRET_KEY):
-                logger.warning("Staging uses a weak SECRET_KEY placeholder — rotate before shared demos")
+                logger.warning("Staging uses a weak SECRET_KEY placeholder - rotate before shared demos")
+            if not self.is_postgres:
+                logger.warning("Staging database is not PostgreSQL - SQLite is NOT recommended")
         return self
 
 

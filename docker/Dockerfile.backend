@@ -1,0 +1,46 @@
+﻿# =============================================================================
+# Multi-stage production Dockerfile for Econojin Backend
+# PostgreSQL + PostGIS + Redis + Celery ready
+# =============================================================================
+
+# Stage 1: Builder
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends     gcc g++ libpq-dev libffi-dev libssl-dev cargo pkg-config     && apt-get clean && apt-get autoremove -y
+
+COPY pyproject.toml .
+COPY requirements.txt .
+
+RUN pip install --upgrade pip setuptools wheel &&     pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.12-slim AS runtime
+
+WORKDIR /app
+
+LABEL maintainer="Econojin DevOps <devops@econojin.com>"       description="Econojin Platform Backend"       version="2.0.0"
+
+RUN apt-get update && apt-get install -y --no-install-recommends     libpq5 curl ca-certificates tini     && apt-get clean && apt-get autoremove -y
+
+COPY --from=builder /wheels /wheels
+COPY apps/ ./apps/
+COPY alembic/ ./alembic/
+COPY alembic.ini .
+COPY pyproject.toml .
+COPY requirements.txt .
+
+RUN pip install --no-cache --no-index --find-links=/wheels -r requirements.txt &&     pip install --no-cache         psycopg2-binary         asyncpg         passlib[argon2]         python-jose[cryptography]         celery[redis]         prometheus-fastapi-instrumentator         structlog
+
+RUN groupadd --gid 1000 app &&     useradd --uid 1000 --gid 1000 --create-home --shell /bin/bash app &&     mkdir -p /app/logs /app/data /app/backups &&     chown -R app:app /app
+
+USER app
+
+ENV PYTHONUNBUFFERED=1     PYTHONPATH=/app     PYTHONDONTWRITEBYTECODE=1     ENVIRONMENT=production     LOG_FORMAT=json     LOG_LEVEL=INFO
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3     CMD curl -f http://localhost:8000/health || exit 1
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["uvicorn", "apps.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+EXPOSE 8000
