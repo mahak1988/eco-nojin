@@ -1,47 +1,69 @@
 /**
  * Single source of truth for Hydroma Nojin × Eco Nojin messaging.
+ * All display strings MUST go through hx(field, lang) — never render objects.
  */
 
+export type UiLang = "fa" | "en" | "ar";
+
+export type I18nText = { fa: string; en: string; ar: string };
+
+/** Resolve multilingual field to a plain string (safe for React children). */
+export function hx(field: I18nText | string | null | undefined, lang: string = "fa"): string {
+  if (field == null) return "";
+  if (typeof field === "string") return field;
+  if (typeof field === "object") {
+    if (lang === "en") return field.en || field.fa || "";
+    if (lang === "ar") return field.ar || field.fa || "";
+    return field.fa || field.en || "";
+  }
+  return String(field);
+}
+
 export const HYDROMA = {
-  brand: { fa: "هیدروما نوژین", en: "Hydroma Nojin", ar: "هيدرومـا نوجين" },
-  eco: { fa: "اکو نوژین", en: "Eco Nojin", ar: "إكو نوجين" },
+  brand: { fa: "هیدروما نوژین", en: "Hydroma Nojin", ar: "هيدرومـا نوجين" } as I18nText,
+  eco: { fa: "اکو نوژین", en: "Eco Nojin", ar: "إكو نوجين" } as I18nText,
   company: {
     fa: "کشت و صنعت دشت امید نارون",
     en: "Dasht Omid Naroon Agri-Industry",
     ar: "زراعة وصناعة دشت أميد نارون",
-  },
+  } as I18nText,
   tagline: {
     fa: "مدیریت هوشمند منظر برای احیای آب، خاک و معیشت در ایران و منطقه منا / مناپ",
     en: "Smart landscape management for restoring water, soil and livelihoods across Iran & MENAP",
     ar: "إدارة المشهد الذكية لاستعادة المياه والتربة وسبل العيش في إيران ومنطقة مينا/ميناب",
-  },
+  } as I18nText,
   mission: {
     fa: "ارائه راه‌حل‌های دانش‌بنیان، کم‌هزینه و بومی برای بازسازی همزمان منابع آب، خاک و معیشت در مناطق خشک",
     en: "Knowledge-based, low-cost, local solutions to restore water, soil and livelihoods in drylands",
     ar: "حلول معرفية منخفضة التكلفة ومحلية لإعادة تأهيل المياه والتربة وسبل العيش في المناطق الجافة",
-  },
+  } as I18nText,
   slogan: {
     fa: "بازآفرینی منظر · بازسازی معیشت · بازگشت به تعادل",
     en: "Restore landscape · Rebuild livelihoods · Return to balance",
     ar: "إعادة المشهد · إعادة سبل العيش · العودة إلى التوازن",
-  },
+  } as I18nText,
   investmentSpark: {
     fa: "سرمایه‌گذاری ۵۰۰ میلیون دلار: جرقه تحول ملی در احیای آب، خاک و امنیت غذایی",
     en: "$500M investment spark for national water, soil and food-security transformation",
     ar: "استثمار 500 مليون دولار: شرارة تحول وطني في المياه والتربة والأمن الغذائي",
+  } as I18nText,
+  /** @deprecated use hx(HYDROMA.tagline, lang) */
+  get taglineFa() {
+    return this.tagline.fa;
+  },
+  /** @deprecated */
+  get sloganFa() {
+    return this.slogan.fa;
+  },
+  /** @deprecated */
+  get missionFa() {
+    return this.mission.fa;
+  },
+  /** @deprecated */
+  get taglineEn() {
+    return this.tagline.en;
   },
 } as const;
-
-export type UiLang = "fa" | "en" | "ar";
-
-export function hx(
-  field: { fa: string; en: string; ar: string },
-  lang: string,
-): string {
-  if (lang === "en") return field.en;
-  if (lang === "ar") return field.ar;
-  return field.fa;
-}
 
 export const FOUR_PILLARS = [
   {
@@ -102,7 +124,14 @@ export type ClimatePilot = {
   focusEn: string;
   lat: number;
   lon: number;
-  climate: "dry_mountain" | "semi_arid_saline" | "humid_forest" | "snow_highland" | "hyper_arid" | "coastal_oasis" | "delta_irrigated";
+  climate:
+    | "dry_mountain"
+    | "semi_arid_saline"
+    | "humid_forest"
+    | "snow_highland"
+    | "hyper_arid"
+    | "coastal_oasis"
+    | "delta_irrigated";
   image: string;
 };
 
@@ -325,14 +354,7 @@ export const PILOTS: ClimatePilot[] = [
   },
 ];
 
-export const SCIENCE_CHAIN = [
-  "SWAT+",
-  "RUSLE",
-  "RothC",
-  "AquaCrop",
-  "WEAP",
-  "HEC-RAS",
-] as const;
+export const SCIENCE_CHAIN = ["SWAT+", "RUSLE", "RothC", "AquaCrop", "WEAP", "HEC-RAS"] as const;
 
 export const ECO_MODULES = [
   { slug: "mrv", titleFa: "MRV سه‌سطحی", titleEn: "3-tier MRV", titleAr: "MRV ثلاثي", path: "/mrv" },
@@ -394,16 +416,3 @@ export const MODULE_IMAGES = [
   "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
   "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80",
 ] as const;
-
-/** Backward-compat aliases used by older pages */
-export const HYDROMA_LEGACY = {
-  brand: HYDROMA.brand.fa,
-  brandEn: HYDROMA.brand.en,
-  eco: HYDROMA.eco.fa,
-  ecoEn: HYDROMA.eco.en,
-  company: HYDROMA.company.fa,
-  taglineFa: HYDROMA.tagline.fa,
-  taglineEn: HYDROMA.tagline.en,
-  sloganFa: HYDROMA.slogan.fa,
-  missionFa: HYDROMA.mission.fa,
-};
