@@ -36,11 +36,13 @@ CONFIG = {
         r"(?i)(cmd\.exe|/bin/sh|/bin/bash|powershell)",
     ],
     "security_headers": {
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'self'",
         "X-Frame-Options": "SAMEORIGIN",
         "X-Content-Type-Options": "nosniff",
         "X-XSS-Protection": "1; mode=block",
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "Cache-Control": "no-store, no-cache, must-revalidate",
+        "X-DNS-Prefetch-Control": "off",
     },
 }
 

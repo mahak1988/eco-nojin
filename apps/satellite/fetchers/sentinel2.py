@@ -1,4 +1,4 @@
-"""Sentinel-2 index fetcher — STAC (MPC) when available, else physics-based synthetic."""
+﻿"""Sentinel-2 index fetcher â€” STAC (MPC) when available, else physics-based synthetic."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ class IndexSample:
 
 
 def _seed(lat: float, lon: float) -> float:
-    h = hashlib.md5(f"{lat:.4f}:{lon:.4f}".encode()).hexdigest()
+    h = hashlib.sha256(f"{lat:.4f}:{lon:.4f}".encode()).hexdigest()
     return int(h[:8], 16) / 0xFFFFFFFF
 
 

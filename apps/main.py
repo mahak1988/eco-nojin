@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Econojin API entrypoint."""
 
@@ -133,7 +133,7 @@ for extra in (
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_cors_origins,
+    allow_origins=_cors_origins if settings.ENVIRONMENT != 'production' else [o for o in _cors_origins if 'localhost' not in o and '127.0.0.1' not in o and not o.endswith('.local')],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=[
@@ -147,6 +147,14 @@ app.add_middleware(
     expose_headers=["X-Total-Count", "X-Page-Count", "X-Request-ID", "X-Process-Time"],
     max_age=600,
 )
+# Rate limit middleware (auth endpoints)
+try:
+    from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
+    app.add_middleware(RateLimitMiddleware)
+    logger.debug('RateLimitMiddleware enabled')
+except Exception as e:
+    logger.debug('RateLimitMiddleware skipped: %s', e)
+
 
 
 @app.middleware("http")
@@ -416,7 +424,7 @@ async def debug_routers() -> dict[str, Any]:
 if __name__ == "__main__":
     import uvicorn
 
-    host = os.getenv("HOST", "0.0.0.0")
+    host = os.getenv("HOST", "127.0.0.1")
     port = int(os.getenv("PORT", "8000"))
     reload = settings.ENVIRONMENT == "local"
     uvicorn.run("apps.main:app", host=host, port=port, reload=reload, log_level="info", access_log=True)

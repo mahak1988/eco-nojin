@@ -60,6 +60,7 @@ SECURITY_CONFIG = {
     
     # Security headers
     "security_headers": {
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'self'",
         "X-Frame-Options": "SAMEORIGIN",
         "X-Content-Type-Options": "nosniff",
         "X-XSS-Protection": "1; mode=block",
@@ -67,7 +68,8 @@ SECURITY_CONFIG = {
         "Cache-Control": "no-store, no-cache, must-revalidate",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
-        "X-Permitted-Cross-Domain-Policies": "none"
+        "X-Permitted-Cross-Domain-Policies": "none",
+        "X-DNS-Prefetch-Control": "off"
     },
     
     # Authentication and authorization
