@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Settings, Activity, FileText, Shield,
   BookOpen, Receipt, CreditCard, Menu, Tractor, CloudSun, TrendingUp, AlertTriangle,
+  Satellite, FlaskConical,
 } from 'lucide-react'
 import { Button } from '@econojin/ui/button'
 import { useState } from 'react'
@@ -24,6 +25,9 @@ const navItems = [
     { to: '/weather', label: 'آب‌وهوا', icon: CloudSun },
     { to: '/economics', label: 'اقتصاد سبز', icon: TrendingUp },
     { to: '/risks', label: 'پیش‌بینی ریسک', icon: AlertTriangle },
+    { to: '/satellite', label: 'داده ماهواره‌ای', icon: Satellite },
+    { to: '/simulation', label: 'مدل‌های شبیه‌سازی', icon: FlaskConical },
+    { to: '/security', label: 'SpiderGuard', icon: Shield },
   ]},
 ]
 

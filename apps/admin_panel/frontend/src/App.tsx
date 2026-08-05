@@ -16,6 +16,9 @@ import FarmsPage from './pages/FarmsPage'
 import WeatherPage from './pages/WeatherPage'
 import EconomicsPage from './pages/EconomicsPage'
 import RisksPage from './pages/RisksPage'
+import SatellitePage from './pages/SatellitePage'
+import SimulationPage from './pages/SimulationPage'
+import SecurityPage from './pages/SecurityPage'
 
 export default function App() {
   return (
@@ -37,6 +40,9 @@ export default function App() {
           <Route path="weather" element={<WeatherPage />} />
           <Route path="economics" element={<EconomicsPage />} />
           <Route path="risks" element={<RisksPage />} />
+          <Route path="satellite" element={<SatellitePage />} />
+          <Route path="simulation" element={<SimulationPage />} />
+          <Route path="security" element={<SecurityPage />} />
           <Route path="*" element={<div className="p-8 text-center">404 Not Found</div>} />
         </Route>
       </Routes>
