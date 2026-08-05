@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Settings, Activity, FileText, Shield,
-  BookOpen, Receipt, CreditCard, Menu,
+  BookOpen, Receipt, CreditCard, Menu, Tractor, CloudSun, TrendingUp, AlertTriangle,
 } from 'lucide-react'
 import { Button } from '@econojin/ui/button'
 import { useState } from 'react'
@@ -18,6 +18,12 @@ const navItems = [
     { to: '/accounting/journal-entries', label: 'مطالب مجله', icon: BookOpen },
     { to: '/accounting/invoices', label: 'صورتحساب‌ها', icon: FileText },
     { to: '/accounting/payments', label: 'پرداخت‌ها', icon: CreditCard },
+  ]},
+  { label: 'کشاورزی هوشمند', icon: Tractor, children: [
+    { to: '/farms', label: 'مزارع', icon: Tractor },
+    { to: '/weather', label: 'آب‌وهوا', icon: CloudSun },
+    { to: '/economics', label: 'اقتصاد سبز', icon: TrendingUp },
+    { to: '/risks', label: 'پیش‌بینی ریسک', icon: AlertTriangle },
   ]},
 ]
 

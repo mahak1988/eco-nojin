@@ -11,25 +11,35 @@ import AccountsPage from './pages/accounting/AccountsPage'
 import JournalEntriesPage from './pages/accounting/JournalEntriesPage'
 import InvoicesPage from './pages/accounting/InvoicesPage'
 import PaymentsPage from './pages/accounting/PaymentsPage'
+// Econojin smart-agriculture pages
+import FarmsPage from './pages/FarmsPage'
+import WeatherPage from './pages/WeatherPage'
+import EconomicsPage from './pages/EconomicsPage'
+import RisksPage from './pages/RisksPage'
 
 export default function App() {
   return (
     <ThemeProvider>
       <Routes>
         <Route path="/" element={<Layout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="users" element={<Users />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="audit-logs" element={<AuditLogsPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="monitoring" element={<MonitoringPage />} />
-        <Route path="accounting/accounts" element={<AccountsPage />} />
-        <Route path="accounting/journal-entries" element={<JournalEntriesPage />} />
-        <Route path="accounting/invoices" element={<InvoicesPage />} />
-        <Route path="accounting/payments" element={<PaymentsPage />} />
-        <Route path="*" element={<div className="p-8 text-center">404 Not Found</div>} />
-      </Route>
-    </Routes>
+          <Route index element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="audit-logs" element={<AuditLogsPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="monitoring" element={<MonitoringPage />} />
+          <Route path="accounting/accounts" element={<AccountsPage />} />
+          <Route path="accounting/journal-entries" element={<JournalEntriesPage />} />
+          <Route path="accounting/invoices" element={<InvoicesPage />} />
+          <Route path="accounting/payments" element={<PaymentsPage />} />
+          {/* Smart agriculture routes */}
+          <Route path="farms" element={<FarmsPage />} />
+          <Route path="weather" element={<WeatherPage />} />
+          <Route path="economics" element={<EconomicsPage />} />
+          <Route path="risks" element={<RisksPage />} />
+          <Route path="*" element={<div className="p-8 text-center">404 Not Found</div>} />
+        </Route>
+      </Routes>
     </ThemeProvider>
   )
 }
