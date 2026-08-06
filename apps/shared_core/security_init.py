@@ -6,9 +6,12 @@ integrating features from both main apps and eco-nojin project
 
 from .security_config import get_security_config, is_production
 from .middleware.security_middleware import SecurityMiddleware
+from .middleware.rate_limit import RateLimitMiddleware
+from .middleware.audit_log import AuditLogMiddleware
 from .security_extended import security_integrator, apply_security_best_practices
 from .zero_trust_security import security_manager, ZeroTrustConfig
 from apps.spider_security.middleware import SpiderGuardMiddleware
+from apps.shared_core.config import settings
 from fastapi import FastAPI, Request
 import logging
 
@@ -31,19 +34,35 @@ def initialize_security(app: FastAPI) -> list:
     # Get security configuration
     config = get_security_config()
     
+    # Auth-focused rate limiting (failed login / register / refresh)
+    if settings.ENABLE_RATE_LIMIT:
+        app.add_middleware(RateLimitMiddleware)
+        security_stack.append("RateLimitMiddleware")
+        logger.info("RateLimitMiddleware enabled (AUTH_RATE_LIMIT_MAX=%s)", settings.AUTH_RATE_LIMIT_MAX)
+    
+    # Audit logging for security-relevant requests
+    if settings.ENABLE_AUDIT_LOG:
+        app.add_middleware(AuditLogMiddleware)
+        security_stack.append("AuditLogMiddleware")
+        logger.info("AuditLogMiddleware enabled")
+    
     # Add security middleware from main security module
     app.add_middleware(SecurityMiddleware)
     security_stack.append("SecurityMiddleware")
     logger.info("SecurityMiddleware enabled")
     
-    # Add SpiderGuard middleware for bot detection
-    app.add_middleware(
-        SpiderGuardMiddleware,
-        max_requests=config["rate_limiting"]["default_requests_per_minute"],
-        window_seconds=config["rate_limiting"]["burst_window_seconds"],
-    )
-    security_stack.append("SpiderGuardMiddleware")
-    logger.info("SpiderGuardMiddleware enabled")
+    # SpiderGuard: bot / aggressive-client detection (on in production or when toggled)
+    enable_spider = settings.ENABLE_SPIDERGUARD or settings.ENVIRONMENT == "production"
+    if enable_spider:
+        app.add_middleware(
+            SpiderGuardMiddleware,
+            max_requests=getattr(settings, "SPIDERGUARD_MAX_REQUESTS", config["rate_limiting"]["default_requests_per_minute"]),
+            window_seconds=getattr(settings, "SPIDERGUARD_WINDOW_SECONDS", config["rate_limiting"]["burst_window_seconds"]),
+        )
+        security_stack.append("SpiderGuardMiddleware")
+        logger.info("SpiderGuardMiddleware enabled")
+    else:
+        logger.info("SpiderGuardMiddleware skipped (ENABLE_SPIDERGUARD=false, non-production)")
     
     # Apply extended security features
     best_practices = apply_security_best_practices()
