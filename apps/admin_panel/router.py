@@ -11,6 +11,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.admin_panel import derived_analytics as da
+from apps.admin_panel.content_version_service import ContentVersionService
+from apps.admin_panel.recommendation_engine import build_ml_recommendations
 from apps.admin_panel.schemas import (
     AdminDashboardResponse,
     AdminSettingResponse,
@@ -65,11 +67,6 @@ async def get_admin_service(
 AdminServiceDependency = Annotated[AdminService, Depends(get_admin_service)]
 
 
-# ==========================================
-# Dashboard
-# ==========================================
-
-
 @router.get("/", response_model=AdminDashboardResponse)
 @require_permission("dashboard.view")
 async def admin_dashboard(
@@ -79,20 +76,9 @@ async def admin_dashboard(
     return await admin_service.get_dashboard_summary()
 
 
-# ==========================================
-# Permissions (Phase 4 — FE RBAC)
-# ==========================================
-
-
 @router.get("/me/permissions")
 async def my_permissions(current_user: CurrentSuperuser):
-    """Return role + permission list for admin frontend menu filtering."""
     return da.user_permissions_payload(current_user)
-
-
-# ==========================================
-# System Settings
-# ==========================================
 
 
 @router.get("/settings", response_model=list[AdminSettingResponse])
@@ -115,29 +101,12 @@ async def upsert_system_setting(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
-    if not any(
-        [
-            payload.value is not None,
-            payload.description is not None,
-            payload.is_active is not None,
-        ]
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least one of value, description, is_active required",
-        )
+    if not any([payload.value is not None, payload.description is not None, payload.is_active is not None]):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one field required")
     setting = await admin_service.upsert_system_setting(
-        key=key,
-        value=payload.value,
-        description=payload.description,
-        is_active=payload.is_active,
+        key=key, value=payload.value, description=payload.description, is_active=payload.is_active
     )
     return AdminSettingResponse.model_validate(setting)
-
-
-# ==========================================
-# Advanced Settings (Phase 4 — democked)
-# ==========================================
 
 
 @router.get("/advanced-settings", response_model=list[AdvancedSettingResponse])
@@ -171,11 +140,6 @@ async def upsert_advanced_setting(
     return AdvancedSettingResponse.model_validate(item)
 
 
-# ==========================================
-# Content Management
-# ==========================================
-
-
 @router.get("/content/types", response_model=list[ContentTypeResponse])
 @require_permission("content.types.read")
 async def list_content_types(
@@ -198,32 +162,36 @@ async def list_content_items(
     offset: int = 0,
 ):
     content_items = await admin_service.get_content_items_by_type(
-        content_type=content_type,
-        search=search,
-        status=status_filter,
-        limit=limit,
-        offset=offset,
+        content_type=content_type, search=search, status=status_filter, limit=limit, offset=offset
     )
     return [ContentItemResponse.model_validate(ci) for ci in content_items]
 
 
-@router.post(
-    "/content/{content_type}",
-    response_model=ContentItemResponse,
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post("/content/{content_type}", response_model=ContentItemResponse, status_code=status.HTTP_201_CREATED)
 @require_permission("content.items.create")
 async def create_content_item(
     content_type: str,
     payload: ContentCreateRequest,
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
+    session: Annotated["AsyncSession", DBSessionDependency],
 ):
     content_item = await admin_service.create_content_item(
-        content_type=content_type,
-        data=payload.data,
-        author_id=current_user.id,
+        content_type=content_type, data=payload.data if hasattr(payload, "data") else payload.model_dump(), author_id=current_user.id
     )
+    # Phase 5: persist initial version
+    try:
+        cvs = ContentVersionService(session)
+        data = payload.model_dump() if hasattr(payload, "model_dump") else {}
+        await cvs.create_version(
+            content_type=content_type,
+            content_id=getattr(content_item, "id", 0),
+            content_data=data,
+            created_by=current_user.id,
+            status=getattr(payload, "status", "draft") or "draft",
+        )
+    except Exception as e:
+        logger.warning("content version create failed: %s", e)
     await admin_service.sync_content_to_modules(content_item, content_type, "create")
     return ContentItemResponse.model_validate(content_item)
 
@@ -236,14 +204,9 @@ async def get_content_item(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
-    content_item = await admin_service.get_content_item_by_id(
-        content_type=content_type, item_id=item_id
-    )
+    content_item = await admin_service.get_content_item_by_id(content_type=content_type, item_id=item_id)
     if not content_item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Content item not found: {content_type}/{item_id}",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content item not found")
     return ContentItemResponse.model_validate(content_item)
 
 
@@ -255,25 +218,32 @@ async def update_content_item(
     payload: ContentUpdateRequest,
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
+    session: Annotated["AsyncSession", DBSessionDependency],
 ):
     content_item = await admin_service.update_content_item(
         content_type=content_type,
         item_id=item_id,
-        data=payload.data,
+        data=payload.model_dump(exclude_unset=True),
         updated_by_id=current_user.id,
     )
     if not content_item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Content item not found: {content_type}/{item_id}",
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content item not found")
+    try:
+        cvs = ContentVersionService(session)
+        await cvs.create_version(
+            content_type=content_type,
+            content_id=item_id,
+            content_data=payload.model_dump(exclude_unset=True),
+            created_by=current_user.id,
+            status=getattr(payload, "status", None) or "draft",
         )
+    except Exception as e:
+        logger.warning("content version update failed: %s", e)
     await admin_service.sync_content_to_modules(content_item, content_type, "update")
     return ContentItemResponse.model_validate(content_item)
 
 
-@router.delete(
-    "/content/{content_type}/{item_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/content/{content_type}/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission("content.items.delete")
 async def delete_content_item(
     content_type: str,
@@ -281,63 +251,51 @@ async def delete_content_item(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
-    success = await admin_service.delete_content_item(
-        content_type=content_type, item_id=item_id
-    )
+    success = await admin_service.delete_content_item(content_type=content_type, item_id=item_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Content item not found: {content_type}/{item_id}",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content item not found")
     await admin_service.sync_content_to_modules(None, content_type, "delete", item_id)
 
 
-@router.get(
-    "/content/{content_type}/{item_id}/versions",
-    response_model=list[ContentVersionResponse],
-)
+@router.get("/content/{content_type}/{item_id}/versions", response_model=list[ContentVersionResponse])
 @require_permission("content.versions.read")
 async def get_content_versions(
     content_type: str,
     item_id: int,
     current_user: CurrentSuperuser,
-    admin_service: AdminServiceDependency,
+    session: Annotated["AsyncSession", DBSessionDependency],
 ):
-    item = None
-    try:
-        item = await admin_service.get_content_item_by_id(
-            content_type=content_type, item_id=item_id
-        )
-    except Exception:
-        item = None
-    versions = da.content_versions_from_item(item_id, current_user.id, item)
-    return [ContentVersionResponse.model_validate(v) for v in versions]
+    """Phase 5 — load versions from DB (content_versions table)."""
+    cvs = ContentVersionService(session)
+    rows = await cvs.list_versions(content_type, item_id)
+    if not rows:
+        # fallback derived snapshot
+        from apps.admin_panel import derived_analytics as _da
+
+        versions = _da.content_versions_from_item(item_id, current_user.id, None)
+        return [ContentVersionResponse.model_validate(v) for v in versions]
+    return [ContentVersionResponse.model_validate(ContentVersionService.to_response_dict(r)) for r in rows]
 
 
-@router.post(
-    "/content/{content_type}/{item_id}/approve",
-    response_model=ContentApprovalResponse,
-)
+@router.post("/content/{content_type}/{item_id}/approve", response_model=ContentApprovalResponse)
 @require_permission("content.approval.manage")
 async def approve_content(
     content_type: str,
     item_id: int,
     current_user: CurrentSuperuser,
-    admin_service: AdminServiceDependency,
+    session: Annotated["AsyncSession", DBSessionDependency],
 ):
-    approval_data = {
-        "content_id": item_id,
-        "approved_by": current_user.id,
-        "approved_at": datetime.utcnow(),
-        "status": "approved",
-        "notes": "محتوا تأیید شد",
-    }
-    return ContentApprovalResponse.model_validate(approval_data)
-
-
-# ==========================================
-# Intelligent Features (Phase 4)
-# ==========================================
+    cvs = ContentVersionService(session)
+    row = await cvs.approve(content_type, item_id, current_user.id)
+    return ContentApprovalResponse.model_validate(
+        {
+            "content_id": item_id,
+            "approved_by": current_user.id,
+            "approved_at": getattr(row, "approved_at", datetime.utcnow()) or datetime.utcnow(),
+            "status": "approved",
+            "notes": "محتوا تأیید شد",
+        }
+    )
 
 
 @router.get("/smart-recommendations", response_model=list[SmartRecommendationResponse])
@@ -346,6 +304,26 @@ async def get_smart_recommendations(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
+    """Phase 5 — prefer ML-scored recommendations; fallback to service."""
+    try:
+        ml_recs = await build_ml_recommendations(admin_service)
+        # Adapt to SmartRecommendationResponse (needs action field)
+        adapted = []
+        for r in ml_recs:
+            adapted.append(
+                {
+                    "id": str(r.get("id", "")),
+                    "title": r.get("title", ""),
+                    "description": r.get("description", ""),
+                    "category": r.get("category", "general"),
+                    "priority": r.get("priority", "medium"),
+                    "action": r.get("action") or r.get("suggested_action", "review"),
+                }
+            )
+        if adapted:
+            return [SmartRecommendationResponse.model_validate(a) for a in adapted]
+    except Exception as e:
+        logger.warning("ML recommendations failed: %s", e)
     recommendations = await admin_service.get_smart_recommendations(current_user.id)
     return [SmartRecommendationResponse.model_validate(rec) for rec in recommendations]
 
@@ -370,10 +348,7 @@ async def get_advanced_analytics(
     return AdvancedAnalyticsResponse.model_validate(analytics)
 
 
-@router.get(
-    "/content-suggestions/{content_type}",
-    response_model=list[ContentSuggestionResponse],
-)
+@router.get("/content-suggestions/{content_type}", response_model=list[ContentSuggestionResponse])
 @require_permission("content.suggestions.view")
 async def get_ai_content_suggestions(
     content_type: str,
@@ -410,6 +385,12 @@ async def get_auto_recommendations(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
+    try:
+        ml_recs = await build_ml_recommendations(admin_service)
+        if ml_recs:
+            return [AutoRecommendationResponse.model_validate(r) for r in ml_recs]
+    except Exception as e:
+        logger.warning("auto ML recs failed: %s", e)
     recs = await da.auto_recommendations_payload(admin_service, current_user.id)
     return [AutoRecommendationResponse.model_validate(rec) for rec in recs]
 
@@ -422,11 +403,6 @@ async def get_advanced_alerts(
 ):
     alerts = await da.advanced_alerts_payload(admin_service)
     return [AdvancedAlertResponse.model_validate(alert) for alert in alerts]
-
-
-# ==========================================
-# Audit Logs
-# ==========================================
 
 
 @router.get("/audit-logs", response_model=list[AuditLogResponse])
@@ -452,11 +428,6 @@ async def list_audit_logs(
     return [AuditLogResponse.model_validate(log) for log in logs]
 
 
-# ==========================================
-# System Reports
-# ==========================================
-
-
 @router.get("/reports", response_model=list[SystemReportResponse])
 @require_permission("reports.read")
 async def list_system_reports(
@@ -469,11 +440,7 @@ async def list_system_reports(
     return [SystemReportResponse.model_validate(r) for r in reports]
 
 
-@router.post(
-    "/reports",
-    response_model=ReportGenerateResponse,
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post("/reports", response_model=ReportGenerateResponse, status_code=status.HTTP_201_CREATED)
 @require_permission("reports.generate")
 async def generate_report(
     payload: ReportGenerateRequest,
@@ -481,8 +448,7 @@ async def generate_report(
     admin_service: AdminServiceDependency,
 ):
     report = await admin_service.create_system_report(
-        report_name=payload.report_name,
-        report_type=payload.report_type,
+        report_name=payload.report_name, report_type=payload.report_type
     )
     return ReportGenerateResponse(
         id=report.id,
@@ -490,11 +456,6 @@ async def generate_report(
         status=report.status,
         message=f"Report '{report.report_name}' generated successfully.",
     )
-
-
-# ==========================================
-# User Management
-# ==========================================
 
 
 @router.get("/users", response_model=list[AdminUserResponse])
@@ -510,12 +471,7 @@ async def list_admin_users(
     offset: int = 0,
 ):
     users = await admin_service.list_users(
-        search=search,
-        role=role,
-        is_active=is_active,
-        is_superuser=is_superuser,
-        limit=limit,
-        offset=offset,
+        search=search, role=role, is_active=is_active, is_superuser=is_superuser, limit=limit, offset=offset
     )
     return [AdminUserResponse.model_validate(u) for u in users]
 
@@ -542,10 +498,7 @@ async def update_user_status(
     admin_service: AdminServiceDependency,
 ):
     if current_user.id == user_id and not payload.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot deactivate yourself",
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot deactivate yourself")
     user = await admin_service.update_user_status(user_id, payload.is_active)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -574,18 +527,10 @@ async def delete_user(
     admin_service: AdminServiceDependency,
 ):
     if current_user.id == user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete yourself",
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete yourself")
     success = await admin_service.delete_user(user_id)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-
-# ==========================================
-# System Health
-# ==========================================
 
 
 @router.get("/health", response_model=SystemHealthResponse)
