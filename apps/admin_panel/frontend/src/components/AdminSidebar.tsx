@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Settings, Activity, FileText, Shield,
   BookOpen, Receipt, CreditCard, Menu, Tractor, CloudSun, TrendingUp, AlertTriangle,
-  Satellite, FlaskConical,
+  Satellite, FlaskConical, Brain,
 } from 'lucide-react'
 import { Button } from '@econojin/ui/button'
 import { useMemo, useState } from 'react'
@@ -20,6 +20,7 @@ const ALL_NAV: NavItem[] = [
   { to: '/audit-logs', label: 'لاگ‌های حسابرسی', icon: Activity, roles: ['admin', 'superuser'] },
   { to: '/reports', label: 'گزارش‌ها', icon: FileText },
   { to: '/monitoring', label: 'نظارت', icon: Shield, roles: ['admin', 'superuser'] },
+  { to: '/insights', label: 'بینش هوشمند', icon: Brain, roles: ['admin', 'superuser'] },
   {
     label: 'حسابداری',
     icon: BookOpen,
