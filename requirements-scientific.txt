@@ -3,7 +3,7 @@
 
 earthengine-api>=0.1.384
 # STAC clients (Planetary Computer path)
-pystac-client>=0.8.0
+pystac-client>=0.9.0
 planetary-computer>=1.0.0
 # Geo helpers
 shapely>=2.1.2
