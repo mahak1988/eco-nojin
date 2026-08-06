@@ -6,6 +6,7 @@ import AuthGuard from './components/AuthGuard'
 import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
+import ForbiddenPage from './pages/ForbiddenPage'
 import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
 import Settings from './pages/Settings'
@@ -45,6 +46,7 @@ export default function App() {
               <Route path="audit-logs" element={<AuditLogsPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="monitoring" element={<MonitoringPage />} />
+              <Route path="forbidden" element={<ForbiddenPage />} />
               <Route path="accounting/accounts" element={<AccountsPage />} />
               <Route path="accounting/journal-entries" element={<JournalEntriesPage />} />
               <Route path="accounting/invoices" element={<InvoicesPage />} />
