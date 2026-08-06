@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,67 @@ async def fetch_era5_land(
     except Exception as e:
         logger.warning("ERA5 fetch failed: %s", e)
         return synthetic_climate(lat, lon, start, end, reason=str(e)[:80])
+
+
+async def fetch_forecast_openmeteo(
+    lat: float,
+    lon: float,
+    days: int,
+) -> dict[str, Any]:
+    """
+    Open-Meteo forecast API (free, no API key required).
+    Docs: https://open-meteo.com/en/docs
+    Provides 7-14 day temperature, precipitation, humidity, wind forecasts.
+    """
+    try:
+        import httpx
+
+        url = "https://api.open-meteo.com/v1/forecast"
+        params = {
+            "latitude": lat,
+            "longitude": lon,
+            "daily": ",".join(
+                [
+                    "temperature_2m_max",
+                    "temperature_2m_min",
+                    "precipitation_sum",
+                    "relative_humidity_2m_mean",
+                    "windspeed_10m_max",
+                ]
+            ),
+            "timezone": "UTC",
+            "forecast_days": min(days, 14),
+        }
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.get(url, params=params)
+            r.raise_for_status()
+            data = r.json()
+        daily = data.get("daily") or {}
+        times = daily.get("time") or []
+        daily_series = []
+        for i, t in enumerate(times):
+            daily_series.append(
+                {
+                    "date": t,
+                    "temp_max_c": _at(daily, "temperature_2m_max", i),
+                    "temp_min_c": _at(daily, "temperature_2m_min", i),
+                    "precip_mm": _at(daily, "precipitation_sum", i),
+                    "humidity_pct": _at(daily, "relative_humidity_2m_mean", i),
+                    "wind_m_s": _at(daily, "windspeed_10m_max", i),
+                    "et0_mm": None,
+                    "condition": "data",
+                }
+            )
+        return {
+            "provider": "open-meteo-forecast",
+            "lat": lat,
+            "lon": lon,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "daily": daily_series,
+        }
+    except Exception as e:
+        logger.warning("Open-Meteo forecast failed: %s", e)
+        return {}
 
 
 async def fetch_chirps_like(

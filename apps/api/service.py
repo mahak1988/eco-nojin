@@ -44,9 +44,7 @@ class ApiService:
         return await self.repo.create(data)
 
     async def update(self, id: int, data: ApiUpdate) -> Api:
-        """Update an existing record."""
-        return await self.get(id)  # raises if not found
-        # The line below actually performs the update
+        """Update an existing record. Raises ValueError if not found."""
         obj = await self.repo.update(id, data)
         if not obj:
             raise ValueError(f"Api with id={id} not found")

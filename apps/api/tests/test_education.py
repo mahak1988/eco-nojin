@@ -8,30 +8,15 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-try:
-    from apps.api.models.education import Course, Lesson, Enrollment, CourseCategory, DifficultyLevel
-except ImportError:
-    Course = None
-    Lesson = None
-    Enrollment = None
-    CourseCategory = None
-    DifficultyLevel = None
-try:
-    from apps.api.schemas.education import CourseCreate, LessonCreate, EnrollmentCreate
-except ImportError:
-    CourseCreate = None
-    LessonCreate = None
-    EnrollmentCreate = None
+from apps.api.models.education import Course, Lesson, Enrollment, CourseCategory, DifficultyLevel
+from apps.api.schemas.education import CourseCreate, LessonCreate, EnrollmentCreate
 
 
 @pytest.fixture
 async def education_db_session():
     """Create a test database session for education models."""
     from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-try:
-        from apps.shared_core.database.session import Base
-except ImportError:
-    Base = None
+    from apps.shared_core.database.session import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

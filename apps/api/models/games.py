@@ -9,11 +9,46 @@ import logging
 logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional, List
+from enum import Enum as PyEnum
 
-from sqlalchemy import String, Integer, DateTime, Boolean, Text, ForeignKey
+from sqlalchemy import String, Integer, Float, DateTime, Boolean, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.session import Base
+
+
+class QuestionType(str, PyEnum):
+    """Question type enumeration."""
+    MULTIPLE_CHOICE = "multiple_choice"
+    TRUE_FALSE = "true_false"
+    SHORT_ANSWER = "short_answer"
+
+
+class QuizDifficulty(str, PyEnum):
+    """Quiz difficulty enumeration."""
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+
+
+class WordDifficulty(str, PyEnum):
+    """Word difficulty enumeration."""
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+
+
+class WordCategory(str, PyEnum):
+    """Word category enumeration."""
+    AGRICULTURE = "agriculture"
+    WATER = "water"
+    ENVIRONMENT = "environment"
+    ECONOMICS = "economics"
+    TECHNOLOGY = "technology"
+
+
+# Backward compatibility alias
+DifficultyLevel = QuizDifficulty
 
 
 class VocabularyWord(Base):
@@ -21,12 +56,14 @@ class VocabularyWord(Base):
 
     __tablename__ = "vocabulary_words"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
     word: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    definition: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     translation: Mapped[str] = mapped_column(String(255), nullable=False)
     pronunciation: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     example: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     category: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    difficulty: Mapped[str] = mapped_column(String(30), default="medium", nullable=False)
     part_of_speech: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
@@ -41,12 +78,13 @@ class Quiz(Base):
 
     __tablename__ = "quizzes"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    category: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    category: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)
     difficulty: Mapped[str] = mapped_column(String(30), default="medium", nullable=False)
     time_limit: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # seconds, 0 = no limit
+    time_limit_minutes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # minutes
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -63,14 +101,16 @@ class QuizQuestion(Base):
 
     __tablename__ = "quiz_questions"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    quiz_id: Mapped[int] = mapped_column(Integer, ForeignKey("quizzes.id"), nullable=False, index=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    quiz_id: Mapped[str] = mapped_column(String(50), ForeignKey("quizzes.id"), nullable=False, index=True)
     question_text: Mapped[str] = mapped_column(Text, nullable=False)
-    option_a: Mapped[str] = mapped_column(String(255), nullable=False)
-    option_b: Mapped[str] = mapped_column(String(255), nullable=False)
+    question_type: Mapped[str] = mapped_column(String(30), default="multiple_choice", nullable=False)
+    options: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON array of options
+    option_a: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    option_b: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     option_c: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     option_d: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    correct_answer: Mapped[str] = mapped_column(String(10), nullable=False)  # 'a', 'b', 'c', or 'd'
+    correct_answer: Mapped[str] = mapped_column(String(10), nullable=False)  # 'a', 'b', 'c', 'd', or index
     points: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     order: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
@@ -87,10 +127,12 @@ class QuizAttempt(Base):
 
     __tablename__ = "quiz_attempts"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    quiz_id: Mapped[int] = mapped_column(Integer, ForeignKey("quizzes.id"), nullable=False, index=True)
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    score: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # points earned
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    quiz_id: Mapped[str] = mapped_column(String(50), ForeignKey("quizzes.id"), nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    score: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)  # percentage 0-100
+    total_questions: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    correct_answers: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_points: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     percentage: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # 0-100
     time_taken: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # seconds
@@ -101,18 +143,4 @@ class QuizAttempt(Base):
 
     def __repr__(self) -> str:
         """Handle __repr__."""
-        return f"<QuizAttempt(quiz_id={self.quiz_id}, user_id={self.user_id}, score={self.percentage}%)>"
-
-
-class WordCategory(str):
-    AGRICULTURE = "agriculture"
-    WATER = "water"
-    ENVIRONMENT = "environment"
-    ECONOMICS = "economics"
-    TECHNOLOGY = "technology"
-
-
-class DifficultyLevel(str):
-    EASY = "easy"
-    MEDIUM = "medium"
-    HARD = "hard"
+        return f"<QuizAttempt(quiz_id={self.quiz_id}, user_id={self.user_id}, score={self.score})>"

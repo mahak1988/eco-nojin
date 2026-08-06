@@ -97,7 +97,7 @@ class TestEcoCoinTransfer:
     """Tests for POST /api/v1/ecocoin/transfer"""
 
     def test_transfer_success(self):
-        """Should successfully process a transfer (auth soft when REQUIRE_AUTH_FOR_WRITES=false)"""
+        """Should successfully process a transfer synchronously (auth soft when REQUIRE_AUTH_FOR_WRITES=false)"""
         response = client.post(
             f"{PREFIX}/transfer",
             json={
@@ -110,7 +110,7 @@ class TestEcoCoinTransfer:
         if response.status_code == 200:
             data = response.json()
             assert "tx_hash" in data
-            assert data["status"] == "pending"
+            assert data["status"] == "confirmed"
             assert data["amount"] == 100.0
             assert data["tx_hash"].startswith("0x")
 

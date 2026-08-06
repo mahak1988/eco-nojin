@@ -8,10 +8,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-try:
-    from apps.api.models.games import (
-except ImportError:
-    ( = None
+from apps.api.models.games import (
     VocabularyWord, Quiz, QuizQuestion, QuizAttempt,
     QuestionType, QuizDifficulty, WordDifficulty
 )
@@ -21,10 +18,7 @@ except ImportError:
 async def games_db_session():
     """Create a test database session for games models."""
     from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-try:
-        from apps.shared_core.database.session import Base
-except ImportError:
-    Base = None
+    from apps.shared_core.database.session import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

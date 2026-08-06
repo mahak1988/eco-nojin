@@ -10,10 +10,29 @@ logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional, List
 
-from sqlalchemy import String, Integer, DateTime, Boolean, Text, ForeignKey
+from enum import Enum as PyEnum
+
+from sqlalchemy import String, Integer, DateTime, Boolean, Text, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from apps.shared_core.database.session import Base
+
+
+class CourseCategory(str, PyEnum):
+    """Course category enumeration."""
+    AGRICULTURE = "agriculture"
+    WATER_MANAGEMENT = "water-management"
+    ENVIRONMENTAL_SCIENCE = "environmental-science"
+    ECONOMICS = "economics"
+    TECHNOLOGY = "technology"
+    SCIENCE = "science"
+
+
+class DifficultyLevel(str, PyEnum):
+    """Course difficulty level enumeration."""
+    BEGINNER = "beginner"
+    INTERMEDIATE = "intermediate"
+    ADVANCED = "advanced"
 
 
 class Course(Base):
@@ -21,13 +40,14 @@ class Course(Base):
 
     __tablename__ = "courses"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     level: Mapped[str] = mapped_column(String(50), default="beginner", nullable=False)
     duration_hours: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     instructor: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    instructor_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -46,8 +66,8 @@ class Lesson(Base):
 
     __tablename__ = "lessons"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    course_id: Mapped[int] = mapped_column(Integer, ForeignKey("courses.id"), nullable=False, index=True)
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    course_id: Mapped[str] = mapped_column(String(50), ForeignKey("courses.id"), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     video_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
@@ -67,10 +87,10 @@ class Enrollment(Base):
 
     __tablename__ = "enrollments"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    course_id: Mapped[int] = mapped_column(Integer, ForeignKey("courses.id"), nullable=False, index=True)
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
-    progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)  # percentage 0-100
+    id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    course_id: Mapped[str] = mapped_column(String(50), ForeignKey("courses.id"), nullable=False, index=True)
+    user_id: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    progress: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)  # 0.0 to 1.0
     enrolled_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
@@ -82,15 +102,5 @@ class Enrollment(Base):
         return f"<Enrollment(course_id={self.course_id}, user_id={self.user_id})>"
 
 
-class CourseLevel(str):
-    BEGINNER = "beginner"
-    INTERMEDIATE = "intermediate"
-    ADVANCED = "advanced"
-
-
-class CourseCategory(str):
-    AGRICULTURE = "agriculture"
-    WATER_MANAGEMENT = "water-management"
-    ENVIRONMENTAL_SCIENCE = "environmental-science"
-    ECONOMICS = "economics"
-    TECHNOLOGY = "technology"
+# Backward compatibility aliases
+CourseLevel = DifficultyLevel

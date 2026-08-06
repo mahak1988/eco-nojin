@@ -33,6 +33,8 @@ from apps.api.models.education import (
     Course,
     Lesson,
     Enrollment,
+    CourseCategory,
+    DifficultyLevel,
 )
 from apps.api.models.library import (
     LibraryResource,
@@ -47,14 +49,23 @@ from apps.api.models.games import (
     Quiz,
     QuizQuestion,
     QuizAttempt,
+    QuestionType,
+    QuizDifficulty,
+    WordDifficulty,
+    WordCategory,
+)
+from apps.api.models.api import (
+    Api,
 )
 
 __all__ = [
     "AccountType", "EntryType", "InvoiceStatus", "PaymentMethod", "TaxType",
     "Account", "JournalEntry", "JournalItem", "Invoice", "InvoiceItem", "Payment", "Budget", "BudgetAlert", "TaxRate", "FixedAsset",
     "AgricultureSchool", "SchoolField",
-    "Course", "Lesson", "Enrollment",
+    "Course", "Lesson", "Enrollment", "CourseCategory", "DifficultyLevel",
     "LibraryResource",
     "Post", "Comment", "Like",
     "VocabularyWord", "Quiz", "QuizQuestion", "QuizAttempt",
+    "QuestionType", "QuizDifficulty", "WordDifficulty", "WordCategory",
+    "Api",
 ]

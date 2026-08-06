@@ -25,6 +25,10 @@ from apps.api.schemas.agriculture_school import (
     AgricultureSchoolBase, AgricultureSchoolCreate, AgricultureSchoolUpdate,
     AgricultureSchoolResponse, AgricultureSchoolListResponse, SchoolStats,
 )
+# Re-export generic Api schemas from schemas.py for backward compatibility
+from apps.api.schemas_file import (
+    ApiBase, ApiCreate, ApiUpdate, ApiResponse, ApiListResponse,
+)
 
 __all__ = [
     # Accounting
@@ -43,4 +47,6 @@ __all__ = [
     "SchoolTypeEnum",
     "AgricultureSchoolBase", "AgricultureSchoolCreate", "AgricultureSchoolUpdate",
     "AgricultureSchoolResponse", "AgricultureSchoolListResponse", "SchoolStats",
+    # Generic Api CRUD schemas
+    "ApiBase", "ApiCreate", "ApiUpdate", "ApiResponse", "ApiListResponse",
 ]
