@@ -13,6 +13,7 @@ import Settings from './pages/Settings'
 import AuditLogsPage from './pages/AuditLogsPage'
 import ReportsPage from './pages/ReportsPage'
 import MonitoringPage from './pages/MonitoringPage'
+import IntelligentInsightsPage from './pages/IntelligentInsightsPage'
 import AccountsPage from './pages/accounting/AccountsPage'
 import JournalEntriesPage from './pages/accounting/JournalEntriesPage'
 import InvoicesPage from './pages/accounting/InvoicesPage'
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="audit-logs" element={<AuditLogsPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="monitoring" element={<MonitoringPage />} />
+              <Route path="insights" element={<IntelligentInsightsPage />} />
               <Route path="forbidden" element={<ForbiddenPage />} />
               <Route path="accounting/accounts" element={<AccountsPage />} />
               <Route path="accounting/journal-entries" element={<JournalEntriesPage />} />
