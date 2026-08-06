@@ -2,12 +2,14 @@ import { Outlet } from 'react-router-dom'
 import AdminSidebar from './AdminSidebar'
 import ThemeSelector from './ThemeSelector'
 import { Button } from '@econojin/ui/button'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, LogOut } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Layout() {
   const { theme, setTheme } = useTheme()
-  
+  const { user, logout } = useAuth()
+
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
   }
@@ -17,8 +19,13 @@ export default function Layout() {
       <header className="border-b bg-card p-4 flex justify-between items-center sticky top-0 z-10">
         <div className="flex items-center gap-4">
           <h1 className="text-xl font-bold text-foreground">پنل مدیریت اکونوژین</h1>
+          {user?.email && (
+            <span className="text-xs text-muted-foreground hidden sm:inline">
+              {user.full_name || user.email}
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <ThemeSelector />
           <Button
             variant="outline"
@@ -27,15 +34,21 @@ export default function Layout() {
             aria-label={theme === 'light' ? 'تغییر به تم تاریک' : 'تغییر به تم روشن'}
             title={theme === 'light' ? 'تغییر به تم تاریک' : 'تغییر به تم روشن'}
           >
-            {theme === 'light' ? (
-              <Moon className="h-4 w-4" />
-            ) : (
-              <Sun className="h-4 w-4" />
-            )}
+            {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => logout()}
+            className="gap-1"
+            aria-label="خروج"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">خروج</span>
           </Button>
         </div>
       </header>
-      
+
       <div className="flex flex-1 overflow-hidden">
         <AdminSidebar />
         <main className="flex-1 p-6 overflow-auto" tabIndex={-1}>
