@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Users, Settings, FileText, Activity, Shield, BarChart3,
-  Brain, Droplets, Cloud, AlertTriangle, Sprout, TrendingUp,
-  Map, Zap, RefreshCw, CheckCircle, XCircle, Loader2
+  Cloud, AlertTriangle, Sprout, TrendingUp,
+  Map, RefreshCw, CheckCircle, XCircle, Loader2, FlaskConical, Satellite,
 } from 'lucide-react'
 import { fetchDashboard, fetchSystemHealth, DashboardData, SystemHealth } from '../api/adminApi'
-
-// ── StatCard ─────────────────────────────────────────────────────────────────
 
 interface StatCardProps {
   title: string
@@ -33,8 +31,6 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, loading,
     </div>
   </div>
 )
-
-// ── Main Dashboard (Phase 1: real /admin/ API) ───────────────────────────────
 
 const Dashboard: React.FC = () => {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null)
@@ -65,64 +61,37 @@ const Dashboard: React.FC = () => {
     load()
   }, [])
 
+  // Only routes that exist in App.tsx
   const navCards = [
     { to: '/users', label: 'مدیریت کاربران', desc: 'مشاهده و مدیریت کاربران سیستم', icon: <Users className="w-5 h-5" />, color: 'bg-blue-100 text-blue-600' },
     { to: '/farms', label: 'مزارع', desc: 'مدیریت اطلاعات مزارع', icon: <Map className="w-5 h-5" />, color: 'bg-emerald-100 text-emerald-600' },
     { to: '/weather', label: 'آب‌وهوا', desc: 'پیش‌بینی و هشدارهای آب‌وهوایی', icon: <Cloud className="w-5 h-5" />, color: 'bg-sky-100 text-sky-600' },
     { to: '/risks', label: 'ارزیابی ریسک', desc: 'پیش‌بینی و مدیریت ریسک', icon: <AlertTriangle className="w-5 h-5" />, color: 'bg-red-100 text-red-600' },
     { to: '/economics', label: 'اقتصاد سبز', desc: 'تحلیل هزینه-فایده و EcoCoin', icon: <TrendingUp className="w-5 h-5" />, color: 'bg-yellow-100 text-yellow-600' },
+    { to: '/satellite', label: 'داده ماهواره‌ای', desc: 'NDVI و تصاویر ماهواره‌ای', icon: <Satellite className="w-5 h-5" />, color: 'bg-lime-100 text-lime-600' },
+    { to: '/simulation', label: 'شبیه‌سازی', desc: 'مدل‌های علمی و سناریوها', icon: <FlaskConical className="w-5 h-5" />, color: 'bg-indigo-100 text-indigo-600' },
     { to: '/reports', label: 'گزارش‌ها', desc: 'گزارش‌های سیستم و عملکرد', icon: <BarChart3 className="w-5 h-5" />, color: 'bg-violet-100 text-violet-600' },
     { to: '/audit-logs', label: 'لاگ حسابرسی', desc: 'مشاهده فعالیت‌های سیستم', icon: <Activity className="w-5 h-5" />, color: 'bg-purple-100 text-purple-600' },
-    { to: '/settings', label: 'تنظیمات', desc: 'پیکربندی سیستم', icon: <Settings className="w-5 h-5" />, color: 'bg-gray-100 text-gray-600' },
     { to: '/monitoring', label: 'نظارت سیستم', desc: 'سلامت و پایش زنده', icon: <Shield className="w-5 h-5" />, color: 'bg-green-100 text-green-600' },
-    { to: '/satellite', label: 'داده ماهواره‌ای', desc: 'NDVI و تصاویر ماهواره‌ای', icon: <Sprout className="w-5 h-5" />, color: 'bg-lime-100 text-lime-600' },
+    { to: '/security', label: 'امنیت', desc: 'SpiderGuard و حفاظت', icon: <Shield className="w-5 h-5" />, color: 'bg-orange-100 text-orange-600' },
+    { to: '/settings', label: 'تنظیمات', desc: 'پیکربندی ظاهر و سیستم', icon: <Settings className="w-5 h-5" />, color: 'bg-gray-100 text-gray-600' },
   ]
 
   const statCards = [
-    {
-      title: 'کل کاربران',
-      value: dashboard?.user_count ?? '—',
-      icon: <Users className="w-5 h-5" />,
-      color: 'bg-blue-100 text-blue-600',
-    },
-    {
-      title: 'کاربران فعال',
-      value: dashboard?.active_user_count ?? '—',
-      icon: <Users className="w-5 h-5" />,
-      color: 'bg-emerald-100 text-emerald-600',
-    },
-    {
-      title: 'سوپریوزر',
-      value: dashboard?.superuser_count ?? '—',
-      icon: <Shield className="w-5 h-5" />,
-      color: 'bg-purple-100 text-purple-600',
-    },
-    {
-      title: 'تنظیمات',
-      value: dashboard?.total_settings ?? '—',
-      icon: <Settings className="w-5 h-5" />,
-      color: 'bg-gray-100 text-gray-600',
-    },
-    {
-      title: 'لاگ حسابرسی',
-      value: dashboard?.total_audit_logs ?? '—',
-      icon: <Activity className="w-5 h-5" />,
-      color: 'bg-amber-100 text-amber-600',
-    },
-    {
-      title: 'گزارش‌ها',
-      value: dashboard?.total_reports ?? '—',
-      icon: <FileText className="w-5 h-5" />,
-      color: 'bg-violet-100 text-violet-600',
-    },
+    { title: 'کل کاربران', value: dashboard?.user_count ?? '—', icon: <Users className="w-5 h-5" />, color: 'bg-blue-100 text-blue-600' },
+    { title: 'کاربران فعال', value: dashboard?.active_user_count ?? '—', icon: <Users className="w-5 h-5" />, color: 'bg-emerald-100 text-emerald-600' },
+    { title: 'سوپریوزر', value: dashboard?.superuser_count ?? '—', icon: <Shield className="w-5 h-5" />, color: 'bg-purple-100 text-purple-600' },
+    { title: 'تنظیمات', value: dashboard?.total_settings ?? '—', icon: <Settings className="w-5 h-5" />, color: 'bg-gray-100 text-gray-600' },
+    { title: 'لاگ حسابرسی', value: dashboard?.total_audit_logs ?? '—', icon: <Activity className="w-5 h-5" />, color: 'bg-amber-100 text-amber-600' },
+    { title: 'گزارش‌ها', value: dashboard?.total_reports ?? '—', icon: <FileText className="w-5 h-5" />, color: 'bg-violet-100 text-violet-600' },
   ]
 
   const dbOk = health?.database === 'ok' || health?.database === 'healthy'
-  const redisOk = health?.redis === 'ok' || health?.redis === 'healthy' || health?.redis === 'unavailable'
+  const redisOk =
+    health?.redis === 'ok' || health?.redis === 'healthy' || health?.redis === 'unavailable'
 
   return (
     <div className="space-y-6 p-1" dir="rtl">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">داشبورد اکونوژین</h1>
@@ -146,7 +115,6 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {statCards.map((s) => (
           <StatCard
@@ -161,7 +129,6 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Navigation Cards */}
       <div>
         <h2 className="text-sm font-semibold text-muted-foreground mb-3">دسترسی سریع</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -183,7 +150,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* System Health */}
       <div className="rounded-xl border bg-card p-4">
         <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
           <Shield className="w-4 h-4 text-green-500" /> وضعیت سرویس‌ها
@@ -196,9 +162,11 @@ const Dashboard: React.FC = () => {
             { name: 'مسیرهای API', ok: (health?.total_api_routes ?? 0) > 0 || !error },
           ].map((s) => (
             <div key={s.name} className="flex items-center gap-2 text-xs">
-              {s.ok
-                ? <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                : <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />}
+              {s.ok ? (
+                <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
+              ) : (
+                <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              )}
               <span className={s.ok ? 'text-foreground' : 'text-destructive'}>{s.name}</span>
             </div>
           ))}
