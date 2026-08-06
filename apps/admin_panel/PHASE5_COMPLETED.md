@@ -1,7 +1,8 @@
 # فاز ۵ — تکمیل‌شده
 
 **تاریخ:** ۱۴۰۵-۰۵-۱۵  
-**شاخه:** `main`
+**شاخه:** `main`  
+**Package manager:** `pnpm`
 
 ## اهداف و وضعیت
 
@@ -23,22 +24,27 @@
 
 ## Migration
 
-پس از deploy، جدول را بسازید:
+پس از deploy، جدول `content_versions` را بسازید (Alembic یا `create_all`).
+
+## اجرا با pnpm
+
+از ریشه monorepo یا پوشه فرانت:
 
 ```bash
-# Alembic یا create_all
-python -c "from apps.shared_core.database.session import Base, engine; ..."
+# نصب وابستگی‌ها (ریشه workspace)
+pnpm install
+
+# Playwright
+cd apps/admin_panel/frontend
+pnpm add -D @playwright/test
+pnpm exec playwright install chromium
+pnpm run test:e2e
 ```
 
-یا migration اختصاصی برای `content_versions`.
-
-## اجرا Playwright
+یا از ریشه (اگر فیلتر workspace تعریف شده):
 
 ```bash
-cd apps/admin_panel/frontend
-npm i -D @playwright/test
-npx playwright install chromium
-npx playwright test
+pnpm --filter @econojin/admin-panel test:e2e
 ```
 
 **فاز ۵ ثبت شد.**

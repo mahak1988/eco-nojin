@@ -18,7 +18,7 @@ export default defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-        command: 'npm run dev -- --host 127.0.0.1 --port 5173',
+        command: 'pnpm run dev -- --host 127.0.0.1 --port 5173',
         url: BASE,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
