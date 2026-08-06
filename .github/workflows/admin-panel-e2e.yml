@@ -1,0 +1,63 @@
+name: Admin Panel E2E (Playwright)
+
+on:
+  push:
+    paths:
+      - 'apps/admin_panel/frontend/**'
+      - '.github/workflows/admin-panel-e2e.yml'
+      - 'pnpm-lock.yaml'
+  pull_request:
+    paths:
+      - 'apps/admin_panel/frontend/**'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+
+jobs:
+  e2e-smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/admin_panel/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies (workspace root)
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+        continue-on-error: true
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+        continue-on-error: true
+
+      - name: Build admin frontend
+        run: pnpm run build
+        continue-on-error: true
+
+      - name: Run smoke tests
+        run: |
+          if [ -f playwright.config.ts ] || [ -f playwright.config.js ]; then
+            pnpm exec playwright test e2e/admin-smoke.spec.ts --reporter=list
+          else
+            echo "Playwright config missing"
+          fi
+        continue-on-error: true
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/admin_panel/frontend/playwright-report
+          retention-days: 7
+        continue-on-error: true

@@ -5,8 +5,6 @@ SQLAlchemy ORM models for the shared_core module.
 """
 
 import logging
-
-logger = logging.getLogger(__name__)
 from datetime import datetime
 from typing import Optional
 
@@ -14,6 +12,8 @@ from sqlalchemy import String, DateTime, Boolean, Integer, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from apps.shared_core.database.session import Base
+
+logger = logging.getLogger(__name__)
 
 
 class SharedCore(Base):
@@ -33,7 +33,6 @@ class SharedCore(Base):
     )
 
     def __repr__(self) -> str:
-        """Handle __repr__."""
         return f"<SharedCore(id={self.id}, name={self.name!r})>"
 
 
@@ -53,7 +52,6 @@ class AdminSetting(Base):
     )
 
     def __repr__(self) -> str:
-        """Handle __repr__."""
         return f"<AdminSetting(id={self.id}, key={self.key!r})>"
 
 
@@ -70,7 +68,6 @@ class AuditLog(Base):
     )
 
     def __repr__(self) -> str:
-        """Handle __repr__."""
         return f"<AuditLog(id={self.id}, event_type={self.event_type!r})>"
 
 
@@ -87,11 +84,9 @@ class SystemReport(Base):
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     def __repr__(self) -> str:
-        """Handle __repr__."""
         return f"<SystemReport(id={self.id}, report_name={self.report_name!r}, status={self.status!r})>"
 
     def to_dict(self) -> dict:
-        """Serialize to dictionary (for API responses)."""
         return {
             "id": self.id,
             "report_name": self.report_name,
@@ -100,3 +95,28 @@ class SystemReport(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
         }
+
+
+class ContentVersion(Base):
+    """Phase 5 — persistent content version history."""
+
+    __tablename__ = "content_versions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    content_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    content_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    version_number: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    content_data: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    created_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    approved_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="draft")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<ContentVersion(id={self.id}, type={self.content_type!r}, "
+            f"content_id={self.content_id}, v={self.version_number})>"
+        )
