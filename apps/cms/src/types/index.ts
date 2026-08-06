@@ -1,9 +1,4 @@
-/**
- * cms types | انواع TypeScript برای cms
- *
- * Auto-scaffolded by phase1_complete_apps.py
- */
-
+/** Minimal shared shape used by scaffold tests — not a Strapi content-type. */
 export interface Cms {
   id: number;
   name: string;
@@ -13,22 +8,9 @@ export interface Cms {
   updated_at: string;
 }
 
-export interface CmsCreate {
-  name: string;
-  description?: string;
-}
-
-export interface CmsUpdate {
-  name?: string;
-  description?: string;
-  is_active?: boolean;
-}
-
+export type CmsCreate = Omit<Cms, 'id' | 'created_at' | 'updated_at'>;
+export type CmsUpdate = Partial<CmsCreate>;
 export interface CmsListResponse {
-  items: Cms[];
-  total: number;
-  skip: number;
-  limit: number;
+  data: Cms[];
+  meta?: { total?: number };
 }
-
-export type CmsStatus = "active" | "inactive" | "pending";
