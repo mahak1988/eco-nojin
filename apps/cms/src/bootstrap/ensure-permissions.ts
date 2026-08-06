@@ -1,6 +1,5 @@
 /**
- * Idempotent default permissions for core content-types.
- * Safe to run on every Strapi boot.
+ * Idempotent default permissions for core content-types + Editor role.
  */
 
 type StrapiLike = {
@@ -10,12 +9,10 @@ type StrapiLike = {
       findOne: (args: unknown) => Promise<any>;
       findMany: (args?: unknown) => Promise<any[]>;
       create: (args: unknown) => Promise<any>;
-      deleteMany?: (args: unknown) => Promise<any>;
     };
   };
 };
 
-/** Content-type actions we manage */
 const CONTENT_ACTIONS = {
   page: [
     'api::page.page.find',
@@ -47,7 +44,6 @@ const CONTENT_ACTIONS = {
   ],
 } as const;
 
-/** Public: read published marketing content only */
 const PUBLIC_ACTIONS = [
   'api::page.page.find',
   'api::page.page.findOne',
@@ -59,12 +55,31 @@ const PUBLIC_ACTIONS = [
   'api::tag.tag.findOne',
 ];
 
-/** Authenticated editors: full CRUD on content */
 const AUTHENTICATED_ACTIONS = [
   ...CONTENT_ACTIONS.page,
   ...CONTENT_ACTIONS['blog-post'],
   ...CONTENT_ACTIONS.category,
   ...CONTENT_ACTIONS.tag,
+];
+
+/** Editor: create/update/read — no delete */
+const EDITOR_ACTIONS = [
+  'api::page.page.find',
+  'api::page.page.findOne',
+  'api::page.page.create',
+  'api::page.page.update',
+  'api::blog-post.blog-post.find',
+  'api::blog-post.blog-post.findOne',
+  'api::blog-post.blog-post.create',
+  'api::blog-post.blog-post.update',
+  'api::category.category.find',
+  'api::category.category.findOne',
+  'api::category.category.create',
+  'api::category.category.update',
+  'api::tag.tag.find',
+  'api::tag.tag.findOne',
+  'api::tag.tag.create',
+  'api::tag.tag.update',
 ];
 
 async function ensurePermission(
@@ -76,15 +91,33 @@ async function ensurePermission(
   if (existing.has(action)) return;
   try {
     await strapi.db.query('plugin::users-permissions.permission').create({
-      data: {
-        action,
-        role: roleId,
-      },
+      data: { action, role: roleId },
     });
     existing.add(action);
   } catch (e: any) {
-    // Duplicate or schema not ready yet
     strapi.log.warn(`[cms:permissions] skip ${action}: ${e?.message || e}`);
+  }
+}
+
+async function ensureEditorRole(strapi: StrapiLike): Promise<any | null> {
+  const roleQuery = strapi.db.query('plugin::users-permissions.role');
+  let editor = await roleQuery.findOne({ where: { type: 'editor' } });
+  if (editor) return editor;
+  editor = await roleQuery.findOne({ where: { name: 'Editor' } });
+  if (editor) return editor;
+  try {
+    editor = await roleQuery.create({
+      data: {
+        name: 'Editor',
+        description: 'Can create and edit content; cannot delete',
+        type: 'editor',
+      },
+    });
+    strapi.log.info('[cms:permissions] created role Editor');
+    return editor;
+  } catch (e: any) {
+    strapi.log.warn(`[cms:permissions] Editor role create failed: ${e?.message || e}`);
+    return null;
   }
 }
 
@@ -95,26 +128,24 @@ export async function ensureDefaultPermissions(strapi: StrapiLike): Promise<void
 
     const publicRole = await roleQuery.findOne({ where: { type: 'public' } });
     const authRole = await roleQuery.findOne({ where: { type: 'authenticated' } });
+    const editorRole = await ensureEditorRole(strapi);
 
     if (!publicRole || !authRole) {
       strapi.log.warn('[cms:permissions] Public/Authenticated roles not found yet');
       return;
     }
 
+    const roleIds = [publicRole.id, authRole.id, editorRole?.id].filter(Boolean) as number[];
     const allPerms = await permQuery.findMany({
-      where: {
-        role: { $in: [publicRole.id, authRole.id] },
-      },
-      limit: 500,
+      where: { role: { $in: roleIds } },
+      limit: 1000,
     });
 
     const byRole = new Map<number, Set<string>>();
-    byRole.set(publicRole.id, new Set());
-    byRole.set(authRole.id, new Set());
+    for (const id of roleIds) byRole.set(id, new Set());
     for (const p of allPerms || []) {
       const rid = typeof p.role === 'object' ? p.role?.id : p.role;
-      if (rid == null) continue;
-      if (!byRole.has(rid)) byRole.set(rid, new Set());
+      if (rid == null || !byRole.has(rid)) continue;
       byRole.get(rid)!.add(p.action);
     }
 
@@ -124,9 +155,14 @@ export async function ensureDefaultPermissions(strapi: StrapiLike): Promise<void
     for (const action of AUTHENTICATED_ACTIONS) {
       await ensurePermission(strapi, authRole.id, action, byRole.get(authRole.id)!);
     }
+    if (editorRole) {
+      for (const action of EDITOR_ACTIONS) {
+        await ensurePermission(strapi, editorRole.id, action, byRole.get(editorRole.id)!);
+      }
+    }
 
     strapi.log.info(
-      '[cms:permissions] defaults applied — Public: read content; Authenticated: full CRUD'
+      '[cms:permissions] defaults applied — Public:read | Authenticated:CRUD | Editor:no-delete'
     );
   } catch (e: any) {
     strapi.log.error(`[cms:permissions] bootstrap failed: ${e?.message || e}`);
@@ -136,4 +172,5 @@ export async function ensureDefaultPermissions(strapi: StrapiLike): Promise<void
 export const ROLE_MATRIX = {
   public: PUBLIC_ACTIONS,
   authenticated: AUTHENTICATED_ACTIONS,
+  editor: EDITOR_ACTIONS,
 };
