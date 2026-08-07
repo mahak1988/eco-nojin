@@ -23,7 +23,7 @@
     "blogPosts": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::blog-post.blog-post",
+      "target": "api::blog-posts.blog-post",
       "mappedBy": "tags"
     },
     "tenant": {

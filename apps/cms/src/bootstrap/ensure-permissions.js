@@ -1,45 +1,46 @@
 'use strict';
 
+/** UIDs must match API folder names under src/api/ */
 const CONTENT_ACTIONS = {
   page: [
-    'api::page.page.find',
-    'api::page.page.findOne',
-    'api::page.page.create',
-    'api::page.page.update',
-    'api::page.page.delete',
+    'api::pages.page.find',
+    'api::pages.page.findOne',
+    'api::pages.page.create',
+    'api::pages.page.update',
+    'api::pages.page.delete',
   ],
   'blog-post': [
-    'api::blog-post.blog-post.find',
-    'api::blog-post.blog-post.findOne',
-    'api::blog-post.blog-post.create',
-    'api::blog-post.blog-post.update',
-    'api::blog-post.blog-post.delete',
+    'api::blog-posts.blog-post.find',
+    'api::blog-posts.blog-post.findOne',
+    'api::blog-posts.blog-post.create',
+    'api::blog-posts.blog-post.update',
+    'api::blog-posts.blog-post.delete',
   ],
   category: [
-    'api::category.category.find',
-    'api::category.category.findOne',
-    'api::category.category.create',
-    'api::category.category.update',
-    'api::category.category.delete',
+    'api::categories.category.find',
+    'api::categories.category.findOne',
+    'api::categories.category.create',
+    'api::categories.category.update',
+    'api::categories.category.delete',
   ],
   tag: [
-    'api::tag.tag.find',
-    'api::tag.tag.findOne',
-    'api::tag.tag.create',
-    'api::tag.tag.update',
-    'api::tag.tag.delete',
+    'api::tags.tag.find',
+    'api::tags.tag.findOne',
+    'api::tags.tag.create',
+    'api::tags.tag.update',
+    'api::tags.tag.delete',
   ],
 };
 
 const PUBLIC_ACTIONS = [
-  'api::page.page.find',
-  'api::page.page.findOne',
-  'api::blog-post.blog-post.find',
-  'api::blog-post.blog-post.findOne',
-  'api::category.category.find',
-  'api::category.category.findOne',
-  'api::tag.tag.find',
-  'api::tag.tag.findOne',
+  'api::pages.page.find',
+  'api::pages.page.findOne',
+  'api::blog-posts.blog-post.find',
+  'api::blog-posts.blog-post.findOne',
+  'api::categories.category.find',
+  'api::categories.category.findOne',
+  'api::tags.tag.find',
+  'api::tags.tag.findOne',
 ];
 
 const AUTHENTICATED_ACTIONS = [
@@ -50,22 +51,22 @@ const AUTHENTICATED_ACTIONS = [
 ];
 
 const EDITOR_ACTIONS = [
-  'api::page.page.find',
-  'api::page.page.findOne',
-  'api::page.page.create',
-  'api::page.page.update',
-  'api::blog-post.blog-post.find',
-  'api::blog-post.blog-post.findOne',
-  'api::blog-post.blog-post.create',
-  'api::blog-post.blog-post.update',
-  'api::category.category.find',
-  'api::category.category.findOne',
-  'api::category.category.create',
-  'api::category.category.update',
-  'api::tag.tag.find',
-  'api::tag.tag.findOne',
-  'api::tag.tag.create',
-  'api::tag.tag.update',
+  'api::pages.page.find',
+  'api::pages.page.findOne',
+  'api::pages.page.create',
+  'api::pages.page.update',
+  'api::blog-posts.blog-post.find',
+  'api::blog-posts.blog-post.findOne',
+  'api::blog-posts.blog-post.create',
+  'api::blog-posts.blog-post.update',
+  'api::categories.category.find',
+  'api::categories.category.findOne',
+  'api::categories.category.create',
+  'api::categories.category.update',
+  'api::tags.tag.find',
+  'api::tags.tag.findOne',
+  'api::tags.tag.create',
+  'api::tags.tag.update',
 ];
 
 async function ensurePermission(strapi, roleId, action, existing) {

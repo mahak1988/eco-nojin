@@ -40,13 +40,13 @@
     "categories": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::category.category",
+      "target": "api::categories.category",
       "inversedBy": "blogPosts"
     },
     "tags": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::tag.tag",
+      "target": "api::tags.tag",
       "inversedBy": "blogPosts"
     },
     "seoTitle": {
