@@ -5,39 +5,16 @@
     "singularName": "tenant",
     "pluralName": "tenants",
     "displayName": "Tenant",
-    "description": "Tenant information and settings"
+    "description": "Tenant information"
   },
   "options": {
     "draftAndPublish": false
   },
-  "pluginOptions": {},
   "attributes": {
-    "name": {
-      "type": "string",
-      "required": true
-    },
-    "slug": {
-      "type": "uid",
-      "targetField": "name",
-      "required": true
-    },
-    "description": {
-      "type": "text"
-    },
-    "settings": {
-      "type": "component",
-      "repeatable": false,
-      "component": "shared.tenant-settings"
-    },
-    "isActive": {
-      "type": "boolean",
-      "default": true
-    },
-    "createdAt": {
-      "type": "datetime"
-    },
-    "updatedAt": {
-      "type": "datetime"
-    }
+    "name": { "type": "string", "required": true },
+    "slug": { "type": "uid", "targetField": "name", "required": true },
+    "description": { "type": "text" },
+    "isActive": { "type": "boolean", "default": true },
+    "settingsJson": { "type": "json" }
   }
 }

@@ -5,61 +5,18 @@
     "singularName": "webhook",
     "pluralName": "webhooks",
     "displayName": "Webhook",
-    "description": "Webhook configuration for external integrations"
+    "description": "Outbound webhook configuration"
   },
   "options": {
     "draftAndPublish": false
   },
-  "pluginOptions": {},
   "attributes": {
-    "name": {
-      "type": "string",
-      "required": true
-    },
-    "url": {
-      "type": "string",
-      "required": true,
-      "format": "uri"
-    },
-    "events": {
-      "type": "enumeration",
-      "enum": [
-        "entry.create",
-        "entry.update",
-        "entry.delete",
-        "entry.publish",
-        "entry.unpublish"
-      ],
-      "multiple": true,
-      "required": true
-    },
-    "headers": {
-      "type": "json"
-    },
-    "isEnabled": {
-      "type": "boolean",
-      "default": true
-    },
-    "retryAttempts": {
-      "type": "integer",
-      "default": 3
-    },
-    "timeout": {
-      "type": "integer",
-      "default": 30000
-    },
-    "secret": {
-      "type": "string"
-    },
-    "tenant": {
-      "type": "string",
-      "required": true
-    },
-    "createdAt": {
-      "type": "datetime"
-    },
-    "updatedAt": {
-      "type": "datetime"
-    }
+    "name": { "type": "string", "required": true },
+    "url": { "type": "string", "required": true },
+    "events": { "type": "json" },
+    "headers": { "type": "json" },
+    "isEnabled": { "type": "boolean", "default": true },
+    "secret": { "type": "string" },
+    "tenant": { "type": "string", "default": "main" }
   }
 }

@@ -5,74 +5,23 @@
     "singularName": "setting",
     "pluralName": "settings",
     "displayName": "Setting",
-    "description": "Multi-tenant configuration, SEO settings, and social media integration"
+    "description": "Site-level settings"
   },
   "options": {
     "draftAndPublish": false
   },
-  "pluginOptions": {},
   "attributes": {
-    "tenantId": {
-      "type": "string",
-      "required": true
-    },
-    "siteName": {
-      "type": "string",
-      "required": true
-    },
-    "siteDescription": {
-      "type": "text"
-    },
+    "tenantId": { "type": "string", "default": "main" },
+    "siteName": { "type": "string", "required": true },
+    "siteDescription": { "type": "text" },
     "logo": {
       "type": "media",
       "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images"
-      ]
+      "allowedTypes": ["images"]
     },
-    "favicon": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images"
-      ]
-    },
-    "defaultSeoTitle": {
-      "type": "string",
-      "maxLength": 60
-    },
-    "defaultSeoDescription": {
-      "type": "text",
-      "maxLength": 160
-    },
-    "defaultSeoImage": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images"
-      ]
-    },
-    "socialMedia": {
-      "type": "component",
-      "repeatable": false,
-      "component": "shared.social-media-links"
-    },
-    "analyticsTrackingId": {
-      "type": "string"
-    },
-    "customDomain": {
-      "type": "string"
-    },
-    "emailNotifications": {
-      "type": "boolean",
-      "default": true
-    },
-    "contentModeration": {
-      "type": "boolean",
-      "default": false
-    }
+    "defaultSeoTitle": { "type": "string", "maxLength": 60 },
+    "defaultSeoDescription": { "type": "text", "maxLength": 160 },
+    "analyticsTrackingId": { "type": "string" },
+    "customDomain": { "type": "string" }
   }
 }
