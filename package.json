@@ -15,7 +15,8 @@
     "dev:admin-panel": "pnpm --filter @econojin/admin-panel dev",
     "dev:ai-agents": "pnpm --filter @econojin/ai-agents dev",
     "build:admin-panel": "pnpm --filter @econojin/admin-panel build",
-    "build:ai-agents": "pnpm --filter @econojin/ai-agents build"
+    "build:ai-agents": "pnpm --filter @econojin/ai-agents build",
+    "rebuild:sqlite": "pnpm rebuild better-sqlite3"
   },
   "devDependencies": {
     "turbo": "^2.10.5"
@@ -23,5 +24,12 @@
   "packageManager": "pnpm@11.4.0",
   "dependencies": {
     "tailwindcss-flip": "^1.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "sharp"
+    ]
   }
 }
