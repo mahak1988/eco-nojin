@@ -5,51 +5,26 @@
     "singularName": "blog-post",
     "pluralName": "blog-posts",
     "displayName": "Blog Post",
-    "description": "Blog posts with categories, tags, and authors"
+    "description": "Blog posts with categories and tags"
   },
   "options": {
     "draftAndPublish": true
   },
-  "pluginOptions": {
-    "i18n": {
-      "localized": true
-    }
-  },
   "attributes": {
     "title": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "type": "string",
       "required": true
     },
     "slug": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "type": "uid",
       "targetField": "title",
       "required": true
     },
     "excerpt": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "type": "text",
-      "maxLength": 160
+      "maxLength": 300
     },
     "content": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "type": "richtext",
       "required": true
     },
@@ -57,20 +32,10 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images"
-      ],
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
+      "allowedTypes": ["images"]
     },
-    "author": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "blogPosts"
+    "authorName": {
+      "type": "string"
     },
     "categories": {
       "type": "relation",
@@ -84,24 +49,11 @@
       "target": "api::tag.tag",
       "inversedBy": "blogPosts"
     },
-    "publishedAt": {
-      "type": "datetime"
-    },
     "seoTitle": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "type": "string",
       "maxLength": 60
     },
     "seoDescription": {
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
       "type": "text",
       "maxLength": 160
     },
@@ -109,18 +61,11 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images"
-      ],
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
+      "allowedTypes": ["images"]
     },
     "tenant": {
       "type": "string",
-      "required": true
+      "default": "main"
     }
   }
 }
