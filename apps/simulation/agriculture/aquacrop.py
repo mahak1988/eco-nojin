@@ -36,7 +36,7 @@ class Management:
     irrigation_events: Dict[int, float] = field(default_factory=dict)
 
 @dataclass
-class SimulationResult:
+class AquaCropResult:
     crop_id: str
     total_yield_t_ha: float
     potential_yield_t_ha: float
@@ -53,7 +53,7 @@ def run_aquacrop_conceptual(
     soil: SoilProfile = SoilProfile(),
     management: Management = Management(),
     potential_yield_t_ha: float = 8.0
-) -> SimulationResult:
+) -> AquaCropResult:
     if crop_id not in CROP_DATABASE:
         crop_id = 'wheat_rainfed'
     
@@ -115,9 +115,128 @@ def run_aquacrop_conceptual(
         
     avg_stress = stress_sum / season_len if season_len > 0 else 0.0
     
-    return SimulationResult(
+    return AquaCropResult(
         crop_id=crop_id, total_yield_t_ha=round(actual_yield, 2), potential_yield_t_ha=potential_yield_t_ha,
         total_water_use_mm=round(total_et_a, 2), irrigation_applied_mm=round(total_irrigation, 2),
         avg_water_stress=round(avg_stress, 2), daily_records=daily_records, status='success',
         message=f"Simulation completed for {crop['name_fa']}. Yield: {actual_yield:.2f} t/ha"
     )
+# ==========================================
+# 4. Simulation Registry Integration (The Bridge)
+# ==========================================
+try:
+    from apps.simulation.base import BaseSimulator, SimulationParameter, SimulationResult, SimulationRegistry
+    from apps.simulation.data import service
+    from datetime import datetime
+
+    @SimulationRegistry.register
+    class AquaCropSimulator(BaseSimulator):
+        @property
+        def id(self) -> str:
+            return "aquacrop"
+
+        @property
+        def name(self) -> str:
+            return "AquaCrop (FAO-56 Conceptual)"
+
+        @property
+        def category(self) -> str:
+            return "agriculture"
+
+        @property
+        def description(self) -> str:
+            return "Conceptual crop yield simulation based on FAO-56 water balance, optimized for arid regions."
+
+        @property
+        def version(self) -> str:
+            return "2.0.0"
+
+        def get_parameters(self) -> list[SimulationParameter]:
+            return [
+                SimulationParameter(id="lat", name="Latitude", type="float", default=35.7),
+                SimulationParameter(id="lon", name="Longitude", type="float", default=51.4),
+                SimulationParameter(id="start_date", name="Start Date", type="string", default="2023-06-01"),
+                SimulationParameter(id="end_date", name="End Date", type="string", default="2023-06-10"),
+                SimulationParameter(id="crop_id", name="Crop Type", type="string", default="wheat_rainfed"),
+                SimulationParameter(id="potential_yield_t_ha", name="Potential Yield (t/ha)", type="float", default=4.0),
+            ]
+
+        async def run(self, params: dict) -> AquaCropResult:
+            # 1. Extract parameters with safe defaults
+            lat = float(params.get("lat", 35.7))
+            lon = float(params.get("lon", 51.4))
+            crop_id = str(params.get("crop_id", "wheat_rainfed"))
+            potential_yield = float(params.get("potential_yield_t_ha", 4.0))
+            
+            # Parse dates
+            start_str = str(params.get("start_date", "2023-06-01"))
+            end_str = str(params.get("end_date", "2023-06-10"))
+            try:
+                start_dt = datetime.strptime(start_str, "%Y-%m-%d").date()
+                end_dt = datetime.strptime(end_str, "%Y-%m-%d").date()
+            except ValueError:
+                return AquaCropResult(
+                    status="error",
+                    metrics={},
+                    advisory={"error": "Invalid date format. Use YYYY-MM-DD."}
+                )
+
+            # 2. Fetch real climate data from NASA POWER (using the service we fixed!)
+            try:
+                climate_series = await service.get_climate_series(lat, lon, start_dt, end_dt, source="nasa")
+            except Exception as e:
+                return AquaCropResult(
+                    status="error",
+                    metrics={},
+                    advisory={"error": f"Failed to fetch climate data: {str(e)}"}
+                )
+
+            if not climate_series:
+                return AquaCropResult(
+                    status="error",
+                    metrics={},
+                    advisory={"error": "No climate data returned for the specified period."}
+                )
+
+            # 3. Format data for the conceptual engine
+            climate_data = []
+            for date_str, day_data in climate_series.items():
+                climate_data.append({
+                    'tmax': float(day_data.get('temp_max_c', 25.0)),
+                    'tmin': float(day_data.get('temp_min_c', 10.0)),
+                    'precip': float(day_data.get('precipitation_mm', 0.0)),
+                    'et0': float(day_data.get('et0_mm', 3.0)) # The ET0 we added!
+                })
+
+            # 4. Run the conceptual engine
+            result = run_aquacrop_conceptual(
+                crop_id=crop_id,
+                climate_data=climate_data,
+                potential_yield_t_ha=potential_yield
+            )
+
+            # 5. Map to standard SimulationResult for the Run database
+            # Return standard SimulationResult for the Run database
+            from apps.simulation.base import SimulationResult
+            return SimulationResult(
+                simulator_id="aquacrop",
+                simulator_name="AquaCrop (FAO-56 Conceptual)",
+                status="success",
+                metrics={
+                    "total_yield_t_ha": result.total_yield_t_ha,
+                    "potential_yield_t_ha": result.potential_yield_t_ha,
+                    "total_water_use_mm": result.total_water_use_mm,
+                    "irrigation_applied_mm": result.irrigation_applied_mm,
+                    "avg_water_stress": result.avg_water_stress
+                },
+                outputs={
+                    "message": result.message,
+                    "crop_name_fa": CROP_DATABASE.get(crop_id, {}).get("name_fa", "Unknown"),
+                    # Store only first 3 days of daily records to keep DB payload light
+                    "daily_sample": result.daily_records[:3] 
+                }
+            )
+
+except ImportError as e:
+    import logging
+    logging.getLogger(__name__).warning(f"AquaCrop Simulator registration skipped: {e}")
