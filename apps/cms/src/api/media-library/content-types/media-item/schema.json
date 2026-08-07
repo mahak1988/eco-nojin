@@ -5,12 +5,11 @@
     "singularName": "media-item",
     "pluralName": "media-items",
     "displayName": "Media Item",
-    "description": "Media library with CDN integration"
+    "description": "Optional media metadata (Strapi Media Library remains primary)"
   },
   "options": {
     "draftAndPublish": false
   },
-  "pluginOptions": {},
   "attributes": {
     "name": {
       "type": "string",
@@ -22,57 +21,15 @@
     "caption": {
       "type": "string"
     },
-    "width": {
-      "type": "integer"
-    },
-    "height": {
-      "type": "integer"
-    },
-    "formats": {
-      "type": "json"
-    },
-    "hash": {
-      "type": "string",
-      "required": true
-    },
-    "ext": {
-      "type": "string"
-    },
-    "mime": {
-      "type": "string",
-      "required": true
-    },
-    "size": {
-      "type": "decimal",
-      "required": true
-    },
     "url": {
       "type": "string",
       "required": true
     },
-    "previewUrl": {
+    "mime": {
       "type": "string"
     },
-    "provider": {
-      "type": "string",
-      "required": true
-    },
-    "provider_metadata": {
-      "type": "json"
-    },
-    "related": {
-      "type": "relation",
-      "relation": "morphToMany"
-    },
-    "folder": {
-      "type": "relation",
-      "target": "plugin::upload.folder",
-      "private": true
-    },
-    "folderPath": {
-      "type": "string",
-      "default": "/",
-      "private": true
+    "size": {
+      "type": "decimal"
     },
     "cdnEnabled": {
       "type": "boolean",
@@ -83,7 +40,7 @@
     },
     "tenant": {
       "type": "string",
-      "required": true
+      "default": "main"
     }
   }
 }
