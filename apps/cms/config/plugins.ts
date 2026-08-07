@@ -1,15 +1,15 @@
+/**
+ * Enable plugins only when packages are installed.
+ * GraphQL requires @strapi/plugin-graphql — keep disabled until added intentionally.
+ */
 export default ({ env }) => ({
-  graphql: {
+  'users-permissions': {
     enabled: true,
     config: {
-      endpoint: '/graphql',
-      shadowCRUD: true,
-      playgroundAlways: env.bool('PLAYGROUND_ALWAYS', false),
-      depthLimit: 7,
-      amountLimit: 100,
-      apolloServer: {
-        tracing: true,
+      jwt: {
+        expiresIn: env('JWT_EXPIRES_IN', '7d'),
       },
     },
   },
+  // graphql: { enabled: false } — enable after: pnpm add @strapi/plugin-graphql
 });

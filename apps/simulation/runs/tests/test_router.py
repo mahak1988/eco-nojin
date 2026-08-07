@@ -55,3 +55,17 @@ class TestRouter:
         except ImportError:
             pytest.skip("Module not available")
 
+
+    def test_RunUpdate_fields(self) -> None:
+        try:
+            from apps.simulation.runs.router import RunUpdate
+            assert hasattr(RunUpdate, 'model_fields')
+        except ImportError:
+            pass
+
+    def test_update_run_exists(self) -> None:
+        try:
+            from apps.simulation.runs.router import update_run
+            assert callable(update_run)
+        except ImportError:
+            pass

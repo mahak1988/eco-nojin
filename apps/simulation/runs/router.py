@@ -109,3 +109,21 @@ async def delete_run(run_id: str, db: AsyncSession = Depends(get_db_session)) ->
     await db.delete(run)
     await db.commit()
     return {"status": "deleted", "id": run_id}
+
+
+class RunUpdate(BaseModel):
+    advisory: Optional[dict] = None
+    scenario_name: Optional[str] = None
+    note: Optional[str] = Field(None, max_length=1000)
+
+
+@router.patch('/{run_id}', summary='Partially update a run')
+async def update_run(run_id: str, data: RunUpdate, db: AsyncSession = Depends(get_db_session)) -> dict:
+    await _ensure_table(db)
+    run = await db.get(SimulationRun, run_id)
+    if not run:
+        raise HTTPException(404, 'Run not found')
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(run, field, value)
+    await db.commit()
+    return {'status': 'updated', 'id': run_id}

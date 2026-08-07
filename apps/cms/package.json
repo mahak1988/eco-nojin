@@ -2,16 +2,34 @@
   "name": "@econojin/cms",
   "version": "0.1.0",
   "private": true,
+  "description": "Econojin headless CMS (Strapi v5)",
   "scripts": {
     "develop": "strapi develop",
+    "dev": "strapi develop",
     "build": "strapi build",
-    "start": "strapi start"
+    "start": "strapi start",
+    "strapi": "strapi",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "@strapi/plugin-users-permissions": "^5.0.0",
     "@strapi/strapi": "^5.0.0",
+    "better-sqlite3": "^11.0.0",
+    "pg": "^8.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.4",
     "styled-components": "^6.4.2"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "npm": ">=6.0.0"
+  },
+  "strapi": {
+    "uuid": "econojin-cms"
   }
 }

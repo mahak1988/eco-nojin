@@ -37,6 +37,17 @@ class ScenarioCreate(BaseModel):
     is_preset: bool = False
 
 
+
+
+class ScenarioUpdate(BaseModel):
+    """Schema for PATCH /scenarios/{id} - partial updates only."""
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    base_params: Optional[dict[str, Any]] = None
+    scenario_params: Optional[dict[str, Any]] = None
+    category: Optional[str] = None
+
+
 class ScenarioResponse(BaseModel):
     id: str
     name: str
@@ -210,6 +221,39 @@ async def delete_scenario(
     await db.delete(scenario)
     await db.commit()
 
+
+
+
+@router.patch("/scenarios/{scenario_id}", response_model=ScenarioResponse)
+async def update_scenario(
+    scenario_id: str,
+    data: ScenarioUpdate,
+    db: AsyncSession = Depends(get_db_session),
+) -> ScenarioResponse:
+    """Partially update a scenario (PATCH semantics)."""
+    result = await db.execute(select(Scenario).where(Scenario.id == uuid.UUID(scenario_id)))
+    scenario = result.scalar_one_or_none()
+    if not scenario:
+        raise HTTPException(404, "Scenario not found")
+    if scenario.is_preset:
+        raise HTTPException(403, "Cannot modify preset scenarios")
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(scenario, field, value)
+    scenario.updated_at = datetime.utcnow()
+    await db.commit()
+    await db.refresh(scenario)
+    return ScenarioResponse(
+        id=str(scenario.id),
+        name=scenario.name,
+        description=scenario.description,
+        simulator_id=scenario.simulator_id,
+        base_params=scenario.base_params,
+        scenario_params=scenario.scenario_params,
+        category=scenario.category,
+        is_preset=scenario.is_preset,
+        created_at=scenario.created_at.isoformat(),
+    )
 
 @router.post("/scenarios/{scenario_id}/run", response_model=ScenarioRunResponse)
 async def run_scenario(

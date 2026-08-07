@@ -90,6 +90,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("Sentry initialized")
     except Exception as e:
         logger.debug("Sentry unavailable: %s", e)
+    try:
+        from apps.admin_panel.integrations.cms import init_cms_service_from_env
+
+        init_cms_service_from_env()
+        logger.info("CMS integration client ready")
+    except Exception as e:
+        logger.debug("CMS integration skip: %s", e)
     logger.info(
         "Routers loaded=%s failed=%s",
         len(_loaded_routers),
@@ -265,6 +272,12 @@ _include(
     lambda: __import__("apps.admin_panel.router", fromlist=["router"]).router,
     prefix=settings.API_V1_STR,
     tags=["Admin"],
+)
+_include(
+    "admin_cms_bridge",
+    lambda: __import__("apps.admin_panel.cms_routes", fromlist=["router"]).router,
+    prefix=settings.API_V1_STR,
+    tags=["Admin CMS Bridge"],
 )
 _include(
     "simulation",

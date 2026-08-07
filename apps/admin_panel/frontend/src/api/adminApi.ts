@@ -1,6 +1,7 @@
 /**
  * Admin Panel API Client
  * Connected to backend /admin/* endpoints via proxy (Vite → FastAPI)
+ * Phase 1 remaining: Authorization interceptor + consistent error handling
  */
 
 import axios from 'axios'
@@ -8,7 +9,44 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: '/api/v1/admin',
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 })
+
+// ==========================================
+// Auth interceptor (Phase 1 remaining task)
+// ==========================================
+
+api.interceptors.request.use((config) => {
+  // Prefer explicit Bearer token from localStorage (legacy / hybrid auth)
+  const token =
+    localStorage.getItem('access_token') ||
+    localStorage.getItem('accessToken') ||
+    localStorage.getItem('token')
+  if (token) {
+    config.headers = config.headers ?? {}
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear stale tokens; redirect only if not already on login
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('token')
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('login')) {
+        // Soft signal – admin shell may handle redirect via auth context
+        console.warn('[adminApi] 401 Unauthorized – token cleared')
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
+export { api }
 
 // ==========================================
 // Types
@@ -75,6 +113,7 @@ export interface SystemHealth {
   total_api_routes: number
   environment: string
   python_version: string
+  cache_status?: Record<string, unknown>
 }
 
 export interface ReportGenerateResponse {
@@ -102,7 +141,10 @@ export async function fetchSettings(limit = 100, offset = 0): Promise<AdminSetti
   return data
 }
 
-export async function upsertSetting(key: string, payload: { value?: string; description?: string; is_active?: boolean }): Promise<AdminSetting> {
+export async function upsertSetting(
+  key: string,
+  payload: { value?: string; description?: string; is_active?: boolean }
+): Promise<AdminSetting> {
   const { data } = await api.put(`/settings/${key}`, payload)
   return data
 }
@@ -171,7 +213,10 @@ export async function fetchReports(limit = 100, offset = 0): Promise<SystemRepor
   return data
 }
 
-export async function generateReport(reportName: string, reportType: string = 'csv'): Promise<ReportGenerateResponse> {
+export async function generateReport(
+  reportName: string,
+  reportType: string = 'csv'
+): Promise<ReportGenerateResponse> {
   const { data } = await api.post('/reports', { report_name: reportName, report_type: reportType })
   return data
 }
