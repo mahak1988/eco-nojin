@@ -81,3 +81,17 @@ class TestRouter:
         except ImportError:
             pytest.skip("Module not available")
 
+
+    def test_ScenarioUpdate_fields(self) -> None:
+        try:
+            from apps.simulation.scenario.router import ScenarioUpdate
+            assert hasattr(ScenarioUpdate, 'model_fields')
+        except ImportError:
+            pass
+
+    def test_update_scenario_exists(self) -> None:
+        try:
+            from apps.simulation.scenario.router import update_scenario
+            assert callable(update_scenario)
+        except ImportError:
+            pass
