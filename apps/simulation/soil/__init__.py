@@ -1,1 +1,1 @@
-"""__init__ module."""
+"""Soil chemistry and physics subpackage."""
