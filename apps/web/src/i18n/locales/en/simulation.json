@@ -1,0 +1,46 @@
+{
+  "hubTitle": "Simulation Lab",
+  "hubSubtitle": "Scientific models for water, soil, carbon and climate",
+  "run": "Run simulation",
+  "running": "Running…",
+  "results": "Results",
+  "parameters": "Parameters",
+  "presets": "Presets",
+  "history": "Run history",
+  "downloadCsv": "Download CSV",
+  "downloadJson": "Download JSON",
+  "metrics": "Metrics",
+  "nse": "NSE",
+  "rmse": "RMSE",
+  "kge": "KGE",
+  "models": {
+    "richards": "Richards / PINN",
+    "sebs": "SEBS / ET",
+    "daycent": "DayCent 7-pool",
+    "saintVenant": "Saint-Venant",
+    "uncertainty": "Uncertainty (PCE / Sobol)",
+    "qaoa": "QAOA water allocation",
+    "nitrogen": "Nitrogen cycle",
+    "soilChem": "Soil chemistry",
+    "canopy": "Canopy microclimate",
+    "shuttleworth": "Shuttleworth–Wallace"
+  },
+  "richards": {
+    "title": "Richards equation & PINN",
+    "desc": "Soil moisture with hysteresis and physics-informed neural nets"
+  },
+  "sebs": {
+    "title": "SEBS energy balance",
+    "desc": "Evapotranspiration from satellite thermal and meteorology"
+  },
+  "daycent": {
+    "title": "DayCent seven pools",
+    "desc": "Soil organic carbon and nitrogen pools kinetics"
+  },
+  "uncertainty": {
+    "title": "Uncertainty quantification",
+    "desc": "Morris, Sobol, PCE and EnKF with NSE / KGE validation"
+  },
+  "emptyState": "Select a model and set parameters to run",
+  "apiOffline": "API unavailable — enable mock or start the backend"
+}
