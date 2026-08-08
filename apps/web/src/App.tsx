@@ -3,6 +3,7 @@ import { lazy, Suspense, Component, useEffect, type ReactNode } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { LanguageProvider } from "./components/eco/i18n";
 import Layout from "./components/Layout/Layout";
+import { RequireAuth } from "./features/auth/RequireAuth";
 import { AdminShell } from "./features/admin/AdminShell";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -145,7 +146,7 @@ export default function App() {
               <Route path="health" element={<AdminHealthPage />} />
               <Route path="settings" element={<AdminSettingsPage />} />
             </Route>
-            <Route path="/" element={<Layout />}>
+            <Route path="/" element={<RequireAuth><Layout /></RequireAuth>}>
               <Route index element={<HomePage />} />
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="farms" element={<FarmsPage />} />

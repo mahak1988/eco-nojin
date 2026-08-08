@@ -34,65 +34,46 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../../hooks/useAuth";
 import { fetchHeaderNavigation, combineNavigationData, type NavigationItem as ApiNavItem } from "../../services/navigationService";
 
-// Define fallback static navigation items for icons and basic structure
-type NavItem = { key: string; to: string; icon: LucideIcon };
+// Define static navigation items for icons (these won't come from the API)
+type NavItemWithIcon = { key: string; to: string; icon: LucideIcon };
 
-const FALLBACK_MAIN_NAV: NavItem[] = [
+// Static navigation items for icons mapping (fallback when API doesn't provide them)
+const STATIC_NAV_ITEMS_WITH_ICONS: NavItemWithIcon[] = [
   { key: "nav_dashboard", to: "/dashboard", icon: LayoutDashboard },
   { key: "nav_farms", to: "/farms", icon: Wheat },
   { key: "nav_education", to: "/education", icon: BookOpen },
   { key: "nav_satellite", to: "/satellite", icon: Satellite },
   { key: "nav_simulators", to: "/simulators", icon: FlaskConical },
   { key: "nav_mrv", to: "/mrv", icon: ShieldCheck },
+  { key: "nav_library", to: "/library", icon: BookOpen },
+  { key: "nav_community", to: "/community", icon: Users },
+  { key: "nav_games", to: "/games", icon: Gamepad2 },
+  { key: "nav_news", to: "/news", icon: FileText },
+  { key: "nav_analytics", to: "/analytics", icon: TrendingUp },
+  { key: "nav_alerts", to: "/alerts", icon: ShieldAlert },
+  { key: "nav_risks", to: "/risks", icon: ShieldAlert },
+  { key: "nav_reports", to: "/reports", icon: FileText },
+  { key: "nav_accounting", to: "/accounting", icon: Receipt },
+  { key: "nav_invoices", to: "/invoices", icon: FileText },
+  { key: "nav_journal", to: "/journal", icon: FileText },
+  { key: "nav_payments", to: "/payments", icon: Coins },
+  { key: "nav_ecocoin", to: "/ecocoin", icon: Coins },
+  { key: "nav_regional", to: "/regional", icon: MapPin },
+  { key: "nav_pilots", to: "/pilots", icon: FlaskConical },
+  { key: "nav_tourism", to: "/tourism", icon: Plane },
+  { key: "nav_users", to: "/users", icon: Users },
+  { key: "nav_account", to: "/account", icon: Users },
+  { key: "nav_policies", to: "/policies", icon: ShieldCheck },
+  { key: "nav_settings", to: "/settings", icon: Settings },
 ];
 
-const FALLBACK_MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
-  {
-    labelKey: "nav_group_monitoring",
-    items: [
-      { key: "nav_analytics", to: "/analytics", icon: TrendingUp },
-      { key: "nav_alerts", to: "/alerts", icon: ShieldAlert },
-      { key: "nav_risks", to: "/risks", icon: ShieldAlert },
-      { key: "nav_reports", to: "/reports", icon: FileText },
-    ],
-  },
-  {
-    labelKey: "nav_group_finance",
-    items: [
-      { key: "nav_accounting", to: "/accounting", icon: Receipt },
-      { key: "nav_invoices", to: "/invoices", icon: FileText },
-      { key: "nav_journal", to: "/journal", icon: FileText },
-      { key: "nav_payments", to: "/payments", icon: Coins },
-      { key: "nav_ecocoin", to: "/ecocoin", icon: Coins },
-    ],
-  },
-  {
-    labelKey: "nav_group_community",
-    items: [
-      { key: "nav_community", to: "/community", icon: Users },
-      { key: "nav_games", to: "/games", icon: Gamepad2 },
-      { key: "nav_news", to: "/news", icon: FileText },
-      { key: "nav_library", to: "/library", icon: BookOpen },
-    ],
-  },
-  {
-    labelKey: "nav_group_regional",
-    items: [
-      { key: "nav_regional", to: "/regional", icon: MapPin },
-      { key: "nav_pilots", to: "/pilots", icon: FlaskConical },
-      { key: "nav_tourism", to: "/tourism", icon: Plane },
-    ],
-  },
-  {
-    labelKey: "nav_group_system",
-    items: [
-      { key: "nav_users", to: "/users", icon: Users },
-      { key: "nav_account", to: "/account", icon: Users },
-      { key: "nav_policies", to: "/policies", icon: ShieldCheck },
-      { key: "nav_settings", to: "/settings", icon: Settings },
-    ],
-  },
-];
+// Helper function to get an icon for a given route or key
+const getIconForRoute = (routeOrKey: string): LucideIcon => {
+  const item = STATIC_NAV_ITEMS_WITH_ICONS.find(item => 
+    item.key === routeOrKey || item.to === routeOrKey || routeOrKey.startsWith(item.to)
+  );
+  return item ? item.icon : BookOpen; // Default icon
+};
 
 
 export function Header() {
@@ -126,30 +107,10 @@ export function Header() {
       } catch (err: any) {
         console.error("Error loading navigation:", err);
         setError(err.message || "Failed to load navigation");
-        // Fallback to static data if API fails
-        setCombinedNav({
-          mainNav: FALLBACK_MAIN_NAV.map(item => ({
-            ...item,
-            id: item.key,
-            title: t(item.key) || item.key, // Attempt to translate title
-            slug: item.key.toLowerCase().replace('nav_', ''), // Generate a slug
-            source: 'fallback',
-            order: 0,
-            isActive: true,
-          })) as ApiNavItem[],
-          moreGroups: FALLBACK_MORE_GROUPS.map(group => ({
-            label: t(group.labelKey) || group.labelKey, // Attempt to translate label
-            items: group.items.map(item => ({
-              ...item,
-              id: item.key,
-              title: t(item.key) || item.key, // Attempt to translate title
-              slug: item.key.toLowerCase().replace('nav_', ''), // Generate a slug
-              source: 'fallback',
-              order: 0,
-              isActive: true,
-            })) as ApiNavItem[]
-          }))
-        });
+        // The service already handles fallback internally, so the data in apiData should be the fallback
+        const apiData = await fetchHeaderNavigation(); // This will return fallback
+        const combined = combineNavigationData(apiData, lang);
+        setCombinedNav(combined);
       } finally {
         setLoading(false);
       }
@@ -227,7 +188,7 @@ export function Header() {
   // Optionally, render with error info but still show fallback content
   if (error) {
     console.warn("Navigation API error, using fallback:", error);
-    // We continue rendering as the fallback data is already set in the catch block
+    // We continue rendering as the fallback data is already loaded by the service
   }
 
   return (
@@ -256,20 +217,15 @@ export function Header() {
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
           {/* Render main navigation from API data */}
-          {combinedNav.mainNav.map((item) => (
-            <Link key={item.id} to={item.url} className={navLinkCls(item.url)}>
-              {/* Icons are not part of the API response, so we use a generic icon or hide it if no mapping is possible */}
-              {/* For now, we'll hide the icon in the main nav for dynamic items, keeping it for static/fallback ones */}
-              {FALLBACK_MAIN_NAV.find(fallbackItem => fallbackItem.key === item.id || fallbackItem.to === item.url) ? (
-                <>
-                  {(FALLBACK_MAIN_NAV.find(fallbackItem => fallbackItem.key === item.id || fallbackItem.to === item.url)?.icon || BookOpen)({ className: "h-4 w-4" })}
-                  <span>{t(item.id) || item.title}</span>
-                </>
-              ) : (
+          {combinedNav.mainNav.map((item) => {
+            const IconComponent = getIconForRoute(item.id) || getIconForRoute(item.url);
+            return (
+              <Link key={item.id} to={item.url} className={navLinkCls(item.url)}>
+                <IconComponent className="h-4 w-4" />
                 <span>{t(item.id) || item.title}</span>
-              )}
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
 
           <div className="relative" ref={moreRef}>
             <button
@@ -296,22 +252,24 @@ export function Header() {
                       {group.label}
                     </p>
                     <div className="space-y-0.5">
-                      {group.items.map((item) => (
-                        <Link
-                          key={item.id}
-                          to={item.url}
-                          role="menuitem"
-                          onClick={() => setMoreOpen(false)}
-                          className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
-                            location.pathname === item.url
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "text-slate-600 hover:bg-slate-100"
-                          }`}
-                        >
-                          {/* No icon for dynamic items in more menu */}
-                          {t(item.id) || item.title}
-                        </Link>
-                      ))}
+                      {group.items.map((item) => {
+                         // No specific icon logic needed in the more menu for dynamic items
+                        return (
+                          <Link
+                            key={item.id}
+                            to={item.url}
+                            role="menuitem"
+                            onClick={() => setMoreOpen(false)}
+                            className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
+                              location.pathname === item.url
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "text-slate-600 hover:bg-slate-100"
+                            }`}
+                          >
+                            {t(item.id) || item.title}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -372,21 +330,24 @@ export function Header() {
         <div className="max-h-[80vh] overflow-y-auto border-t border-slate-200 bg-white lg:hidden">
           <nav className="mx-auto max-w-7xl space-y-4 px-4 py-4">
             <div className="grid grid-cols-2 gap-1">
-              {combinedNav.mainNav.map((item) => (
-                <Link
-                  key={item.id}
-                  to={item.url}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
-                    location.pathname.startsWith(item.url)
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-slate-600"
-                  }`}
-                >
-                  {/* No icon for dynamic items in mobile menu */}
-                  {t(item.id) || item.title}
-                </Link>
-              ))}
+              {combinedNav.mainNav.map((item) => {
+                const IconComponent = getIconForRoute(item.id) || getIconForRoute(item.url);
+                return (
+                  <Link
+                    key={item.id}
+                    to={item.url}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
+                      location.pathname.startsWith(item.url)
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "text-slate-600"
+                    }`}
+                  >
+                    <IconComponent className="h-4 w-4" />
+                    {t(item.id) || item.title}
+                  </Link>
+                );
+              })}
             </div>
             {combinedNav.moreGroups.map((group, groupIndex) => (
               <div key={groupIndex /* Use index as key since label might not be unique */}>
@@ -401,7 +362,6 @@ export function Header() {
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
                     >
-                      {/* No icon for dynamic items in mobile menu */}
                       {t(item.id) || item.title}
                     </Link>
                   ))}
