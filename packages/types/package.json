@@ -2,7 +2,7 @@
     "name":  "@econojin/types",
     "version":  "0.1.0",
     "private":  true,
-    "description":  "ãÑÌÚ ãÑ˜Òí ÊãÇãí ÇíäÊÑİíÓåÇ æ ÊÇíåÇí TypeScript",
+    "description":  "ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ˜ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óï¿½ï¿½ ï¿½ ï¿½ï¿½íï¿½ï¿½ï¿½ TypeScript",
     "main":  "src/index.ts",
     "types":  "src/index.ts",
     "scripts":  {

@@ -1,11 +1,14 @@
 export default [
   {
-    ignores: ["**/node_modules/**", "**/dist/**", "**/build/**", "**/.turbo/**"],
-  },
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    languageOptions: {
-      parser: (await import("typescript-eslint")).default.configs.base,
-    },
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.turbo/**",
+      "**/.venv/**",
+      "**/__pycache__/**",
+      "**/*.ts",
+      "**/*.tsx",
+    ],
   },
 ];

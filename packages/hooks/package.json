@@ -2,7 +2,7 @@
     "name":  "@econojin/hooks",
     "version":  "0.1.0",
     "private":  true,
-    "description":  "åæ˜åÇí ãÔÊÑ˜ æ ŞÇÈá ÇÓÊİÇÏå ãÌÏÏ",
+    "description":  "Ù‡ÙˆÚ©â€ŒÙ‡Ø§ÙŠ Ù…Ø´ØªØ±Ú© Ùˆ Ù‚Ø§Ø¨Ù„ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ù…Ø¬Ø¯Ø¯",
     "main":  "src/index.ts",
     "types":  "src/index.ts",
     "scripts":  {
