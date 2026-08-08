@@ -1,0 +1,1 @@
+{"name":"hydroma-mock-server","version":"1.0.0","scripts":{"start":"node mock-server.js","dev":"node --watch mock-server.js"},"dependencies":{"express":"^4.18.2","cors":"^2.8.5"}}

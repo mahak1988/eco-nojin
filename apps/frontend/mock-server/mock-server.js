@@ -1,0 +1,9 @@
+const express=require('express');const cors=require('cors');const app=express();app.use(cors());app.use(express.json());const LATENCY=()=>new Promise(r=>setTimeout(r,200+Math.random()*400));
+app.post('/api/v1/simulation/richards',async(req,res)=>{await LATENCY();res.json({status:'ok',h_final:[...Array(21)].map((_,i)=>-0.5-i*0.12),theta_final:[...Array(21)].map((_,i)=>0.35-i*0.015),n_steps:24})});
+app.post('/api/v1/simulation/daycent',async(req,res)=>{await LATENCY();res.json({status:'ok',final:{N_org:45,NH4:4.2,NO3:8.5,N2O:0.03,N2:0.15},history:[...Array(30)].map((_,i)=>[45-i*0.2,4.2+i*0.02,8.5-i*0.1,0.03+i*0.001,0.01+i*0.005])})});
+app.post('/api/v1/simulation/sebs',async(req,res)=>{await LATENCY();res.json({Rn:450,G0:40,H:120,LE:290,EF:0.72,ET_mm:5.2})});
+app.get('/api/v1/satellite/ndvi',async(req,res)=>{await LATENCY();res.json({mean:0.45,min:0.12,max:0.82,std:0.18,time:'2026-08-08'})});
+app.get('/api/v1/satellite/layers',(req,res)=>{res.json([{id:'ndvi',name:'NDVI',enabled:true,source:'Sentinel-2',resolution:'10m'},{id:'soil-moisture',name:'Soil Moisture',enabled:true,source:'Sentinel-1',resolution:'20m'},{id:'et',name:'ET',enabled:true,source:'SEBS/Landsat',resolution:'30m'}])});
+app.get('/api/v1/analysis/benchmark',async(req,res)=>{await LATENCY();res.json({models:[{name:'Hydroma',NSE:0.91,KGE:0.88,RMSE:4.2},{name:'SWAT',NSE:0.82,KGE:0.79,RMSE:7.1}]})});
+app.get('/api/v1/science/status',(req,res)=>{res.json({models:[{name:'Richards',status:'ready'},{name:'DayCent',status:'ready'},{name:'PINN',status:'training'}],uptime:'48h',version:'2.0'})});
+const PORT=8001;app.listen(PORT,()=>console.log(`Hydroma Mock Server → http://localhost:${PORT}`))
