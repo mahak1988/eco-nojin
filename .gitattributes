@@ -1,0 +1,17 @@
+# Auto-detect text files, normalize line endings
+* text=auto
+
+# Documentation
+*.md linguist-detectable=true
+docs/* linguist-documentation=true
+
+# Python
+*.py linguist-language=Python
+
+# Notebooks
+*.ipynb linguist-language=Jupyter Notebook
+
+# Binary
+*.png binary
+*.jpg binary
+*.pdf binary
