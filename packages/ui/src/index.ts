@@ -9,3 +9,7 @@ export * from './toast';
 export * from './use-toast';
 export * from './components/maps/MapViewer';
 export * from './components/booking/BookingCalendar';
+export * from './tabs';
+export * from './skeleton';
+export * from './switch';
+export * from './slider';

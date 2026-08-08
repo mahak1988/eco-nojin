@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Image, Video, Calendar, User, Eye, Edit, Trash2, Plus, Search, Filter, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@econojin/ui/button';
-import { Input } from '@econojin/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@econojin/ui/card';
-import { Badge } from '@econojin/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@econojin/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@econojin/ui/select';
+import { Button } from '@econojin/ui';
+import { Input } from '@econojin/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@econojin/ui';
+import { Badge } from '@econojin/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@econojin/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@econojin/ui';
 
 // Types for content management
 interface ContentItem {

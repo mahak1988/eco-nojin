@@ -17,6 +17,36 @@ module.exports = ({ env }) => {
     };
   }
 
+  // Check for DATABASE_URL first (standard for platforms like Supabase)
+  const databaseUrl = env('DATABASE_URL');
+
+  if (databaseUrl) {
+    // Parse the DATABASE_URL to extract connection details
+    const { URL } = require('url'); // Import URL module
+    const parsedUrl = new URL(databaseUrl);
+
+    return {
+      connection: {
+        client: 'postgres',
+        connection: {
+          host: parsedUrl.hostname,
+          port: parseInt(parsedUrl.port, 10),
+          database: parsedUrl.pathname.slice(1), // Remove leading '/'
+          user: parsedUrl.username,
+          password: parsedUrl.password,
+          ssl: env.bool('DATABASE_SSL', false)
+            ? { rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', true) }
+            : false,
+        },
+        pool: {
+          min: env.int('DATABASE_POOL_MIN', 0),
+          max: env.int('DATABASE_POOL_MAX', 10),
+        },
+      },
+    };
+  }
+
+  // Fallback to individual environment variables if DATABASE_URL is not set
   return {
     connection: {
       client: 'postgres',

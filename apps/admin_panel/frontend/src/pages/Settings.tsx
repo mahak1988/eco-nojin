@@ -1,9 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@econojin/ui/card';
-import { Label } from '@econojin/ui/label';
-import { Switch } from '@econojin/ui/switch';
-import { Slider } from '@econojin/ui/slider';
-import { Input } from '@econojin/ui/input';
-import { Button } from '@econojin/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@econojin/ui';
+import { Label } from '@econojin/ui';
+import { Switch } from '@econojin/ui';
+import { Slider } from '@econojin/ui';
+import { Input } from '@econojin/ui';
+import { Button } from '@econojin/ui';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeSelector from '../components/ThemeSelector';
 import { Palette, Monitor } from 'lucide-react';

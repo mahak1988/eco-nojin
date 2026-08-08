@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import AdminSidebar from './AdminSidebar'
 import ThemeSelector from './ThemeSelector'
-import { Button } from '@econojin/ui/button'
+import { Button } from '@econojin/ui'
 import { Moon, Sun, LogOut } from 'lucide-react'
 import { useTheme } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'

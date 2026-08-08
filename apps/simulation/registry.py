@@ -1,4 +1,4 @@
-"""
+﻿"""
 Simulator Registry
 ==================
 Auto-discovers and registers simulators at IMPORT TIME. Robust: modules that
@@ -37,6 +37,8 @@ SIMULATOR_MODULES: list[tuple[str, str]] = [
     ("apps.simulation.energy.homer", "HOMERSimulator"),
     ("apps.simulation.energy.leap", "LEAPSimulator"),
     ("apps.simulation.soil.epic", "EPICSimulator"),
+    ("apps.simulation.soil.hydrus", "HydrusSimulator"),
+    ("apps.simulation.carbon_cycle.daycent", "DayCentSimulator"),
     ("apps.simulation.soil.rusle2", "RUSLE2Simulator"),
     ("apps.simulation.water_quality.qual2k", "QUAL2KSimulator"),
     ("apps.simulation.water_quality.wasp", "WASPSimulator"),
@@ -59,19 +61,19 @@ def _load_all() -> tuple[int, int]:
                 _FAILED.append({"module": mod_path, "reason": f"class {cls_name} not found"})
                 skipped += 1
         except ModuleNotFoundError:
-            logger.debug(f"⏭️  {mod_path} — not implemented (skip)")
+            logger.debug(f"âڈ­ï¸ڈ  {mod_path} â€” not implemented (skip)")
             skipped += 1
         except Exception as e:
-            # e.g. "Can't instantiate abstract class ..." → record, skip silently
-            logger.debug(f"⏭️  {mod_path} — {e} (skip)")
+            # e.g. "Can't instantiate abstract class ..." â†’ record, skip silently
+            logger.debug(f"âڈ­ï¸ڈ  {mod_path} â€” {e} (skip)")
             _FAILED.append({"module": mod_path, "reason": str(e)})
             skipped += 1
     return loaded, skipped
 
 
 _LOADED, _SKIPPED = _load_all()
-# یک خط خلاصه (INFO) — نه اخطار
-logger.info(f"🔬 شبیه‌سازها: {_LOADED} بارگذاری، {_SKIPPED} skip")
+# غŒع© ط®ط· ط®ظ„ط§طµظ‡ (INFO) â€” ظ†ظ‡ ط§ط®ط·ط§ط±
+logger.info(f"ًں”¬ ط´ط¨غŒظ‡â€Œط³ط§ط²ظ‡ط§: {_LOADED} ط¨ط§ط±ع¯ط°ط§ط±غŒطŒ {_SKIPPED} skip")
 
 
 def register_all_simulators() -> list[dict]:

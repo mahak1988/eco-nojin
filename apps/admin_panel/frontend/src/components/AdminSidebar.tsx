@@ -4,7 +4,7 @@ import {
   BookOpen, Receipt, CreditCard, Menu, Tractor, CloudSun, TrendingUp, AlertTriangle,
   Satellite, FlaskConical, Brain,
 } from 'lucide-react'
-import { Button } from '@econojin/ui/button'
+import { Button } from '@econojin/ui'
 import { useMemo, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 

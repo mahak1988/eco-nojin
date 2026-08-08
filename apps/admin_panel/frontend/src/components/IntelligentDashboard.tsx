@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, TrendingUp, AlertTriangle, Lightbulb, BarChart3, Activity } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@econojin/ui/card';
-import { Badge } from '@econojin/ui/badge';
-import { Button } from '@econojin/ui/button';
-import { Skeleton } from '@econojin/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@econojin/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@econojin/ui';
+import { Badge } from '@econojin/ui';
+import { Button } from '@econojin/ui';
+import { Skeleton } from '@econojin/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@econojin/ui';
 
 // Types for intelligent features
 interface SmartRecommendation {
