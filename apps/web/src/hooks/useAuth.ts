@@ -4,8 +4,8 @@ import { authApi } from "../api/auth.api";
 import type { AuthUser } from "../types/auth";
 
 function mapUser(me: {
-  id: string;
-  email: string;
+  id?: number | string;
+  email?: string;
   full_name?: string | null;
   is_active?: boolean;
   is_superuser?: boolean;
@@ -13,8 +13,8 @@ function mapUser(me: {
   locale?: string;
 }): AuthUser {
   return {
-    id: me.id,
-    email: me.email,
+    id: String(me.id ?? ""),
+    email: me.email ?? "",
     full_name: me.full_name ?? undefined,
     is_superuser: me.is_superuser,
   } as AuthUser;
@@ -30,7 +30,7 @@ export function useAuth() {
     (async () => {
       try {
         const me = await authApi.me();
-        if (!cancelled && me && typeof me === "object" && "id" in me) {
+        if (!cancelled && me && typeof me === "object" && ("id" in me || "email" in me)) {
           setSession(token || "cookie", mapUser(me as never));
         }
       } catch {
@@ -46,7 +46,7 @@ export function useAuth() {
 
   const setSessionFromAuth = useCallback(
     (tok: string, u?: unknown) => {
-      if (u && typeof u === "object" && u !== null && "id" in u) {
+      if (u && typeof u === "object" && u !== null && ("id" in u || "email" in u)) {
         setSession(tok || "cookie", mapUser(u as never));
       } else if (tok) {
         setSession(tok);
@@ -58,6 +58,7 @@ export function useAuth() {
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await authApi.login({ username: email, password });
+      // authApi.login already normalizes accessToken → access_token
       const tok = res.access_token || "";
       if (res.user) setSessionFromAuth(tok, res.user);
       else if (tok) setSession(tok);
@@ -81,15 +82,14 @@ export function useAuth() {
         email,
         password,
         full_name: extra?.full_name,
-        locale: "en-US" // Adding default locale for registration
+        phone: extra?.phone,
+        organization: extra?.organization,
+        role: extra?.role ?? "farmer",
+        accept_terms: true,
       });
-      
-      // After registration, login to get the token
-      const loginResult = await login(email, password);
-      
       return res;
     },
-    [setSession, setSessionFromAuth],
+    [],
   );
 
   const logout = useCallback(async () => {
