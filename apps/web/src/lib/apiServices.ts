@@ -128,6 +128,14 @@ export async function getClimateZones() {
   });
 }
 
+export async function applyClimateZonePackage(zoneId: string) {
+  return fetchSafe(
+    `/api/v1/science/climate-zones/${zoneId}/apply`,
+    { ok: false },
+    { method: "POST", headers: { "Content-Type": "application/json" } },
+  );
+}
+
 export async function getSatelliteCatalog() {
   return fetchSafe("/api/v1/science/satellite-catalog", {
     platforms: [] as SatellitePlatform[],
