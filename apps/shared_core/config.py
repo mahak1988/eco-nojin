@@ -94,7 +94,6 @@ class Settings(BaseSettings):
     def jwt_secret(self) -> str:
         return self.JWT_SECRET_KEY or self.SECRET_KEY
 
-    
     @model_validator(mode="after")
     def warn_empty_secret(self) -> "Settings":
         if not self.SECRET_KEY:
@@ -106,8 +105,14 @@ class Settings(BaseSettings):
         if self.ENVIRONMENT == "production":
             if len(self.SECRET_KEY) < 32 or self.SECRET_KEY.startswith("local-dev"):
                 raise ValueError("SECRET_KEY must be a strong random value in production")
-            if self.ALGORITHM.upper().startswith("HS"):
-                logger.warning("Production still on HS* — prefer RS256 with mounted keys")
+            # Enforce RS256 in production
+            if self.ALGORITHM.upper() != "RS256":
+                raise ValueError("ALGORITHM must be RS256 in production environment.")
+            # Ensure RS256 keys are provided in production
+            if not (self.JWT_PRIVATE_KEY_PATH or self.JWT_PRIVATE_KEY):
+                raise ValueError("JWT_PRIVATE_KEY_PATH or JWT_PRIVATE_KEY must be set in production when using RS256.")
+            if not (self.JWT_PUBLIC_KEY_PATH or self.JWT_PUBLIC_KEY):
+                raise ValueError("JWT_PUBLIC_KEY_PATH or JWT_PUBLIC_KEY must be set in production when using RS256.")
             if self.REQUIRE_AUTH_FOR_WRITES is False:
                 logger.warning("REQUIRE_AUTH_FOR_WRITES is False in production")
             if not self.ENABLE_RATE_LIMIT:
@@ -118,6 +123,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
-
-settings = get_settings()

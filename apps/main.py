@@ -21,12 +21,18 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# Import core security components
 from apps.shared_core.security_init import (
     initialize_security,
     apply_response_security_headers,
     authenticate_request,
 )
 from apps.shared_core.config import settings
+
+# Import security middlewares
+from apps.shared_core.middleware.rate_limit import RateLimitMiddleware
+from apps.spider_security.middleware import SpiderGuardMiddleware
+from apps.shared_core.middleware.audit_log import AuditLogMiddleware
 
 logging.basicConfig(
     level=logging.INFO,
@@ -115,13 +121,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 _docs = "/docs" if settings.ENVIRONMENT != "production" else None
 _redoc = "/redoc" if settings.ENVIRONMENT != "production" else None
 
+# Create FastAPI instance with minimal initial setup
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description="Agriculture, water, environment and economy platform",
     version=settings.VERSION,
-    docs_url=_docs,
-    redoc_url=_redoc,
     lifespan=lifespan,
+    # Disable docs in production for security
+    docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc",
 )
 
 _security_stack.extend(initialize_security(app))
@@ -138,6 +146,23 @@ for extra in (
     if extra not in _cors_origins:
         _cors_origins.append(extra)
 
+# Apply security middlewares in the correct order
+# 1. Audit Log - logs all requests
+if settings.ENABLE_AUDIT_LOG:
+    app.add_middleware(AuditLogMiddleware)
+    logger.info("AuditLog middleware enabled.")
+
+# 2. Rate Limiting - prevents abuse
+if settings.ENABLE_RATE_LIMIT:
+    app.add_middleware(RateLimitMiddleware)
+    logger.info("RateLimit middleware enabled.")
+
+# 3. SpiderGuard - protects against bots
+if settings.ENABLE_SPIDERGUARD:
+    app.add_middleware(SpiderGuardMiddleware)
+    logger.info("SpiderGuard middleware enabled.")
+
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
@@ -194,6 +219,14 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
     )
 
 
+@app.exception_handler(429)
+def ratelimit_handler(request: Request, exc):
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={"detail": "Rate limit exceeded"},
+    )
+
+
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
     return JSONResponse(
@@ -207,236 +240,3 @@ async def not_found_handler(request: Request, exc: Exception) -> JSONResponse:
             }
         },
     )
-
-
-def _is_optional_failure(msg: str) -> bool:
-    lower = msg.lower()
-    return any(h in lower for h in _OPTIONAL_MODULE_HINTS)
-
-
-def _include(label: str, loader: Any, **kwargs: Any) -> None:
-    try:
-        router = loader()
-        app.include_router(router, **kwargs)
-        _loaded_routers.append(label)
-        logger.info("%s: router loaded", label)
-    except Exception as e:
-        err = str(e)
-        _failed_routers.append({"label": label, "error": err[:300]})
-        if _is_optional_failure(err):
-            logger.debug("%s skipped (optional): %s", label, err)
-        else:
-            logger.warning("%s FAILED: %s", label, e, exc_info=True)
-
-
-_include(
-    "users",
-    lambda: __import__("apps.users.router", fromlist=["router"]).router,
-    prefix=f"{settings.API_V1_STR}/users",
-    tags=["Users"],
-)
-_include(
-    "auth",
-    lambda: __import__("apps.users.auth_router", fromlist=["router"]).router,
-    prefix=settings.API_V1_STR,
-    tags=["Authentication"],
-)
-_include(
-    "ai_agents",
-    lambda: __import__("apps.ai_agents.router", fromlist=["router"]).router,
-    prefix=f"{settings.API_V1_STR}/ai-agents",
-    tags=["AI Agents"],
-)
-_include(
-    "ai_agents_public",
-    lambda: __import__("apps.ai_agents.public_router", fromlist=["router"]).router,
-)
-_include("accounting", lambda: __import__("apps.api.routes.accounting", fromlist=["router"]).router)
-_include(
-    "accounting_seed",
-    lambda: __import__("apps.api.routes.accounting_seed", fromlist=["router"]).router,
-)
-_include("payments", lambda: __import__("apps.api.routes.payments", fromlist=["router"]).router)
-_include("ecocoin", lambda: __import__("apps.api.routes.ecocoin", fromlist=["router"]).router)
-_include(
-    "mrv_standards",
-    lambda: __import__("apps.api.routes.mrv_standards_api", fromlist=["router"]).router,
-    prefix=settings.API_V1_STR,
-    tags=["MRV Standards"],
-)
-_include("monitoring", lambda: __import__("apps.api.routes.monitoring", fromlist=["router"]).router)
-_include("alerts", lambda: __import__("apps.api.routes.alerts", fromlist=["router"]).router)
-_include("simulator", lambda: __import__("apps.api.routes.simulator", fromlist=["router"]).router)
-_include(
-    "admin_panel",
-    lambda: __import__("apps.admin_panel.router", fromlist=["router"]).router,
-    prefix=settings.API_V1_STR,
-    tags=["Admin"],
-)
-_include(
-    "admin_cms_bridge",
-    lambda: __import__("apps.admin_panel.cms_routes", fromlist=["router"]).router,
-    prefix=settings.API_V1_STR,
-    tags=["Admin CMS Bridge"],
-)
-_include(
-    "simulation",
-    lambda: __import__("apps.simulation.router", fromlist=["router"]).router,
-    prefix=f"{settings.API_V1_STR}/simulation",
-    tags=["Simulation"],
-)
-_include("data", lambda: __import__("apps.simulation.data.router", fromlist=["router"]).router)
-_include("advisory", lambda: __import__("apps.simulation.advisory.router", fromlist=["router"]).router)
-_include("runs", lambda: __import__("apps.simulation.runs.router", fromlist=["router"]).router)
-_include("scenario", lambda: __import__("apps.simulation.scenario.router", fromlist=["router"]).router)
-_include(
-    "validation", lambda: __import__("apps.simulation.validation.router", fromlist=["router"]).router
-)
-_include(
-    "agriculture_schools",
-    lambda: __import__("apps.api.routes.agriculture_schools", fromlist=["router"]).router,
-)
-_include("education", lambda: __import__("apps.api.routes.education", fromlist=["router"]).router)
-_include(
-    "education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router
-)
-_include(
-    "navigation",
-    lambda: __import__("apps.api.routes.navigation", fromlist=["router"]).router,
-    prefix=settings.API_V1_STR,
-    tags=["Navigation"],
-)
-_include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
-_include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
-_include(
-    "science_catalog",
-    lambda: __import__("apps.api.routes.science_catalog_routes", fromlist=["router"]).router,
-)
-_include("rothc_full", lambda: __import__("apps.api.routes.rothc_full", fromlist=["router"]).router)
-_include("soil_carbon", lambda: __import__("apps.api.routes.soil_carbon", fromlist=["router"]).router)
-_include(
-    "organic_matter",
-    lambda: __import__("apps.api.routes.organic_matter", fromlist=["router"]).router,
-)
-_include("nitrogen", lambda: __import__("apps.api.routes.nitrogen", fromlist=["router"]).router)
-_include("soil_suite", lambda: __import__("apps.api.routes.soil_suite", fromlist=["router"]).router)
-_include(
-    "phosphorus_soil",
-    lambda: __import__("apps.api.routes.phosphorus_soil", fromlist=["router"]).router,
-)
-_include(
-    "science_monitors",
-    lambda: __import__("apps.api.routes.science_monitors", fromlist=["router"]).router,
-)
-_include("ml", lambda: __import__("apps.api.routes.ml", fromlist=["router"]).router)
-_include("science_phase3", lambda: __import__("apps.simulation.phase3_router", fromlist=["router"]).router)
-_include("community", lambda: __import__("apps.api.routes.community", fromlist=["router"]).router)
-_include("games", lambda: __import__("apps.api.routes.games", fromlist=["router"]).router)
-_include("chain", lambda: __import__("apps.simulation.chain.router", fromlist=["router"]).router)
-_include("reports", lambda: __import__("apps.simulation.reports.router", fromlist=["router"]).router)
-_include("farms", lambda: __import__("apps.farms.router", fromlist=["router"]).router)
-_include("farms_spatial", lambda: __import__("apps.farms.spatial_router", fromlist=["router"]).router)
-_include("crops", lambda: __import__("apps.crops.router", fromlist=["router"]).router)
-_include("water", lambda: __import__("apps.water.router", fromlist=["router"]).router)
-_include("planting", lambda: __import__("apps.planting.router", fromlist=["router"]).router)
-_include("inventory", lambda: __import__("apps.inventory.router", fromlist=["router"]).router)
-_include("weather", lambda: __import__("apps.weather.router", fromlist=["router"]).router)
-_include("dashboard", lambda: __import__("apps.dashboard.router", fromlist=["router"]).router)
-_include(
-    "dashboard_overview",
-    lambda: __import__("apps.api.routes.dashboard_overview", fromlist=["router"]).router,
-)
-_include("notifications", lambda: __import__("apps.notifications.router", fromlist=["router"]).router)
-_include("risks", lambda: __import__("apps.risks.router", fromlist=["router"]).router)
-_include("monitoring_core", lambda: __import__("apps.monitoring.router", fromlist=["router"]).router)
-_include("satellite", lambda: __import__("apps.satellite.router", fromlist=["router"]).router)
-_include("simulation_jobs", lambda: __import__("apps.simulation.jobs_router", fromlist=["router"]).router)
-_include("websocket", lambda: __import__("apps.shared_core.websocket.router", fromlist=["router"]).router)
-_include(
-    "economics",
-    lambda: __import__("apps.economics", fromlist=["router"]).router,
-    prefix=f"{settings.API_V1_STR}/economics",
-    tags=["Economics"],
-)
-
-
-
-
-_include(
-    "finance",
-    lambda: __import__("apps.finance.router", fromlist=["router"]).router,
-    prefix=f"{settings.API_V1_STR}/finance",
-    tags=["Finance"],
-)
-@app.get("/", tags=["Root"])
-async def root() -> dict[str, Any]:
-    return {
-        "name": settings.PROJECT_NAME,
-        "status": "running",
-        "version": settings.VERSION,
-        "environment": settings.ENVIRONMENT,
-        "docs": _docs,
-        "project_root": str(PROJECT_ROOT),
-    }
-
-
-@app.get("/health", tags=["Health"])
-async def health() -> dict[str, Any]:
-    db_live = False
-    db_detail = _db_status.get("detail", "unknown")
-    try:
-        from apps.shared_core.database.session import get_engine
-
-        eng = get_engine()
-        async with eng.connect() as conn:
-            await conn.execute(text("SELECT 1"))
-        db_live = True
-        db_detail = "ok"
-    except Exception as e:
-        db_live = False
-        db_detail = str(e)[:200]
-    return {
-        "status": "healthy" if db_live else "degraded",
-        "version": settings.VERSION,
-        "environment": settings.ENVIRONMENT,
-        "database": "ok" if db_live else "fail",
-        "database_detail": db_detail,
-        "security": {
-            "stack": list(_security_stack),
-            "rate_limit": settings.ENABLE_RATE_LIMIT,
-            "audit_log": settings.ENABLE_AUDIT_LOG,
-            "spiderguard": settings.ENABLE_SPIDERGUARD or settings.ENVIRONMENT == "production",
-            "require_auth_writes": settings.REQUIRE_AUTH_FOR_WRITES,
-            "algorithm": settings.ALGORITHM,
-        },
-        "science_loaded": "science" in _loaded_routers,
-        "monitors_loaded": "science_monitors" in _loaded_routers,
-        "ml_loaded": "ml" in _loaded_routers,
-        "payments_loaded": "payments" in _loaded_routers,
-        "mrv_standards_loaded": "mrv_standards" in _loaded_routers,
-        "loaded_routers": list(_loaded_routers),
-        "failed_routers": list(_failed_routers),
-    }
-
-
-@app.get("/api/v1/debug/routers", tags=["Debug"])
-async def debug_routers() -> dict[str, Any]:
-    paths = sorted({getattr(r, "path", "") for r in app.routes if getattr(r, "path", None)})
-    science = [p for p in paths if "science" in p or "/ml" in p or "/mrv" in p]
-    return {
-        "project_root": str(PROJECT_ROOT),
-        "loaded": _loaded_routers,
-        "failed": _failed_routers,
-        "security_stack": _security_stack,
-        "science_paths": science,
-        "path_count": len(paths),
-    }
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", "8000"))
-    reload = settings.ENVIRONMENT == "local"
-    uvicorn.run("apps.main:app", host=host, port=port, reload=reload, log_level="info", access_log=True)
