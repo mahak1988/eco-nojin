@@ -32,10 +32,12 @@ import { useLang, CONTENT } from "../eco/i18n";
 import { tr } from "../eco/i18n_extras";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useAuth } from "../../hooks/useAuth";
+import { fetchHeaderNavigation, combineNavigationData, type NavigationItem as ApiNavItem } from "../../services/navigationService";
 
+// Define fallback static navigation items for icons and basic structure
 type NavItem = { key: string; to: string; icon: LucideIcon };
 
-const MAIN_NAV: NavItem[] = [
+const FALLBACK_MAIN_NAV: NavItem[] = [
   { key: "nav_dashboard", to: "/dashboard", icon: LayoutDashboard },
   { key: "nav_farms", to: "/farms", icon: Wheat },
   { key: "nav_education", to: "/education", icon: BookOpen },
@@ -44,7 +46,7 @@ const MAIN_NAV: NavItem[] = [
   { key: "nav_mrv", to: "/mrv", icon: ShieldCheck },
 ];
 
-const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
+const FALLBACK_MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
   {
     labelKey: "nav_group_monitoring",
     items: [
@@ -92,6 +94,7 @@ const MORE_GROUPS: { labelKey: string; items: NavItem[] }[] = [
   },
 ];
 
+
 export function Header() {
   const { lang } = useLang();
   const pack = (CONTENT[lang] ?? CONTENT.fa) as unknown as Record<string, unknown>;
@@ -101,13 +104,70 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [loading, setLoading] = useState(true); // Loading state for API call
+  const [error, setError] = useState<string | null>(null); // Error state for API call
+  const [combinedNav, setCombinedNav] = useState<{ mainNav: ApiNavItem[]; moreGroups: { label: string; items: ApiNavItem[] }[] }>({ 
+    mainNav: [], 
+    moreGroups: [] // Initialize with empty arrays
+  });
+
   const moreRef = useRef<HTMLDivElement>(null);
   const canGoBack = location.pathname !== "/";
 
+  // Fetch navigation data from API on component mount
+  useEffect(() => {
+    const loadNavigation = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const apiData = await fetchHeaderNavigation();
+        const combined = combineNavigationData(apiData, lang);
+        setCombinedNav(combined);
+      } catch (err: any) {
+        console.error("Error loading navigation:", err);
+        setError(err.message || "Failed to load navigation");
+        // Fallback to static data if API fails
+        setCombinedNav({
+          mainNav: FALLBACK_MAIN_NAV.map(item => ({
+            ...item,
+            id: item.key,
+            title: t(item.key) || item.key, // Attempt to translate title
+            slug: item.key.toLowerCase().replace('nav_', ''), // Generate a slug
+            source: 'fallback',
+            order: 0,
+            isActive: true,
+          })) as ApiNavItem[],
+          moreGroups: FALLBACK_MORE_GROUPS.map(group => ({
+            label: t(group.labelKey) || group.labelKey, // Attempt to translate label
+            items: group.items.map(item => ({
+              ...item,
+              id: item.key,
+              title: t(item.key) || item.key, // Attempt to translate title
+              slug: item.key.toLowerCase().replace('nav_', ''), // Generate a slug
+              source: 'fallback',
+              order: 0,
+              isActive: true,
+            })) as ApiNavItem[]
+          }))
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNavigation();
+
+    // Reset mobile and more menus on route change
+    setMobileOpen(false);
+    setMoreOpen(false);
+  }, [lang]); // Re-fetch if language changes
+
+  // Also reset menus on route change
   useEffect(() => {
     setMobileOpen(false);
     setMoreOpen(false);
   }, [location.pathname]);
+
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -139,6 +199,37 @@ export function Header() {
     navigate("/");
   };
 
+  // Show loading indicator while fetching
+  if (loading) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
+          <div className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20">
+                <Leaf className="h-5 w-5" />
+              </div>
+              <span className="font-display hidden text-xl font-bold text-slate-800 sm:block">
+                {t("appName")}
+              </span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            {/* Show loading skeleton or spinner */}
+            <div className="flex items-center gap-2 px-4 py-2 text-sm text-slate-500">Loading...</div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  // Optionally, render with error info but still show fallback content
+  if (error) {
+    console.warn("Navigation API error, using fallback:", error);
+    // We continue rendering as the fallback data is already set in the catch block
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
@@ -164,10 +255,19 @@ export function Header() {
         </div>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
-          {MAIN_NAV.map((item) => (
-            <Link key={item.key} to={item.to} className={navLinkCls(item.to)}>
-              <item.icon className="h-4 w-4" />
-              <span>{t(item.key)}</span>
+          {/* Render main navigation from API data */}
+          {combinedNav.mainNav.map((item) => (
+            <Link key={item.id} to={item.url} className={navLinkCls(item.url)}>
+              {/* Icons are not part of the API response, so we use a generic icon or hide it if no mapping is possible */}
+              {/* For now, we'll hide the icon in the main nav for dynamic items, keeping it for static/fallback ones */}
+              {FALLBACK_MAIN_NAV.find(fallbackItem => fallbackItem.key === item.id || fallbackItem.to === item.url) ? (
+                <>
+                  {(FALLBACK_MAIN_NAV.find(fallbackItem => fallbackItem.key === item.id || fallbackItem.to === item.url)?.icon || BookOpen)({ className: "h-4 w-4" })}
+                  <span>{t(item.id) || item.title}</span>
+                </>
+              ) : (
+                <span>{t(item.id) || item.title}</span>
+              )}
             </Link>
           ))}
 
@@ -190,26 +290,26 @@ export function Header() {
                 role="menu"
                 className="absolute end-0 top-full z-[60] mt-1 grid w-[min(520px,90vw)] grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xl"
               >
-                {MORE_GROUPS.map((group) => (
-                  <div key={group.labelKey}>
+                {combinedNav.moreGroups.map((group, groupIndex) => (
+                  <div key={groupIndex /* Use index as key since label might not be unique */}>
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                      {t(group.labelKey)}
+                      {group.label}
                     </p>
                     <div className="space-y-0.5">
                       {group.items.map((item) => (
                         <Link
-                          key={item.key}
-                          to={item.to}
+                          key={item.id}
+                          to={item.url}
                           role="menuitem"
                           onClick={() => setMoreOpen(false)}
                           className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium ${
-                            location.pathname === item.to
+                            location.pathname === item.url
                               ? "bg-emerald-50 text-emerald-700"
                               : "text-slate-600 hover:bg-slate-100"
                           }`}
                         >
-                          <item.icon className="h-4 w-4 opacity-70" />
-                          {t(item.key)}
+                          {/* No icon for dynamic items in more menu */}
+                          {t(item.id) || item.title}
                         </Link>
                       ))}
                     </div>
@@ -272,37 +372,37 @@ export function Header() {
         <div className="max-h-[80vh] overflow-y-auto border-t border-slate-200 bg-white lg:hidden">
           <nav className="mx-auto max-w-7xl space-y-4 px-4 py-4">
             <div className="grid grid-cols-2 gap-1">
-              {MAIN_NAV.map((item) => (
+              {combinedNav.mainNav.map((item) => (
                 <Link
-                  key={item.key}
-                  to={item.to}
+                  key={item.id}
+                  to={item.url}
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold ${
-                    location.pathname.startsWith(item.to)
+                    location.pathname.startsWith(item.url)
                       ? "bg-emerald-50 text-emerald-700"
                       : "text-slate-600"
                   }`}
                 >
-                  <item.icon className="h-4 w-4" />
-                  {t(item.key)}
+                  {/* No icon for dynamic items in mobile menu */}
+                  {t(item.id) || item.title}
                 </Link>
               ))}
             </div>
-            {MORE_GROUPS.map((group) => (
-              <div key={group.labelKey}>
+            {combinedNav.moreGroups.map((group, groupIndex) => (
+              <div key={groupIndex /* Use index as key since label might not be unique */}>
                 <p className="mb-1 px-2 text-[11px] font-bold uppercase text-slate-400">
-                  {t(group.labelKey)}
+                  {group.label}
                 </p>
                 <div className="grid grid-cols-2 gap-1">
                   {group.items.map((item) => (
                     <Link
-                      key={item.key}
-                      to={item.to}
+                      key={item.id}
+                      to={item.url}
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
                     >
-                      <item.icon className="h-4 w-4 opacity-70" />
-                      {t(item.key)}
+                      {/* No icon for dynamic items in mobile menu */}
+                      {t(item.id) || item.title}
                     </Link>
                   ))}
                 </div>

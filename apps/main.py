@@ -360,6 +360,14 @@ _include(
 )
 
 
+
+
+_include(
+    "finance",
+    lambda: __import__("apps.finance.router", fromlist=["router"]).router,
+    prefix=f"{settings.API_V1_STR}/finance",
+    tags=["Finance"],
+)
 @app.get("/", tags=["Root"])
 async def root() -> dict[str, Any]:
     return {
