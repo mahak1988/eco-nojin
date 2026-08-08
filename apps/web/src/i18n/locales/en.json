@@ -1,0 +1,1 @@
+{"app":{"name":"EcoNojin"},"nav":{"dashboard":"Dashboard","simulate":"Simulate","farms":"Farms","analysis":"Analysis","map":"Map","settings":"Settings"},"model_fidelity":{"official":"Official","simplified":"Simplified","experimental":"Experimental"},"uncertainty":{"ci95":"95% CI"},"common":{"save":"Save","cancel":"Cancel","export":"Export"}}

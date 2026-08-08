@@ -1,0 +1,4 @@
+import {useTranslation} from 'react-i18next';
+interface Props {fidelity:'official'|'simplified'|'experimental'}
+const M={official:{bg:'bg-green-900/30 border-green-700/30 text-green-400',dot:'bg-green-400'},simplified:{bg:'bg-yellow-900/30 border-yellow-700/30 text-yellow-400',dot:'bg-yellow-400'},experimental:{bg:'bg-blue-900/30 border-blue-700/30 text-blue-400',dot:'bg-blue-400'}};
+export default function ModelFidelityBadge({fidelity}:Props){const{t}=useTranslation();const c=M[fidelity];return(<span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${c.bg}`}><span className={`w-1.5 h-1.5 rounded-full ${c.dot}`}/>{t(`model_fidelity.${fidelity}`)}</span>)}

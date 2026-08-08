@@ -1,8 +1,1 @@
-export * from "./http";
-export * from "./auth.api";
-export * from "./education.api";
-export * from "./community.api";
-export * from "./accounting.api";
-export * from "./simulation.api";
-export * from "./admin.api";
-export * from "./games.api";
+export {http} from './http';export {authApi} from './auth.api';export {simulationApi} from './simulation.api';export {satelliteApi} from './satellite.api';export {mrvApi} from './mrv.api';export {regionalApi} from './regional.api';export {ecocoinApi} from './ecocoin.api';export {contentApi} from './content.api';export {farmsApi} from './farms.api';export {accountingApi} from './accounting.api';export {educationApi} from './education.api';export {communityApi} from './community.api';
