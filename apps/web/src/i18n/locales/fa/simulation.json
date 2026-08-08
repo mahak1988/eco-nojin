@@ -1,0 +1,46 @@
+{
+  "hubTitle": "آزمایشگاه شبیه‌سازی",
+  "hubSubtitle": "مدل‌های علمی آب، خاک، کربن و اقلیم",
+  "run": "اجرای شبیه‌سازی",
+  "running": "در حال اجرا…",
+  "results": "نتایج",
+  "parameters": "پارامترها",
+  "presets": "پیش‌فرض‌ها",
+  "history": "تاریخچه اجرا",
+  "downloadCsv": "دانلود CSV",
+  "downloadJson": "دانلود JSON",
+  "metrics": "معیارها",
+  "nse": "NSE",
+  "rmse": "RMSE",
+  "kge": "KGE",
+  "models": {
+    "richards": "ریچاردز / PINN",
+    "sebs": "SEBS / تبخیر-تعرق",
+    "daycent": "DayCent هفت‌مخزنه",
+    "saintVenant": "سنت‌ونان",
+    "uncertainty": "عدم‌قطعیت (PCE / Sobol)",
+    "qaoa": "تخصیص آب QAOA",
+    "nitrogen": "چرخه نیتروژن",
+    "soilChem": "شیمی خاک",
+    "canopy": "میکروکلیمای تاج‌پوش",
+    "shuttleworth": "شاتلوورث–والاس"
+  },
+  "richards": {
+    "title": "معادله ریچاردز و PINN",
+    "desc": "رطوبت خاک با هیسترزیس و شبکه عصبی آگاه از فیزیک"
+  },
+  "sebs": {
+    "title": "بیلان انرژی SEBS",
+    "desc": "تبخیر-تعرق از داده حرارتی ماهواره و هواشناسی"
+  },
+  "daycent": {
+    "title": "DayCent هفت مخزن",
+    "desc": "سینتیک مخازن کربن آلی و نیتروژن خاک"
+  },
+  "uncertainty": {
+    "title": "تحلیل عدم‌قطعیت",
+    "desc": "Morris، Sobol، PCE و EnKF با اعتبارسنجی NSE / KGE"
+  },
+  "emptyState": "یک مدل را انتخاب و پارامترها را تنظیم کنید",
+  "apiOffline": "API در دسترس نیست — mock را فعال یا بک‌اند را اجرا کنید"
+}
