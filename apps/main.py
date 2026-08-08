@@ -300,6 +300,12 @@ _include("education", lambda: __import__("apps.api.routes.education", fromlist=[
 _include(
     "education_seed", lambda: __import__("apps.api.routes.education_seed", fromlist=["router"]).router
 )
+_include(
+    "navigation",
+    lambda: __import__("apps.api.routes.navigation", fromlist=["router"]).router,
+    prefix=settings.API_V1_STR,
+    tags=["Navigation"],
+)
 _include("rbac_seed", lambda: __import__("apps.api.routes.rbac_seed", fromlist=["router"]).router)
 _include("science", lambda: __import__("apps.api.routes.science", fromlist=["router"]).router)
 _include(

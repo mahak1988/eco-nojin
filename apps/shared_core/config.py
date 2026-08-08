@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     DB_ECHO: bool = Field(default=False)
     FORCE_POSTGRES: bool = Field(default=False)
 
-    SECRET_KEY: str = Field(default="local-dev-only-change-me-use-secrets-token-urlsafe-48")
+    SECRET_KEY: str = Field(default="")
     JWT_SECRET_KEY: Optional[str] = Field(default=None)
     ALGORITHM: str = Field(default="HS256")
     JWT_PRIVATE_KEY_PATH: Optional[str] = Field(default=None)
@@ -93,6 +93,13 @@ class Settings(BaseSettings):
     @property
     def jwt_secret(self) -> str:
         return self.JWT_SECRET_KEY or self.SECRET_KEY
+
+    
+    @model_validator(mode="after")
+    def warn_empty_secret(self) -> "Settings":
+        if not self.SECRET_KEY:
+            logger.critical("SECRET_KEY is empty! Set it in .env or environment. Using empty key is insecure.")
+        return self
 
     @model_validator(mode="after")
     def validate_production_settings(self) -> Settings:
