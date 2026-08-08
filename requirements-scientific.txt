@@ -1,12 +1,14 @@
-# Optional Phase 3 scientific stack — install when running EO / GEE / spatial heavy jobs
-# pip install -r requirements-scientific.txt
-
-earthengine-api>=0.1.419
-# STAC clients (Planetary Computer path)
-pystac-client>=0.9.0
-planetary-computer>=1.0.0
-# Geo helpers
-shapely>=2.1.2
-# Keep asyncpg for Postgres phase3
-asyncpg>=0.30.0
-psycopg[binary]>=3.3.4
+# Scientific dependencies — install: pip install -r requirements-scientific.txt
+numpy>=1.24
+scipy>=1.10
+pandas>=2.0
+torch>=2.0  # Required for PINN solvers (hydrology/pinn_*.py)
+scikit-learn>=1.3
+joblib>=1.3
+h5py>=3.9
+netCDF4>=1.6
+xarray>=2023.6
+rasterio>=1.3
+shapely>=2.0
+geopandas>=0.13
+aquacrop>=3.0  # Official AquaCrop Python API (Apache 2.0)
