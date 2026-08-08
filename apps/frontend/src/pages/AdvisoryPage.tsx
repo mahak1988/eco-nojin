@@ -1,0 +1,5 @@
+import{useState,useMemo}from'react';import{Bot,Send,Search,Sparkles,MessageSquare,ThumbsUp,BookOpen}from'lucide-react';import{ADVISORY_DB}from'../data/advisory-database';
+interface Message{role:'user'|'bot';text:string;id:number}
+export default function AdvisoryPage(){const[chat,setChat]=useState<Message[]>([{role:'bot',text:'👋 Welcome to Hydroma Advisory! Ask me anything about models, calibration, data sources, or troubleshooting.',id:0}]);const[input,setInput]=useState('');
+const quickQuestions=['How to calibrate Richards?','Why did simulation fail?','Export results','Climate scenario','PINN vs FEM'];
+const findAnswer=(q:string):string=>{const lq=q.toLowerCase();const match=ADVISORY_DB.find(a=>lq.includes(a.question.toLowerCase().slice(0,20))||a.tags.some(t=>lq.includes(t)));if(match)return match.answer;const tagMatch=ADVISORY_DB.find(a=>a.tags.some(t=>new RegExp(t,'i').test(q)));if(tagMatch)return tagMatch.answer;const wordMatch=ADVISORY_DB.find(a=>q.split(' ').some(w=>a.question.toLowerCase().includes(w.toLowerCase())));if(wordMatch)return wordMatch.answer;return`I couldn't find a specific answer for 
