@@ -1,0 +1,1 @@
+import {ethers} from "hardhat";async function main(){const T=process.env.TREASURY||"0x...";const f=await ethers.getContractFactory("EcoCoin");const c=await f.deploy(T);await c.waitForDeployment();console.log("EcoCoin:",await c.getAddress(),"Supply:",ethers.formatEther(await c.totalSupply()))}main().catch(e=>{console.error(e);process.exitCode=1});
