@@ -1,0 +1,3 @@
+import {ReactNode,useEffect} from 'react';import {useLocale} from '../../hooks/useLocale';
+import '../../styles/rtl.css';
+export default function RtlLayout({children}:{children:ReactNode}){const{locale,isRTL}=useLocale();useEffect(()=>{document.documentElement.lang=locale;document.documentElement.dir=isRTL?'rtl':'ltr';document.title=isRTL?'اکونوجین | کشاورزی هوشمند':'EcoNojin | Smart Agriculture'},[locale,isRTL]);return(<div className="min-h-screen">{children}</div>)}

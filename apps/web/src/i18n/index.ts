@@ -1,2 +1,5 @@
 import i18n from 'i18next';import {initReactI18next} from 'react-i18next';import en from './locales/en.json';import fa from './locales/fa.json';
-i18n.use(initReactI18next).init({resources:{en:{translation:en},fa:{translation:fa}},fallbackLng:'en',lng:typeof window!=='undefined'?localStorage.getItem('locale')||'fa':'fa',interpolation:{escapeValue:false}});export default i18n;
+const saved=typeof window!=='undefined'?localStorage.getItem('locale'):null;const bl=typeof navigator!=='undefined'?(navigator.language||'').split('-')[0]:'en';const dl=saved||(bl==='fa'?'fa':'en');
+i18n.use(initReactI18next).init({resources:{en:{translation:en},fa:{translation:fa}},fallbackLng:'en',lng:dl,interpolation:{escapeValue:false}});
+i18n.on('languageChanged',lng=>{if(typeof window!=='undefined'){localStorage.setItem('locale',lng);document.documentElement.lang=lng;document.documentElement.dir=lng==='fa'?'rtl':'ltr'}});
+if(typeof window!=='undefined'){document.documentElement.lang=dl;document.documentElement.dir=dl==='fa'?'rtl':'ltr'}export default i18n;

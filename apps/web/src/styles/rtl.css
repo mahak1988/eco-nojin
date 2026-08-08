@@ -1,0 +1,16 @@
+/* RTL Full Support — EcoNojin */
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+[dir="rtl"]{direction:rtl;text-align:start;--font:'Vazirmatn',system-ui,sans-serif}[dir="ltr"]{--font:'Inter',system-ui,sans-serif}
+body{font-family:var(--font)}[dir="rtl"] .ltr-only{direction:ltr;text-align:left;display:inline-block}
+[dir="rtl"] .sidebar{margin-inline-start:auto;border-inline-end:none;border-inline-start:1px solid}
+[dir="rtl"] .nav-link-arrow{transform:scaleX(-1)}[dir="rtl"] .btn-icon-right svg{order:-1}
+[dir="rtl"] table,[dir="rtl"] th,[dir="rtl"] td{text-align:right}
+[dir="rtl"] .numeric-cell{direction:ltr;text-align:right;unicode-bidi:plaintext}
+[dir="rtl"] input,[dir="rtl"] textarea{text-align:right}[dir="rtl"] .form-label{text-align:right}
+[dir="rtl"] .recharts-wrapper{direction:ltr}[dir="rtl"] .modal-header{text-align:right}
+[dir="rtl"] .modal-footer{justify-content:flex-start}[dir="ltr"] .modal-footer{justify-content:flex-end}
+.card{padding-inline:1.25rem;margin-inline:auto;border-inline-start:2px solid transparent}
+.flex-row-rtl{display:flex}[dir="rtl"] .flex-row-rtl{flex-direction:row-reverse}[dir="ltr"] .flex-row-rtl{flex-direction:row}
+[dir="rtl"] .badge-pill{flex-direction:row-reverse}[dir="rtl"] .slide-in-left{animation-name:slideInRight;animation-duration:.3s}[dir="ltr"] .slide-in-left{animation-name:slideInLeft;animation-duration:.3s}
+@keyframes slideInRight{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes slideInLeft{from{transform:translateX(-20px);opacity:0}to{transform:translateX(0);opacity:1}}
+@media print{[dir="rtl"]{direction:rtl!important}}
