@@ -6,8 +6,8 @@ import {
   Leaf, Droplets, Flame, BarChart3, TrendingUp, 
   Download, Info, Layers, Calculator
 } from "lucide-react";
-import {
 import { CHART, GIS } from '@econojin/ui/lib/chart-colors';
+import {
 
   calculateAllIndices,
   interpretNDVI,

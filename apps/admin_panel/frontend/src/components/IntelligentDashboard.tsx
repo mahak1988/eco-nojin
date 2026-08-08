@@ -523,7 +523,7 @@ const IntelligentDashboard: React.FC = () => {
                     <div key={alert.id} className="flex items-start gap-4 p-4 border rounded-lg">
                       <div className="flex-shrink-0">
                         <TypeBadge type={alert.type} />
-                        <SeverityBadge severity={alert.severity} className="mt-2" />
+                        <SeverityBadge {...({severity: alert.severity, className: "mt-2"} as any)} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-lg">{alert.title}</h3>

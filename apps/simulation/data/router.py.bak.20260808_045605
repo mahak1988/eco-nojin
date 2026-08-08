@@ -10,10 +10,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from apps.simulation.data import service as data_service
 from apps.simulation.data import world_bank
-try:
-    from apps.simulation.data.nasa_power import fetch_nasa_power_data
-except ImportError:
-    fetch_nasa_power_data = None
+from apps.simulation.data.nasa_power import fetch_nasa_power_data
 
 logger = logging.getLogger(__name__)
 

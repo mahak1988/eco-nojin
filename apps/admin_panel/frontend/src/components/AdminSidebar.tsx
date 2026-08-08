@@ -137,9 +137,9 @@ export default function AdminSidebar() {
             }
             return (
               <NavLink
-                key={item.to}
-                to={item.to!}
-                end={item.end}
+                key={(item as { to: string; end?: boolean }).to}
+                to={(item as { to: string; end?: boolean }).to}
+                end={(item as { to: string; end?: boolean }).end}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive ? 'bg-eco-100 text-eco-800' : 'text-muted-foreground hover:bg-accent'

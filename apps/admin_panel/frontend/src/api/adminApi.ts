@@ -23,7 +23,7 @@ api.interceptors.request.use((config) => {
     localStorage.getItem('accessToken') ||
     localStorage.getItem('token')
   if (token) {
-    config.headers = config.headers ?? {}
+    config.headers = (config.headers ?? {}) as any
     config.headers.Authorization = `Bearer ${token}`
   }
   return config

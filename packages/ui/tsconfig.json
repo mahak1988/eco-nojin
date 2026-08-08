@@ -1,15 +1,37 @@
 {
-  "extends": "../../packages/config-typescript/base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "skipLibCheck": true
-  },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+    "extends":  "../../packages/config-typescript/base.json",
+    "compilerOptions":  {
+                            "outDir":  "dist",
+                            "rootDir":  "src",
+                            "skipLibCheck":  true,
+                            "jsx":  "react-jsx",
+                            "paths":  {
+                                          "@/*":  [
+                                                      "./src/*"
+                                                  ]
+                                      },
+                            "baseUrl":  "."
+                        },
+    "include":  [
+                    "src"
+                ],
+    "exclude":  [
+                    "node_modules",
+                    "dist",
+                    "src/components/LanguageSwitcher.tsx",
+                    "src/components/media-hero.tsx",
+                    "src/components/textarea.tsx",
+                    "src/components/toaster.tsx",
+                    "src/components/alert.tsx",
+                    "src/components/AnimatedStatCard.tsx",
+                    "src/components/api.ts",
+                    "src/components/ChartCard.tsx",
+                    "src/components/config.py",
+                    "src/components/database.py",
+                    "src/components/DataTable.tsx",
+                    "src/components/form-field.tsx",
+                    "src/components/GlassPanel.tsx",
+                    "src/components/orchestrator.py",
+                    "src/components/router.py"
+                ]
 }
