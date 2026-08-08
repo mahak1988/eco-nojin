@@ -1,21 +1,25 @@
 /**
- * Lightweight i18n (English source of truth; fa/ar packs).
- * Source code stays English; UI strings come from locale JSON only.
+ * Lightweight i18n — source of truth: locale JSON under locales/{en,fa,ar}/.
+ * Supported UI languages: English, Persian (fa), Arabic (ar).
+ * Expand by adding locales/{code}/*.json and registering in catalogs.
  */
 
 import arAuth from "./locales/ar/auth.json";
 import arCommon from "./locales/ar/common.json";
+import arSimulation from "./locales/ar/simulation.json";
 import enAuth from "./locales/en/auth.json";
 import enCommon from "./locales/en/common.json";
+import enSimulation from "./locales/en/simulation.json";
 import faAuth from "./locales/fa/auth.json";
 import faCommon from "./locales/fa/common.json";
+import faSimulation from "./locales/fa/simulation.json";
 
 export type Locale = "en" | "fa" | "ar";
 
 const catalogs: Record<Locale, Record<string, unknown>> = {
-  en: { common: enCommon, auth: enAuth },
-  fa: { common: faCommon, auth: faAuth },
-  ar: { common: arCommon, auth: arAuth },
+  en: { common: enCommon, auth: enAuth, simulation: enSimulation },
+  fa: { common: faCommon, auth: faAuth, simulation: faSimulation },
+  ar: { common: arCommon, auth: arAuth, simulation: arSimulation },
 };
 
 const STORAGE_KEY = "econojin_locale";
@@ -52,7 +56,7 @@ function dig(obj: unknown, path: string): string | undefined {
   return typeof cur === "string" ? cur : undefined;
 }
 
-/** Translate key like "common.nav.farms" or "auth.loginTitle". */
+/** Translate key like "common.nav.farms" or "simulation.hubTitle". */
 export function t(key: string, locale?: Locale): string {
   const loc = locale || getStoredLocale();
   const [ns, ...rest] = key.split(".");
@@ -63,3 +67,7 @@ export function t(key: string, locale?: Locale): string {
 }
 
 export const supportedLocales: Locale[] = ["en", "fa", "ar"];
+
+/** How to add a new language: copy locales/en → locales/{code}, translate, add to Locale + catalogs. */
+export const i18nExpandGuide =
+  "Add locales/{code}/{common,auth,simulation}.json then extend Locale union and catalogs.";
