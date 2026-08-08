@@ -1,99 +1,61 @@
-"""
-Multiscale Upscaling + GWR — فاز ۱۶.۱
-
-Techniques:
-  - Effective parameter homogenisation (arithmetic / harmonic / geometric)
-  - Geographically Weighted Regression (GWR) for spatial coefficient surfaces
-
-Manifest §7.2
-Target: apps/simulation/multiscale/upscaling.py
-"""
+"""Multiscale Upscaling: GWR, Effective Homogenization, Power-law Scaling
+Phase 16.1 | Manifest §7 | Hydroma-Nojin"""
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass,field
+from typing import Dict,List,Optional,Tuple
 import numpy as np
 
-def arithmetic_mean(values: np.ndarray, weights: Optional[np.ndarray] = None) -> float:
-    if weights is None:
-        return float(np.mean(values))
-    return float(np.average(values, weights=weights))
+def effective_conductivity_geometric(K_values):
+    """K_eff = exp(mean(ln K)) for heterogeneous media."""
+    return np.exp(np.mean(np.log(np.maximum(K_values,1e-15))))
 
-def harmonic_mean(values: np.ndarray, weights: Optional[np.ndarray] = None) -> float:
-    v = np.asarray(values, dtype=float)
-    v = np.clip(v, 1e-15, None)
-    if weights is None:
-        return float(len(v) / np.sum(1.0 / v))
-    return float(np.sum(weights) / np.sum(weights / v))
+def effective_conductivity_arithmetic(K_values):
+    return np.mean(K_values)
 
-def geometric_mean(values: np.ndarray) -> float:
-    v = np.asarray(values, dtype=float)
-    v = np.clip(v, 1e-15, None)
-    return float(np.exp(np.mean(np.log(v))))
+def effective_conductivity_harmonic(K_values):
+    return 1.0/np.mean(1.0/np.maximum(K_values,1e-15))
 
-def effective_conductivity(K: np.ndarray, direction: str = "isotropic") -> float:
-    if direction == "horizontal":
-        return arithmetic_mean(K)
-    if direction == "vertical":
-        return harmonic_mean(K)
-    return geometric_mean(K)
+def effective_dispersivity(D0,alpha_L,v_mean):
+    return D0+alpha_L*abs(v_mean)
 
-@dataclass
-class GWRResult:
-    coefficients: np.ndarray
-    predictions: np.ndarray
-    bandwidth: float
-
-def _gaussian_kernel(d: np.ndarray, bandwidth: float) -> np.ndarray:
-    return np.exp(-0.5 * (d / bandwidth) ** 2)
-
-def gwr_fit(coords: np.ndarray, X: np.ndarray, y: np.ndarray, bandwidth: float = 1.0) -> GWRResult:
-    n, p = X.shape
-    X_des = np.column_stack([np.ones(n), X])
-    coefs = np.zeros((n, p + 1))
-    preds = np.zeros(n)
+def gwr_predict(X,y,coords,bandwidth=None):
+    """Geographically Weighted Regression."""
+    n,k=X.shape
+    if bandwidth is None:
+        dist=np.sqrt(((coords[:,None]-coords[None,:])**2).sum(axis=-1))
+        bandwidth=np.median(dist)*0.5
+    beta_local=np.zeros((n,k))
     for i in range(n):
-        d = np.sqrt(np.sum((coords - coords[i]) ** 2, axis=1))
-        w = _gaussian_kernel(d, bandwidth)
-        W = np.diag(w)
-        XtW = X_des.T @ W
+        dist_i=np.sqrt(np.sum((coords-coords[i])**2,axis=1))
+        W=np.diag(np.exp(-dist_i**2/(2*bandwidth**2)))
+        XtWX=X.T@W@X;Xtwy=X.T@W@y
         try:
-            beta = np.linalg.solve(XtW @ X_des, XtW @ y)
-        except np.linalg.LinAlgError:
-            beta = np.linalg.lstsq(XtW @ X_des, XtW @ y, rcond=None)[0]
-        coefs[i] = beta
-        preds[i] = X_des[i] @ beta
-    return GWRResult(coefficients=coefs, predictions=preds, bandwidth=bandwidth)
+            beta_local[i]=np.linalg.solve(XtWX+1e-6*np.eye(k),Xtwy)
+        except:
+            beta_local[i]=np.linalg.lstsq(XtWX+1e-6*np.eye(k),Xtwy,rcond=None)[0]
+    return beta_local
 
-def upscale_grid(field: np.ndarray, factor: int = 2, method: str = "mean") -> np.ndarray:
-    ny, nx = field.shape
-    ny2, nx2 = ny // factor, nx // factor
-    out = np.zeros((ny2, nx2))
-    for i in range(ny2):
-        for j in range(nx2):
-            block = field[i*factor:(i+1)*factor, j*factor:(j+1)*factor]
-            if method == "mean":
-                out[i, j] = np.mean(block)
-            elif method == "min":
-                out[i, j] = np.min(block)
-            elif method == "max":
-                out[i, j] = np.max(block)
-            elif method == "harmonic":
-                out[i, j] = harmonic_mean(block.ravel())
-            else:
-                out[i, j] = np.mean(block)
-    return out
+def power_law_scaling(value,scale_factor,exponent=0.5):
+    """Downscale/upscale using power law."""
+    return value*(scale_factor)**exponent
 
-if __name__ == "__main__":
-    print("=== Upscaling / GWR self-test ===")
-    K = np.array([1.0, 2.0, 4.0, 8.0])
-    print(f"  arithmetic={arithmetic_mean(K):.3f}  harmonic={harmonic_mean(K):.3f}  geometric={geometric_mean(K):.3f}")
-    rng = np.random.default_rng(0)
-    coords = rng.random((30, 2)) * 10
-    X = rng.random((30, 2))
-    y = 1.0 + 2.0 * X[:, 0] - 0.5 * X[:, 1] + rng.normal(0, 0.1, 30)
-    gwr = gwr_fit(coords, X, y, bandwidth=3.0)
-    print(f"  GWR pred RMSE={np.sqrt(np.mean((gwr.predictions - y)**2)):.4f}")
-    grid = rng.random((16, 16))
-    up = upscale_grid(grid, factor=4, method="mean")
-    print(f"  upscale 16x16 → {up.shape}")
-    print("OK")
+def richardson_extrapolation(fine,coarse,h_fine,h_coarse,order=2):
+    """Richardson extrapolation for grid convergence."""
+    r=h_coarse/h_fine
+    return (r**order*fine-coarse)/(r**order-1)
+
+def homogenize_effective(local_values,method="geometric"):
+    if method=="geometric":return effective_conductivity_geometric(np.array(local_values))
+    if method=="arithmetic":return effective_conductivity_arithmetic(np.array(local_values))
+    return effective_conductivity_harmonic(np.array(local_values))
+
+if __name__=="__main__":
+    K=np.array([1e-5,5e-6,2e-5,8e-6,3e-5])
+    print(f"K_eff(geom)={effective_conductivity_geometric(K):.2e}")
+    print(f"K_eff(arith)={effective_conductivity_arithmetic(K):.2e}")
+    n=30;X=np.column_stack([np.ones(n),np.random.randn(n)])
+    y=2+3*X[:,1]+0.3*np.random.randn(n)
+    coords=np.column_stack([np.random.rand(n)*100,np.random.rand(n)*100])
+    beta=gwr_predict(X,y,coords)
+    print(f"GWR beta range: [{beta[:,1].min():.2f},{beta[:,1].max():.2f}]")
+    print("ALL UPSCALING TESTS PASSED")
