@@ -1,4 +1,4 @@
-import { paths } from "./minimal-schema"; // Changed from schema to minimal-schema
+﻿import { paths } from "./minimal-schema"; // Changed from schema to minimal-schema
 import { authStore } from "../../stores/authStore";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS";

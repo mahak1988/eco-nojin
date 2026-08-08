@@ -129,6 +129,53 @@ class DayCentNative:
         k_total = k_ref * f_T * f_M * f_O2 * f_pH * f_Clay
         return k_total
 
+    def _calculate_fluxes(self, k_rates: np.ndarray, C: np.ndarray) -> np.ndarray:
+        """
+        محاسبه شارهای انتقال کربن بین مخازن.
+
+        Args:
+            k_rates: نرخ‌های تجزیه نهایی.
+            C: آرایه مقادیر فعلی کربن در مخازن.
+
+        Returns:
+            آرایه numpy شامل تغییرات کربن در هر مخزن (dC/dt).
+        """
+        # این ماتریس نشان می‌دهد چه مقدار از مخزن i به مخزن j منتقل می‌شود.
+        # ماتریس انتقال (Transfer Matrix) - ساختار فرضی برای نمایش
+        # [MET, STR, ACT, SLOW, PASS, DOC, BC]
+        # فرض: MET و STR تجزیه می‌شوند و به ACT و SLOW کربن می‌ریزند
+        #       ACT و SLOW تجزیه می‌شوند و به PASS و DOC می‌ریزند
+        #       DOC بخشی تجزیه می‌شود و بخشی خارج می‌شود
+        #       BC بسیار پایدار است
+        #       این اعداد فیک هستند و باید از مطالعات تجربی آمده باشند.
+        epsilon = np.array([
+            [0, 0, 0.4, 0.2, 0, 0, 0], # 40% MET -> ACT, 20% -> SLOW
+            [0, 0, 0.3, 0.3, 0, 0, 0], # 30% STR -> ACT, 30% -> SLOW
+            [0, 0, 0, 0.5, 0.1, 0.2, 0], # ACT -> SLOW, PASS, DOC
+            [0, 0, 0, 0, 0.3, 0.4, 0], # SLOW -> PASS, DOC
+            [0, 0, 0, 0, 0, 0.6, 0], # PASS -> DOC
+            [0, 0, 0, 0, 0, 0, 0], # DOC -> (loss, negligible return to pools here)
+            [0, 0, 0, 0, 0, 0, 0]  # BC -> (no outflow assumed)
+        ])
+
+        dC_dt = np.zeros_like(C)
+        for i in range(len(C)):
+            loss_from_i = k_rates[i] * C[i]
+            dC_dt[i] -= loss_from_i # تلفات از مخزن i
+            for j in range(len(C)):
+                gain_to_j = epsilon[i, j] * loss_from_i
+                dC_dt[j] += gain_to_j # سود به مخزن j
+
+        return dC_dt
+
+    def add_residue_input(self, met_input: float, str_input: float):
+        """
+        افزودن ورودی ماده آلی (مانند بقایای گیاهی) به مخازن MET و STR.
+        """
+        self.pools["MET"] += met_input
+        self.pools["STR"] += str_input
+        self.C = np.array([self.pools[name] for name in self.pool_names])
+
     def step(self, temp: float, moisture: float, clay_fraction: float, oxygen: float = 0.2, ph: float = 6.5, base_rates: Dict[str, float] = None):
         """
         یک گام زمانی از مدل تجزیه را اجرا می‌کند.
@@ -156,11 +203,14 @@ class DayCentNative:
         env_factors = self._calculate_environmental_factors(temp, moisture, clay_fraction, oxygen, ph)
         k_rates = self._calculate_decomposition_rates(env_factors, base_rates)
 
-        # dC/dt = -k * C (مدل ساده شده جهت نمایش)
-        dC_dt = -k_rates * self.C
+        # محاسبه شارهای بین مخازن
+        dC_dt_flux = self._calculate_fluxes(k_rates, self.C)
+
+        # dC/dt = -k * C + flux_terms (مدل کامل‌تر)
+        dC_dt_total = -k_rates * self.C + dC_dt_flux
 
         # انتگرال‌گیری ساده
-        self.C += dC_dt * self.dt
+        self.C += dC_dt_total * self.dt
 
         # بروزرسانی دیکشنری pools
         for i, name in enumerate(self.pool_names):

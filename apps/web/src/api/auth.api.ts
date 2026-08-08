@@ -1,4 +1,4 @@
-import { apiClient } from "../lib/api/api-client";
+﻿import { apiClient } from "../lib/api/api-client";
 import { clearLegacyTokens } from "./http";
 
 export interface LoginPayload {
@@ -40,6 +40,11 @@ export async function login(credentials: { username: string; password: string })
     : (typeof process !== "undefined" && (process as { env?: Record<string, string> }).env?.API_BASE_URL) || "http://localhost:8000";
 
   const response = await fetch(`${baseURL}/api/v1/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: credentials.username, password: credentials.password }),
+    credentials: "include",
+  });, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: credentials.username, password: credentials.password }),

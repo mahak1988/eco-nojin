@@ -1,0 +1,16 @@
+﻿# Access Control List for MQTT
+
+# Admin user has full access
+user econojin_admin
+topic readwrite #
+
+# Service users
+user econojin_sensor
+topic readwrite sensors/#
+topic readwrite iot/#
+
+user econojin_sim
+topic readwrite simulation/#
+
+# Default: deny all
+pattern deny #

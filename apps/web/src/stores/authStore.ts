@@ -1,5 +1,7 @@
 ﻿/**
- * Lightweight auth session store (no external state library).
+ * Auth session store — HttpOnly cookie-first with localStorage fallback.
+ * Tokens are stored in HttpOnly cookies set by the backend.
+ * localStorage is only used as a legacy fallback for dev without cookies.
  */
 import type { AuthUser } from "../types/auth";
 
@@ -25,13 +27,16 @@ function isTokenExpired(token: string): boolean {
 }
 
 function readToken(): string | null {
-  try {
-    const tok = localStorage.getItem("access_token") || localStorage.getItem("token");
-  if (tok && isTokenExpired(tok)) { localStorage.removeItem("access_token"); localStorage.removeItem("token"); return null; }
-  return tok;
-  } catch {
+  // HttpOnly cookies are NOT readable by JS — this is by design.
+  // The backend sets access_token cookie; we just check if we have
+  // a legacy localStorage token as fallback for development.
+  const tok = localStorage.getItem("access_token") || localStorage.getItem("token");
+  if (tok && isTokenExpired(tok)) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
     return null;
   }
+  return tok;
 }
 
 export const authStore = {
@@ -41,12 +46,13 @@ export const authStore = {
     return () => listeners.delete(listener);
   },
   setSession: (token: string, user: AuthUser | null = null) => {
+    // In production: token is stored in HttpOnly cookie by backend.
+    // In dev fallback: also store in localStorage for apiClient.
     try {
-      localStorage.setItem("access_token", token);
-      localStorage.setItem("token", token);
-    } catch {
-      /* ignore */
-    }
+      if (token && token !== "cookie") {
+        localStorage.setItem("access_token", token);
+      }
+    } catch { /* ignore */ }
     state = { token, user };
     emit();
   },
@@ -54,13 +60,12 @@ export const authStore = {
     try {
       localStorage.removeItem("access_token");
       localStorage.removeItem("token");
-    } catch {
-      /* ignore */
-    }
+    } catch { /* ignore */ }
     state = { token: null, user: null };
     emit();
   },
   hydrate: () => {
+    // Check if we have a legacy token; otherwise rely on cookies
     state = { ...state, token: readToken() };
     emit();
   },

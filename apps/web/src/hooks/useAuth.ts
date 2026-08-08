@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { useAuthStore } from "../stores/authStore";
 import { authApi } from "../api/auth.api";
 import type { AuthUser } from "../types/auth";
@@ -59,8 +59,9 @@ export function useAuth() {
     async (email: string, password: string) => {
       const res = await authApi.login({ username: email, password });
       // authApi.login already normalizes accessToken → access_token
-      const tok = res.access_token || "";
+      const tok = res.access_token || res.accessToken || "cookie";
       if (res.user) setSessionFromAuth(tok, res.user);
+      // Backend also sets HttpOnly cookies — token is fallback only
       else if (tok) setSession(tok);
       return res;
     },
