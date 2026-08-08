@@ -1,0 +1,46 @@
+{
+  "hubTitle": "مختبر المحاكاة",
+  "hubSubtitle": "نماذج علمية للمياه والتربة والكربون والمناخ",
+  "run": "تشغيل المحاكاة",
+  "running": "جارٍ التشغيل…",
+  "results": "النتائج",
+  "parameters": "المعاملات",
+  "presets": "الإعدادات المسبقة",
+  "history": "سجل التشغيل",
+  "downloadCsv": "تنزيل CSV",
+  "downloadJson": "تنزيل JSON",
+  "metrics": "المؤشرات",
+  "nse": "NSE",
+  "rmse": "RMSE",
+  "kge": "KGE",
+  "models": {
+    "richards": "ريتشاردز / PINN",
+    "sebs": "SEBS / التبخرنتح",
+    "daycent": "DayCent سبعة أحواض",
+    "saintVenant": "سانت فينان",
+    "uncertainty": "عدم اليقين (PCE / Sobol)",
+    "qaoa": "توزيع المياه QAOA",
+    "nitrogen": "دورة النيتروجين",
+    "soilChem": "كيمياء التربة",
+    "canopy": "مناخ التاج النباتي",
+    "shuttleworth": "شاتلوورث–والاس"
+  },
+  "richards": {
+    "title": "معادلة ريتشاردز و PINN",
+    "desc": "رطوبة التربة مع الهسترة والشبكات العصبية الواعية بالفيزياء"
+  },
+  "sebs": {
+    "title": "توازن الطاقة SEBS",
+    "desc": "التبخرنتح من البيانات الحرارية الفضائية والأرصاد"
+  },
+  "daycent": {
+    "title": "DayCent سبعة أحواض",
+    "desc": "حركية أحواض الكربون العضوي والنيتروجين في التربة"
+  },
+  "uncertainty": {
+    "title": "تحليل عدم اليقين",
+    "desc": "Morris و Sobol و PCE و EnKF مع التحقق NSE / KGE"
+  },
+  "emptyState": "اختر نموذجاً واضبط المعاملات للتشغيل",
+  "apiOffline": "واجهة البرمجة غير متاحة — فعّل المحاكاة أو شغّل الخادم"
+}
