@@ -1,5 +1,5 @@
 """
-Finance Router — Minimal stub (source restored from compiled bytecode).
+Finance Router - Minimal stub (source restored from compiled bytecode).
 Original router.py was lost; this stub restores the API surface.
 """
 from __future__ import annotations

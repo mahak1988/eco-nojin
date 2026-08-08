@@ -68,17 +68,19 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      // Call register with only the fields supported by the new API
       await authApi.register({
         email,
         password,
         full_name: fullName || undefined,
-        locale: "en-US" // Adding locale as required by the new API
+        phone: phone || undefined,
+        organization: organization || undefined,
+        role,
+        accept_terms: true,
       });
       
       // Then log in to get the token
       const res = await login(email, password);
-      const tok = res.access_token || "";
+      const tok = res.accessToken || res.access_token || "";
       if (tok && setSessionFromAuth) setSessionFromAuth(tok, res.user);
       navigate("/farms", { replace: true });
     } catch (err) {

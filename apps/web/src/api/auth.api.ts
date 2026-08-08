@@ -26,7 +26,10 @@ export interface RegisterPayload {
   email: string;
   password: string;
   full_name?: string;
-  locale?: string;
+  phone?: string;
+  organization?: string;
+  role?: "farmer" | "expert" | "viewer";
+  accept_terms: boolean;
 }
 
 // Special function for login since it requires form URL encoding
