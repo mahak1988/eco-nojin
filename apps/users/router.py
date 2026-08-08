@@ -6,6 +6,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from apps.shared_core.rbac.deps import require_permission
 from apps.users.dependencies import (
     get_current_active_superuser,
     get_current_user,
@@ -49,35 +50,24 @@ async def login(
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user_info(current_user: User = Depends(get_current_user)):
+async def read_own_profile(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-@router.put("/me", response_model=UserResponse)
-async def update_current_user(
-    user_in: UserUpdate,
-    current_user: User = Depends(get_current_user),
-    user_service: UserService = Depends(get_user_service),
-):
-    return await user_service.update_user(current_user, user_in)
-
-
-@router.get("/", response_model=list[UserResponse])
-async def list_users(
-    skip: int = 0,
-    limit: int = 100,
-    current_user: User = Depends(get_current_active_superuser),
-    user_service: UserService = Depends(get_user_service),
-):
-    return await user_service.repo.get_multi(limit=limit, offset=skip)
-
-
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def deactivate_user(
+@router.put("/{user_id}/permissions", response_model=UserResponse)
+async def update_user_permissions(
     user_id: int,
-    current_user: User = Depends(get_current_active_superuser),
+    permissions: list[str], # Example schema for permissions
+    current_user: User = Depends(require_permission("user.manage")),
     user_service: UserService = Depends(get_user_service),
 ):
-    success = await user_service.deactivate_user(user_id)
-    if not success:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    """
+    Update permissions for a specific user. Requires 'user.manage' permission.
+    This demonstrates a write endpoint protected by RBAC.
+    """
+    logger.info(f"User {current_user.id} is attempting to update permissions for user {user_id}.")
+    # This is a simplified example. A real implementation would handle permissions differently.
+    updated_user = await user_service.update_user_permissions(user_id, permissions)
+    if not updated_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return updated_user

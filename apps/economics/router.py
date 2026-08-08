@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from apps.auth.dependencies import require_permission
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -60,9 +61,10 @@ async def get_analysis(
 @router.post("/analyses", response_model=EconomicAnalysisResponse, status_code=status.HTTP_201_CREATED)
 async def create_analysis(
     data: EconomicAnalysisCreate,
+    current_user: EconomicAnalysis = Depends(require_permission("economics.analysis.create")),
     service: EconomicsService = Depends(get_service),
 ) -> EconomicAnalysisResponse:
-    """Create a new economic analysis."""
+    """Create a new economic analysis with required permissions."""
     analysis = await service.create(data)
     return analysis
 
@@ -71,9 +73,10 @@ async def create_analysis(
 async def update_analysis(
     analysis_id: int,
     data: EconomicAnalysisUpdate,
+    current_user: EconomicAnalysis = Depends(require_permission("economics.analysis.update")),
     service: EconomicsService = Depends(get_service),
 ) -> EconomicAnalysisResponse:
-    """Update an existing economic analysis."""
+    """Update an existing economic analysis with required permissions."""
     analysis = await service.update(analysis_id, data)
     if not analysis:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found")
@@ -83,9 +86,10 @@ async def update_analysis(
 @router.delete("/analyses/{analysis_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_analysis(
     analysis_id: int,
+    current_user: EconomicAnalysis = Depends(require_permission("economics.analysis.delete")),
     service: EconomicsService = Depends(get_service),
 ) -> None:
-    """Delete an economic analysis."""
+    """Delete an economic analysis with required permissions."""
     deleted = await service.delete(analysis_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found")
@@ -93,8 +97,9 @@ async def delete_analysis(
 
 @router.post("/cost-benefit", response_model=CostBenefitResult)
 async def cost_benefit_calculation(
-    total_cost: float,
-    total_benefit: float,
+    current_user: EconomicAnalysis = Depends(require_permission("economics.use_calculator")),
+    total_cost: float = 0.0,
+    total_benefit: float = 0.0,
     discount_rate: float = 0.1,
     time_horizon_years: int = 5,
 ) -> CostBenefitResult:
@@ -109,9 +114,10 @@ async def cost_benefit_calculation(
 
 @router.post("/npv", response_model=dict)
 async def npv_calculation(
-    initial_investment: float,
-    annual_cash_flows: list[float],
-    discount_rate: float,
+    current_user: EconomicAnalysis = Depends(require_permission("economics.use_calculator")),
+    initial_investment: float = 0.0,
+    annual_cash_flows: list[float] = [],
+    discount_rate: float = 0.0,
 ) -> dict:
     """Calculate NPV from cash flows."""
     npv = EconomicsService.calculate_npv(
@@ -124,8 +130,9 @@ async def npv_calculation(
 
 @router.post("/irr", response_model=dict)
 async def irr_calculation(
-    initial_investment: float,
-    annual_cash_flows: list[float],
+    current_user: EconomicAnalysis = Depends(require_permission("economics.use_calculator")),
+    initial_investment: float = 0.0,
+    annual_cash_flows: list[float] = [],
 ) -> dict:
     """Calculate IRR from cash flows."""
     irr = EconomicsService.calculate_irr(

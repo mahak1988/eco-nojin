@@ -13,16 +13,10 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 
+# Import the real user dependency from the users module
+from apps.users.dependencies import get_current_user as get_real_current_user
 
-# Example: a stub for the current user dependency.
-# Replace with your real auth dependency (e.g., from apps.users.dependencies).
-async def get_current_user() -> dict:
-    """Return the current authenticated user."""
-    # TODO: integrate with apps.users.auth_router / JWT validation
-    return {"id": 1, "email": "anonymous@example.com", "role": "user"}
-
-
-CurrentUser = Annotated[dict, Depends(get_current_user)]
+CurrentUser = Annotated[dict, Depends(get_real_current_user)]
 
 
 def require_role(*roles: str) -> None:
@@ -32,7 +26,15 @@ def require_role(*roles: str) -> None:
         if user.get("role") not in roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Requires one of roles: {', '.join(roles)}",
+                detail="Access denied: Insufficient permissions.",
             )
         return user
-    return _check
+    return Depends(_check)
+
+
+def require_permission(permission: str):
+    """Dependency factory: require the user to have a specific permission."""
+    # This relies on the underlying implementation in shared_core.rbac
+    # which should fetch permissions for the user from the database/session.
+    from apps.shared_core.rbac.deps import require_permission as rbac_require_permission
+    return rbac_require_permission(permission)

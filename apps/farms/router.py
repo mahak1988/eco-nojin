@@ -15,6 +15,7 @@ from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db_session
 from apps.shared_core.rbac import require_permission
 from apps.shared_core.schemas.pagination import ListMeta
+from apps.users.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/v1/farms", tags=["Farms"])
 
@@ -35,6 +36,7 @@ async def list_farms(
 
 @router.post("/seed-demo", status_code=status.HTTP_200_OK)
 async def seed_farms(
+    current_user: Farm = Depends(require_permission("farm.seed")),
     session: AsyncSession = Depends(get_db_session),
 ):
     """Insert demo farms (local/dev only). Uses direct COUNT — no meta tuple bugs."""
@@ -88,11 +90,12 @@ async def seed_farms(
 
 @router.post("", response_model=FarmResponse, status_code=status.HTTP_201_CREATED)
 async def create_farm(
-    payload: FarmCreate,
+    farm_in: FarmCreate,
+    current_user: Farm = Depends(require_permission("farm.create")),
     session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(require_permission("farms:write")),
 ):
-    return await FarmService(session).create_farm(payload)
+    service = FarmService(session)
+    return await service.create_farm(farm_in)
 
 
 @router.get("/{farm_id}", response_model=FarmResponse)
@@ -106,26 +109,28 @@ async def get_farm(farm_id: int, session: AsyncSession = Depends(get_db_session)
 @router.patch("/{farm_id}", response_model=FarmResponse)
 async def update_farm(
     farm_id: int,
-    payload: FarmUpdate,
+    farm_in: FarmUpdate,
+    current_user: Farm = Depends(require_permission("farm.update")),
     session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(require_permission("farms:write")),
 ):
-    try:
-        return await FarmService(session).update_farm(farm_id, payload)
-    except ValueError:
+    service = FarmService(session)
+    farm = await service.update_farm(farm_id, farm_in)
+    if not farm:
         raise HTTPException(status_code=404, detail="Farm not found")
+    return farm
 
 
 @router.delete("/{farm_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_farm(
     farm_id: int,
+    current_user: Farm = Depends(require_permission("farm.delete")),
     session: AsyncSession = Depends(get_db_session),
-    _: object = Depends(require_permission("farms:write")),
 ):
-    try:
-        await FarmService(session).delete_farm(farm_id)
-    except ValueError:
+    service = FarmService(session)
+    success = await service.delete_farm(farm_id)
+    if not success:
         raise HTTPException(status_code=404, detail="Farm not found")
+    return  # 204 No Content
 
 
 @router.get("/{farm_id}/geojson")

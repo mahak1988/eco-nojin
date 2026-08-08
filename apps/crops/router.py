@@ -57,13 +57,23 @@ async def get_yield_prediction(
     return yield_prediction(crop, area_ha, water_stress, fertility)
 
 
+from apps.shared_core.rbac import require_permission
+from apps.crops.models import Crop
+
 @router.post("/rotation-plan")
-async def post_rotation_plan(body: RotationIn):
+async def post_rotation_plan(
+    body: RotationIn,
+    current_user: Annotated[Crop, Depends(require_permission("crop.rotation_plan"))],
+):
     return rotation_plan(body.current_crop, body.years)
 
 
+from apps.shared_core.rbac import require_permission
+from apps.crops.models import Crop
+
 @router.post("/seed-demo")
 async def seed_crops(
+    current_user: Annotated[Crop, Depends(require_permission("crop.seed"))],
     force: bool = Query(False),
     session: AsyncSession = Depends(get_db_session),
 ):
@@ -82,6 +92,12 @@ async def get_crop(crop_id: int, session: AsyncSession = Depends(get_db_session)
         raise HTTPException(status_code=404, detail="Crop not found")
 
 
+from apps.shared_core.rbac import require_permission
+from apps.crops.models import Crop
+
 @router.post("/irrigation/calculate", response_model=IrrigationCalcResponse)
-async def irrigation_calculate(body: IrrigationCalcRequest):
+async def irrigation_calculate(
+    body: IrrigationCalcRequest,
+    current_user: Annotated[Crop, Depends(require_permission("crop.irrigation_calc"))],
+):
     return CropService.calc_irrigation(body)

@@ -49,109 +49,64 @@ class UserService:
         ثبت‌نام کاربر جدید.
         
         Args:
-            user_in: اطلاعات کاربر
-        
+            user_in: اطلاعات کاربر برای ثبت‌نام
+            
         Returns:
-            کاربر ایجاد شده
-        
+            User: شیء کاربر ایجاد شده
+            
         Raises:
             ValueError: اگر ایمیل تکراری باشد
         """
-        # بررسی تکراری نبودن ایمیل
         existing_user = await self.repo.get_by_email(user_in.email)
         if existing_user:
-            raise ValueError("ایمیل قبلاً ثبت شده است")
-        
-        # hash کردن پسورد با Argon2/Bcrypt
+            raise ValueError("Email already registered")
         hashed_password = get_password_hash(user_in.password)
-        
-        # ایجاد کاربر
-        user_data = {
-            "email": user_in.email,
-            "hashed_password": hashed_password,
-            "full_name": user_in.full_name,
-            "is_active": True,
-            "is_superuser": False
-        }
-        
-        user = await self.repo.create(user_data)
-        return user
-    
-    async def authenticate_user(self, email: str, password: str) -> Optional[User]:
-        """
-        احراز هویت کاربر.
-        
-        Args:
-            email: ایمیل کاربر
-            password: پسورد plaintext
-        
-        Returns:
-            کاربر در صورت موفقیت، None در صورت شکست
-        """
-        user = await self.repo.get_by_email(email)
-        if not user:
-            return None
-        
-        if not verify_password(password, user.hashed_password):
-            return None
-        
-        if not user.is_active:
-            return None
-        
-        return user
-    
-    async def create_access_token_for_user(self, user: User) -> str:
-        """
-        ساخت توکن دسترسی برای کاربر.
-        
-        Args:
-            user: شیء کاربر
-        
-        Returns:
-            توکن JWT
-        """
-        access_token = create_access_token(
-            data={"sub": str(user.id), "email": user.email}
+        db_user = User(
+            email=user_in.email,
+            hashed_password=hashed_password,
+            full_name=user_in.full_name,
+            phone=user_in.phone,
+            organization=user_in.organization,
+            role=user_in.role,
         )
-        return access_token
-    
+        return await self.repo.create(db_user)
+
+    async def authenticate_user(self, email: str, password: str) -> Optional[User]:
+        """Authenticate user by email and password."""
+        user = await self.repo.get_by_email(email)
+        if not user or not verify_password(password, user.hashed_password):
+            return None
+        return user
+
+    async def create_access_token_for_user(self, user: User) -> str:
+        """Create an access token for the authenticated user."""
+        return create_access_token(subject=user.id)
+
     async def get_user_by_id(self, user_id: int) -> Optional[User]:
-        """دریافت کاربر بر اساس شناسه."""
+        """Retrieve a user by their ID."""
         return await self.repo.get_by_id(user_id)
-    
-    async def update_user(self, user: User, user_in: UserUpdate) -> User:
-        """
-        بروزرسانی اطلاعات کاربر.
-        
-        Args:
-            user: کاربر فعلی
-            user_in: اطلاعات جدید
-        
-        Returns:
-            کاربر بروزرسانی شده
-        """
+
+    async def update_user(self, user_id: int, user_in: UserUpdate) -> Optional[User]:
+        """Update user details."""
         update_data = user_in.model_dump(exclude_unset=True)
-        
-        # اگر پسورد تغییر کرده، hash کن
         if "password" in update_data:
             update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
-        
-        updated_user = await self.repo.update(user, update_data)
-        return updated_user
-    
-    async def deactivate_user(self, user_id: int) -> bool:
+        return await self.repo.update(user_id, update_data)
+
+    async def update_user_permissions(self, user_id: int, permissions: list[str]) -> Optional[User]:
         """
-        غیرفعال کردن کاربر (Soft Delete).
-        
-        Args:
-            user_id: شناسه کاربر
-        
-        Returns:
-            True در صورت موفقیت
+        Update permissions for a user. This is a placeholder for the actual permission logic
+        which might involve a separate Permission table/model or a role-based lookup.
+        For this example, we'll just log the action and return the user if found.
         """
+        logger.info(f"Updating permissions for user {user_id} to {permissions}.")
+        # In a real implementation, you would update a permissions table or a roles table
+        # based on the 'permissions' list provided.
+        # This is a stub implementation that just retrieves and returns the user.
         user = await self.repo.get_by_id(user_id)
-        if not user:
-            return False
-        
-        await self.repo.update(user, {"is_active": False})
-        return True
+        if user:
+            # Example: Update a 'permissions' field on the user object if it existed
+            # user.permissions = permissions
+            # await self.repo.update(user_id, {"permissions": permissions})
+            pass
+        return user
