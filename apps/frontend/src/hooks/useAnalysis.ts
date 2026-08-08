@@ -1,0 +1,8 @@
+import{useQuery}from'@tanstack/react-query';import{apiGet,apiPost}from'../api/client';
+export interface ShapResult{feature:string;importance:number;std:number}
+export interface SobolResult{metric:string;S1:number;ST:number}
+export interface PceResult{order:number;coeff:number;explained_variance:number}
+export function useShapAnalysis(modelId:string,enabled=true){return useQuery<ShapResult[]>({queryKey:['analysis','shap',modelId],queryFn:()=>apiGet(`/analysis/shap/${modelId}`),enabled,placeholderData:[{feature:'Soil Moisture',importance:0.38,std:0.04},{feature:'Temperature',importance:0.25,std:0.03},{feature:'LAI',importance:0.18,std:0.02}]})}
+export function useSobolAnalysis(modelId:string,enabled=true){return useQuery<SobolResult[]>({queryKey:['analysis','sobol',modelId],queryFn:()=>apiGet(`/analysis/sobol/${modelId}`),enabled,placeholderData:[{metric:'Soil Moisture',S1:0.42,ST:0.58},{metric:'Temperature',S1:0.28,ST:0.35},{metric:'Precip',S1:0.15,ST:0.22}]})}
+export function usePceAnalysis(modelId:string,nVars=3,enabled=true){return useQuery<PceResult[]>({queryKey:['analysis','pce',modelId],queryFn:()=>apiPost('/analysis/pce',{modelId,nVars}),enabled,placeholderData:[{order:1,coeff:0.72,explained_variance:0.68},{order:2,coeff:0.21,explained_variance:0.85},{order:3,coeff:0.05,explained_variance:0.91}]})}
+export function useBenchmarkResults(){return useQuery({queryKey:['analysis','benchmark'],queryFn:()=>apiGet('/analysis/benchmark'),placeholderData:{models:[{name:'Hydroma',NSE:0.91,KGE:0.88,RMSE:4.2},{name:'SWAT',NSE:0.82,KGE:0.79,RMSE:7.1},{name:'VIC',NSE:0.78,KGE:0.75,RMSE:8.5},{name:'SPEEDY',NSE:0.74,KGE:0.71,RMSE:9.8}]}})}

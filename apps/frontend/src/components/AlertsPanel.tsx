@@ -1,0 +1,6 @@
+import{AlertTriangle}from'lucide-react';
+interface Alert{id:number;type:'critical'|'warning'|'info';title:string;detail:string;action?:string}
+const AD:Alert[]=[{id:1,type:'critical',title:'Water Stress',detail:'Farm C soil moisture below wilting point for 3 days.',action:'View'},{id:2,type:'warning',title:'N Leaching Risk',detail:'Nitrate elevated after rain.',action:'Analysis'},{id:3,type:'info',title:'Sowing Window',detail:'Optimal wheat sowing: Oct 15-25.',action:'Calendar'}];
+const CM={critical:'bg-red-900/20 border-red-700/30',warning:'bg-yellow-900/20 border-yellow-700/30',info:'bg-blue-900/20 border-blue-700/30'};
+const CI={critical:'text-red-400',warning:'text-yellow-400',info:'text-blue-400'};
+export default function AlertsPanel(){return(<div className="space-y-2">{AD.map(a=>(<div key={a.id} className={`${CM[a.type]} border rounded-lg px-4 py-3`}><div className="flex items-start gap-3"><AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${CI[a.type]}`}/><div className="flex-1"><h5 className="text-sm font-medium text-white">{a.title}</h5><p className="text-xs text-slate-400 mt-0.5">{a.detail}</p>{a.action&&<button className="text-xs text-brand-400 mt-1.5 font-medium">{a.action} →</button>}</div></div></div>))}</div>)}
