@@ -5,7 +5,7 @@ Public compute: aquacrop-advanced, rothc, coupled-run, maturity, crop-library.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -60,11 +60,11 @@ class AquaBody(BaseModel):
     ky: float = 1.15
     y_potential_t_ha: float = 6.0
     irrig_threshold_frac: float = 0.55
-    canopy_cover: Optional[list[float]] = None
-    lat: Optional[float] = None
-    lon: Optional[float] = None
+    canopy_cover: list[float] | None = None
+    lat: float | None = None
+    lon: float | None = None
     use_ndvi_canopy: bool = False
-    farm_id: Optional[int] = None
+    farm_id: int | None = None
     persist: bool = False
     crop: str = "wheat"
     soc_t_ha: float = 40.0
@@ -112,7 +112,7 @@ class SwatBody(BaseModel):
     soil_awc_mm: float = 120.0
     slope_pct: float = 3.0
     land_cover: str = "cropland"
-    farm_id: Optional[int] = None
+    farm_id: int | None = None
     persist: bool = True
 
 
@@ -131,7 +131,7 @@ class SoilProfileBody(BaseModel):
     clay_pct: float = 25.0
     soc_surface_pct: float = 1.2
     moisture_frac: float = 0.55
-    layers_cm: Optional[list[float]] = None
+    layers_cm: list[float] | None = None
 
 
 @router.get("/status")
@@ -231,7 +231,9 @@ async def swat_run(
         try:
             from apps.simulation.run_store import save_run_async
 
-            row = await save_run_async(session, "scs_cn_basin_balance", params, result, farm_id=farm_id)
+            row = await save_run_async(
+                session, "scs_cn_basin_balance", params, result, farm_id=farm_id
+            )
             result["run_id"] = row.id
         except Exception as e:
             result["persist_error"] = str(e)[:200]
@@ -279,7 +281,9 @@ async def aquacrop_run(
         try:
             from apps.simulation.ndvi_canopy import fetch_ndvi_canopy_async
 
-            bridge = await fetch_ndvi_canopy_async(float(lat), float(lon), days=int(params.get("days", 90)))
+            bridge = await fetch_ndvi_canopy_async(
+                float(lat), float(lon), days=int(params.get("days", 90))
+            )
             params["canopy_cover"] = bridge["canopy_cover"]
             ndvi_meta = {"provider": bridge["provider"], "count": bridge["count"]}
         except Exception as e:
@@ -297,7 +301,9 @@ async def aquacrop_run(
         try:
             from apps.simulation.run_store import save_run_async
 
-            row = await save_run_async(session, "aquacrop_advanced", params, result, farm_id=farm_id)
+            row = await save_run_async(
+                session, "aquacrop_advanced", params, result, farm_id=farm_id
+            )
             result["run_id"] = row.id
         except Exception as e:
             result["persist_error"] = str(e)[:200]
@@ -331,8 +337,8 @@ async def ndvi_canopy(
 
 @router.get("/runs")
 async def runs_list(
-    model: Optional[str] = None,
-    farm_id: Optional[int] = None,
+    model: str | None = None,
+    farm_id: int | None = None,
     limit: int = Query(50, ge=1, le=200),
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:

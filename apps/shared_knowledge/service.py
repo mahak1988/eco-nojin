@@ -8,7 +8,6 @@ Controllers (routers) call services; services call repositories.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,7 +23,7 @@ class SharedKnowledgeService:
         """Handle __init__ (session)."""
         self.repo = SharedKnowledgeRepository(session)
 
-    async def get(self, id: int) -> Optional[SharedKnowledge]:
+    async def get(self, id: int) -> SharedKnowledge | None:
         """Get a single record. Raises NotFoundError if missing."""
         obj = await self.repo.get_by_id(id)
         if not obj:

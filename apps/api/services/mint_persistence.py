@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,7 +69,7 @@ async def list_mint_events(
     session: AsyncSession,
     *,
     limit: int = 20,
-    recipient: Optional[str] = None,
+    recipient: str | None = None,
 ) -> list[dict[str, Any]]:
     q = select(MintEvent).order_by(MintEvent.id.desc()).limit(limit)
     if recipient:

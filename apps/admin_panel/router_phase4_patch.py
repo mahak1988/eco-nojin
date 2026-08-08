@@ -7,19 +7,14 @@ Apply in router handlers:
 
 Or call functions below from existing route handlers.
 """
+
 from __future__ import annotations
 
-from fastapi import APIRouter, status
+from datetime import UTC
 
 from apps.admin_panel import derived_analytics as da
 from apps.admin_panel.schemas import (
-    AdvancedAlertResponse,
-    AdvancedSettingResponse,
     AdvancedSettingUpdate,
-    AutoRecommendationResponse,
-    ContentApprovalResponse,
-    ContentVersionResponse,
-    IntelligentAnalyticsResponse,
 )
 
 
@@ -41,19 +36,21 @@ async def wire_upsert_advanced_setting(admin_service, key: str, payload: Advance
 async def wire_content_versions(admin_service, content_type: str, item_id: int, user_id: int):
     item = None
     try:
-        item = await admin_service.get_content_item_by_id(content_type=content_type, item_id=item_id)
+        item = await admin_service.get_content_item_by_id(
+            content_type=content_type, item_id=item_id
+        )
     except Exception:
         item = None
     return da.content_versions_from_item(item_id, user_id, item)
 
 
 async def wire_approve_content(item_id: int, user_id: int):
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     return {
         "content_id": item_id,
         "approved_by": user_id,
-        "approved_at": datetime.now(timezone.utc).replace(tzinfo=None),
+        "approved_at": datetime.now(UTC).replace(tzinfo=None),
         "status": "approved",
         "notes": "محتوا تأیید شد",
     }

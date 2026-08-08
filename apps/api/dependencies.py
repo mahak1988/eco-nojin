@@ -27,6 +27,7 @@ CurrentUser = Annotated[dict, Depends(get_current_user)]
 
 def require_role(*roles: str) -> None:
     """Dependency factory: require the user to have one of the given roles."""
+
     async def _check(user: CurrentUser) -> dict:
         """Handle _check (user)."""
         if user.get("role") not in roles:
@@ -35,4 +36,5 @@ def require_role(*roles: str) -> None:
                 detail=f"Requires one of roles: {', '.join(roles)}",
             )
         return user
+
     return _check

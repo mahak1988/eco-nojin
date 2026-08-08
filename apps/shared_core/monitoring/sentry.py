@@ -8,14 +8,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 import os
-from typing import Optional
 
 # Sentry SDK import with fallback
 try:
     import sentry_sdk
+    from sentry_sdk.integrations.asyncio import AsyncioIntegration
     from sentry_sdk.integrations.fastapi import FastApiIntegration
     from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
-    from sentry_sdk.integrations.asyncio import AsyncioIntegration
+
     SENTRY_AVAILABLE = True
 except ImportError:
     SENTRY_AVAILABLE = False
@@ -39,13 +39,14 @@ def init_sentry(app) -> None:
         environment=os.getenv("ENVIRONMENT", "production"),
         release=os.getenv("APP_VERSION", "1.0.0"),
     )
-    
+
     # Add Sentry middleware to FastAPI app
     from sentry_sdk.integrations.starlette import SentryAsgiMiddleware
+
     app.add_middleware(SentryAsgiMiddleware)
 
 
-def capture_exception(exc: Exception, context: Optional[dict] = None) -> None:
+def capture_exception(exc: Exception, context: dict | None = None) -> None:
     """Capture an exception with optional context."""
     if SENTRY_AVAILABLE:
         with sentry_sdk.push_scope() as scope:

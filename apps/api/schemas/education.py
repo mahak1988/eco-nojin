@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -27,25 +26,25 @@ class CourseCategoryEnum(str, Enum):
 
 class CourseBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=2000)
+    description: str | None = Field(None, max_length=2000)
     category: str = Field(default="agriculture")
     level: str = Field(default="beginner")
     duration_hours: int = Field(0, ge=0)
-    instructor: Optional[str] = Field(None, max_length=255)
+    instructor: str | None = Field(None, max_length=255)
 
 
 class CourseCreate(CourseBase):
-    lessons: Optional[List[dict]] = Field(default_factory=list)
+    lessons: list[dict] | None = Field(default_factory=list)
 
 
 class CourseUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    category: Optional[str] = None
-    level: Optional[str] = None
-    duration_hours: Optional[int] = Field(None, ge=0)
-    instructor: Optional[str] = None
-    is_active: Optional[bool] = None
+    title: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    category: str | None = None
+    level: str | None = None
+    duration_hours: int | None = Field(None, ge=0)
+    instructor: str | None = None
+    is_active: bool | None = None
 
 
 class LessonResponse(BaseModel):
@@ -53,8 +52,8 @@ class LessonResponse(BaseModel):
 
     id: int
     title: str
-    content: Optional[str] = None
-    video_url: Optional[str] = None
+    content: str | None = None
+    video_url: str | None = None
     duration_minutes: int = 0
     order: int = 0
 
@@ -66,7 +65,7 @@ class EnrollmentResponse(BaseModel):
     user_id: int
     progress: int = 0
     enrolled_at: datetime
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
 
 class CourseResponse(CourseBase):
@@ -76,17 +75,17 @@ class CourseResponse(CourseBase):
     is_active: bool = True
     created_at: datetime
     updated_at: datetime
-    lessons: List[LessonResponse] = Field(default_factory=list)
-    enrollments: List[EnrollmentResponse] = Field(default_factory=list)
+    lessons: list[LessonResponse] = Field(default_factory=list)
+    enrollments: list[EnrollmentResponse] = Field(default_factory=list)
 
 
 class CourseListResponse(BaseModel):
     """R14 envelope + legacy fields for existing FE mappers."""
 
-    data: List[CourseResponse] = Field(default_factory=list)
+    data: list[CourseResponse] = Field(default_factory=list)
     meta: ListMeta
     # legacy (until all clients migrate)
-    items: List[CourseResponse] = Field(default_factory=list)
+    items: list[CourseResponse] = Field(default_factory=list)
     total: int = 0
     skip: int = 0
     limit: int = 20
@@ -94,8 +93,8 @@ class CourseListResponse(BaseModel):
 
 class LessonBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    content: Optional[str] = None
-    video_url: Optional[str] = Field(None, max_length=500)
+    content: str | None = None
+    video_url: str | None = Field(None, max_length=500)
     duration_minutes: int = Field(0, ge=0)
     order: int = Field(0, ge=0)
 
@@ -105,11 +104,11 @@ class LessonCreate(LessonBase):
 
 
 class LessonUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    content: Optional[str] = None
-    video_url: Optional[str] = None
-    duration_minutes: Optional[int] = Field(None, ge=0)
-    order: Optional[int] = Field(None, ge=0)
+    title: str | None = Field(None, min_length=1, max_length=255)
+    content: str | None = None
+    video_url: str | None = None
+    duration_minutes: int | None = Field(None, ge=0)
+    order: int | None = Field(None, ge=0)
 
 
 class EnrollmentBase(BaseModel):
@@ -121,8 +120,8 @@ class EnrollmentCreate(EnrollmentBase):
 
 
 class EnrollmentUpdate(BaseModel):
-    progress: Optional[int] = Field(None, ge=0, le=100)
-    completed_at: Optional[datetime] = None
+    progress: int | None = Field(None, ge=0, le=100)
+    completed_at: datetime | None = None
 
 
 class CourseStats(BaseModel):

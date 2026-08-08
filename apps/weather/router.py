@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import math
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Query
 
-from apps.shared_core.config import settings
 from apps.weather.alerts import evaluate_alerts
 from apps.weather.era5_chirps import fetch_chirps_like, fetch_era5_land, fetch_forecast_openmeteo
 
@@ -18,7 +17,7 @@ router = APIRouter(prefix="/api/v1/weather", tags=["Weather"])
 def _synthetic_forecast(lat: float, lon: float, days: int) -> dict[str, Any]:
     base = 18 + 8 * math.sin(lat / 20)
     daily = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for i in range(days):
         d = now + timedelta(days=i)
         t = base + 4 * math.sin(i / 2 + lon / 50)
@@ -69,7 +68,7 @@ async def current_weather(lat: float = Query(32.65), lon: float = Query(51.67)):
             "provider": result["provider"],
             "lat": lat,
             "lon": lon,
-            "observed_at": result.get("generated_at", datetime.now(timezone.utc).isoformat()),
+            "observed_at": result.get("generated_at", datetime.now(UTC).isoformat()),
             **day,
         }
     # Fallback to synthetic
@@ -79,7 +78,7 @@ async def current_weather(lat: float = Query(32.65), lon: float = Query(51.67)):
         "provider": fc["provider"],
         "lat": lat,
         "lon": lon,
-        "observed_at": datetime.now(timezone.utc).isoformat(),
+        "observed_at": datetime.now(UTC).isoformat(),
         **day,
     }
 

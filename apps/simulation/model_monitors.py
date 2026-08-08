@@ -4,8 +4,8 @@ Model monitors (پایشگرها) — evaluate science outputs against dynamic t
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 MONITOR_CATALOG: list[dict[str, Any]] = [
     {
@@ -153,7 +153,7 @@ def effective_catalog() -> list[dict[str, Any]]:
             w = float(ov["warning"])
         if "critical" in ov and ov["critical"] is not None:
             c = float(ov["critical"])
-        if "operator" in ov and ov["operator"]:
+        if ov.get("operator"):
             op = str(ov["operator"])
         enabled = ov.get("enabled", True)
         if enabled is False:
@@ -163,7 +163,11 @@ def effective_catalog() -> list[dict[str, Any]]:
         mon["operator"] = op
         mon["preset"] = preset
         mon["overridden"] = bool(ov)
-        mon["defaults"] = {"warning": base["warning"], "critical": base["critical"], "operator": base["operator"]}
+        mon["defaults"] = {
+            "warning": base["warning"],
+            "critical": base["critical"],
+            "operator": base["operator"],
+        }
         out.append(mon)
     return out
 
@@ -231,8 +235,8 @@ def extract_metrics(bundle: dict[str, Any]) -> dict[str, float]:
 def evaluate_monitors(
     metrics: dict[str, float],
     *,
-    monitor_ids: Optional[list[str]] = None,
-    catalog: Optional[list[dict[str, Any]]] = None,
+    monitor_ids: list[str] | None = None,
+    catalog: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     catalog = catalog or effective_catalog()
     events: list[dict[str, Any]] = []
@@ -264,7 +268,7 @@ def evaluate_monitors(
                 "message_fa": _msg_fa(mon, value, sev),
                 "message_en": _msg_en(mon, value, sev),
                 "icon": mon.get("icon", "activity"),
-                "observed_at": datetime.now(timezone.utc).isoformat(),
+                "observed_at": datetime.now(UTC).isoformat(),
             }
         )
     order = {"critical": 0, "warning": 1, "ok": 2}
@@ -307,9 +311,9 @@ def run_full_watch(
     lat: float = 32.65,
     lon: float = 51.67,
     include_sensors: bool = True,
-    aquacrop_params: Optional[dict[str, Any]] = None,
-    scs_params: Optional[dict[str, Any]] = None,
-    rothc_params: Optional[dict[str, Any]] = None,
+    aquacrop_params: dict[str, Any] | None = None,
+    scs_params: dict[str, Any] | None = None,
+    rothc_params: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
     from apps.simulation.models_swat import run_swat_plus
@@ -417,7 +421,11 @@ def run_full_watch(
                 for k in ("model", "yield_relative", "irrigation_need_mm", "analysis")
                 if k in aq
             },
-            "scs": {"model": scs.get("model"), "outputs": scs.get("outputs"), "analysis": scs.get("analysis")},
+            "scs": {
+                "model": scs.get("model"),
+                "outputs": scs.get("outputs"),
+                "analysis": scs.get("analysis"),
+            },
             "rothc": {k: rt.get(k) for k in ("model", "delta", "soc_final", "analysis") if k in rt},
             "ndvi": {
                 "provider": ndvi_block.get("provider"),
@@ -426,5 +434,5 @@ def run_full_watch(
             },
         },
         "sensors": sensors,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

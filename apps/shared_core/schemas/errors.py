@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -11,7 +11,7 @@ class ErrorBody(BaseModel):
     code: str
     message: str
     details: list[Any] = Field(default_factory=list)
-    request_id: Optional[str] = None
+    request_id: str | None = None
 
 
 class ErrorResponse(BaseModel):

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import DateTime, Float, Integer, String, Text, select
 from sqlalchemy.orm import Mapped, mapped_column
@@ -19,7 +19,7 @@ class SatelliteIndexCache(Base):
     __tablename__ = "satellite_index_cache"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    farm_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
+    farm_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     lat: Mapped[float] = mapped_column(Float, nullable=False)
     lon: Mapped[float] = mapped_column(Float, nullable=False)
     # WKT point for PostGIS-compatible storage (ST_GeomFromText on PG)
@@ -31,9 +31,9 @@ class SatelliteIndexCache(Base):
     smi: Mapped[float] = mapped_column(Float, nullable=False)
     cloud_pct: Mapped[float] = mapped_column(Float, default=0.0)
     provider: Mapped[str] = mapped_column(String(64), default="synthetic-s2")
-    payload_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
 
@@ -46,7 +46,7 @@ async def cache_samples(
     samples: list[dict[str, Any]],
     lat: float,
     lon: float,
-    farm_id: Optional[int] = None,
+    farm_id: int | None = None,
 ) -> int:
     n = 0
     for s in samples:
@@ -120,10 +120,14 @@ async def spatial_nearby(
             from sqlalchemy import text
 
             rows = (
-                await session.execute(
-                    text(sql), {"lat": lat, "lon": lon, "radius": radius_m, "lim": limit}
+                (
+                    await session.execute(
+                        text(sql), {"lat": lat, "lon": lon, "radius": radius_m, "lim": limit}
+                    )
                 )
-            ).mappings().all()
+                .mappings()
+                .all()
+            )
             return [dict(r) for r in rows]
         except Exception as e:
             logger.warning("PostGIS spatial query failed, fallback: %s", e)

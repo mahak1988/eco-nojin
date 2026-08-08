@@ -1,15 +1,14 @@
-"""
+﻿"""
 Zero Trust Security Implementation for Econojin Platform
 Integrates Zero Trust principles with existing security infrastructure
 """
 
-from typing import Dict, List, Set, Optional
-from enum import Enum
-import os
-from datetime import datetime, timezone
 import hashlib
+import os
 import secrets
 from collections import defaultdict
+from datetime import UTC, datetime
+from enum import Enum
 
 
 class SecurityLevel(Enum):
@@ -29,7 +28,7 @@ class ZeroTrustConfig:
     # In local/dev, do not require token on every route (see authenticate_request)
     REQUIRE_AUTH_ALL_ENDPOINTS = True
 
-    PUBLIC_ENDPOINTS: Set[str] = {
+    PUBLIC_ENDPOINTS: set[str] = {
         "/",
         "/health",
         "/docs",
@@ -40,7 +39,7 @@ class ZeroTrustConfig:
         "/api/v1/auth/register",
         "/api/v1/auth/refresh",
         "/api/v1/auth/forgot-password",
-        "/api/v1/debug/routers",
+        ""  # Removed from public,
         # Science public compute (Phase B1)
         "/api/v1/science/status",
         "/api/v1/science/aquacrop-advanced",
@@ -80,11 +79,11 @@ class ZeroTrustConfig:
     }
 
     SERVICE_TOKENS = {
-        "api": "internal-api-token",
-        "cms": "internal-cms-token",
-        "ai": "internal-ai-token",
-        "simulation": "internal-sim-token",
-        "ml": "internal-ml-token",
+        "api": os.getenv("SERVICE_TOKEN_API", ""),
+        "cms": os.getenv("SERVICE_TOKEN_CMS", ""),
+        "ai": os.getenv("SERVICE_TOKEN_AI", ""),
+        "simulation": os.getenv("SERVICE_TOKEN_SIM", ""),
+        "ml": os.getenv("SERVICE_TOKEN_ML", ""),
     }
 
     TOKEN_MAX_AGE_MINUTES = 60
@@ -111,7 +110,7 @@ class SupplyChainSecurity:
         self.integrity_checks_enabled = True
 
     def verify_component_integrity(
-        self, component_path: str, expected_hash: Optional[str] = None
+        self, component_path: str, expected_hash: str | None = None
     ) -> bool:
         if not self.integrity_checks_enabled:
             return True
@@ -172,7 +171,7 @@ class EnhancedSecurityManager:
     def authenticate_request(
         self,
         endpoint: str,
-        auth_token: Optional[str],
+        auth_token: str | None,
         client_ip: str,
         user_agent: str,
     ) -> bool:
@@ -186,7 +185,8 @@ class EnhancedSecurityManager:
             return True
 
         if not self.zero_trust_config.REQUIRE_AUTH_ALL_ENDPOINTS:
-            return True
+            # In non-production, still require auth but log it
+            pass
 
         if not auth_token:
             self._record_failed_attempt(client_ip)
@@ -205,12 +205,12 @@ class EnhancedSecurityManager:
                     return False
             else:
                 self.active_sessions[session_key] = {
-                    "created_at": datetime.now(timezone.utc),
-                    "last_access": datetime.now(timezone.utc),
+                    "created_at": datetime.now(UTC),
+                    "last_access": datetime.now(UTC),
                     "token": auth_token,
                 }
 
-        self.last_access_times[client_ip] = datetime.now(timezone.utc)
+        self.last_access_times[client_ip] = datetime.now(UTC)
         return True
 
     def authorize_request(self, user_role: str, required_permission: str) -> bool:
@@ -221,16 +221,24 @@ class EnhancedSecurityManager:
         return required_permission in allowed_roles
 
     def _verify_token(self, token: str) -> bool:
-        if len(token) < 10:
+        """Actually validate JWT token — no bypass."""
+        if not token or len(token) < 10:
             return False
-
-        if token in self.zero_trust_config.SERVICE_TOKENS.values():
-            return True
-
-        return True
-
-    def _is_session_valid(self, session_info: Dict) -> bool:
-        now = datetime.now(timezone.utc)
+        # Check service tokens from env vars
+        for svc_token in self.zero_trust_config.SERVICE_TOKENS.values():
+            if svc_token and token == svc_token:
+                return True
+        # Actually decode and validate JWT
+        try:
+            from apps.shared_core.security import decode_token
+            payload = decode_token(token)
+            if payload and payload.get("sub"):
+                return True
+        except Exception:
+            pass
+        return False
+    def _is_session_valid(self, session_info: dict) -> bool:
+        now = datetime.now(UTC)
         age = now - session_info["created_at"]
         max_age = self.zero_trust_config.TOKEN_MAX_AGE_MINUTES * 60
         return age.total_seconds() < max_age
@@ -241,13 +249,11 @@ class EnhancedSecurityManager:
         if self.failed_attempts[client_ip] >= self.zero_trust_config.AUTO_LOCKOUT_THRESHOLD:
             pass
 
-    def log_access_event(
-        self, client_ip: str, endpoint: str, success: bool, user_agent: str = ""
-    ):
+    def log_access_event(self, client_ip: str, endpoint: str, success: bool, user_agent: str = ""):
         if not self.zero_trust_config.LOG_ALL_ACCESS:
             return
 
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = datetime.now(UTC).isoformat()
         event = {
             "timestamp": timestamp,
             "client_ip": client_ip,
@@ -259,12 +265,12 @@ class EnhancedSecurityManager:
         if self.zero_trust_config.ANOMALY_DETECTION:
             self._check_for_anomalies(event)
 
-    def _check_for_anomalies(self, event: Dict):
+    def _check_for_anomalies(self, event: dict):
         client_ip = event["client_ip"]
         recent_events = [
             ev
             for ev in self.last_access_times.items()
-            if (datetime.now(timezone.utc) - ev[1]).total_seconds() < 60
+            if (datetime.now(UTC) - ev[1]).total_seconds() < 60
         ]
 
         if len([ev for ev in recent_events if ev[0] == client_ip]) > 10:
@@ -274,7 +280,7 @@ class EnhancedSecurityManager:
         return secrets.token_urlsafe(length)
 
     def cleanup_expired_sessions(self):
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         expired_sessions = []
 
         for session_key, session_info in self.active_sessions.items():
@@ -293,10 +299,10 @@ def get_security_manager() -> EnhancedSecurityManager:
 
 
 __all__ = [
-    "ZeroTrustConfig",
-    "SupplyChainSecurity",
     "EnhancedSecurityManager",
     "SecurityLevel",
-    "security_manager",
+    "SupplyChainSecurity",
+    "ZeroTrustConfig",
     "get_security_manager",
+    "security_manager",
 ]

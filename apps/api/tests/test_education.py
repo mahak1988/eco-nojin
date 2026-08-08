@@ -8,14 +8,14 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.models.education import Course, Lesson, Enrollment, CourseCategory, DifficultyLevel
-from apps.api.schemas.education import CourseCreate, LessonCreate, EnrollmentCreate
+from apps.api.models.education import Course, CourseCategory, DifficultyLevel, Enrollment, Lesson
 
 
 @pytest.fixture
 async def education_db_session():
     """Create a test database session for education models."""
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
     from apps.shared_core.database.session import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
@@ -126,7 +126,9 @@ async def test_enrollment_crud(education_db_session: AsyncSession):
     await education_db_session.flush()
 
     # Read
-    result = await education_db_session.execute(select(Enrollment).where(Enrollment.id == "enroll-1"))
+    result = await education_db_session.execute(
+        select(Enrollment).where(Enrollment.id == "enroll-1")
+    )
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.progress == 0.5
@@ -135,7 +137,9 @@ async def test_enrollment_crud(education_db_session: AsyncSession):
     fetched.progress = 1.0
     await education_db_session.flush()
 
-    result = await education_db_session.execute(select(Enrollment).where(Enrollment.id == "enroll-1"))
+    result = await education_db_session.execute(
+        select(Enrollment).where(Enrollment.id == "enroll-1")
+    )
     updated = result.scalar_one()
     assert updated.progress == 1.0
 

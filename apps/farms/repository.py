@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,8 +20,8 @@ class FarmRepository:
         *,
         skip: int = 0,
         limit: int = 20,
-        search: Optional[str] = None,
-        owner_id: Optional[int] = None,
+        search: str | None = None,
+        owner_id: int | None = None,
     ) -> tuple[Sequence[Farm], int]:
         q = select(Farm).where(Farm.is_deleted.is_(False))
         count_q = select(func.count()).select_from(Farm).where(Farm.is_deleted.is_(False))
@@ -33,18 +33,16 @@ class FarmRepository:
             q = q.where(Farm.owner_id == owner_id)
             count_q = count_q.where(Farm.owner_id == owner_id)
         total = int((await self.session.execute(count_q)).scalar_one())
-        result = await self.session.execute(
-            q.order_by(Farm.id.desc()).offset(skip).limit(limit)
-        )
+        result = await self.session.execute(q.order_by(Farm.id.desc()).offset(skip).limit(limit))
         return result.scalars().all(), total
 
-    async def get(self, farm_id: int) -> Optional[Farm]:
+    async def get(self, farm_id: int) -> Farm | None:
         result = await self.session.execute(
             select(Farm).where(Farm.id == farm_id, Farm.is_deleted.is_(False))
         )
         return result.scalar_one_or_none()
 
-    async def create(self, data: FarmCreate, owner_id: Optional[int] = None) -> Farm:
+    async def create(self, data: FarmCreate, owner_id: int | None = None) -> Farm:
         farm = Farm(
             name=data.name,
             description=data.description,

@@ -7,9 +7,8 @@ Data access layer — all database queries live here.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models.library import LibraryResource
@@ -23,7 +22,7 @@ class LibraryRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, resource_id: int) -> Optional[LibraryResource]:
+    async def get_by_id(self, resource_id: int) -> LibraryResource | None:
         """Handle get_by_id (resource_id)."""
         result = await self.session.execute(
             select(LibraryResource).where(LibraryResource.id == resource_id)
@@ -34,19 +33,19 @@ class LibraryRepository:
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
-        author: Optional[str] = None
-    ) -> tuple[List[LibraryResource], int]:
+        search: str | None = None,
+        category: str | None = None,
+        author: str | None = None,
+    ) -> tuple[list[LibraryResource], int]:
         """Handle list (skip, limit, search, category, author)."""
         query = select(LibraryResource)
 
         if search:
             search_term = f"%{search.lower()}%"
             query = query.where(
-                (LibraryResource.title.ilike(search_term)) |
-                (LibraryResource.description.ilike(search_term)) |
-                (LibraryResource.tags.ilike(search_term))
+                (LibraryResource.title.ilike(search_term))
+                | (LibraryResource.description.ilike(search_term))
+                | (LibraryResource.tags.ilike(search_term))
             )
 
         if category:
@@ -63,9 +62,9 @@ class LibraryRepository:
         if search:
             search_term = f"%{search.lower()}%"
             count_query = count_query.where(
-                (LibraryResource.title.ilike(search_term)) |
-                (LibraryResource.description.ilike(search_term)) |
-                (LibraryResource.tags.ilike(search_term))
+                (LibraryResource.title.ilike(search_term))
+                | (LibraryResource.description.ilike(search_term))
+                | (LibraryResource.tags.ilike(search_term))
             )
         if category:
             count_query = count_query.where(LibraryResource.category == category)
@@ -89,7 +88,7 @@ class LibraryRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, resource_id: int, data: LibraryResourceUpdate) -> Optional[LibraryResource]:
+    async def update(self, resource_id: int, data: LibraryResourceUpdate) -> LibraryResource | None:
         """Handle update (resource_id, data)."""
         obj = await self.get_by_id(resource_id)
         if not obj:
@@ -97,7 +96,7 @@ class LibraryRepository:
 
         update_data = data.model_dump(exclude_unset=True)
         # Convert tags list to comma-separated string
-        if "tags" in update_data and update_data["tags"]:
+        if update_data.get("tags"):
             update_data["tags"] = ",".join(update_data["tags"])
         elif "tags" in update_data:
             update_data["tags"] = ""
@@ -138,5 +137,5 @@ class LibraryRepository:
             "by_category": {
                 cat: len([r for r in resources if r.category == cat])
                 for cat in ["research", "guides", "policies", "reports", "training"]
-            }
+            },
         }

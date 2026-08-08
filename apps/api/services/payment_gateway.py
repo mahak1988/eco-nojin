@@ -2,6 +2,7 @@
 Payment gateway — Stripe Checkout + Zarinpal request/verify.
 Keys from environment; without keys returns configured=false.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -11,7 +12,7 @@ import logging
 import os
 import time
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -60,9 +61,9 @@ async def create_checkout(
     amount: float,
     currency: str,
     description: str,
-    invoice_id: Optional[str] = None,
+    invoice_id: str | None = None,
     provider: str = "auto",
-    customer_email: Optional[str] = None,
+    customer_email: str | None = None,
 ) -> dict[str, Any]:
     currency = (currency or "USD").upper()
     intent_id = f"pi_{uuid.uuid4().hex[:16]}"
@@ -119,7 +120,7 @@ async def create_checkout(
     return meta
 
 
-async def _stripe_checkout(meta: dict[str, Any], email: Optional[str]) -> dict[str, Any]:
+async def _stripe_checkout(meta: dict[str, Any], email: str | None) -> dict[str, Any]:
     amount = meta["amount"]
     currency = meta["currency"].lower()
     zero_decimal = currency in ("jpy", "krw", "vnd")
@@ -260,11 +261,11 @@ def apply_stripe_event(event: dict[str, Any]) -> dict[str, Any]:
     return {"handled": True, "intent": meta}
 
 
-def get_intent(intent_id: str) -> Optional[dict[str, Any]]:
+def get_intent(intent_id: str) -> dict[str, Any] | None:
     return _INTENTS.get(intent_id)
 
 
-def mark_demo_paid(intent_id: str) -> Optional[dict[str, Any]]:
+def mark_demo_paid(intent_id: str) -> dict[str, Any] | None:
     meta = _INTENTS.get(intent_id)
     if not meta:
         return None

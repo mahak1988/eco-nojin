@@ -7,15 +7,12 @@ Business logic layer — orchestrates repositories and enforces rules.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.repositories.agriculture_school import AgricultureSchoolRepository
-from apps.api.schemas.agriculture_school import (
-    AgricultureSchoolCreate, AgricultureSchoolUpdate
-)
 from apps.api.models.agriculture_school import AgricultureSchool
+from apps.api.repositories.agriculture_school import AgricultureSchoolRepository
+from apps.api.schemas.agriculture_school import AgricultureSchoolCreate, AgricultureSchoolUpdate
 
 
 class AgricultureSchoolService:
@@ -26,8 +23,12 @@ class AgricultureSchoolService:
         self.repo = AgricultureSchoolRepository(session)
 
     async def list(
-        self, skip: int = 0, limit: int = 100, search: Optional[str] = None, school_type: Optional[str] = None
-    ) -> tuple[List[AgricultureSchool], int]:
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str | None = None,
+        school_type: str | None = None,
+    ) -> tuple[list[AgricultureSchool], int]:
         """Handle list (skip, limit, search, school_type)."""
         limit = min(limit, 200)
         return await self.repo.list(skip, limit, search, school_type)

@@ -10,10 +10,9 @@ from __future__ import annotations
 
 import json
 import math
-import random
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 def _dot(a: list[float], b: list[float]) -> float:
@@ -73,7 +72,10 @@ class LinearModel:
     name: str = "linear"
 
     def predict(self, x: list[float]) -> float:
-        xn = [(xi - m) / (s if s > 1e-9 else 1.0) for xi, m, s in zip(x, self.feature_means, self.feature_stds)]
+        xn = [
+            (xi - m) / (s if s > 1e-9 else 1.0)
+            for xi, m, s in zip(x, self.feature_means, self.feature_stds)
+        ]
         xn = xn + [1.0]
         y_n = _dot(self.weights, xn)
         return y_n * self.target_std + self.target_mean
@@ -90,7 +92,10 @@ class LogisticModel:
     name: str = "logistic"
 
     def predict_proba(self, x: list[float]) -> dict[str, float]:
-        xn = [(xi - m) / (s if s > 1e-9 else 1.0) for xi, m, s in zip(x, self.feature_means, self.feature_stds)]
+        xn = [
+            (xi - m) / (s if s > 1e-9 else 1.0)
+            for xi, m, s in zip(x, self.feature_means, self.feature_stds)
+        ]
         xn = xn + [1.0]
         if len(self.classes) == 2:
             z = _dot(self.weights[0], xn)
@@ -151,13 +156,15 @@ def fit_linear(X: list[list[float]], y: list[float], ridge: float = 1e-2) -> Lin
     XtX = _add_ridge(XtX, ridge)
     Xty = [_dot(Xt[i], yn) for i in range(d + 1)]
     w = _solve_linear(XtX, Xty)
-    return LinearModel(weights=w, feature_means=means, feature_stds=stds, target_mean=y_mean, target_std=y_std)
+    return LinearModel(
+        weights=w, feature_means=means, feature_stds=stds, target_mean=y_mean, target_std=y_std
+    )
 
 
 def fit_logistic(
     X: list[list[float]],
     y: list[str],
-    classes: Optional[list[str]] = None,
+    classes: list[str] | None = None,
     lr: float = 0.15,
     epochs: int = 400,
 ) -> LogisticModel:
@@ -233,7 +240,7 @@ class ModelBundle:
         }
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "ModelBundle":
+    def from_dict(d: dict[str, Any]) -> ModelBundle:
         return ModelBundle(
             yield_regressor=LinearModel(**d["yield_regressor"]),
             risk_classifier=LogisticModel(**d["risk_classifier"]),
@@ -247,7 +254,7 @@ def save_bundle(bundle: ModelBundle, path: Path) -> None:
     path.write_text(json.dumps(bundle.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def load_bundle(path: Path) -> Optional[ModelBundle]:
+def load_bundle(path: Path) -> ModelBundle | None:
     if not path.is_file():
         return None
     try:

@@ -1,4 +1,5 @@
 """Tests for router."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestRouter:
         """Verify register is callable."""
         try:
             from apps.users.router import register
+
             assert callable(register)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,6 +28,7 @@ class TestRouter:
         """Verify login is callable."""
         try:
             from apps.users.router import login
+
             assert callable(login)
         except ImportError:
             pytest.skip("Module not available")
@@ -34,6 +37,7 @@ class TestRouter:
         """Verify get_current_user_info is callable."""
         try:
             from apps.users.router import get_current_user_info
+
             assert callable(get_current_user_info)
         except ImportError:
             pytest.skip("Module not available")
@@ -42,6 +46,7 @@ class TestRouter:
         """Verify update_current_user is callable."""
         try:
             from apps.users.router import update_current_user
+
             assert callable(update_current_user)
         except ImportError:
             pytest.skip("Module not available")
@@ -50,7 +55,7 @@ class TestRouter:
         """Verify list_users is callable."""
         try:
             from apps.users.router import list_users
+
             assert callable(list_users)
         except ImportError:
             pytest.skip("Module not available")
-

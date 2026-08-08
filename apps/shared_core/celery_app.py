@@ -8,15 +8,12 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
-REDIS_URL = (
-    os.getenv("CELERY_BROKER_URL")
-    or os.getenv("REDIS_URL")
-    or "redis://localhost:6379/0"
-)
+REDIS_URL = os.getenv("CELERY_BROKER_URL") or os.getenv("REDIS_URL") or "redis://localhost:6379/0"
 
 CELERY_AVAILABLE = False
 celery_app: Any = None

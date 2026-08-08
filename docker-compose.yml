@@ -1,9 +1,9 @@
-services:
+﻿services:
   postgres:
     image: postgis/postgis:16-3.4
     environment:
       POSTGRES_USER: econojin
-      POSTGRES_PASSWORD: econojin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       POSTGRES_DB: econojin
     ports:
       - "5432:5432"

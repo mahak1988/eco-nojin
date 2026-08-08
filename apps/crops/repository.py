@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,12 +20,14 @@ class CropRepository:
         *,
         skip: int = 0,
         limit: int = 50,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
+        search: str | None = None,
+        category: str | None = None,
     ) -> tuple[Sequence[Crop], int]:
         q = select(Crop).where(Crop.is_deleted.is_(False), Crop.is_active.is_(True))
-        cq = select(func.count()).select_from(Crop).where(
-            Crop.is_deleted.is_(False), Crop.is_active.is_(True)
+        cq = (
+            select(func.count())
+            .select_from(Crop)
+            .where(Crop.is_deleted.is_(False), Crop.is_active.is_(True))
         )
         if search:
             like = f"%{search}%"
@@ -38,7 +40,7 @@ class CropRepository:
         rows = await self.session.execute(q.order_by(Crop.name).offset(skip).limit(limit))
         return rows.scalars().all(), total
 
-    async def get(self, crop_id: int) -> Optional[Crop]:
+    async def get(self, crop_id: int) -> Crop | None:
         r = await self.session.execute(
             select(Crop).where(Crop.id == crop_id, Crop.is_deleted.is_(False))
         )

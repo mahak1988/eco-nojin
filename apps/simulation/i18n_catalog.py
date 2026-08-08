@@ -119,7 +119,9 @@ def localize_sim_meta(meta: dict[str, Any], lang: str) -> dict[str, Any]:
             out["name"] = pack["name"].get(lang) or pack["name"].get("en") or out.get("name")
         if "description" in pack:
             out["description"] = (
-                pack["description"].get(lang) or pack["description"].get("en") or out.get("description")
+                pack["description"].get(lang)
+                or pack["description"].get("en")
+                or out.get("description")
             )
     cat = str(out.get("category") or "other")
     cat_pack = CATEGORY_I18N.get(cat) or CATEGORY_I18N["other"]

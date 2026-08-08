@@ -1,10 +1,10 @@
-"""Authentication — HttpOnly cookies + RS256/HS256 via shared security module."""
+﻿"""Authentication — HttpOnly cookies + RS256/HS256 via shared security module."""
 
 from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -26,6 +26,9 @@ from apps.shared_core.security import (
 from apps.shared_core.token_store import is_refresh_revoked, revoke_refresh
 from apps.users.models import User
 
+# Dummy bcrypt hash for constant-time login response (prevents user enumeration)
+_DUMMY_BCRYPT_HASH = "$2b$12$invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid.invalid"
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -37,8 +40,8 @@ ALLOWED_ROLES = {"farmer", "expert", "viewer"}
 
 
 class LoginRequest(BaseModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
+    email: EmailStr | None = None
+    username: str | None = None
     password: str
 
     @model_validator(mode="before")
@@ -47,7 +50,11 @@ class LoginRequest(BaseModel):
         if isinstance(values, dict):
             if not values.get("email") and not values.get("username"):
                 raise ValueError("Either email or username must be provided")
-            if values.get("username") and not values.get("email") and "@" in str(values["username"]):
+            if (
+                values.get("username")
+                and not values.get("email")
+                and "@" in str(values["username"])
+            ):
                 values["email"] = values["username"]
         return values
 
@@ -55,11 +62,26 @@ class LoginRequest(BaseModel):
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=72)
-    full_name: Optional[str] = Field(None, max_length=255)
-    phone: Optional[str] = Field(None, max_length=40)
-    organization: Optional[str] = Field(None, max_length=255)
+    full_name: str | None = Field(None, max_length=255)
+    phone: str | None = Field(None, max_length=40)
+    organization: str | None = Field(None, max_length=255)
     role: Literal["farmer", "expert", "viewer"] = "farmer"
     accept_terms: bool = False
+
+    @field_validator("password")
+    @classmethod
+    @classmethod
+    def password_complexity(cls, v: str) -> str:
+        """Ensure password meets complexity requirements."""
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        if not any(c.isupper() for c in v):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not any(c.islower() for c in v):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not any(c.isdigit() for c in v):
+            raise ValueError("Password must contain at least one digit")
+        return v
 
     @field_validator("password")
     @classmethod
@@ -78,14 +100,14 @@ class RegisterRequest(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    organization: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
+    organization: str | None = None
     role: str = "farmer"
     is_active: bool
     is_superuser: bool = False
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class AuthResponse(BaseModel):
@@ -96,7 +118,7 @@ class AuthResponse(BaseModel):
 
 
 class RefreshRequest(BaseModel):
-    refreshToken: Optional[str] = None
+    refreshToken: str | None = None
 
 
 def _user_response(user: User) -> UserResponse:
@@ -212,7 +234,10 @@ async def login(
     result = await db.execute(select(User).where(User.email == str(identifier).lower()))
     user = result.scalar_one_or_none()
     stored = getattr(user, "hashed_password", None) if user else None
-    if not user or not stored or not verify_password(body.password, stored):
+    # Always run bcrypt to prevent timing-based user enumeration
+    if not stored:
+        stored = _DUMMY_BCRYPT_HASH
+    if not user or not verify_password(body.password, stored):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -254,7 +279,7 @@ async def logout(request: Request, response: Response) -> dict[str, str]:
 async def refresh_token(
     response: Response,
     request: Request,
-    body: Optional[RefreshRequest] = None,
+    body: RefreshRequest | None = None,
     db: AsyncSession = Depends(get_db),
 ) -> AuthResponse:
     raw = None

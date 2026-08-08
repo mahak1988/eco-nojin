@@ -8,9 +8,8 @@ Services call repositories; repositories never call services.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models import Api
@@ -24,26 +23,19 @@ class ApiRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, id: int) -> Optional[Api]:
+    async def get_by_id(self, id: int) -> Api | None:
         """Fetch a single record by ID."""
-        result = await self.session.execute(
-            select(Api).where(Api.id == id)
-        )
+        result = await self.session.execute(select(Api).where(Api.id == id))
         return result.scalar_one_or_none()
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list[Api], int]:
         """Fetch a paginated list of records + total count."""
         result = await self.session.execute(
-            select(Api)
-            .order_by(Api.id.desc())
-            .offset(skip)
-            .limit(limit)
+            select(Api).order_by(Api.id.desc()).offset(skip).limit(limit)
         )
         items = list(result.scalars().all())
 
-        count_result = await self.session.execute(
-            select(func.count()).select_from(Api)
-        )
+        count_result = await self.session.execute(select(func.count()).select_from(Api))
         total = count_result.scalar_one()
         return items, total
 
@@ -55,7 +47,7 @@ class ApiRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, id: int, data: ApiUpdate) -> Optional[Api]:
+    async def update(self, id: int, data: ApiUpdate) -> Api | None:
         """Update an existing record. Returns None if not found."""
         obj = await self.get_by_id(id)
         if not obj:

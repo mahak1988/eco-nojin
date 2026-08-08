@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, Dict, Any, List
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -12,8 +12,8 @@ from pydantic import BaseModel, ConfigDict, Field
 class AdminSettingBase(BaseModel):
     key: str = Field(..., max_length=128)
     value: str
-    description: Optional[str] = None
-    is_active: Optional[bool] = True
+    description: str | None = None
+    is_active: bool | None = True
 
 
 class AdminSettingCreate(AdminSettingBase):
@@ -21,9 +21,9 @@ class AdminSettingCreate(AdminSettingBase):
 
 
 class AdminSettingUpdate(BaseModel):
-    value: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
+    value: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
 
 
 class AdminSettingResponse(AdminSettingBase):
@@ -38,10 +38,10 @@ class AuditLogResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    actor_id: Optional[int]
-    actor_email: Optional[str]
+    actor_id: int | None
+    actor_email: str | None
     event_type: str
-    event_data: Optional[str] = None
+    event_data: str | None = None
     created_at: datetime
 
 
@@ -51,9 +51,9 @@ class SystemReportResponse(BaseModel):
     id: int
     report_name: str
     status: str
-    report_data: Optional[str] = None
+    report_data: str | None = None
     created_at: datetime
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
 
 class AdminDashboardResponse(BaseModel):
@@ -69,12 +69,13 @@ class AdminDashboardResponse(BaseModel):
 # Advanced Settings Schemas (NEW FOR 4.3)
 # ==========================================
 
+
 class AdvancedSettingBase(BaseModel):
     key: str = Field(..., max_length=128)
     value: str
-    description: Optional[str] = None
+    description: str | None = None
     category: str = Field(..., max_length=64)  # e.g., 'performance', 'security', 'cache'
-    is_active: Optional[bool] = True
+    is_active: bool | None = True
 
 
 class AdvancedSettingCreate(AdvancedSettingBase):
@@ -82,10 +83,10 @@ class AdvancedSettingCreate(AdvancedSettingBase):
 
 
 class AdvancedSettingUpdate(BaseModel):
-    value: Optional[str] = None
-    description: Optional[str] = None
-    category: Optional[str] = Field(None, max_length=64)
-    is_active: Optional[bool] = None
+    value: str | None = None
+    description: str | None = None
+    category: str | None = Field(None, max_length=64)
+    is_active: bool | None = None
 
 
 class AdvancedSettingResponse(AdvancedSettingBase):
@@ -100,52 +101,58 @@ class AdvancedSettingResponse(AdvancedSettingBase):
 # Content Management Schemas (NEW FOR PHASE 2 & 5.2)
 # ==========================================
 
+
 class ContentTypeResponse(BaseModel):
     """Response schema for content types."""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     name: str
     display_name: str
-    description: Optional[str] = None
-    fields: List[Dict[str, Any]]
+    description: str | None = None
+    fields: list[dict[str, Any]]
     created_at: datetime
     updated_at: datetime
 
 
 class ContentItemResponse(BaseModel):
     """Response schema for content items."""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     type: str
     title: str
     slug: str
-    content: Dict[str, Any]
+    content: dict[str, Any]
     status: str
     author_id: int
-    published_at: Optional[datetime] = None
+    published_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 
 
 class ContentCreateRequest(BaseModel):
     """Request schema for creating content items."""
+
     title: str
     slug: str
-    content: Dict[str, Any]
+    content: dict[str, Any]
     status: str = "draft"
 
 
 class ContentUpdateRequest(BaseModel):
     """Request schema for updating content items."""
-    title: Optional[str] = None
-    slug: Optional[str] = None
-    content: Optional[Dict[str, Any]] = None
-    status: Optional[str] = None
+
+    title: str | None = None
+    slug: str | None = None
+    content: dict[str, Any] | None = None
+    status: str | None = None
 
 
 class ContentManagementResponse(BaseModel):
     """Response schema for content management operations."""
+
     content_type: str
     total_items: int
     published_items: int
@@ -155,32 +162,36 @@ class ContentManagementResponse(BaseModel):
 
 class ContentVersionResponse(BaseModel):
     """Response schema for content versions."""
+
     id: int
     version_number: int
     content_id: int
-    content_data: Dict[str, Any]
+    content_data: dict[str, Any]
     created_by: int
     created_at: datetime
-    approved_by: Optional[int] = None
-    approved_at: Optional[datetime] = None
+    approved_by: int | None = None
+    approved_at: datetime | None = None
     status: str  # draft, pending_approval, approved, rejected
 
 
 class ContentApprovalResponse(BaseModel):
     """Response schema for content approval."""
+
     content_id: int
     approved_by: int
     approved_at: datetime
     status: str
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 # ==========================================
 # Intelligent Features Schemas (NEW FOR PHASE 4 & 5.3)
 # ==========================================
 
+
 class SmartRecommendationResponse(BaseModel):
     """Response schema for smart recommendations."""
+
     id: str
     title: str
     description: str
@@ -191,26 +202,29 @@ class SmartRecommendationResponse(BaseModel):
 
 class UserBehaviorAnalysisResponse(BaseModel):
     """Response schema for user behavior analysis."""
-    most_active_users: List[Dict[str, Any]]
-    peak_activity_days: List[tuple]  # (date, count)
-    most_common_events: List[tuple]  # (event_type, count)
+
+    most_active_users: list[dict[str, Any]]
+    peak_activity_days: list[tuple]  # (date, count)
+    most_common_events: list[tuple]  # (event_type, count)
     total_activities: int
-    insights: List[str]
+    insights: list[str]
 
 
 class AdvancedAnalyticsResponse(BaseModel):
     """Response schema for advanced analytics."""
-    dashboard_summary: Dict[str, Any]
+
+    dashboard_summary: dict[str, Any]
     user_behavior: UserBehaviorAnalysisResponse
-    system_health: Dict[str, Any]
-    active_users_trend: Dict[str, Any]
-    content_growth: Dict[str, Any]
-    system_performance: Dict[str, Any]
-    prediction_insights: Dict[str, Any]
+    system_health: dict[str, Any]
+    active_users_trend: dict[str, Any]
+    content_growth: dict[str, Any]
+    system_performance: dict[str, Any]
+    prediction_insights: dict[str, Any]
 
 
 class ContentSuggestionResponse(BaseModel):
     """Response schema for AI content suggestions."""
+
     id: str
     title: str
     description: str
@@ -221,6 +235,7 @@ class ContentSuggestionResponse(BaseModel):
 
 class IntelligentAlertResponse(BaseModel):
     """Response schema for intelligent alerts."""
+
     id: str
     type: str  # 'error', 'warning', 'info'
     title: str
@@ -232,15 +247,17 @@ class IntelligentAlertResponse(BaseModel):
 
 class IntelligentAnalyticsResponse(BaseModel):
     """Response schema for intelligent analytics dashboard."""
-    summary: Dict[str, int]
-    recommendations: List[SmartRecommendationResponse]
-    alerts: List[IntelligentAlertResponse]
-    predictions: Dict[str, Any]
-    insights: Dict[str, List[str]]
+
+    summary: dict[str, int]
+    recommendations: list[SmartRecommendationResponse]
+    alerts: list[IntelligentAlertResponse]
+    predictions: dict[str, Any]
+    insights: dict[str, list[str]]
 
 
 class AutoRecommendationResponse(BaseModel):
     """Response schema for automatic AI recommendations."""
+
     id: str
     title: str
     description: str
@@ -253,8 +270,9 @@ class AutoRecommendationResponse(BaseModel):
 
 class AdvancedAlertResponse(IntelligentAlertResponse):
     """Extended response schema for advanced intelligent alerts."""
+
     pattern_recognition_score: float
-    related_incidents: List[str]
+    related_incidents: list[str]
     recommended_resolution: str
 
 
@@ -262,15 +280,17 @@ class AdvancedAlertResponse(IntelligentAlertResponse):
 # User Management Schemas (Admin)
 # ==========================================
 
+
 class AdminUserResponse(BaseModel):
     """Response schema for admin user list/detail."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     email: str
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    organization: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
+    organization: str | None = None
     role: str
     is_active: bool
     is_superuser: bool
@@ -280,20 +300,23 @@ class AdminUserResponse(BaseModel):
 
 class AdminUserStatusUpdate(BaseModel):
     """Update user active status."""
+
     is_active: bool
 
 
 class AdminUserRoleUpdate(BaseModel):
     """Update user role."""
+
     is_superuser: bool
 
 
 class AdminUserSearchParams(BaseModel):
     """Search/filter params for admin user list."""
-    search: Optional[str] = Field(None, max_length=255)
-    role: Optional[str] = Field(None, max_length=40)
-    is_active: Optional[bool] = None
-    is_superuser: Optional[bool] = None
+
+    search: str | None = Field(None, max_length=255)
+    role: str | None = Field(None, max_length=40)
+    is_active: bool | None = None
+    is_superuser: bool | None = None
     limit: int = Field(default=100, ge=1, le=500)
     offset: int = Field(default=0, ge=0)
 
@@ -302,13 +325,15 @@ class AdminUserSearchParams(BaseModel):
 # System Health Schemas
 # ==========================================
 
+
 class SystemHealthResponse(BaseModel):
     """System health check response."""
+
     database: str
-    database_latency_ms: Optional[float] = None
+    database_latency_ms: float | None = None
     redis: str = "not_configured"
-    redis_latency_ms: Optional[float] = None
-    uptime_seconds: Optional[float] = None
+    redis_latency_ms: float | None = None
+    uptime_seconds: float | None = None
     total_users: int
     active_users_last_24h: int
     total_api_routes: int
@@ -320,11 +345,12 @@ class SystemHealthResponse(BaseModel):
 # Audit Log Filtering
 # ==========================================
 
+
 class AuditLogFilterParams(BaseModel):
-    event_type: Optional[str] = Field(None, max_length=128)
-    actor_email: Optional[str] = Field(None, max_length=255)
-    date_from: Optional[datetime] = None
-    date_to: Optional[datetime] = None
+    event_type: str | None = Field(None, max_length=128)
+    actor_email: str | None = Field(None, max_length=255)
+    date_from: datetime | None = None
+    date_to: datetime | None = None
     limit: int = Field(default=100, ge=1, le=1000)
     offset: int = Field(default=0, ge=0)
 
@@ -332,6 +358,7 @@ class AuditLogFilterParams(BaseModel):
 # ==========================================
 # Report Generation
 # ==========================================
+
 
 class ReportGenerateRequest(BaseModel):
     report_name: str = Field(..., max_length=255)

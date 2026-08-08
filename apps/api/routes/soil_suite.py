@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -40,8 +40,8 @@ class LeachBody(BaseModel):
     et_mm_day: float = Field(2.0, ge=0, le=15)
     irrigation_mm_day: float = Field(0.5, ge=0, le=30)
     no3_kg_ha_layer: float = Field(25.0, ge=0, le=200)
-    no3_profile: Optional[list[float]] = None
-    fertilizer_events: Optional[list[dict[str, Any]]] = None
+    no3_profile: list[float] | None = None
+    fertilizer_events: list[dict[str, Any]] | None = None
 
 
 class TextureBody(BaseModel):
@@ -108,7 +108,7 @@ class NLIBody(BaseModel):
 
 
 class ProfileNBody(BaseModel):
-    layers: Optional[list[dict[str, Any]]] = None
+    layers: list[dict[str, Any]] | None = None
 
 
 class InfilBody(BaseModel):
@@ -121,7 +121,7 @@ class InfilBody(BaseModel):
 class TempBody(BaseModel):
     t_air_c: float = 25
     t_annual_mean_c: float = 15
-    depths_cm: Optional[list[float]] = None
+    depths_cm: list[float] | None = None
 
 
 class HealthBody(BaseModel):

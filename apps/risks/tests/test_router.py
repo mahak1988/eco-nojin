@@ -1,4 +1,5 @@
 """Tests for risks router — /api/v1/risks."""
+
 from __future__ import annotations
 
 import pytest
@@ -70,6 +71,7 @@ class TestRisksRouterImport:
     def test_router_importable(self):
         try:
             from apps.risks.router import router
+
             assert router is not None
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -77,6 +79,7 @@ class TestRisksRouterImport:
     def test_predict_callable(self):
         try:
             from apps.risks.router import predict_risk
+
             assert callable(predict_risk)
         except (ImportError, AttributeError) as e:
             pytest.skip(f"Not available: {e}")
@@ -84,6 +87,7 @@ class TestRisksRouterImport:
     def test_predict_demo_callable(self):
         try:
             from apps.risks.router import predict_risk_demo
+
             assert callable(predict_risk_demo)
         except (ImportError, AttributeError) as e:
             pytest.skip(f"Not available: {e}")
@@ -93,6 +97,7 @@ class TestRisksSchemas:
     def test_risk_report_importable(self):
         try:
             from apps.risks.schemas import RiskReport
+
             assert RiskReport is not None
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -100,6 +105,7 @@ class TestRisksSchemas:
     def test_risk_report_fields_exist(self):
         try:
             from apps.risks.schemas import RiskReport
+
             fields = RiskReport.model_fields
             assert len(fields) > 0
         except (ImportError, AttributeError) as e:

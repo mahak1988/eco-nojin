@@ -7,13 +7,12 @@ Business logic layer — orchestrates repositories and enforces rules.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.models.community import Comment, Like, Post
 from apps.api.repositories.community import CommunityRepository
-from apps.api.schemas.community import PostCreate, PostUpdate, CommentCreate, CommentUpdate
-from apps.api.models.community import Post, Comment, Like
+from apps.api.schemas.community import CommentCreate, CommentUpdate, PostCreate, PostUpdate
 
 
 class CommunityService:
@@ -26,9 +25,13 @@ class CommunityService:
     # ==================== Post Operations ====================
 
     async def list_posts(
-        self, skip: int = 0, limit: int = 100,
-        search: Optional[str] = None, category: Optional[str] = None, author_id: Optional[int] = None
-    ) -> tuple[List[Post], int]:
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str | None = None,
+        category: str | None = None,
+        author_id: int | None = None,
+    ) -> tuple[list[Post], int]:
         """Handle list_posts (skip, limit, search, category, author_id)."""
         limit = min(limit, 200)
         return await self.repo.list_posts(skip, limit, search, category, author_id)
@@ -58,7 +61,9 @@ class CommunityService:
 
     # ==================== Comment Operations ====================
 
-    async def list_comments(self, post_id: int, skip: int = 0, limit: int = 100) -> tuple[List[Comment], int]:
+    async def list_comments(
+        self, post_id: int, skip: int = 0, limit: int = 100
+    ) -> tuple[list[Comment], int]:
         """Handle list_comments (post_id, skip, limit)."""
         return await self.repo.list_comments_by_post(post_id, skip, limit)
 

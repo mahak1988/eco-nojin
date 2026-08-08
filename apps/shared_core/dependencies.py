@@ -21,6 +21,7 @@ CurrentUser = Annotated[dict, Depends(get_real_current_user)]
 
 def require_role(*roles: str) -> None:
     """Dependency factory: require the user to have one of the given roles."""
+
     async def _check(user: CurrentUser) -> dict:
         """Handle _check (user)."""
         if user.get("role") not in roles:
@@ -29,6 +30,7 @@ def require_role(*roles: str) -> None:
                 detail="Access denied: Insufficient permissions.",
             )
         return user
+
     return Depends(_check)
 
 
@@ -37,4 +39,5 @@ def require_permission(permission: str):
     # This relies on the underlying implementation in shared_core.rbac
     # which should fetch permissions for the user from the database/session.
     from apps.shared_core.rbac.deps import require_permission as rbac_require_permission
+
     return rbac_require_permission(permission)

@@ -142,8 +142,13 @@ class TestEconomicModels:
 
     def test_models_importable(self) -> None:
         """Verify economics models are importable."""
-        from apps.economics.models import EconomicAnalysis, CostItem, BenefitItem
-        from apps.economics.models import AnalysisType, Currency
+        from apps.economics.models import (
+            AnalysisType,
+            BenefitItem,
+            CostItem,
+            Currency,
+            EconomicAnalysis,
+        )
 
         assert EconomicAnalysis is not None
         assert CostItem is not None
@@ -158,10 +163,25 @@ class TestEconomicModels:
         # Use SQLAlchemy inspection
         column_names = {c.name for c in EconomicAnalysis.__table__.columns}
         expected = {
-            "id", "farm_id", "project_id", "title", "analysis_type",
-            "currency", "total_cost", "total_revenue", "total_benefit",
-            "npv", "irr", "roi", "payback_period_years", "break_even_point",
-            "discount_rate", "time_horizon_years", "notes", "is_active",
-            "created_at", "updated_at",
+            "id",
+            "farm_id",
+            "project_id",
+            "title",
+            "analysis_type",
+            "currency",
+            "total_cost",
+            "total_revenue",
+            "total_benefit",
+            "npv",
+            "irr",
+            "roi",
+            "payback_period_years",
+            "break_even_point",
+            "discount_rate",
+            "time_horizon_years",
+            "notes",
+            "is_active",
+            "created_at",
+            "updated_at",
         }
         assert expected.issubset(column_names)

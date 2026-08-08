@@ -9,15 +9,21 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.models.games import (
-    VocabularyWord, Quiz, QuizQuestion, QuizAttempt,
-    QuestionType, QuizDifficulty, WordDifficulty
+    QuestionType,
+    Quiz,
+    QuizAttempt,
+    QuizDifficulty,
+    QuizQuestion,
+    VocabularyWord,
+    WordDifficulty,
 )
 
 
 @pytest.fixture
 async def games_db_session():
     """Create a test database session for games models."""
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
     from apps.shared_core.database.session import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
@@ -48,7 +54,9 @@ async def test_vocabulary_word_crud(games_db_session: AsyncSession):
     await games_db_session.flush()
 
     # Read
-    result = await games_db_session.execute(select(VocabularyWord).where(VocabularyWord.id == "word-1"))
+    result = await games_db_session.execute(
+        select(VocabularyWord).where(VocabularyWord.id == "word-1")
+    )
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.word == "Sustainability"
@@ -58,7 +66,9 @@ async def test_vocabulary_word_crud(games_db_session: AsyncSession):
     fetched.definition = "Updated definition"
     await games_db_session.flush()
 
-    result = await games_db_session.execute(select(VocabularyWord).where(VocabularyWord.id == "word-1"))
+    result = await games_db_session.execute(
+        select(VocabularyWord).where(VocabularyWord.id == "word-1")
+    )
     updated = result.scalar_one()
     assert updated.definition == "Updated definition"
 
@@ -118,7 +128,9 @@ async def test_quiz_question_crud(games_db_session: AsyncSession):
     await games_db_session.flush()
 
     # Read
-    result = await games_db_session.execute(select(QuizQuestion).where(QuizQuestion.id == "question-1"))
+    result = await games_db_session.execute(
+        select(QuizQuestion).where(QuizQuestion.id == "question-1")
+    )
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.question_type == QuestionType.MULTIPLE_CHOICE
@@ -149,7 +161,9 @@ async def test_quiz_attempt_crud(games_db_session: AsyncSession):
     await games_db_session.flush()
 
     # Read
-    result = await games_db_session.execute(select(QuizAttempt).where(QuizAttempt.id == "attempt-1"))
+    result = await games_db_session.execute(
+        select(QuizAttempt).where(QuizAttempt.id == "attempt-1")
+    )
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.score == 85.5

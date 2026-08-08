@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from apps.simulation.rothc_model import run_rothc
 from apps.simulation.soil_models import run_rusle2
@@ -64,7 +65,12 @@ def _rusle_y(vec: list[float]) -> float:
     return float(run_rusle2(d)["outputs"]["A_t_ha_year"])
 
 
-def _src(param_spec: list[tuple[str, float, float]], model: Callable[[list[float]], float], n: int, seed: int) -> dict[str, Any]:
+def _src(
+    param_spec: list[tuple[str, float, float]],
+    model: Callable[[list[float]], float],
+    n: int,
+    seed: int,
+) -> dict[str, Any]:
     rng = random.Random(seed)
     d = len(param_spec)
     X, y = [], []
@@ -88,7 +94,7 @@ def _src(param_spec: list[tuple[str, float, float]], model: Callable[[list[float
     beta = _gauss(g, d)
     y_hat = [sum(beta[j] * Z[i][j] for j in range(d)) for i in range(n)]
     ss_res = sum((yz[i] - y_hat[i]) ** 2 for i in range(n))
-    ss_tot = sum(v ** 2 for v in yz) or 1.0
+    ss_tot = sum(v**2 for v in yz) or 1.0
     rows = [
         {"feature": param_spec[j][0], "src": round(beta[j], 5), "abs_src": round(abs(beta[j]), 5)}
         for j in range(d)
@@ -114,7 +120,12 @@ def _gauss(aug: list[list[float]], n: int) -> list[float]:
     return [a[i][n] for i in range(n)]
 
 
-def _morris(param_spec: list[tuple[str, float, float]], model: Callable[[list[float]], float], r: int, seed: int) -> dict[str, Any]:
+def _morris(
+    param_spec: list[tuple[str, float, float]],
+    model: Callable[[list[float]], float],
+    r: int,
+    seed: int,
+) -> dict[str, Any]:
     rng = random.Random(seed)
     d = len(param_spec)
     p_levels = 6
@@ -150,7 +161,12 @@ def _morris(param_spec: list[tuple[str, float, float]], model: Callable[[list[fl
     return {"method": "Morris", "effects": rows}
 
 
-def _sobol(param_spec: list[tuple[str, float, float]], model: Callable[[list[float]], float], n: int, seed: int) -> dict[str, Any]:
+def _sobol(
+    param_spec: list[tuple[str, float, float]],
+    model: Callable[[list[float]], float],
+    n: int,
+    seed: int,
+) -> dict[str, Any]:
     rng = random.Random(seed)
     d = len(param_spec)
     n = max(16, min(n, 96))
@@ -195,7 +211,9 @@ def _sobol(param_spec: list[tuple[str, float, float]], model: Callable[[list[flo
     }
 
 
-def global_sa_rothc(n_src: int = 100, n_morris: int = 10, n_sobol: int = 32, seed: int = 42) -> dict[str, Any]:
+def global_sa_rothc(
+    n_src: int = 100, n_morris: int = 10, n_sobol: int = 32, seed: int = 42
+) -> dict[str, Any]:
     return {
         "model": "rothc_26_3",
         "target": "delta_soc_t_ha",
@@ -207,7 +225,9 @@ def global_sa_rothc(n_src: int = 100, n_morris: int = 10, n_sobol: int = 32, see
     }
 
 
-def global_sa_rusle(n_src: int = 100, n_morris: int = 10, n_sobol: int = 32, seed: int = 42) -> dict[str, Any]:
+def global_sa_rusle(
+    n_src: int = 100, n_morris: int = 10, n_sobol: int = 32, seed: int = 42
+) -> dict[str, Any]:
     return {
         "model": "rusle2_proxy",
         "target": "A_t_ha_year",

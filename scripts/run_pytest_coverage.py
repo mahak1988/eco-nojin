@@ -5,7 +5,6 @@ This script assumes pytest and pytest-cov are installed in the environment.
 """
 
 import subprocess
-import sys
 from pathlib import Path
 
 
@@ -36,4 +35,6 @@ if __name__ == "__main__":
     pytest_cov_cmd = "pytest --cov=apps --cov-report=html --cov-report=term-missing"
     run_command(pytest_cov_cmd, "Pytest Coverage Report")
 
-    print(f"\nCheck the generated HTML report in {project_root}/htmlcov/ for detailed coverage information.")
+    print(
+        f"\nCheck the generated HTML report in {project_root}/htmlcov/ for detailed coverage information."
+    )

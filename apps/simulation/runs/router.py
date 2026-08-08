@@ -1,13 +1,13 @@
 """
 Saved Runs Router — save / list / fetch / delete simulation runs.
 """
+
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
-from sqlalchemy import select, desc
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_core.database.session import get_db_session
@@ -18,11 +18,14 @@ async def _ensure_table(db: AsyncSession) -> None:
     """Idempotently create the simulation_runs table on first use."""
     try:
         from apps.simulation.runs.models import SimulationRun
+
         bind = db.get_bind()
         async with bind.begin() as conn:
             await conn.run_sync(SimulationRun.metadata.create_all)
     except Exception as e:
-        import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
+        import logging
+
+        logging.getLogger(__name__).debug("Skipped: %s", e)
 
 
 router = APIRouter(prefix="/api/v1/simulation/runs", tags=["💾 Saved Runs"])
@@ -34,18 +37,23 @@ class RunCreate(BaseModel):
     parameters: dict = Field(default_factory=dict)
     metrics: dict = Field(default_factory=dict)
     advisory: dict = Field(default_factory=dict)
-    scenario_name: Optional[str] = None
-    note: Optional[str] = Field(default=None, max_length=1000)
-    user_id: Optional[str] = None
+    scenario_name: str | None = None
+    note: str | None = Field(default=None, max_length=1000)
+    user_id: str | None = None
 
 
 def _to_dict(r: SimulationRun) -> dict:
     """Handle _to_dict (r)."""
     return {
-        "id": r.id, "user_id": r.user_id, "simulator_id": r.simulator_id,
-        "simulator_name": r.simulator_name, "parameters": r.parameters,
-        "metrics": r.metrics, "advisory": r.advisory,
-        "scenario_name": r.scenario_name, "note": r.note,
+        "id": r.id,
+        "user_id": r.user_id,
+        "simulator_id": r.simulator_id,
+        "simulator_name": r.simulator_name,
+        "parameters": r.parameters,
+        "metrics": r.metrics,
+        "advisory": r.advisory,
+        "scenario_name": r.scenario_name,
+        "note": r.note,
         "created_at": r.created_at.isoformat() if r.created_at else None,
     }
 
@@ -73,8 +81,8 @@ async def save_run(data: RunCreate, db: AsyncSession = Depends(get_db_session)) 
 
 @router.get("", summary="List saved runs (newest first)")
 async def list_runs(
-    simulator_id: Optional[str] = Query(None),
-    user_id: Optional[str] = Query(None),
+    simulator_id: str | None = Query(None),
+    user_id: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -112,18 +120,20 @@ async def delete_run(run_id: str, db: AsyncSession = Depends(get_db_session)) ->
 
 
 class RunUpdate(BaseModel):
-    advisory: Optional[dict] = None
-    scenario_name: Optional[str] = None
-    note: Optional[str] = Field(None, max_length=1000)
+    advisory: dict | None = None
+    scenario_name: str | None = None
+    note: str | None = Field(None, max_length=1000)
 
 
-@router.patch('/{run_id}', summary='Partially update a run')
-async def update_run(run_id: str, data: RunUpdate, db: AsyncSession = Depends(get_db_session)) -> dict:
+@router.patch("/{run_id}", summary="Partially update a run")
+async def update_run(
+    run_id: str, data: RunUpdate, db: AsyncSession = Depends(get_db_session)
+) -> dict:
     await _ensure_table(db)
     run = await db.get(SimulationRun, run_id)
     if not run:
-        raise HTTPException(404, 'Run not found')
+        raise HTTPException(404, "Run not found")
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(run, field, value)
     await db.commit()
-    return {'status': 'updated', 'id': run_id}
+    return {"status": "updated", "id": run_id}

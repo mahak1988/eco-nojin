@@ -4,8 +4,8 @@ EcoCoin API — impact-backed utility token for Econojin.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -20,8 +20,8 @@ from apps.api.services.ecocoin_engine import (
     CREDIT_FACTORS,
     DISTRIBUTION,
     MAX_SUPPLY,
-    ProtocolState,
     STAKING_TIERS,
+    ProtocolState,
     challenge_reward,
     compute_impact_mint,
     compute_indicators,
@@ -31,7 +31,6 @@ from apps.api.services.ecocoin_engine import (
     get_tier,
     quality_from_mrv,
     sensitivity_analysis,
-    tx_hash,
 )
 from apps.api.services.oracle_sign import sign_mint_payload
 from apps.shared_core.deps import require_write_auth
@@ -49,7 +48,7 @@ class TransferRequest(BaseModel):
     from_address: str
     to_address: str
     amount: float
-    project_id: Optional[str] = None
+    project_id: str | None = None
 
 
 class TransferResponse(BaseModel):
@@ -118,14 +117,14 @@ class ChallengeClaimRequest(BaseModel):
 
 class RewardClaimRequest(BaseModel):
     address: str
-    amount: Optional[float] = None
+    amount: float | None = None
 
 
 class MrvQualityRequest(BaseModel):
-    ndvi_observed: Optional[float] = Field(None, ge=0, le=1)
-    ndvi_expected: Optional[float] = Field(None, ge=0, le=1)
-    model_yield_t_ha: Optional[float] = Field(None, ge=0)
-    field_yield_t_ha: Optional[float] = Field(None, ge=0)
+    ndvi_observed: float | None = Field(None, ge=0, le=1)
+    ndvi_expected: float | None = Field(None, ge=0, le=1)
+    model_yield_t_ha: float | None = Field(None, ge=0)
+    field_yield_t_ha: float | None = Field(None, ge=0)
     field_data_present: bool = False
     satellite_available: bool = False
 
@@ -141,7 +140,7 @@ _MOCK_TXS: list[dict[str, Any]] = [
         "tx_hash": "0x" + "a" * 64,
         "type": "transfer",
         "amount": 100.0,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 ]
 
@@ -153,7 +152,7 @@ _MOCK_MINTS: list[dict[str, Any]] = [
         "amount": 500.0,
         "project_id": "amazon-north-47",
         "tx_hash": "0x" + "b" * 64,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 ]
 
@@ -345,7 +344,7 @@ async def get_recent_mints(
 @router.get("/mining/events")
 async def get_mint_events_from_db(
     limit: int = Query(20, ge=1, le=100),
-    recipient: Optional[str] = Query(None),
+    recipient: str | None = Query(None),
 ) -> dict[str, Any]:
     try:
         from apps.api.services.mint_persistence import list_mint_events
@@ -421,7 +420,9 @@ async def unstake(
             "tx_hash": entry["tx_hash"],
         }
     _STATE.locked_stake = max(0.0, _STATE.locked_stake - req.amount)
-    _MOCK_BALANCES[req.address] = _MOCK_BALANCES.get(req.address, 0.0) + req.amount + req.pending_reward
+    _MOCK_BALANCES[req.address] = (
+        _MOCK_BALANCES.get(req.address, 0.0) + req.amount + req.pending_reward
+    )
     entry = ledger_append("unstake", req.address, req.amount, req.pending_reward)
     return {
         "status": "unstaked",
@@ -531,8 +532,8 @@ async def impact_mint(
 
 @router.get("/challenges")
 async def list_challenges(
-    status: Optional[str] = Query(None),
-    address: Optional[str] = Query(None),
+    status: str | None = Query(None),
+    address: str | None = Query(None),
 ) -> dict[str, Any]:
     items = list(_CHALLENGES)
     if status:

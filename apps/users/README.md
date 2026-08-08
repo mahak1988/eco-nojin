@@ -51,17 +51,17 @@ users/
 ```python
 class User(Base):
     """مدل کاربر برای پلتفرم SaaS با پشتیبانی RBAC."""
-    
+
     __tablename__ = "users"
-    
-    id: int                    # شناسه یکتا
-    email: str                 # ایمیل (unique, index)
-    hashed_password: str       # رمز عبور هش شده
-    full_name: str | None      # نام کامل (اختیاری)
-    is_active: bool            # وضعیت فعال بودن (پیش‌فرض: True)
-    is_superuser: bool         # دسترسی ادمین (پیش‌فرض: False)
-    created_at: datetime       # تاریخ ایجاد
-    updated_at: datetime       # تاریخ بروزرسانی
+
+    id: int  # شناسه یکتا
+    email: str  # ایمیل (unique, index)
+    hashed_password: str  # رمز عبور هش شده
+    full_name: str | None  # نام کامل (اختیاری)
+    is_active: bool  # وضعیت فعال بودن (پیش‌فرض: True)
+    is_superuser: bool  # دسترسی ادمین (پیش‌فرض: False)
+    created_at: datetime  # تاریخ ایجاد
+    updated_at: datetime  # تاریخ بروزرسانی
 ```
 
 **نکته امنیتی:** رمز عبور هرگز به صورت plaintext ذخیره نمی‌شود. هش کردن با Argon2 (اولیه) و Bcrypt (پشتیبان) در `apps/shared_core/security.py` انجام می‌شود.
@@ -185,16 +185,14 @@ from apps.users.dependencies import (
 )
 from apps.users.models import User
 
+
 # در endpointهای محافظت‌شده:
-async def protected_endpoint(
-    current_user: User = Depends(get_current_user)
-):
+async def protected_endpoint(current_user: User = Depends(get_current_user)):
     return {"email": current_user.email}
 
+
 # در endpointهای ادمین:
-async def admin_endpoint(
-    current_user: User = Depends(get_current_active_superuser)
-):
+async def admin_endpoint(current_user: User = Depends(get_current_active_superuser)):
     return {"message": "Welcome admin!"}
 ```
 
@@ -227,20 +225,19 @@ import httpx
 # ثبت‌نام
 response = httpx.post(
     "http://localhost:8000/api/v1/users/register",
-    json={"email": "user@example.com", "password": "<password>"}
+    json={"email": "user@example.com", "password": "<password>"},
 )
 
 # ورود
 response = httpx.post(
     "http://localhost:8000/api/v1/auth/login",
-    json={"email": "user@example.com", "password": "<password>"}
+    json={"email": "user@example.com", "password": "<password>"},
 )
 token = response.json()["access_token"]
 
 # درخواست محافظت‌شده
 response = httpx.get(
-    "http://localhost:8000/api/v1/users/me",
-    headers={"Authorization": f"Bearer {token}"}
+    "http://localhost:8000/api/v1/users/me", headers={"Authorization": f"Bearer {token}"}
 )
 ```
 

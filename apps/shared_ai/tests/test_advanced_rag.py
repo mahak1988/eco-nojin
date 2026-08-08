@@ -13,33 +13,34 @@ if str(project_root) not in sys.path:
 import asyncio
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 async def test_advanced_rag():
     """تست Advanced RAG."""
     logger.info("🚀 Starting Advanced RAG Test")
-    
+
     # Step 1: Import tools
     logger.info("\n📦 Step 1: Importing Advanced RAG components...")
     try:
         from apps.shared_ai.ai.tools.rag_tools import (
-            upload_document,
-            search_knowledge_base,
+            get_knowledge_base_stats,
             get_rag_context,
-            get_knowledge_base_stats
+            search_knowledge_base,
+            upload_document,
         )
+
         logger.info("✅ Advanced RAG tools imported")
     except Exception as e:
         logger.error(f"❌ Import failed: {e}")
         return
-    
+
     user_id = 1  # Test user
-    
+
     # Step 2: Upload document with semantic chunking
     logger.info("\n📄 Step 2: Uploading document with semantic chunking...")
-    
+
     long_document = """
     استراتژی سرمایه‌گذاری Econojin برای سال 2026:
     
@@ -64,67 +65,70 @@ async def test_advanced_rag():
     اهداف ما شامل بازده سالانه 15%، Sharpe Ratio بالای 1.5 و حداکثر Drawdown زیر 20% است.
     این اهداف بر اساس benchmarkهای بازار و تحمل ریسک سرمایه‌گذاران تعیین شده‌اند.
     """
-    
-    result1 = await upload_document.ainvoke({
-        "content": long_document,
-        "title": "استراتژی جامع سرمایه‌گذاری 2026",
-        "user_id": user_id,
-        "file_type": "txt"
-    })
+
+    result1 = await upload_document.ainvoke(
+        {
+            "content": long_document,
+            "title": "استراتژی جامع سرمایه‌گذاری 2026",
+            "user_id": user_id,
+            "file_type": "txt",
+        }
+    )
     logger.info(f"✅ Document uploaded with semantic chunking:\n{result1}")
-    
+
     # Step 3: Test Hybrid Search (Keyword)
     logger.info("\n🔍 Step 3: Testing Hybrid Search (Keyword-based)...")
-    
-    search_result1 = await search_knowledge_base.ainvoke({
-        "query": "حد ضرر stop-loss",
-        "user_id": user_id,
-        "top_k": 3,
-        "use_reranking": False
-    })
+
+    search_result1 = await search_knowledge_base.ainvoke(
+        {"query": "حد ضرر stop-loss", "user_id": user_id, "top_k": 3, "use_reranking": False}
+    )
     logger.info(f"✅ Keyword search result:\n{search_result1}")
-    
+
     # Step 4: Test Hybrid Search (Semantic)
     logger.info("\n🧠 Step 4: Testing Hybrid Search (Semantic)...")
-    
-    search_result2 = await search_knowledge_base.ainvoke({
-        "query": "چگونه ریسک سرمایه‌گذاری را مدیریت کنیم؟",
-        "user_id": user_id,
-        "top_k": 3,
-        "use_reranking": False
-    })
+
+    search_result2 = await search_knowledge_base.ainvoke(
+        {
+            "query": "چگونه ریسک سرمایه‌گذاری را مدیریت کنیم؟",
+            "user_id": user_id,
+            "top_k": 3,
+            "use_reranking": False,
+        }
+    )
     logger.info(f"✅ Semantic search result:\n{search_result2}")
-    
+
     # Step 5: Test with Reranking
     logger.info("\n🎯 Step 5: Testing with Reranking...")
-    
-    search_result3 = await search_knowledge_base.ainvoke({
-        "query": "بهترین روش برای تنوع‌بخشی پورتفوی چیست؟",
-        "user_id": user_id,
-        "top_k": 3,
-        "use_reranking": True
-    })
+
+    search_result3 = await search_knowledge_base.ainvoke(
+        {
+            "query": "بهترین روش برای تنوع‌بخشی پورتفوی چیست؟",
+            "user_id": user_id,
+            "top_k": 3,
+            "use_reranking": True,
+        }
+    )
     logger.info(f"✅ Reranked search result:\n{search_result3}")
-    
+
     # Step 6: Test Context Generation
     logger.info("\n📚 Step 6: Testing Context Generation...")
-    
-    context = await get_rag_context.ainvoke({
-        "query": "تحلیل تکنیکال و فاندامنتال چه تفاوتی دارند؟",
-        "user_id": user_id,
-        "top_k": 2,
-        "use_reranking": True
-    })
+
+    context = await get_rag_context.ainvoke(
+        {
+            "query": "تحلیل تکنیکال و فاندامنتال چه تفاوتی دارند؟",
+            "user_id": user_id,
+            "top_k": 2,
+            "use_reranking": True,
+        }
+    )
     logger.info(f"✅ RAG context:\n{context[:500]}...")
-    
+
     # Step 7: Get stats
     logger.info("\n📊 Step 7: Getting knowledge base stats...")
-    
-    stats = await get_knowledge_base_stats.ainvoke({
-        "user_id": user_id
-    })
+
+    stats = await get_knowledge_base_stats.ainvoke({"user_id": user_id})
     logger.info(f"✅ Stats:\n{stats}")
-    
+
     logger.info("\n✅ Advanced RAG Test Completed!")
     logger.info("\n📊 Summary:")
     logger.info("   - Semantic Chunking: ✅")

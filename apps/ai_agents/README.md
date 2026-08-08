@@ -258,11 +258,8 @@ import json
 
 response = httpx.post(
     "http://localhost:8000/api/v1/ai-agents/chat",
-    json={
-        "message": "روندهای بازار را تحلیل کن",
-        "agent_type": "financial"
-    },
-    headers={"Authorization": f"Bearer {token}"}
+    json={"message": "روندهای بازار را تحلیل کن", "agent_type": "financial"},
+    headers={"Authorization": f"Bearer {token}"},
 )
 
 result = response.json()

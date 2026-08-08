@@ -15,7 +15,10 @@ KNOWLEDGE: dict[str, dict] = {
         "formula": "ΔT = λ · ln(CO₂ / CO₂₀)  ؛  ΔP ≈ ف(ΔT, مسیر SSP)",
         "formula_desc": "تغییر دما از حساسیت اقلیمی (λ) و لگاریتم غلظت CO₂؛ بارش و رویدادهای شدید از مسیرهای IPCC.",
         "assumptions": ["تعادل انرژی در ستون جو", "پارامتری‌سازی بازخوردها (ابخار، ابر، یخ‌کره)"],
-        "limitations": ["عدم قطعیت ذاتی در حساسیت اقلیمی", "ریزمقیاس‌نبودن خروجی (مناسب روند، نه پیش‌بینی محلی دقیق)"],
+        "limitations": [
+            "عدم قطعیت ذاتی در حساسیت اقلیمی",
+            "ریزمقیاس‌نبودن خروجی (مناسب روند، نه پیش‌بینی محلی دقیق)",
+        ],
         "references": ["IPCC (2021). Climate Change 2021: The Physical Science Basis. AR6 WG1."],
         "domain": ["سیاست‌گذار اقلیم", "محقق محیط‌زیست", "برنامه‌ریز منابع آب"],
         "why": "پیش‌بینی روند دما/بارش و رویدادهای شدید برای برنامه‌ریزی بلندمدت کشاورزی و آب.",
@@ -26,7 +29,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "اتوماتای سلولی (Cellular Automata) گسترش کالبدی شهر و زنجیرهٔ مارکوف احتمال تغییر کاربری را مدل می‌کند.",
         "assumptions": ["روند تاریخی رشد تداوم دارد", "همگنی قواعد انتقال در پهنهٔ مطالعه"],
         "limitations": ["وابسته به کیفیت دادهٔ کاربری اراضی تاریخی", "عدم‌قطعیت در سناریوهای سیاستی"],
-        "references": ["Clarke K.C. et al. (1997). A self-modifying CA model of urban growth (SLEUTH). Environment & Planning B."],
+        "references": [
+            "Clarke K.C. et al. (1997). A self-modifying CA model of urban growth (SLEUTH). Environment & Planning B."
+        ],
         "domain": ["شهرساز", "برنامه‌ریز شهری و منطقه‌ای", "مدیریت بحران"],
         "why": "پیش‌بینی گسترش شهر و فشار بر اراضی کشاورزی/طبیعی برای مدیریت هوشمند رشد.",
     },
@@ -36,7 +41,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "زمان حرارتی (GDD) فنولوژی را پیش می‌برد؛ زیست‌توده لجستیک با ضرایب تنش آب/نیتروژن تعدیل می‌شود.",
         "assumptions": ["پارامترهای ژنتیکی رقم کالیبره شده", "دادهٔ اقلیم روزانهٔ معتبر"],
         "limitations": ["نیاز به کالیبراسیون محلی", "حساس به دادهٔ خاک و مدیریت"],
-        "references": ["Jones J.W. et al. (2003). The DSSAT cropping system model. European J. Agronomy 18:235-265."],
+        "references": [
+            "Jones J.W. et al. (2003). The DSSAT cropping system model. European J. Agronomy 18:235-265."
+        ],
         "domain": ["محقق زراعت", "کشاورز پیشرو", "مشاور فنی"],
         "why": "شبیه‌سازی دقیق رشد و عملکرد برای بهینه‌سازی مدیریت مزرعه و تحقیقات.",
     },
@@ -46,7 +53,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "عملکرد (Y) = شاخص برداشت (HI) × بهره‌وری آب (WP) × مجموع تعرق (Tr). تعادل دقت، سادگی و پایداری.",
         "assumptions": ["پاسخ خطی عملکرد به تعرق", "پارامترهای محصول فائو برای اقلیم محلی معتبرند"],
         "limitations": ["برای محصولات علفی بهینه است (نه درختی)", "دقت وابسته به دادهٔ ET₀ و خاک"],
-        "references": ["Steduto P. et al. (2009). AquaCrop — The FAO Crop Model to Simulate Yield Response to Water. FAO Irrigation & Drainage Paper 66."],
+        "references": [
+            "Steduto P. et al. (2009). AquaCrop — The FAO Crop Model to Simulate Yield Response to Water. FAO Irrigation & Drainage Paper 66."
+        ],
         "domain": ["کشاورز", "مهندس آبیاری", "سیاست‌گذار امنیت غذایی"],
         "why": "پاسخ عملکرد به آب با حداقل داده؛ مناسب مناطق کم‌داده و سناریوهای کم‌آبیاری.",
     },
@@ -56,7 +65,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "رشد روزانه بر پایهٔ جذب نور و فتوسنتز؛ سه سطح: پتانسیل، محدود به آب، محدود به نیتروژن.",
         "assumptions": ["پارامترهای محصول واخنینگن", "دادهٔ هواشناسی روزانه"],
         "limitations": ["کالیبراسیون منطقه‌ای لازم", "تمرکز بر محصولات اصلی"],
-        "references": ["de Wit A. et al. (2019). The WOFOST crop growth simulation model. Agricultural Systems 171:156-164."],
+        "references": [
+            "de Wit A. et al. (2019). The WOFOST crop growth simulation model. Agricultural Systems 171:156-164."
+        ],
         "domain": ["کارشناس امنیت غذایی", "پایش محصول", "سیاست‌گذار کشاورزی"],
         "why": "پایش و پیش‌بینی عملکرد در سطح منطقه برای هشدار زودهنگام غذایی.",
     },
@@ -66,7 +77,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "زیست‌توده = کارایی مصرف تابش (RUE) × مجموع تابش فعال فتوسنتزی جذب‌شده (تابع مونتیث).",
         "assumptions": ["RUE ثابت در طول دوره", "رابطهٔ نمایی جذب نور با LAI"],
         "limitations": ["ساده‌سازی فرآیندهای فیزیولوژیک", "بدون چرخهٔ آب/نیتروژن صریح"],
-        "references": ["Monteith J.L. (1977). Climate and the efficiency of crop production. Phil. Trans. R. Soc. B 281:277-294."],
+        "references": [
+            "Monteith J.L. (1977). Climate and the efficiency of crop production. Phil. Trans. R. Soc. B 281:277-294."
+        ],
         "domain": ["کشاورز", "مشاور ترویج", "آموزش"],
         "why": "تخمین سریع و سادهٔ عملکرد با دادهٔ کم؛ مناسب آموزش و برآورد اولیه.",
     },
@@ -76,7 +89,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "بیلان آب روزانه در سطح HRU: بارش منهای تبخیرتعرق، رواناب سطحی، جریان جانبی و نفوذ به آب زیرزمینی.",
         "assumptions": ["تفکیک حوضه به HRU همگن", "دادهٔ DEM، خاک و کاربری اراضی"],
         "limitations": ["نیاز به دادهٔ مکانی زیاد", "کالیبراسیون با دادهٔ دبی رودخانه"],
-        "references": ["Arnold J.G. et al. (1998). Large area hydrologic modeling and assessment — SWAT. JAWRA 34(1):73-89."],
+        "references": [
+            "Arnold J.G. et al. (1998). Large area hydrologic modeling and assessment — SWAT. JAWRA 34(1):73-89."
+        ],
         "domain": ["مهندس منابع آب", "مدیر حوضهٔ آبریز", "محقق هیدرولوژی"],
         "why": "مدیریت یکپارچهٔ حوضه و ارزیابی اثر کاربری اراضی و اقلیم بر منابع آب.",
     },
@@ -86,7 +101,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "تعادل ماهانهٔ عرضه و تقاضای آب با تخصیص بر اساس اولویت و محدودیت‌های شبکه.",
         "assumptions": ["اولویت‌بندی بخش‌ها مشخص است", "دادهٔ عرضه و تقاضای ماهانه"],
         "limitations": ["وابسته به کیفیت دادهٔ تقاضا", "ساده‌سازی هیدرولوژی (مگر اتصال به MODFLOW)"],
-        "references": ["Sieber J. & Purkey D. (2015). WEAP User Guide. Stockholm Environment Institute."],
+        "references": [
+            "Sieber J. & Purkey D. (2015). WEAP User Guide. Stockholm Environment Institute."
+        ],
         "domain": ["برنامه‌ریز منابع آب", "شرکت‌های آب منطقه‌ای", "سیاست‌گذار"],
         "why": "برنامه‌ریزی تخصیص آب بین بخش‌ها و ارزیابی سناریوهای کمبود.",
     },
@@ -96,7 +113,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "تجزیهٔ کربن آلی در ۵ مخزن با سینتیک مرتبهٔ اول؛ نرخ‌ها با دما، رطوبت خاک و پوشش گیاهی تعدیل می‌شوند.",
         "assumptions": ["سینتیک مرتبهٔ اول", "پارامترهای ورودی بقایا مشخص"],
         "limitations": ["بدون چرخهٔ صریح نیتروژن", "وابسته به دادهٔ اقلیم ماهانه"],
-        "references": ["Coleman K. & Jenkinson D.S. (1996). RothC-26.3 — A model for the turnover of carbon in soil. Rothamsted."],
+        "references": [
+            "Coleman K. & Jenkinson D.S. (1996). RothC-26.3 — A model for the turnover of carbon in soil. Rothamsted."
+        ],
         "domain": ["متخصص خاک", "کارشناس ترسیب کربن", "محقق تغییر اقلیم"],
         "why": "پیش‌بینی تغییرات کربن آلی خاک و پتانسیل ترسیب کربن در بلندمدت.",
     },
@@ -106,7 +125,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "دینامیک کربن، نیتروژن و فسفر در خاک و گیاه؛ تجزیهٔ مادهٔ آلی در سه مخزن با نرخ‌های متفاوت.",
         "assumptions": ["تعادل نسبی چرخه‌ها در بلندمدت", "دادهٔ اقلیم و مدیریت"],
         "limitations": ["پیچیدگی پارامتردهی", "کالیبراسیون بلندمدت لازم"],
-        "references": ["Parton W.J. et al. (1987). Analysis of factors controlling soil organic matter levels. SSSAJ 51:1173-1179."],
+        "references": [
+            "Parton W.J. et al. (1987). Analysis of factors controlling soil organic matter levels. SSSAJ 51:1173-1179."
+        ],
         "domain": ["اکولوژیست", "متخصص حاصلخیزی خاک", "محقق بیوژئوشیمی"],
         "why": "شبیه‌سازی بلندمدت دینامیک مادهٔ آلی و مواد مغذی خاک تحت مدیریت‌های مختلف.",
     },
@@ -116,7 +137,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "ارزش فعلی خالص = مجموع منافع منهای هزینه‌های تنزیل‌شده؛ نرخ بازده داخلی ریشهٔ NPV=۰ است.",
         "assumptions": ["نرخ تنزیل ثابت", "جریان‌های نقدی قابل برآورد"],
         "limitations": ["حساس به نرخ تنزیل", "دشواری ارزش‌گذاری منافع غیربازاری"],
-        "references": ["Boardman A.E. et al. (2017). Cost-Benefit Analysis: Concepts and Practice. Cambridge University Press."],
+        "references": [
+            "Boardman A.E. et al. (2017). Cost-Benefit Analysis: Concepts and Practice. Cambridge University Press."
+        ],
         "domain": ["اقتصاددان", "تحلیلگر پروژه", "سیاست‌گذار"],
         "why": "توجیه اقتصادی پروژه‌ها و مقایسهٔ سناریوهای سرمایه‌گذاری.",
     },
@@ -126,7 +149,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "مجموعه‌مدل‌های خدمات اکوسیستم: ذخیرهٔ کربن، تولید آب، کیفیت زیستگاه و فرسایش.",
         "assumptions": ["نقشه‌های کاربری اراضی و ذخایر کربن", "ضرایب خدمات برای هر کلاس"],
         "limitations": ["وابسته به کیفیت نقشه‌ها", "ساده‌سازی فرآیندهای اکولوژیک"],
-        "references": ["Sharp R. et al. (2020). InVEST User's Guide. The Natural Capital Project (Stanford/TNC/WWF)."],
+        "references": [
+            "Sharp R. et al. (2020). InVEST User's Guide. The Natural Capital Project (Stanford/TNC/WWF)."
+        ],
         "domain": ["سیاست‌گذار محیط‌زیست", "برنامه‌ریز سرزمین", "محقق اکوسیستم"],
         "why": "ارزش‌گذاری خدمات اکوسیستم برای تصمیم‌گیری در حفاظت و توسعهٔ سرزمین.",
     },
@@ -146,7 +171,9 @@ KNOWLEDGE: dict[str, dict] = {
         "formula_desc": "فرسایش خاک (A) = بارندگی (R) × فرسایش‌پذیری خاک (K) × طول/شیب (LS) × پوشش (C) × اقدامات حفاظتی (P).",
         "assumptions": ["روابط تجربی RUSLE برای منطقه معتبرند", "دادهٔ DEM و نقشهٔ خاک"],
         "limitations": ["میانگین بلندمدت (نه رویداد تک)", "مناسب فرسایش ورقه‌ای/شیاری"],
-        "references": ["Renard K.G. et al. (1997). Predicting Soil Erosion by Water (RUSLE). USDA Agriculture Handbook 703."],
+        "references": [
+            "Renard K.G. et al. (1997). Predicting Soil Erosion by Water (RUSLE). USDA Agriculture Handbook 703."
+        ],
         "domain": ["مهندس حفاظت خاک", "برنامه‌ریز کشاورزی", "مدیریت آبخیز"],
         "why": "پیش‌بینی فرسایش خاک و طراحی اقدامات حفاظتی مؤثر (تراس، کشت کانتوری، پوشش).",
     },
@@ -155,10 +182,16 @@ KNOWLEDGE: dict[str, dict] = {
 
 def get_knowledge(simulator_id: str) -> dict:
     """Return the scientific knowledge card for a simulator (or a generic fallback)."""
-    return KNOWLEDGE.get(simulator_id, {
-        "title": simulator_id,
-        "formula": "—",
-        "formula_desc": "مستندات علمی این شبیه‌ساز در حال تکمیل است.",
-        "assumptions": [], "limitations": [],
-        "references": [], "domain": [], "why": "در حال تدوین.",
-    })
+    return KNOWLEDGE.get(
+        simulator_id,
+        {
+            "title": simulator_id,
+            "formula": "—",
+            "formula_desc": "مستندات علمی این شبیه‌ساز در حال تکمیل است.",
+            "assumptions": [],
+            "limitations": [],
+            "references": [],
+            "domain": [],
+            "why": "در حال تدوین.",
+        },
+    )

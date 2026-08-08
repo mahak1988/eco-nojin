@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,8 +32,8 @@ router = APIRouter(prefix="/api/v1/games", tags=["Games"])
 async def list_vocabulary(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    search: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
+    search: str | None = Query(None),
+    category: str | None = Query(None),
     session: AsyncSession = Depends(get_db_session),
 ) -> VocabularyWordListResponse:
     service = GamesService(session)
@@ -43,7 +41,9 @@ async def list_vocabulary(
     return VocabularyWordListResponse(items=words, total=total, skip=skip, limit=limit)
 
 
-@router.post("/vocabulary", response_model=VocabularyWordResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/vocabulary", response_model=VocabularyWordResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_vocabulary(
     payload: VocabularyWordCreate,
     session: AsyncSession = Depends(get_db_session),
@@ -99,9 +99,9 @@ async def delete_vocabulary(
 async def list_quizzes(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    search: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
-    difficulty: Optional[str] = Query(None),
+    search: str | None = Query(None),
+    category: str | None = Query(None),
+    difficulty: str | None = Query(None),
     session: AsyncSession = Depends(get_db_session),
 ) -> QuizListResponse:
     service = GamesService(session)
@@ -162,13 +162,13 @@ async def delete_quiz(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.get("/quizzes/{quiz_id}/questions", response_model=List[QuizQuestionResponse])
+@router.get("/quizzes/{quiz_id}/questions", response_model=list[QuizQuestionResponse])
 async def list_questions(
     quiz_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     session: AsyncSession = Depends(get_db_session),
-) -> List[QuizQuestionResponse]:
+) -> list[QuizQuestionResponse]:
     service = GamesService(session)
     questions, _ = await service.list_questions(quiz_id, skip, limit)
     return [QuizQuestionResponse.model_validate(q) for q in questions]

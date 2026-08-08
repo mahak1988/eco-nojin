@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Base Builder Module
 Provides common functionality for all builders.
 """
+
 import logging
 import shutil
 from datetime import datetime

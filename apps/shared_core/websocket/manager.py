@@ -20,7 +20,9 @@ class ConnectionManager:
         await websocket.accept()
         async with self._lock:
             self._channels.setdefault(channel, set()).add(websocket)
-        logger.info("ws connect channel=%s clients=%s", channel, len(self._channels.get(channel, ())))
+        logger.info(
+            "ws connect channel=%s clients=%s", channel, len(self._channels.get(channel, ()))
+        )
 
     async def disconnect(self, channel: str, websocket: WebSocket) -> None:
         async with self._lock:

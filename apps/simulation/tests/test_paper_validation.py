@@ -1,4 +1,4 @@
-﻿"""
+"""
 Paper Validation Tests
 ======================
 Validate simulator outputs against expected results from
@@ -10,7 +10,9 @@ Tests the exact scenarios described in the paper:
 - Maize nitrogen (DSSAT)
 - SCS-CN runoff (SWAT)
 """
+
 import pytest
+
 from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
 from apps.simulation.rothc_model import run_rothc_conceptual
 
@@ -26,11 +28,13 @@ class TestPaperResults:
 
         Conditions: rainfed, 250mm annual rainfall, no supplemental irrigation.
         """
-        result = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 210,  # Winter wheat cycle
-            "area_ha": 1.0,
-        })
+        result = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 210,  # Winter wheat cycle
+                "area_ha": 1.0,
+            }
+        )
 
         yield_val = result.get("total_yield_t_ha", 0)
         water_stress = result.get("avg_water_stress", 0)
@@ -38,27 +42,23 @@ class TestPaperResults:
 
         # Paper reports ~3.8 t/ha with 15% tolerance
         assert yield_val > 0, "Yield must be positive"
-        assert yield_val < 6.0, (
-            f"Yield {yield_val} exceeds rainfed wheat ceiling of 6 t/ha"
-        )
+        assert yield_val < 6.0, f"Yield {yield_val} exceeds rainfed wheat ceiling of 6 t/ha"
 
         # Water stress should be meaningful
-        assert 0 <= water_stress <= 1, (
-            f"Water stress {water_stress} must be in [0,1]"
-        )
+        assert 0 <= water_stress <= 1, f"Water stress {water_stress} must be in [0,1]"
 
         # Water use should be physically realistic
-        assert 100 <= water_use <= 800, (
-            f"Water use {water_use}mm outside realistic range for wheat"
-        )
+        assert 100 <= water_use <= 800, f"Water use {water_use}mm outside realistic range for wheat"
 
     def test_aquacrop_potential_yield_parameter(self):
         """AquaCrop accepts and uses potential_yield_t_ha parameter."""
-        result = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 120,
-            "area_ha": 1.0,
-        })
+        result = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 120,
+                "area_ha": 1.0,
+            }
+        )
 
         assert "total_yield_t_ha" in result
         assert "total_water_use_mm" in result
@@ -86,9 +86,7 @@ class TestPaperResults:
         annual_rate = total_sequestered / 5.0
 
         # Paper: final ~ 53 t/ha, seq ~ 13 t/ha
-        assert final_soc >= 45.0, (
-            f"Expected SOC > 45 t/ha with good management, got {final_soc}"
-        )
+        assert final_soc >= 45.0, f"Expected SOC > 45 t/ha with good management, got {final_soc}"
         assert total_sequestered >= 5.0, (
             f"Expected sequestration > 5 t/ha over 5 years, got {total_sequestered}"
         )
@@ -100,12 +98,20 @@ class TestPaperResults:
     def test_rothc_temperature_effect(self):
         """Higher temperature should increase decomposition rate."""
         result_cold = run_rothc_conceptual(
-            initial_soc=40.0, carbon_input=3.5, clay=20.0,
-            temperature=10.0, moisture=0.6, years=5,
+            initial_soc=40.0,
+            carbon_input=3.5,
+            clay=20.0,
+            temperature=10.0,
+            moisture=0.6,
+            years=5,
         )
         result_hot = run_rothc_conceptual(
-            initial_soc=40.0, carbon_input=3.5, clay=20.0,
-            temperature=30.0, moisture=0.6, years=5,
+            initial_soc=40.0,
+            carbon_input=3.5,
+            clay=20.0,
+            temperature=30.0,
+            moisture=0.6,
+            years=5,
         )
 
         # Hotter climate -> more decomposition -> less sequestration
@@ -119,12 +125,20 @@ class TestPaperResults:
     def test_rothc_clay_effect(self):
         """Higher clay content should protect carbon from decomposition."""
         result_sandy = run_rothc_conceptual(
-            initial_soc=40.0, carbon_input=3.5, clay=5.0,
-            temperature=17.9, moisture=0.6, years=5,
+            initial_soc=40.0,
+            carbon_input=3.5,
+            clay=5.0,
+            temperature=17.9,
+            moisture=0.6,
+            years=5,
         )
         result_clayey = run_rothc_conceptual(
-            initial_soc=40.0, carbon_input=3.5, clay=40.0,
-            temperature=17.9, moisture=0.6, years=5,
+            initial_soc=40.0,
+            carbon_input=3.5,
+            clay=40.0,
+            temperature=17.9,
+            moisture=0.6,
+            years=5,
         )
 
         seq_sandy = result_sandy.get("total_sequestered", 0)
@@ -146,9 +160,7 @@ class TestPaperResults:
 
         # Daily average rainfall 1.2mm -> no runoff
         runoff = calculate_scs_runoff(precip_mm=1.2, cn=79)
-        assert runoff == 0.0, (
-            f"Rainfall 1.2mm < Ia 13.5mm should produce zero runoff, got {runoff}"
-        )
+        assert runoff == 0.0, f"Rainfall 1.2mm < Ia 13.5mm should produce zero runoff, got {runoff}"
 
     def test_scs_cn_above_ia_produces_runoff(self):
         """Rainfall significantly above Ia should produce runoff."""
@@ -179,10 +191,19 @@ class TestPaperResults:
 class TestSimulatorRegistry:
     """Test that all registered simulators can be instantiated and run."""
 
-    @pytest.mark.parametrize("simulator_key", [
-        "aquacrop", "rothc", "dssat", "swat",
-        "climate", "cba", "rusle2", "urban",
-    ])
+    @pytest.mark.parametrize(
+        "simulator_key",
+        [
+            "aquacrop",
+            "rothc",
+            "dssat",
+            "swat",
+            "climate",
+            "cba",
+            "rusle2",
+            "urban",
+        ],
+    )
     def test_simulator_importable(self, simulator_key):
         """Each registered simulator module should be importable."""
         import importlib
@@ -212,11 +233,13 @@ class TestSimulatorChain:
 
     def test_aquacrop_to_rothc_chain(self):
         """AquaCrop yield estimate can inform RothC carbon input calculation."""
-        aqua_result = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 120,
-            "area_ha": 1.0,
-        })
+        aqua_result = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 120,
+                "area_ha": 1.0,
+            }
+        )
 
         yield_val = aqua_result.get("total_yield_t_ha", 0)
         assert yield_val > 0, "Need valid yield for chain input"

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Contracts Builder Module
 Generates Solidity smart contracts and secure Hardhat configuration.
 """
+
 import logging
 
 from .base_builder import CONTRACTS_DIR, BaseBuilder

@@ -77,11 +77,11 @@ shared_core/
 from apps.shared_core.config import settings
 
 # دسترسی به تنظیمات
-print(settings.PROJECT_NAME)       # "Econojin API"
-print(settings.ENVIRONMENT)        # "local" | "staging" | "production"
-print(settings.API_V1_STR)         # "/api/v1"
-print(settings.DATABASE_URL)       # SQLite یا PostgreSQL
-print(settings.LLM_PROVIDER)       # "groq" | "gemini" | "xai" | ...
+print(settings.PROJECT_NAME)  # "Econojin API"
+print(settings.ENVIRONMENT)  # "local" | "staging" | "production"
+print(settings.API_V1_STR)  # "/api/v1"
+print(settings.DATABASE_URL)  # SQLite یا PostgreSQL
+print(settings.LLM_PROVIDER)  # "groq" | "gemini" | "xai" | ...
 ```
 
 ### ویژگی‌های کلیدی تنظیمات:
@@ -113,11 +113,11 @@ payload = decode_token(token)  # {"sub": user_id, "exp": timestamp}
 ### Dependency Injection (`deps.py`)
 ```python
 from apps.shared_core.deps import (
-    SessionDep,           # AsyncSession
-    CurrentUser,          # کاربر احراز هویت شده
-    CurrentActiveUser,    # کاربر فعال
-    CurrentSuperUser,     # کاربر superuser
-    TokenDep,             # Bearer token اختیاری
+    SessionDep,  # AsyncSession
+    CurrentUser,  # کاربر احراز هویت شده
+    CurrentActiveUser,  # کاربر فعال
+    CurrentSuperUser,  # کاربر superuser
+    TokenDep,  # Bearer token اختیاری
 )
 ```
 
@@ -130,13 +130,14 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.shared_core.database.session import get_db_session
 
-async def my_endpoint(db: AsyncSession = Depends(get_db_session)):
-    ...
+
+async def my_endpoint(db: AsyncSession = Depends(get_db_session)): ...
 ```
 
 ### استفاده از DI سطح بالا
 ```python
 from apps.shared_core.deps import SessionDep, CurrentUser
+
 
 @app.get("/items")
 async def list_items(
@@ -155,12 +156,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.shared_core.database.repository import BaseRepository
 from apps.shared_core.models import AdminSetting
 
+
 class AdminSettingRepository(BaseRepository[AdminSetting]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, AdminSetting)
 
-    async def get_by_key(self, key: str) -> AdminSetting | None:
-        ...
+    async def get_by_key(self, key: str) -> AdminSetting | None: ...
 ```
 
 ## اجرای تست‌ها

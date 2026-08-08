@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy import and_, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,38 +15,37 @@ logger = logging.getLogger(__name__)
 
 class AdminSettingRepository(BaseRepository):
     """Repository for AdminSetting model."""
-    
+
     def __init__(self, session: AsyncSession):
         super().__init__(session, AdminSetting)
 
-    async def get_by_key(self, key: str) -> Optional[AdminSetting]:
+    async def get_by_key(self, key: str) -> AdminSetting | None:
         """Get setting by key."""
         stmt = select(AdminSetting).where(AdminSetting.key == key)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
-        
-    async def get_multi_cursor(self, cursor: Optional[int] = None, limit: int = 100) -> List[AdminSetting]:
+
+    async def get_multi_cursor(
+        self, cursor: int | None = None, limit: int = 100
+    ) -> list[AdminSetting]:
         """Get multiple settings with cursor-based pagination."""
         stmt = select(AdminSetting).order_by(AdminSetting.id.asc()).limit(limit)
-        
+
         if cursor is not None:
             stmt = stmt.where(AdminSetting.id > cursor)
-        
+
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
 
 class AuditLogRepository(BaseRepository):
     """Repository for AuditLog model."""
-    
+
     def __init__(self, session: AsyncSession):
         super().__init__(session, AuditLog)
 
     async def filter_by_event_type(
-        self,
-        event_type: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0
+        self, event_type: str | None = None, limit: int = 100, offset: int = 0
     ) -> list[AuditLog]:
         stmt = select(AuditLog).order_by(desc(AuditLog.id))
         """Handle filter_by_event_type (event_type, limit, offset)."""
@@ -58,15 +57,15 @@ class AuditLogRepository(BaseRepository):
 
     async def filter_by_params(
         self,
-        event_type: Optional[str] = None,
-        actor_email: Optional[str] = None,
-        date_from: Optional[datetime] = None,
-        date_to: Optional[datetime] = None,
+        event_type: str | None = None,
+        actor_email: str | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
         limit: int = 100,
-        offset: int = 0
-    ) -> List[AuditLog]:
+        offset: int = 0,
+    ) -> list[AuditLog]:
         """Filter audit logs by multiple optional parameters including date range."""
-        
+
         stmt = select(AuditLog).order_by(desc(AuditLog.id))
 
         conditions = []
@@ -88,15 +87,15 @@ class AuditLogRepository(BaseRepository):
 
     async def filter_by_params_cursor(
         self,
-        cursor: Optional[int] = None,
-        event_type: Optional[str] = None,
-        actor_email: Optional[str] = None,
-        date_from: Optional[datetime] = None,
-        date_to: Optional[datetime] = None,
-        limit: int = 100
-    ) -> List[AuditLog]:
+        cursor: int | None = None,
+        event_type: str | None = None,
+        actor_email: str | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        limit: int = 100,
+    ) -> list[AuditLog]:
         """Filter audit logs by parameters with cursor-based pagination."""
-        
+
         stmt = select(AuditLog).order_by(AuditLog.id.asc()).limit(limit)
 
         conditions = []
@@ -120,35 +119,38 @@ class AuditLogRepository(BaseRepository):
 
 class SystemReportRepository(BaseRepository):
     """Repository for SystemReport model."""
-    
+
     def __init__(self, session: AsyncSession):
         super().__init__(session, SystemReport)
 
-    async def get_multi_cursor(self, cursor: Optional[int] = None, limit: int = 100) -> List[SystemReport]:
+    async def get_multi_cursor(
+        self, cursor: int | None = None, limit: int = 100
+    ) -> list[SystemReport]:
         """Get multiple reports with cursor-based pagination."""
         stmt = select(SystemReport).order_by(SystemReport.id.asc()).limit(limit)
-        
+
         if cursor is not None:
             stmt = stmt.where(SystemReport.id > cursor)
-        
+
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
 
 # BaseRepository remains at the bottom since it's extended by the other repositories
 class BaseRepository:
     """Base repository with common operations."""
-    
+
     def __init__(self, session: AsyncSession, model):
         self.session = session
         self.model = model
 
-    async def get_by_id(self, id_: int) -> Optional[Any]:
+    async def get_by_id(self, id_: int) -> Any | None:
         """Get entity by ID."""
         stmt = select(self.model).where(self.model.id == id_)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_multi(self, limit: int = 100, offset: int = 0) -> List[Any]:
+    async def get_multi(self, limit: int = 100, offset: int = 0) -> list[Any]:
         """Get multiple entities with pagination."""
         stmt = select(self.model).limit(limit).offset(offset).order_by(desc(self.model.id))
         result = await self.session.execute(stmt)

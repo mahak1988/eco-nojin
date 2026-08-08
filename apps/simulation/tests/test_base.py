@@ -1,4 +1,5 @@
 """Tests for base."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestBase:
         """Verify SimulationStatus can be referenced."""
         try:
             from apps.simulation.base import SimulationStatus
+
             assert SimulationStatus is not None
         except ImportError:
             pytest.skip("Module not available")
@@ -26,6 +28,7 @@ class TestBase:
         """Verify SimulationParameter can be referenced."""
         try:
             from apps.simulation.base import SimulationParameter
+
             assert SimulationParameter is not None
         except ImportError:
             pytest.skip("Module not available")
@@ -34,7 +37,7 @@ class TestBase:
         """Verify SimulationResult can be referenced."""
         try:
             from apps.simulation.base import SimulationResult
+
             assert SimulationResult is not None
         except ImportError:
             pytest.skip("Module not available")
-

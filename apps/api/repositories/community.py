@@ -7,12 +7,11 @@ Data access layer — all database queries live here.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.models.community import Post, Comment, Like
+from apps.api.models.community import Comment, Like, Post
 from apps.api.schemas.community import PostCreate, PostUpdate
 
 
@@ -25,30 +24,25 @@ class CommunityRepository:
 
     # ==================== Post Operations ====================
 
-    async def get_post_by_id(self, post_id: int) -> Optional[Post]:
+    async def get_post_by_id(self, post_id: int) -> Post | None:
         """Handle get_post_by_id (post_id)."""
-        result = await self.session.execute(
-            select(Post).where(Post.id == post_id)
-        )
+        result = await self.session.execute(select(Post).where(Post.id == post_id))
         return result.scalar_one_or_none()
 
     async def list_posts(
         self,
         skip: int = 0,
         limit: int = 100,
-        search: Optional[str] = None,
-        category: Optional[str] = None,
-        author_id: Optional[int] = None
-    ) -> tuple[List[Post], int]:
+        search: str | None = None,
+        category: str | None = None,
+        author_id: int | None = None,
+    ) -> tuple[list[Post], int]:
         """Handle list_posts (skip, limit, search, category, author_id)."""
         query = select(Post)
 
         if search:
             search_term = f"%{search.lower()}%"
-            query = query.where(
-                (Post.title.ilike(search_term)) |
-                (Post.content.ilike(search_term))
-            )
+            query = query.where((Post.title.ilike(search_term)) | (Post.content.ilike(search_term)))
 
         if category:
             query = query.where(Post.category == category)
@@ -64,8 +58,7 @@ class CommunityRepository:
         if search:
             search_term = f"%{search.lower()}%"
             count_query = count_query.where(
-                (Post.title.ilike(search_term)) |
-                (Post.content.ilike(search_term))
+                (Post.title.ilike(search_term)) | (Post.content.ilike(search_term))
             )
         if category:
             count_query = count_query.where(Post.category == category)
@@ -89,7 +82,7 @@ class CommunityRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_post(self, post_id: int, data: PostUpdate) -> Optional[Post]:
+    async def update_post(self, post_id: int, data: PostUpdate) -> Post | None:
         """Handle update_post (post_id, data)."""
         obj = await self.get_post_by_id(post_id)
         if not obj:
@@ -117,16 +110,14 @@ class CommunityRepository:
 
     # ==================== Comment Operations ====================
 
-    async def get_comment_by_id(self, comment_id: int) -> Optional[Comment]:
+    async def get_comment_by_id(self, comment_id: int) -> Comment | None:
         """Handle get_comment_by_id (comment_id)."""
-        result = await self.session.execute(
-            select(Comment).where(Comment.id == comment_id)
-        )
+        result = await self.session.execute(select(Comment).where(Comment.id == comment_id))
         return result.scalar_one_or_none()
 
     async def list_comments_by_post(
         self, post_id: int, skip: int = 0, limit: int = 100
-    ) -> tuple[List[Comment], int]:
+    ) -> tuple[list[Comment], int]:
         """Handle list_comments_by_post (post_id, skip, limit)."""
         query = select(Comment).where(Comment.post_id == post_id)
         query = query.order_by(Comment.created_at).offset(skip).limit(limit)
@@ -150,9 +141,10 @@ class CommunityRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update_comment(self, comment_id: int, data: dict) -> Optional[Comment]:
+    async def update_comment(self, comment_id: int, data: dict) -> Comment | None:
         """Handle update_comment (comment_id, data)."""
         from apps.api.schemas.community import CommentUpdate
+
         obj = await self.get_comment_by_id(comment_id)
         if not obj:
             return None
@@ -181,21 +173,19 @@ class CommunityRepository:
 
     # ==================== Like Operations ====================
 
-    async def get_like_by_id(self, like_id: int) -> Optional[Like]:
+    async def get_like_by_id(self, like_id: int) -> Like | None:
         """Handle get_like_by_id (like_id)."""
-        result = await self.session.execute(
-            select(Like).where(Like.id == like_id)
-        )
+        result = await self.session.execute(select(Like).where(Like.id == like_id))
         return result.scalar_one_or_none()
 
-    async def get_user_post_like(self, user_id: int, post_id: int) -> Optional[Like]:
+    async def get_user_post_like(self, user_id: int, post_id: int) -> Like | None:
         """Handle get_user_post_like (user_id, post_id)."""
         result = await self.session.execute(
             select(Like).where(Like.user_id == user_id, Like.post_id == post_id)
         )
         return result.scalar_one_or_none()
 
-    async def get_user_comment_like(self, user_id: int, comment_id: int) -> Optional[Like]:
+    async def get_user_comment_like(self, user_id: int, comment_id: int) -> Like | None:
         """Handle get_user_comment_like (user_id, comment_id)."""
         result = await self.session.execute(
             select(Like).where(Like.user_id == user_id, Like.comment_id == comment_id)
@@ -260,6 +250,13 @@ class CommunityRepository:
             "total_likes": len(likes),
             "by_category": {
                 cat: len([p for p in posts if p.category == cat])
-                for cat in ["general", "agriculture", "water", "environment", "economics", "technology"]
-            }
+                for cat in [
+                    "general",
+                    "agriculture",
+                    "water",
+                    "environment",
+                    "economics",
+                    "technology",
+                ]
+            },
         }

@@ -1,14 +1,15 @@
-﻿"""
+"""
 NASA POWER API Client - Fetches real-world historical weather data.
 Docs: https://power.larc.nasa.gov/docs/
 
 Enhanced with ALLSKY_SFC_SW_DWN (solar radiation) and Hargreaves ET0.
 Clean Room Implementation - uses public API, no proprietary code.
 """
+
 import logging
 import math
-from datetime import date, timedelta
-from typing import Any, Dict, Optional
+from datetime import date
+from typing import Any
 
 import httpx
 
@@ -17,17 +18,17 @@ USER_AGENT = "EcoNojin/2.0"
 DEFAULT_TIMEOUT = 30.0
 
 NASA_PARAMETERS = [
-    "T2M",             # Temperature at 2m (C)
-    "T2M_MAX",         # Max temperature (C)
-    "T2M_MIN",         # Min temperature (C)
-    "PRECTOTCORR",     # Corrected precipitation (mm/day)
+    "T2M",  # Temperature at 2m (C)
+    "T2M_MAX",  # Max temperature (C)
+    "T2M_MIN",  # Min temperature (C)
+    "PRECTOTCORR",  # Corrected precipitation (mm/day)
     "ALLSKY_SFC_SW_DWN",  # All-sky insolation (MJ/m^2/day)
 ]
 
 
 async def fetch_nasa_power_data(
     lat: float, lon: float, start_date: str, end_date: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Fetch daily temperature, precipitation, and solar radiation from NASA POWER.
 
@@ -76,9 +77,7 @@ async def fetch_nasa_power_data(
         return {"source": "NASA POWER", "status": "error", "message": str(e)}
 
 
-def hargreaves_et0(
-    tmax: float, tmin: float, tmean: float, doy: int, lat: float
-) -> float:
+def hargreaves_et0(tmax: float, tmin: float, tmean: float, doy: int, lat: float) -> float:
     """
     Hargreaves reference evapotranspiration (ET0).
 
@@ -151,7 +150,7 @@ def validate_climate_value(value: Any, default: float = 0.0) -> float:
 
 async def get_daily_climate(
     lat: float, lon: float, start: date, end: date
-) -> Dict[str, Dict[str, float]]:
+) -> dict[str, dict[str, float]]:
     """
     Fetch daily climate data from NASA POWER and compute ET0.
 
@@ -174,7 +173,7 @@ async def get_daily_climate(
     precs = result.get("precip_mm", {}) or {}
     solar = result.get("solar_mj_m2", {}) or {}
 
-    out: Dict[str, Dict[str, float]] = {}
+    out: dict[str, dict[str, float]] = {}
 
     for dk in set(list(means.keys()) + list(maxs.keys()) + list(mins.keys())):
         tmean = validate_climate_value(means.get(dk), 15.0)
@@ -202,9 +201,7 @@ async def get_daily_climate(
     return out
 
 
-async def fetch_climate_with_et0(
-    lat: float, lon: float, start: date, end: date
-) -> Dict[str, Any]:
+async def fetch_climate_with_et0(lat: float, lon: float, start: date, end: date) -> dict[str, Any]:
     """
     Complete climate fetch including all NASA POWER parameters and computed ET0.
 

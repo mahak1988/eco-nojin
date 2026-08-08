@@ -6,7 +6,7 @@ This router keeps SWAT / scenarios / pipeline / climate helpers.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field
@@ -35,13 +35,13 @@ class SwatBody(BaseModel):
     soil_awc_mm: float = 120.0
     slope_pct: float = 3.0
     land_cover: str = "cropland"
-    farm_id: Optional[int] = None
+    farm_id: int | None = None
     async_mode: bool = False
     persist: bool = True
 
 
 class ScenarioBody(BaseModel):
-    scenarios: Optional[list[dict[str, Any]]] = None
+    scenarios: list[dict[str, Any]] | None = None
 
 
 @router.get("/status", operation_id="phase3_science_status")
@@ -121,8 +121,8 @@ async def ndvi_canopy(
 
 @router.get("/runs", operation_id="phase3_runs_list")
 async def runs_list(
-    model: Optional[str] = None,
-    farm_id: Optional[int] = None,
+    model: str | None = None,
+    farm_id: int | None = None,
     limit: int = Query(50, ge=1, le=200),
     session: AsyncSession = Depends(get_db_session),
 ) -> dict[str, Any]:

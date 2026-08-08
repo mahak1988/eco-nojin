@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""
+(
+    """
 scan_i18n_issues.py — Phase P0, Step 1
 ========================================
 Scans the entire repository for:
-  1. Persian / Arabic / RTL script inside source-code comments (//, #, /* */, """ """)
+  1. Persian / Arabic / RTL script inside source-code comments (//, #, /* */, """
+    """)
   2. Persian / Arabic / RTL script inside Python / JS docstrings
   3. Hard-coded user-facing strings in JSX / TSX that should go through i18n
   4. Non-English content in README / docs / config files
@@ -15,6 +17,7 @@ Output:
     - reports/i18n_scan_report.json   — machine-readable
     - reports/i18n_scan_report.md     — human-readable summary
 """
+)
 
 import json
 import os
@@ -23,40 +26,66 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Set
 
 ROOT = Path(__file__).resolve().parent.parent
 
-EXCLUDE_DIRS: Set[str] = {
-    ".git", ".github", ".venv", ".turbo", ".pnpm-store",
-    ".mypy_cache", ".pytest_cache", ".security_backup",
-    "__pycache__", "node_modules", "dist", "build", ".next",
-    "cache", "artifacts", "typechain-types", ".zcode",
+EXCLUDE_DIRS: set[str] = {
+    ".git",
+    ".github",
+    ".venv",
+    ".turbo",
+    ".pnpm-store",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".security_backup",
+    "__pycache__",
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    "cache",
+    "artifacts",
+    "typechain-types",
+    ".zcode",
 }
 
-EXCLUDE_FILES: Set[str] = {
-    "pnpm-lock.yaml", "package-lock.json", "yarn.lock",
-    ".env", ".env.docker", "econojin.db",
+EXCLUDE_FILES: set[str] = {
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    ".env",
+    ".env.docker",
+    "econojin.db",
 }
 
-SCAN_EXTENSIONS: Set[str] = {
-    ".py", ".pyi", ".ts", ".tsx", ".js", ".jsx",
-    ".html", ".css", ".scss",
-    ".json", ".yaml", ".yml", ".toml", ".ini", ".cfg",
-    ".md", ".rst", ".txt",
-    ".sol", ".sh", ".ps1", ".bat",
+SCAN_EXTENSIONS: set[str] = {
+    ".py",
+    ".pyi",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".html",
+    ".css",
+    ".scss",
+    ".json",
+    ".yaml",
+    ".yml",
+    ".toml",
+    ".ini",
+    ".cfg",
+    ".md",
+    ".rst",
+    ".txt",
+    ".sol",
+    ".sh",
+    ".ps1",
+    ".bat",
 }
 
-RTL_RE = re.compile(
-    "[\u0600-\u06FF"
-    "\u0750-\u077F"
-    "\u08A0-\u08FF"
-    "\uFB50-\uFDFF"
-    "\uFE70-\uFEFF"
-    "]"
-)
+RTL_RE = re.compile("[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]")
 
-PERSIAN_DIGITS_RE = re.compile("[\u0660-\u0669\u06F0-\u06F9]")
+PERSIAN_DIGITS_RE = re.compile("[\u0660-\u0669\u06f0-\u06f9]")
 
 
 def _is_excluded(path: Path) -> bool:
@@ -78,18 +107,18 @@ def _has_rtl(text: str) -> bool:
     return bool(RTL_RE.search(text))
 
 
-def _get_line_context(lines: List[str], lineno: int, window: int = 1) -> str:
+def _get_line_context(lines: list[str], lineno: int, window: int = 1) -> str:
     start = max(0, lineno - window)
     end = min(len(lines), lineno + window + 1)
-    ctx: List[str] = []
+    ctx: list[str] = []
     for i in range(start, end):
         prefix = ">" if i == lineno else " "
-        ctx.append(f"  {prefix} {i+1:>6d} | {lines[i].rstrip()}")
+        ctx.append(f"  {prefix} {i + 1:>6d} | {lines[i].rstrip()}")
     return "\n".join(ctx)
 
 
-def scan_source_file(path: Path) -> List[dict]:
-    results: List[dict] = []
+def scan_source_file(path: Path) -> list[dict]:
+    results: list[dict] = []
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
     except Exception:
@@ -112,13 +141,15 @@ def scan_source_file(path: Path) -> List[dict]:
             if m:
                 content = m.group(1)
                 if _has_rtl(content):
-                    results.append({
-                        "line": i,
-                        "column": m.start(),
-                        "type": "comment",
-                        "snippet": content.strip()[:120],
-                        "context": _get_line_context(lines, i),
-                    })
+                    results.append(
+                        {
+                            "line": i,
+                            "column": m.start(),
+                            "type": "comment",
+                            "snippet": content.strip()[:120],
+                            "context": _get_line_context(lines, i),
+                        }
+                    )
 
     # Multi-line comments / docstrings
     if ext in {".py", ".pyi"}:
@@ -126,25 +157,29 @@ def scan_source_file(path: Path) -> List[dict]:
             content = m.group(1)
             if _has_rtl(content):
                 lineno = text[: m.start()].count("\n")
-                results.append({
-                    "line": lineno,
-                    "column": 0,
-                    "type": "docstring",
-                    "snippet": content.strip()[:120],
-                    "context": _get_line_context(lines, lineno),
-                })
+                results.append(
+                    {
+                        "line": lineno,
+                        "column": 0,
+                        "type": "docstring",
+                        "snippet": content.strip()[:120],
+                        "context": _get_line_context(lines, lineno),
+                    }
+                )
     elif ext in {".ts", ".tsx", ".js", ".jsx", ".sol"}:
         for m in re.finditer(r"/\*\*\s*(.*?)\s*\*/", text, re.DOTALL):
             content = m.group(1)
             if _has_rtl(content):
                 lineno = text[: m.start()].count("\n")
-                results.append({
-                    "line": lineno,
-                    "column": 0,
-                    "type": "jsdoc",
-                    "snippet": content.strip()[:120],
-                    "context": _get_line_context(lines, lineno),
-                })
+                results.append(
+                    {
+                        "line": lineno,
+                        "column": 0,
+                        "type": "jsdoc",
+                        "snippet": content.strip()[:120],
+                        "context": _get_line_context(lines, lineno),
+                    }
+                )
 
     # Hard-coded strings in JSX/TSX
     if ext in {".tsx", ".jsx"}:
@@ -152,19 +187,21 @@ def scan_source_file(path: Path) -> List[dict]:
             content = m.group(1)
             if _has_rtl(content):
                 lineno = text[: m.start()].count("\n")
-                results.append({
-                    "line": lineno,
-                    "column": m.start() - text.rfind("\n", 0, m.start()),
-                    "type": "hardcoded_ui",
-                    "snippet": content.strip()[:120],
-                    "context": _get_line_context(lines, lineno),
-                })
+                results.append(
+                    {
+                        "line": lineno,
+                        "column": m.start() - text.rfind("\n", 0, m.start()),
+                        "type": "hardcoded_ui",
+                        "snippet": content.strip()[:120],
+                        "context": _get_line_context(lines, lineno),
+                    }
+                )
 
     return results
 
 
-def scan_markdown_file(path: Path) -> List[dict]:
-    results: List[dict] = []
+def scan_markdown_file(path: Path) -> list[dict]:
+    results: list[dict] = []
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
     except Exception:
@@ -176,18 +213,20 @@ def scan_markdown_file(path: Path) -> List[dict]:
         if stripped.startswith("```") or stripped.startswith("    "):
             continue
         if _has_rtl(stripped):
-            results.append({
-                "line": i,
-                "column": 0,
-                "type": "markdown",
-                "snippet": stripped[:120],
-                "context": _get_line_context(lines, i),
-            })
+            results.append(
+                {
+                    "line": i,
+                    "column": 0,
+                    "type": "markdown",
+                    "snippet": stripped[:120],
+                    "context": _get_line_context(lines, i),
+                }
+            )
     return results
 
 
-def scan_config_file(path: Path) -> List[dict]:
-    results: List[dict] = []
+def scan_config_file(path: Path) -> list[dict]:
+    results: list[dict] = []
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
     except Exception:
@@ -199,18 +238,20 @@ def scan_config_file(path: Path) -> List[dict]:
         if not stripped or stripped.startswith("#") or stripped.startswith(";"):
             continue
         if _has_rtl(stripped):
-            results.append({
-                "line": i,
-                "column": 0,
-                "type": "config_value",
-                "snippet": stripped[:120],
-                "context": _get_line_context(lines, i),
-            })
+            results.append(
+                {
+                    "line": i,
+                    "column": 0,
+                    "type": "config_value",
+                    "snippet": stripped[:120],
+                    "context": _get_line_context(lines, i),
+                }
+            )
     return results
 
 
-def scan_repository() -> Dict[str, List[dict]]:
-    report: Dict[str, List[dict]] = defaultdict(list)
+def scan_repository() -> dict[str, list[dict]]:
+    report: dict[str, list[dict]] = defaultdict(list)
     total_files = 0
     scanned_files = 0
     found_files = 0
@@ -236,7 +277,7 @@ def scan_repository() -> Dict[str, List[dict]]:
 
             total_files += 1
             rel = str(fpath.relative_to(ROOT)).replace("\\", "/")
-            matches: List[dict] = []
+            matches: list[dict] = []
 
             try:
                 if ext in {".md", ".rst", ".txt"}:
@@ -264,7 +305,7 @@ def scan_repository() -> Dict[str, List[dict]]:
     return report
 
 
-def write_json_report(report: Dict[str, List[dict]], path: Path) -> None:
+def write_json_report(report: dict[str, list[dict]], path: Path) -> None:
     output = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "generator": "scan_i18n_issues.py",
@@ -276,8 +317,8 @@ def write_json_report(report: Dict[str, List[dict]], path: Path) -> None:
     print(f"  -> {path}  ({output['total_issues']} issues)", file=sys.stderr)
 
 
-def write_markdown_report(report: Dict[str, List[dict]], path: Path) -> None:
-    lines: List[str] = [
+def write_markdown_report(report: dict[str, list[dict]], path: Path) -> None:
+    lines: list[str] = [
         "# i18n Scan Report - Phase P0",
         "",
         f"**Generated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
@@ -295,7 +336,7 @@ def write_markdown_report(report: Dict[str, List[dict]], path: Path) -> None:
         lines.append("|------|------|---------|")
         for m in matches:
             snippet = m["snippet"].replace("\n", "\\n")[:80]
-            lines.append(f"| {m['line']+1} | {m['type']} | `{snippet}` |")
+            lines.append(f"| {m['line'] + 1} | {m['type']} | `{snippet}` |")
         lines.append("")
 
     path.write_text("\n".join(lines), encoding="utf-8")
@@ -316,7 +357,9 @@ def main():
     write_markdown_report(report, out_dir / "i18n_scan_report.md")
 
     total = sum(len(v) for v in report.values())
-    print(f"\nDone - {total} potential i18n issues found across {len(report)} files.", file=sys.stderr)
+    print(
+        f"\nDone - {total} potential i18n issues found across {len(report)} files.", file=sys.stderr
+    )
 
 
 if __name__ == "__main__":

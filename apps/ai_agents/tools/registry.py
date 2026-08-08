@@ -4,37 +4,40 @@ Agent Tool Registry
 Tool calling framework for AI agents.
 """
 
-from typing import Callable, Any
 import logging
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger("econojin")
 
 
 class AgentToolRegistry:
     """Registry of tools available to AI agents."""
-    
+
     _tools: dict[str, Callable] = {}
-    
+
     @classmethod
     def register(cls, name: str) -> Callable:
         """Register a tool function by name."""
+
         def decorator(fn: Callable) -> Callable:
             """Handle decorator (fn)."""
             cls._tools[name] = fn
             logger.info(f"Registered agent tool: {name}")
             return fn
+
         return decorator
-    
+
     @classmethod
     def get(cls, name: str) -> Callable | None:
         """Get a tool by name."""
         return cls._tools.get(name)
-    
+
     @classmethod
     def list_tools(cls) -> list[str]:
         """List all registered tool names."""
         return list(cls._tools.keys())
-    
+
     @classmethod
     def execute(cls, name: str, *args: Any, **kwargs: Any) -> Any:
         """Execute a tool by name."""
@@ -49,6 +52,7 @@ class AgentToolRegistry:
 async def get_weather_data(latitude: float, longitude: float, days: int = 7) -> dict:
     """Get weather forecast for a location."""
     from apps.simulation.climate import ClimateSimulator
+
     sim = ClimateSimulator()
     return await sim.run({"latitude": latitude, "longitude": longitude, "days": days})
 
@@ -66,14 +70,14 @@ async def get_crop_recommendation(
         "water_medium": ["wheat", "maize"],
         "water_low": ["tomato", "sorghum"],
     }
-    
+
     if water_availability > 500:
         recommended = crops["water_high"]
     elif water_availability > 300:
         recommended = crops["water_medium"]
     else:
         recommended = crops["water_low"]
-    
+
     return {"province": province, "recommended_crops": recommended}
 
 
@@ -86,10 +90,10 @@ async def calculate_irrigation(
 ) -> dict:
     """Calculate irrigation requirements."""
     from apps.simulation.agriculture.aquacrop import FAO_CROP_DATA
-    
+
     crop_data = FAO_CROP_DATA.get(crop, FAO_CROP_DATA["wheat"])
     water_needed = evapotranspiration * area_ha * 1000  # mm to liters
-    
+
     return {
         "crop": crop,
         "water_needed_m3": water_needed,
@@ -107,7 +111,7 @@ async def analyze_financial(
     total_costs = sum(costs)
     profit = revenue - total_costs
     roi = (profit / total_costs * 100) if total_costs > 0 else 0
-    
+
     return {
         "revenue": revenue,
         "total_costs": total_costs,

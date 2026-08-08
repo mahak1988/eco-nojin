@@ -20,13 +20,13 @@ async def ensure_postgis(engine: AsyncEngine) -> dict[str, Any]:
             result = await conn.execute(text("SELECT PostGIS_version();"))
             version = result.scalar()
             logger.info(f"PostGIS is available. Version: {version}")
-            await conn.commit() # Commit the transaction
+            await conn.commit()  # Commit the transaction
             return {"ok": True, "version": version}
     except Exception as e:
         logger.warning(f"PostGIS check failed (expected if not installed): {e}")
         # Attempt to create the extension
         try:
-            async with engine.begin() as conn: # Use begin for DDL statements
+            async with engine.begin() as conn:  # Use begin for DDL statements
                 await conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis;"))
             logger.info("PostGIS extension created or ensured.")
             # Retry the check after creation
@@ -56,19 +56,26 @@ async def ensure_farms_spatial(engine: AsyncEngine) -> dict[str, Any]:
             #     logger.info("Spatial index 'idx_farms_geom' created.")
             # else:
             #     logger.info("Spatial index 'idx_farms_geom' already exists.")
-            steps = ["Conceptual check for farms spatial index completed."] # Placeholder for actual logic
+            steps = [
+                "Conceptual check for farms spatial index completed."
+            ]  # Placeholder for actual logic
             logger.info(steps[0])
             await conn.commit()
             return {"ok": True, "steps": steps}
     except Exception as e:
         logger.error(f"Failed to ensure farms spatial index: {e}")
         return {"ok": False, "error": str(e)}
+
+
 async def query_farms_nearby(db, lat: float, lon: float, radius_km: float = 10):
     """Query farms near a point. Stub implementation for SQLite."""
     from sqlalchemy import text
+
     try:
         result = await db.execute(
-            text("SELECT id, name, latitude, longitude FROM farms WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+            text(
+                "SELECT id, name, latitude, longitude FROM farms WHERE latitude IS NOT NULL AND longitude IS NOT NULL"
+            )
         )
         farms = result.fetchall()
         # Simple distance filter (Pythagorean approximation)
@@ -78,7 +85,15 @@ async def query_farms_nearby(db, lat: float, lon: float, radius_km: float = 10):
             dlon = (f[3] - lon) * 111 * 0.8
             dist = (dlat**2 + dlon**2) ** 0.5
             if dist <= radius_km:
-                nearby.append({"id": f[0], "name": f[1], "lat": f[2], "lon": f[3], "distance_km": round(dist, 2)})
+                nearby.append(
+                    {
+                        "id": f[0],
+                        "name": f[1],
+                        "lat": f[2],
+                        "lon": f[3],
+                        "distance_km": round(dist, 2),
+                    }
+                )
         return nearby
     except Exception:
         return []

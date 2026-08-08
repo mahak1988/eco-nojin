@@ -22,5 +22,7 @@ def probe_gee() -> dict[str, Any]:
     return {
         "installed": True,
         "initialized": ok,
-        "message": "ready" if ok else "set GEE_SERVICE_ACCOUNT + GEE_CREDENTIALS_FILE + register SA in EE",
+        "message": "ready"
+        if ok
+        else "set GEE_SERVICE_ACCOUNT + GEE_CREDENTIALS_FILE + register SA in EE",
     }

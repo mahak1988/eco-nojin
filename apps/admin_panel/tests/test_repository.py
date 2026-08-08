@@ -1,4 +1,5 @@
 """Tests for repository."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestRepository:
         """Verify AdminSettingRepository can be referenced."""
         try:
             from apps.admin_panel.repository import AdminSettingRepository
+
             assert AdminSettingRepository is not None
         except ImportError:
             pytest.skip("Module not available")
@@ -26,6 +28,7 @@ class TestRepository:
         """Verify AuditLogRepository can be referenced."""
         try:
             from apps.admin_panel.repository import AuditLogRepository
+
             assert AuditLogRepository is not None
         except ImportError:
             pytest.skip("Module not available")
@@ -34,7 +37,7 @@ class TestRepository:
         """Verify SystemReportRepository can be referenced."""
         try:
             from apps.admin_panel.repository import SystemReportRepository
+
             assert SystemReportRepository is not None
         except ImportError:
             pytest.skip("Module not available")
-

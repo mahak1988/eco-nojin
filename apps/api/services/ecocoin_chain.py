@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 # In-process append-only ledger (simulates L2 / sidechain until RPC is set)
@@ -35,14 +35,14 @@ def ledger_append(
     *parts: Any,
     meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    raw = "|".join(str(p) for p in (action, *parts, datetime.now(timezone.utc).isoformat()))
+    raw = "|".join(str(p) for p in (action, *parts, datetime.now(UTC).isoformat()))
     h = "0x" + hashlib.sha256(raw.encode()).hexdigest()
     entry = {
         "tx_hash": h,
         "action": action,
         "parts": [str(p) for p in parts],
         "meta": meta or {},
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "mode": chain_config()["mode"],
         "block_index": len(_LEDGER) + 1,
     }

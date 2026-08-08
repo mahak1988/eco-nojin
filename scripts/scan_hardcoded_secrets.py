@@ -14,10 +14,10 @@ def scan_file_for_secrets(file_path: Path):
         # Captures the value part to check its strength/validity.
         r"(?i)(?:password|passwd|pwd|secret|token|api[_\-]?key|apikey|access[_\-]?key|auth[_\-]?token|client[_\-]?secret)\s*[:=]\s*[\"']([^\"'\s]{8,128})[\"']",
         # Matches long hex/base64-like strings which might be keys
-        r"([A-Za-z0-9+/]{20,}={0,2})", 
+        r"([A-Za-z0-9+/]{20,}={0,2})",
     ]
-    
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
 
     issues = []
@@ -29,13 +29,17 @@ def scan_file_for_secrets(file_path: Path):
                 value = match.group(1)
                 # Flag common weak passwords regardless of pattern
                 if value.lower() in ["password", "123456", "admin", "changeme", "secret"]:
-                     issues.append(f"  Weak hardcoded value '{value}' at {match.start()}-{match.end()}")
+                    issues.append(
+                        f"  Weak hardcoded value '{value}' at {match.start()}-{match.end()}"
+                    )
             # For the second pattern (long string), just report the match
             elif i == 1:
                 value = match.group(0)
                 # Avoid reporting long strings that look like legitimate code (e.g., SQL queries)
-                if not ('SELECT' in value or 'FROM' in value or 'WHERE' in value):
-                    issues.append(f"  Potential hardcoded key/token at {match.start()}-{match.end()}: '{value[:30]}...'")
+                if not ("SELECT" in value or "FROM" in value or "WHERE" in value):
+                    issues.append(
+                        f"  Potential hardcoded key/token at {match.start()}-{match.end()}: '{value[:30]}...'"
+                    )
 
     return issues
 
@@ -48,7 +52,7 @@ def scan_directory(directory: Path):
         issues = scan_file_for_secrets(file_path)
         if issues:
             all_issues[file_path] = issues
-    
+
     return all_issues
 
 
@@ -56,7 +60,7 @@ if __name__ == "__main__":
     project_root = Path(__file__).resolve().parent.parent
     print(f"Scanning {project_root} for potential hardcoded secrets...")
     issues = scan_directory(project_root)
-    
+
     if issues:
         print("\nPotential issues found:")
         for file_path, file_issues in issues.items():

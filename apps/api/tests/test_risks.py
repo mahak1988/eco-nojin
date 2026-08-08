@@ -4,21 +4,19 @@ Risks Engine Tests
 Tests for heuristic agricultural risk scoring models.
 """
 
-import pytest
-
 from apps.risks.engine import (
     RiskInput,
     RiskReport,
-    evaluate_risks,
-    score_drought,
-    score_flood,
-    score_erosion,
-    score_pest,
-    score_disease,
-    score_heat,
-    score_frost,
-    _level,
     _clamp,
+    _level,
+    evaluate_risks,
+    score_disease,
+    score_drought,
+    score_erosion,
+    score_flood,
+    score_frost,
+    score_heat,
+    score_pest,
 )
 
 

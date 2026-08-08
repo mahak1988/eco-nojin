@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Search GitHub for high-quality reference repositories matching our project structure."""
-import urllib.request
+
 import json
-import sys
-import os
+import urllib.request
 
 QUERIES = [
     "FastAPI+React+PostgreSQL+monorepo+production",
@@ -15,7 +14,7 @@ QUERIES = [
     "FastAPI+JWT+OTP+authentication+boilerplate",
     "FastAPI+alembic+migrations+postgres+production",
     "React+TypeScript+TanStack+Query+dashboard+template",
-    "Vite+React+i18n+multi-language+dashboard"
+    "Vite+React+i18n+multi-language+dashboard",
 ]
 
 for query in QUERIES:
@@ -24,9 +23,9 @@ for query in QUERIES:
         req = urllib.request.Request(url, headers={"User-Agent": "econojin-research"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read())
-            print(f"\n{'='*80}")
+            print(f"\n{'=' * 80}")
             print(f"QUERY: {query}")
-            print(f"{'='*80}")
+            print(f"{'=' * 80}")
             for r in data.get("items", []):
                 desc = (r["description"] or "N/A")[:100]
                 print(f"  ⭐ {r['stargazers_count']:>5} | {r['full_name']:<45} | {desc}")
@@ -37,15 +36,15 @@ for query in QUERIES:
         print(f"  Error: {e}")
 
 # Now clone/search for specific high-value repos
-print("\n\n" + "="*80)
+print("\n\n" + "=" * 80)
 print("TOP REPOSITORIES TO EXPLORE FOR FILE INTEGRATION")
-print("="*80)
+print("=" * 80)
 
 TARGETS = [
     {
         "repo": "tobymao/sqlglot",
         "reason": "SQL parser/transpiler - useful for query standardization",
-        "files": []
+        "files": [],
     },
     {
         "repo": "fastapi/full-stack-fastapi-template",
@@ -60,37 +59,29 @@ TARGETS = [
             "backend/app/api/deps.py",
             "backend/alembic/env.py",
             "docker-compose.yml",
-            ".env.example"
-        ]
+            ".env.example",
+        ],
     },
     {
         "repo": "zhanymkanov/fastapi-best-practices",
         "reason": "FastAPI best practices guide - project structure, error handling, testing",
-        "files": []
+        "files": [],
     },
-    {
-        "repo": "AbdullahAlfaraj/Auto-README",
-        "reason": "README generation template",
-        "files": []
-    },
+    {"repo": "AbdullahAlfaraj/Auto-README", "reason": "README generation template", "files": []},
     {
         "repo": "RealToughCandy/fastapi-production-setup",
         "reason": "Production-ready FastAPI setup with testing, CI/CD",
-        "files": [
-            "app/config.py",
-            "app/database.py",
-            "tests/"
-        ]
+        "files": ["app/config.py", "app/database.py", "tests/"],
     },
     {
         "repo": "goldbergyoni/nodebestpractices",
         "reason": "Node.js best practices - applicable to frontend structure",
-        "files": []
+        "files": [],
     },
     {
         "repo": "microsoft/TypeScript-React-Starter",
         "reason": "TypeScript React patterns",
-        "files": []
+        "files": [],
     },
     {
         "repo": "alan2207/bulletproof-react",
@@ -104,33 +95,33 @@ TARGETS = [
             "src/providers/",
             "src/routes/",
             "src/test/",
-            "src/types/"
-        ]
+            "src/types/",
+        ],
     },
     {
         "repo": "appwrite/appwrite",
         "reason": "Backend-as-a-service - reference for auth, storage, database structure",
-        "files": []
+        "files": [],
     },
     {
         "repo": "withastro/astro",
         "reason": "Web framework - reference for multi-language support",
-        "files": []
+        "files": [],
     },
     {
         "repo": "n8n-io/n8n",
         "reason": "Workflow automation - reference for AI agent workflows",
-        "files": []
-    }
+        "files": [],
+    },
 ]
 
 for t in TARGETS:
-    print(f"\n{'─'*80}")
+    print(f"\n{'─' * 80}")
     print(f"📦 {t['repo']}")
     print(f"   📝 {t['reason']}")
-    if t['files']:
-        print(f"   📋 Key files to examine:")
-        for f in t['files']:
+    if t["files"]:
+        print("   📋 Key files to examine:")
+        for f in t["files"]:
             print(f"      - {f}")
 
 print("\n\nTo clone a repo for file analysis:")

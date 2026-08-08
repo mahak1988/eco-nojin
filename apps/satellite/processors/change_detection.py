@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def delta_status(mean_a: float, mean_b: float, improve: float = 0.1, degrade: float = -0.1) -> str:

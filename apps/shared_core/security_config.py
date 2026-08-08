@@ -3,9 +3,9 @@ Security Configuration Module
 Integrates security configurations from both main apps and eco-nojin project
 """
 
-from typing import Dict, List, Any
 import os
 from enum import Enum
+from typing import Any
 
 
 class SecurityLevel(Enum):
@@ -18,7 +18,6 @@ class SecurityLevel(Enum):
 # Security configuration based on analysis of both codebases
 SECURITY_CONFIG = {
     "level": SecurityLevel.HIGH,
-    
     # Rate limiting configuration
     "rate_limiting": {
         "enabled": True,
@@ -26,22 +25,39 @@ SECURITY_CONFIG = {
         "login_requests_per_minute": 30,
         "burst_window_seconds": 60,
         "track_by_ip": True,
-        "track_by_user_agent": True
+        "track_by_user_agent": True,
     },
-    
     # Bot detection and prevention
     "bot_detection": {
         "enabled": True,
         "blocked_agents": [
-            "sqlmap", "nikto", "nmap", "masscan", "dirbuster", 
-            "gobuster", "wfuzz", "hydra", "burp", "zap", "scrapy",
-            "googlebot", "bingbot", "yandexbot", "baiduspider",
-            "duckduckbot", "slurp", "facebot", "ia_archiver",
-            "semrushbot", "ahrefsbot", "dotbot", "mj12bot", "petalbot"
+            "sqlmap",
+            "nikto",
+            "nmap",
+            "masscan",
+            "dirbuster",
+            "gobuster",
+            "wfuzz",
+            "hydra",
+            "burp",
+            "zap",
+            "scrapy",
+            "googlebot",
+            "bingbot",
+            "yandexbot",
+            "baiduspider",
+            "duckduckbot",
+            "slurp",
+            "facebot",
+            "ia_archiver",
+            "semrushbot",
+            "ahrefsbot",
+            "dotbot",
+            "mj12bot",
+            "petalbot",
         ],
-        "allow_developer_tools": True  # Allow curl, wget, httpie for API clients
+        "allow_developer_tools": True,  # Allow curl, wget, httpie for API clients
     },
-    
     # Input validation and sanitization
     "input_validation": {
         "max_request_size_bytes": 10 * 1024 * 1024,  # 10MB
@@ -50,14 +66,15 @@ SECURITY_CONFIG = {
             r"(?i)(<script|javascript:|vbscript:|on\w+\s*=)",
             r"(?i)(\.\./|\.\.\\|%2e%2e)",
             r"(?i)(cmd\.exe|/bin/sh|/bin/bash|powershell)",
-            r"(?i)(eval\s*\(|exec\s*\(|system\s*\()"
+            r"(?i)(eval\s*\(|exec\s*\(|system\s*\()",
         ],
         "allowed_content_types": [
-            "application/json", "application/x-www-form-urlencoded", 
-            "multipart/form-data", "text/plain"
-        ]
+            "application/json",
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/plain",
+        ],
     },
-    
     # Security headers
     "security_headers": {
         "X-Frame-Options": "SAMEORIGIN",
@@ -67,9 +84,8 @@ SECURITY_CONFIG = {
         "Cache-Control": "no-store, no-cache, must-revalidate",
         "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
-        "X-Permitted-Cross-Domain-Policies": "none"
+        "X-Permitted-Cross-Domain-Policies": "none",
     },
-    
     # Authentication and authorization
     "authentication": {
         "jwt_algorithm": "HS256",
@@ -78,39 +94,37 @@ SECURITY_CONFIG = {
         "require_https": True,
         "session_timeout_minutes": 30,
         "max_login_attempts": 5,
-        "lockout_duration_minutes": 30
+        "lockout_duration_minutes": 30,
     },
-    
     # Logging and monitoring
     "monitoring": {
         "log_security_events": True,
         "alert_on_anomalies": True,
         "request_tracing_enabled": True,
         "failed_auth_logging": True,
-        "suspicious_activity_alerts": True
+        "suspicious_activity_alerts": True,
     },
-    
     # Environment-specific settings
     "environments": {
         "production": {
             "debug_mode": False,
             "detailed_error_messages": False,
             "strict_security": True,
-            "require_authentication": True
+            "require_authentication": True,
         },
         "development": {
             "debug_mode": True,
             "detailed_error_messages": True,
             "strict_security": False,
-            "rate_limit_multiplier": 2
+            "rate_limit_multiplier": 2,
         },
         "testing": {
             "debug_mode": True,
             "detailed_error_messages": True,
             "strict_security": False,
-            "rate_limit_multiplier": 10
-        }
-    }
+            "rate_limit_multiplier": 10,
+        },
+    },
 }
 
 
@@ -119,11 +133,11 @@ def get_current_environment() -> str:
     return os.getenv("ENVIRONMENT", os.getenv("APP_ENV", "development")).lower()
 
 
-def get_security_config() -> Dict[str, Any]:
+def get_security_config() -> dict[str, Any]:
     """Get security configuration adjusted for current environment."""
     env = get_current_environment()
     config = SECURITY_CONFIG.copy()
-    
+
     # Adjust settings based on environment
     if env in config["environments"]:
         env_settings = config["environments"][env]
@@ -134,7 +148,7 @@ def get_security_config() -> Dict[str, Any]:
                 )
             else:
                 config[key] = value
-    
+
     return config
 
 
@@ -143,20 +157,22 @@ def is_production() -> bool:
     return get_current_environment() == "production"
 
 
-def get_blocked_user_agents() -> List[str]:
+def get_blocked_user_agents() -> list[str]:
     """Get list of blocked user agents."""
     config = get_security_config()
-    return config["bot_detection"]["blocked_agents"] + [
-        "curl/", "wget/", "httpie/", "python-requests"
-    ] if not config["bot_detection"]["allow_developer_tools"] else config["bot_detection"]["blocked_agents"]
+    return (
+        config["bot_detection"]["blocked_agents"] + ["curl/", "wget/", "httpie/", "python-requests"]
+        if not config["bot_detection"]["allow_developer_tools"]
+        else config["bot_detection"]["blocked_agents"]
+    )
 
 
 # Export the configuration
 __all__ = [
-    'SECURITY_CONFIG',
-    'SecurityLevel',
-    'get_security_config',
-    'get_current_environment',
-    'is_production',
-    'get_blocked_user_agents'
+    "SECURITY_CONFIG",
+    "SecurityLevel",
+    "get_blocked_user_agents",
+    "get_current_environment",
+    "get_security_config",
+    "is_production",
 ]

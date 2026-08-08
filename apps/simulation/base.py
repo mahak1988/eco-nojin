@@ -8,17 +8,18 @@ result serialization, and registry pattern.
 import logging
 
 logger = logging.getLogger(__name__)
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, UTC
-from enum import Enum
-from typing import Any, Optional
 import json
 import uuid
+from abc import ABC, abstractmethod
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
+from enum import Enum
+from typing import Any
 
 
 class SimulationStatus(str, Enum):
     """Status of a simulation run."""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -29,14 +30,15 @@ class SimulationStatus(str, Enum):
 @dataclass
 class SimulationParameter:
     """A single simulation parameter with metadata."""
+
     name: str
     label: str
     type: str  # "float", "int", "string", "select", "boolean"
     default: Any = None
     description: str = ""
     unit: str = ""
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
+    min_value: float | None = None
+    max_value: float | None = None
     options: list[str] = field(default_factory=list)  # for select type
     required: bool = True
 
@@ -48,6 +50,7 @@ class SimulationParameter:
 @dataclass
 class SimulationResult:
     """Result of a simulation run."""
+
     simulator_id: str
     simulator_name: str
     status: SimulationStatus
@@ -57,7 +60,7 @@ class SimulationResult:
     outputs: dict[str, Any] = field(default_factory=dict)
     metrics: dict[str, float] = field(default_factory=dict)
     charts: dict[str, list] = field(default_factory=dict)  # chart data series
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float = 0.0
 
     def to_dict(self) -> dict:
@@ -71,6 +74,7 @@ class SimulationResult:
 
 class SimulationRegistry:
     """Registry of all available simulators."""
+
     _simulators: dict[str, type["BaseSimulator"]] = {}
 
     @classmethod
@@ -81,7 +85,7 @@ class SimulationRegistry:
         return simulator_class
 
     @classmethod
-    def get(cls, simulator_id: str) -> Optional[type["BaseSimulator"]]:
+    def get(cls, simulator_id: str) -> type["BaseSimulator"] | None:
         """Handle get (cls, simulator_id)."""
         return cls._simulators.get(simulator_id)
 
@@ -113,41 +117,34 @@ class BaseSimulator(ABC):
     @abstractmethod
     def id(self) -> str:
         """Unique identifier for this simulator."""
-        pass
 
     @property
     @abstractmethod
     def name(self) -> str:
         """Human-readable name."""
-        pass
 
     @property
     @abstractmethod
     def category(self) -> str:
         """Category: agriculture, hydrology, carbon, etc."""
-        pass
 
     @property
     @abstractmethod
     def description(self) -> str:
         """Detailed description."""
-        pass
 
     @property
     @abstractmethod
     def version(self) -> str:
         """Version string."""
-        pass
 
     @abstractmethod
     def get_parameters(self) -> list[SimulationParameter]:
         """Return list of required simulation parameters."""
-        pass
 
     @abstractmethod
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
         """Execute the simulation with given parameters."""
-        pass
 
     def validate(self, parameters: dict[str, Any]) -> list[str]:
         """Validate parameters. Returns list of error messages."""

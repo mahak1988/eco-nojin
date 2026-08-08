@@ -1,4 +1,5 @@
 """Tests for weather router — /api/v1/weather."""
+
 from __future__ import annotations
 
 import pytest
@@ -78,6 +79,7 @@ class TestWeatherRouterImport:
     def test_router_importable(self):
         try:
             from apps.weather.router import router
+
             assert router is not None
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -85,6 +87,7 @@ class TestWeatherRouterImport:
     def test_forecast_endpoint_exists(self):
         try:
             from apps.weather import router as weather_router
+
             route_paths = [r.path for r in weather_router.router.routes]
             assert any("forecast" in p for p in route_paths)
         except (ImportError, AttributeError) as e:
@@ -93,6 +96,7 @@ class TestWeatherRouterImport:
     def test_current_endpoint_exists(self):
         try:
             from apps.weather import router as weather_router
+
             route_paths = [r.path for r in weather_router.router.routes]
             assert any("current" in p for p in route_paths)
         except (ImportError, AttributeError) as e:
@@ -101,6 +105,7 @@ class TestWeatherRouterImport:
     def test_alerts_endpoint_exists(self):
         try:
             from apps.weather import router as weather_router
+
             route_paths = [r.path for r in weather_router.router.routes]
             assert any("alerts" in p for p in route_paths)
         except (ImportError, AttributeError) as e:

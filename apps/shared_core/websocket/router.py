@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
@@ -27,15 +27,17 @@ async def websocket_endpoint(websocket: WebSocket, channel: str):
             try:
                 data = await asyncio.wait_for(websocket.receive_text(), timeout=25.0)
                 if data == "ping":
-                    await websocket.send_json({"type": "pong", "ts": datetime.now(timezone.utc).isoformat()})
+                    await websocket.send_json({"type": "pong", "ts": datetime.now(UTC).isoformat()})
                 else:
-                    await manager.broadcast(channel, {"type": "echo", "channel": channel, "payload": data})
-            except asyncio.TimeoutError:
+                    await manager.broadcast(
+                        channel, {"type": "echo", "channel": channel, "payload": data}
+                    )
+            except TimeoutError:
                 await websocket.send_json(
                     {
                         "type": "heartbeat",
                         "channel": channel,
-                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "ts": datetime.now(UTC).isoformat(),
                     }
                 )
     except WebSocketDisconnect:

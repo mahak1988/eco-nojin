@@ -6,9 +6,10 @@ Hydroma MRV standards engine — assurance levels L1/L2/L3 aligned with:
 
 Pure functions; no I/O.
 """
+
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 AssuranceLevel = Literal["L1", "L2", "L3"]
 
@@ -68,12 +69,12 @@ def classify_assurance(
 
 def quality_from_mrv_v2(
     *,
-    ndvi_observed: Optional[float] = None,
-    ndvi_expected: Optional[float] = None,
-    model_yield_t_ha: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
-    model_soc_t_ha: Optional[float] = None,
-    lab_soc_t_ha: Optional[float] = None,
+    ndvi_observed: float | None = None,
+    ndvi_expected: float | None = None,
+    model_yield_t_ha: float | None = None,
+    field_yield_t_ha: float | None = None,
+    model_soc_t_ha: float | None = None,
+    lab_soc_t_ha: float | None = None,
     field_data_present: bool = False,
     satellite_available: bool = False,
     model_present: bool = False,
@@ -90,11 +91,7 @@ def quality_from_mrv_v2(
     if model_soc_t_ha is not None or model_yield_t_ha is not None:
         model_present = True
 
-    if (
-        ndvi_observed is not None
-        and ndvi_expected is not None
-        and ndvi_expected != 0
-    ):
+    if ndvi_observed is not None and ndvi_expected is not None and ndvi_expected != 0:
         rel_err = abs(ndvi_observed - ndvi_expected) / max(abs(ndvi_expected), 1e-6)
         ndvi_score = max(0.0, 1.0 - rel_err)
         components["ndvi_agreement"] = round(ndvi_score, 4)
@@ -102,11 +99,7 @@ def quality_from_mrv_v2(
         satellite_available = True
 
     # Yield agreement
-    if (
-        model_yield_t_ha is not None
-        and field_yield_t_ha is not None
-        and model_yield_t_ha > 0
-    ):
+    if model_yield_t_ha is not None and field_yield_t_ha is not None and model_yield_t_ha > 0:
         rel_err = abs(model_yield_t_ha - field_yield_t_ha) / max(model_yield_t_ha, 1e-6)
         model_score = max(0.0, 1.0 - rel_err)
         components["model_field_yield_agreement"] = round(model_score, 4)

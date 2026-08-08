@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
 from apps.simulation.models_swat import run_swat_plus
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def run_aquacrop_advanced_local(
     params: dict[str, Any] | None = None,
     *,
-    farm_id: Optional[int] = None,
+    farm_id: int | None = None,
     persist: bool = True,
 ) -> dict[str, Any]:
     params = dict(params or {})
@@ -44,7 +44,7 @@ def run_aquacrop_advanced_local(
 def run_swat_local(
     params: dict[str, Any] | None = None,
     *,
-    farm_id: Optional[int] = None,
+    farm_id: int | None = None,
     persist: bool = True,
 ) -> dict[str, Any]:
     params = dict(params or {})

@@ -8,12 +8,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from apps.shared_core.rbac.deps import require_permission
 from apps.users.dependencies import (
-    get_current_active_superuser,
     get_current_user,
     get_user_service,
 )
 from apps.users.models import User
-from apps.users.schemas import LoginRequest, Token, UserCreate, UserResponse, UserUpdate
+from apps.users.schemas import LoginRequest, Token, UserCreate, UserResponse
 from apps.users.service import UserService
 
 logger = logging.getLogger(__name__)
@@ -57,7 +56,7 @@ async def read_own_profile(current_user: User = Depends(get_current_user)):
 @router.put("/{user_id}/permissions", response_model=UserResponse)
 async def update_user_permissions(
     user_id: int,
-    permissions: list[str], # Example schema for permissions
+    permissions: list[str],  # Example schema for permissions
     current_user: User = Depends(require_permission("user.manage")),
     user_service: UserService = Depends(get_user_service),
 ):

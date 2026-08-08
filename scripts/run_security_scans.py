@@ -5,7 +5,6 @@ This script assumes bandit and pip-audit are installed in the environment.
 """
 
 import subprocess
-import sys
 from pathlib import Path
 
 

@@ -14,7 +14,6 @@ Endpoints:
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,16 +23,18 @@ try:
     from apps.shared_core.database.session import get_db_session
 except ImportError:
     # Fallback stub — replace with real implementation
-    from typing import AsyncGenerator
+    from collections.abc import AsyncGenerator
+
     async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
         """Handle get_db_session."""
         raise NotImplementedError("Wire up get_db_session in apps.shared_core.database.session")
 
+
 from apps.shared_sim.schemas import (
     SharedSimCreate,
-    SharedSimUpdate,
-    SharedSimResponse,
     SharedSimListResponse,
+    SharedSimResponse,
+    SharedSimUpdate,
 )
 from apps.shared_sim.service import SharedSimService
 
@@ -51,7 +52,9 @@ async def list_shared_sim(
     items, total = await service.list(skip=skip, limit=limit)
     return SharedSimListResponse(
         items=[SharedSimResponse.model_validate(item) for item in items],
-        total=total, skip=skip, limit=limit,
+        total=total,
+        skip=skip,
+        limit=limit,
     )
 
 
@@ -109,4 +112,3 @@ async def delete_shared_sim(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     await session.commit()
-    return None

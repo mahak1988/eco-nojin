@@ -2,20 +2,23 @@
 
 Uses AdminService live data (settings, users, health, audit) where available.
 """
+
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
-async def list_advanced_settings(admin_service, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
+async def list_advanced_settings(
+    admin_service, limit: int = 100, offset: int = 0
+) -> list[dict[str, Any]]:
     """Map system settings to advanced-settings shape; seed defaults if empty."""
     settings_list = await admin_service.get_system_settings(limit=500, offset=0)
-    items: List[Dict[str, Any]] = []
+    items: list[dict[str, Any]] = []
     for s in settings_list:
         key = getattr(s, "key", None) or (s.get("key") if isinstance(s, dict) else None)
         if not key:
@@ -24,7 +27,9 @@ async def list_advanced_settings(admin_service, limit: int = 100, offset: int = 
             {
                 "id": getattr(s, "id", None) or (s.get("id") if isinstance(s, dict) else 0),
                 "key": key,
-                "value": str(getattr(s, "value", None) or (s.get("value") if isinstance(s, dict) else "")),
+                "value": str(
+                    getattr(s, "value", None) or (s.get("value") if isinstance(s, dict) else "")
+                ),
                 "description": getattr(s, "description", None)
                 or (s.get("description") if isinstance(s, dict) else None),
                 "category": _category_for_key(key),
@@ -68,11 +73,11 @@ async def list_advanced_settings(admin_service, limit: int = 100, offset: int = 
 async def upsert_advanced_setting(
     admin_service,
     key: str,
-    value: Optional[str],
-    description: Optional[str],
-    category: Optional[str],
-    is_active: Optional[bool],
-) -> Dict[str, Any]:
+    value: str | None,
+    description: str | None,
+    category: str | None,
+    is_active: bool | None,
+) -> dict[str, Any]:
     """Persist via system settings table."""
     setting = await admin_service.upsert_system_setting(
         key=key,
@@ -96,7 +101,7 @@ def content_versions_from_item(
     item_id: int,
     current_user_id: int,
     content_item: Any = None,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Build version list from live content item when available."""
     now = _now()
     if content_item is not None:
@@ -131,7 +136,7 @@ def content_versions_from_item(
     ]
 
 
-async def intelligent_analytics_payload(admin_service, user_id: int) -> Dict[str, Any]:
+async def intelligent_analytics_payload(admin_service, user_id: int) -> dict[str, Any]:
     recommendations = await admin_service.get_smart_recommendations(user_id)
     alerts = await admin_service.get_intelligent_alerts()
     try:
@@ -163,7 +168,9 @@ async def intelligent_analytics_payload(admin_service, user_id: int) -> Dict[str
         },
         "insights": {
             "top_performing_content": [],
-            "underperforming_areas": [a.get("title", "") for a in alerts[:3] if isinstance(a, dict)],
+            "underperforming_areas": [
+                a.get("title", "") for a in alerts[:3] if isinstance(a, dict)
+            ],
             "optimization_opportunities": [
                 r.get("title", r.get("suggested_action", ""))
                 for r in recommendations[:5]
@@ -173,10 +180,10 @@ async def intelligent_analytics_payload(admin_service, user_id: int) -> Dict[str
     }
 
 
-async def auto_recommendations_payload(admin_service, user_id: int) -> List[Dict[str, Any]]:
+async def auto_recommendations_payload(admin_service, user_id: int) -> list[dict[str, Any]]:
     """Wrap smart recommendations in AutoRecommendationResponse shape."""
     recs = await admin_service.get_smart_recommendations(user_id)
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for i, r in enumerate(recs):
         if not isinstance(r, dict):
             continue
@@ -195,9 +202,9 @@ async def auto_recommendations_payload(admin_service, user_id: int) -> List[Dict
     return out
 
 
-async def advanced_alerts_payload(admin_service) -> List[Dict[str, Any]]:
+async def advanced_alerts_payload(admin_service) -> list[dict[str, Any]]:
     base = await admin_service.get_intelligent_alerts()
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for alert in base:
         if not isinstance(alert, dict):
             continue
@@ -220,7 +227,7 @@ async def advanced_alerts_payload(admin_service) -> List[Dict[str, Any]]:
     return out
 
 
-def user_permissions_payload(user) -> Dict[str, Any]:
+def user_permissions_payload(user) -> dict[str, Any]:
     """Permissions for FE menu filtering."""
     is_super = bool(getattr(user, "is_superuser", False))
     role = getattr(user, "role", None) or ("superuser" if is_super else "user")

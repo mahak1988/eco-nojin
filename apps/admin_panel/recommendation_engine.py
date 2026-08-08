@@ -3,11 +3,12 @@
 Weighted feature scoring (no heavy ML deps). Acts as a transparent
 "model" over dashboard/health/audit signals.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 
 
 @dataclass
@@ -35,7 +36,7 @@ def score_system_state(
     total_reports: int = 0,
     db_ok: bool = True,
     redis_ok: bool = True,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Compute normalized feature scores 0..1 (higher = more attention needed)."""
     inactive_ratio = 0.0
     if user_count > 0:
@@ -69,10 +70,10 @@ def score_system_state(
     }
 
 
-def generate_scored_recommendations(features: Dict[str, float]) -> List[Dict[str, Any]]:
+def generate_scored_recommendations(features: dict[str, float]) -> list[dict[str, Any]]:
     """Map feature scores to actionable recommendations with confidence."""
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
-    recs: List[Dict[str, Any]] = []
+    now = datetime.now(UTC).replace(tzinfo=None)
+    recs: list[dict[str, Any]] = []
 
     rules = [
         (
@@ -176,11 +177,16 @@ def generate_scored_recommendations(features: Dict[str, float]) -> List[Dict[str
             }
         )
 
-    recs.sort(key=lambda r: (-{"high": 3, "medium": 2, "low": 1}.get(r["priority"], 0), -r.get("confidence", 0)))
+    recs.sort(
+        key=lambda r: (
+            -{"high": 3, "medium": 2, "low": 1}.get(r["priority"], 0),
+            -r.get("confidence", 0),
+        )
+    )
     return recs
 
 
-async def build_ml_recommendations(admin_service) -> List[Dict[str, Any]]:
+async def build_ml_recommendations(admin_service) -> list[dict[str, Any]]:
     """End-to-end: pull live stats → score → recommendations."""
     try:
         dash = await admin_service.get_dashboard_summary()

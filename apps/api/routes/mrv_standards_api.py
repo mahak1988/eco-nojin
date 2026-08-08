@@ -1,7 +1,8 @@
 """MRV standards API — L1/L2/L3 quality and issuable mint preview."""
+
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -12,12 +13,12 @@ router = APIRouter(prefix="/mrv", tags=["mrv-standards"])
 
 
 class QualityV2Request(BaseModel):
-    ndvi_observed: Optional[float] = None
-    ndvi_expected: Optional[float] = None
-    model_yield_t_ha: Optional[float] = None
-    field_yield_t_ha: Optional[float] = None
-    model_soc_t_ha: Optional[float] = None
-    lab_soc_t_ha: Optional[float] = None
+    ndvi_observed: float | None = None
+    ndvi_expected: float | None = None
+    model_yield_t_ha: float | None = None
+    field_yield_t_ha: float | None = None
+    model_soc_t_ha: float | None = None
+    lab_soc_t_ha: float | None = None
     field_data_present: bool = False
     satellite_available: bool = False
     model_present: bool = False

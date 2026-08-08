@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 
 from apps.satellite.providers.base import BBox, NDVIResult
 from apps.satellite.providers.copernicus_provider import CopernicusProvider
@@ -87,7 +87,9 @@ class SatelliteService:
                 continue
         raise SatelliteServiceError(f"All providers failed. Last error: {last_error}")
 
-    async def get_ndvi_image(self, bbox: BBox, target_date: date, cloud_max: int = 20) -> NDVIResult:
+    async def get_ndvi_image(
+        self, bbox: BBox, target_date: date, cloud_max: int = 20
+    ) -> NDVIResult:
         last_error: Exception | None = None
         for provider in self.ndvi_providers:
             if not provider.is_available:
@@ -157,7 +159,7 @@ class SatelliteService:
         return out
 
 
-_service: Optional[SatelliteService] = None
+_service: SatelliteService | None = None
 
 
 def get_satellite_service() -> SatelliteService:

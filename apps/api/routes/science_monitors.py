@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/v1/science", tags=["Phase3 Science Monitors"])
 
 class EvaluateBody(BaseModel):
     metrics: dict[str, float] = Field(default_factory=dict)
-    monitor_ids: Optional[list[str]] = None
+    monitor_ids: list[str] | None = None
 
 
 class WatchBody(BaseModel):
@@ -23,16 +23,16 @@ class WatchBody(BaseModel):
 
 
 class ThresholdItem(BaseModel):
-    warning: Optional[float] = None
-    critical: Optional[float] = None
-    operator: Optional[str] = Field(None, pattern="^(lt|lte|gt|gte)$")
-    enabled: Optional[bool] = None
+    warning: float | None = None
+    critical: float | None = None
+    operator: str | None = Field(None, pattern="^(lt|lte|gt|gte)$")
+    enabled: bool | None = None
 
 
 class ThresholdsPutBody(BaseModel):
     overrides: dict[str, ThresholdItem] = Field(default_factory=dict)
     merge: bool = True
-    preset: Optional[str] = None
+    preset: str | None = None
 
 
 class PresetBody(BaseModel):
@@ -71,7 +71,13 @@ async def get_thresholds() -> dict[str, Any]:
     store = get_store()
     return {
         "defaults": [
-            {"id": m["id"], "warning": m["warning"], "critical": m["critical"], "operator": m["operator"], "model": m["model"]}
+            {
+                "id": m["id"],
+                "warning": m["warning"],
+                "critical": m["critical"],
+                "operator": m["operator"],
+                "model": m["model"],
+            }
             for m in MONITOR_CATALOG
         ],
         "effective": effective_catalog(),

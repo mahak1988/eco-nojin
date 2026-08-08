@@ -1,4 +1,4 @@
-﻿"""
+"""
 Simulator Registry
 ==================
 Auto-discovers and registers simulators at IMPORT TIME. Robust: modules that

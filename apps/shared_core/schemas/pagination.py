@@ -6,8 +6,9 @@ page_params(page, size) -> (page, size, offset)
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from math import ceil
-from typing import Any, Generic, Sequence, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 

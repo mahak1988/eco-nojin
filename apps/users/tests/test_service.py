@@ -1,4 +1,5 @@
 """Tests for service."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestService:
         """Verify decode_access_token is callable."""
         try:
             from apps.users.service import decode_access_token
+
             assert callable(decode_access_token)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,7 +28,7 @@ class TestService:
         """Verify UserService can be referenced."""
         try:
             from apps.users.service import UserService
+
             assert UserService is not None
         except ImportError:
             pytest.skip("Module not available")
-

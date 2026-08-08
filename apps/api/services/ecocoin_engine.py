@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 MAX_SUPPLY = 1_000_000_000.0
 GENESIS_SUPPLY = 50_000_000.0
@@ -32,10 +32,38 @@ DISTRIBUTION = {
 }
 
 STAKING_TIERS: list[dict[str, Any]] = [
-    {"id": 0, "duration": "3 months", "apy": 8.0, "multiplier": 1.0, "min_amount": 1000.0, "days": 90},
-    {"id": 1, "duration": "6 months", "apy": 15.0, "multiplier": 1.2, "min_amount": 5000.0, "days": 180},
-    {"id": 2, "duration": "12 months", "apy": 25.0, "multiplier": 1.5, "min_amount": 10000.0, "days": 365},
-    {"id": 3, "duration": "24 months", "apy": 50.0, "multiplier": 2.0, "min_amount": 25000.0, "days": 730},
+    {
+        "id": 0,
+        "duration": "3 months",
+        "apy": 8.0,
+        "multiplier": 1.0,
+        "min_amount": 1000.0,
+        "days": 90,
+    },
+    {
+        "id": 1,
+        "duration": "6 months",
+        "apy": 15.0,
+        "multiplier": 1.2,
+        "min_amount": 5000.0,
+        "days": 180,
+    },
+    {
+        "id": 2,
+        "duration": "12 months",
+        "apy": 25.0,
+        "multiplier": 1.5,
+        "min_amount": 10000.0,
+        "days": 365,
+    },
+    {
+        "id": 3,
+        "duration": "24 months",
+        "apy": 50.0,
+        "multiplier": 2.0,
+        "min_amount": 25000.0,
+        "days": 730,
+    },
 ]
 
 EARLY_UNSTAKE_FEE_RATE = 0.05
@@ -76,12 +104,7 @@ class ProtocolState:
 
     @property
     def circulating_supply(self) -> float:
-        circ = (
-            self.total_minted
-            - self.total_burned
-            - self.locked_treasury
-            - self.locked_stake
-        )
+        circ = self.total_minted - self.total_burned - self.locked_treasury - self.locked_stake
         return max(0.0, min(circ, self.total_supply))
 
 
@@ -93,41 +116,33 @@ def remaining_impact_budget(state: ProtocolState) -> float:
 def mint_scarcity_factor(state: ProtocolState) -> float:
     used = max(0.0, state.total_minted - GENESIS_SUPPLY)
     ratio = min(1.0, used / IMPACT_MINT_BUDGET) if IMPACT_MINT_BUDGET else 1.0
-    return max(0.2, 1.0 - 0.8 * (ratio ** 1.5))
+    return max(0.2, 1.0 - 0.8 * (ratio**1.5))
 
 
 def scarcity_at_ratio(ratio: float) -> float:
     r = max(0.0, min(1.0, ratio))
-    return max(0.2, 1.0 - 0.8 * (r ** 1.5))
+    return max(0.2, 1.0 - 0.8 * (r**1.5))
 
 
 def quality_from_mrv(
-    ndvi_observed: Optional[float] = None,
-    ndvi_expected: Optional[float] = None,
-    model_yield_t_ha: Optional[float] = None,
-    field_yield_t_ha: Optional[float] = None,
+    ndvi_observed: float | None = None,
+    ndvi_expected: float | None = None,
+    model_yield_t_ha: float | None = None,
+    field_yield_t_ha: float | None = None,
     field_data_present: bool = False,
     satellite_available: bool = False,
 ) -> dict[str, Any]:
     components: dict[str, float] = {}
     base = 0.85
 
-    if (
-        ndvi_observed is not None
-        and ndvi_expected is not None
-        and ndvi_expected != 0
-    ):
+    if ndvi_observed is not None and ndvi_expected is not None and ndvi_expected != 0:
         rel_err = abs(ndvi_observed - ndvi_expected) / max(abs(ndvi_expected), 1e-6)
         ndvi_score = max(0.0, 1.0 - rel_err)
         components["ndvi_agreement"] = round(ndvi_score, 4)
         base = 0.9 + 0.2 * ndvi_score
         satellite_available = True
 
-    if (
-        model_yield_t_ha is not None
-        and field_yield_t_ha is not None
-        and model_yield_t_ha > 0
-    ):
+    if model_yield_t_ha is not None and field_yield_t_ha is not None and model_yield_t_ha > 0:
         rel_err = abs(model_yield_t_ha - field_yield_t_ha) / max(model_yield_t_ha, 1e-6)
         model_score = max(0.0, 1.0 - rel_err)
         components["model_field_agreement"] = round(model_score, 4)
@@ -165,9 +180,9 @@ def compute_impact_mint(
     measured_value: float,
     quality_score: float = 1.0,
     region_multiplier: float = 1.0,
-    state: Optional[ProtocolState] = None,
-    credit_factor_override: Optional[float] = None,
-    scarcity_override: Optional[float] = None,
+    state: ProtocolState | None = None,
+    credit_factor_override: float | None = None,
+    scarcity_override: float | None = None,
 ) -> dict[str, Any]:
     if credit_type not in CREDIT_FACTORS:
         return {"ok": False, "error": "invalid_credit_type", "mint_total": 0.0}
@@ -182,11 +197,7 @@ def compute_impact_mint(
     raw = measured_value * base * quality * region
 
     st = state or ProtocolState()
-    scarcity = (
-        scarcity_override
-        if scarcity_override is not None
-        else mint_scarcity_factor(st)
-    )
+    scarcity = scarcity_override if scarcity_override is not None else mint_scarcity_factor(st)
     scarcity = max(0.2, min(1.0, scarcity))
     budget = remaining_impact_budget(st)
     mint_total = min(raw * scarcity, budget)
@@ -219,12 +230,10 @@ def sensitivity_analysis(
     measured_value: float = 40.0,
     quality_score: float = 1.0,
     region_multiplier: float = 1.0,
-    state: Optional[ProtocolState] = None,
+    state: ProtocolState | None = None,
 ) -> dict[str, Any]:
     st = state or ProtocolState()
-    base = compute_impact_mint(
-        credit_type, measured_value, quality_score, region_multiplier, st
-    )
+    base = compute_impact_mint(credit_type, measured_value, quality_score, region_multiplier, st)
     if not base["ok"]:
         return base
 
@@ -249,37 +258,45 @@ def sensitivity_analysis(
         r_hi_x = max(0.8, region_multiplier - 0.1)
 
     fc_hi = compute_impact_mint(
-        credit_type, measured_value, quality_score, region_multiplier, st,
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
         credit_factor_override=fc_hi_x,
     )
     fc_lo = compute_impact_mint(
-        credit_type, measured_value, quality_score, region_multiplier, st,
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
         credit_factor_override=fc_lo_x,
     )
     s_hi = compute_impact_mint(
-        credit_type, measured_value, quality_score, region_multiplier, st,
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
         scarcity_override=s_hi_x,
     )
     s_lo = compute_impact_mint(
-        credit_type, measured_value, quality_score, region_multiplier, st,
+        credit_type,
+        measured_value,
+        quality_score,
+        region_multiplier,
+        st,
         scarcity_override=s_lo_x,
     )
-    q_hi = compute_impact_mint(
-        credit_type, measured_value, q_hi_x, region_multiplier, st
-    )
-    q_lo = compute_impact_mint(
-        credit_type, measured_value, q_lo_x, region_multiplier, st
-    )
-    r_hi = compute_impact_mint(
-        credit_type, measured_value, quality_score, r_hi_x, st
-    )
-    r_lo = compute_impact_mint(
-        credit_type, measured_value, quality_score, r_lo_x, st
-    )
+    q_hi = compute_impact_mint(credit_type, measured_value, q_hi_x, region_multiplier, st)
+    q_lo = compute_impact_mint(credit_type, measured_value, q_lo_x, region_multiplier, st)
+    r_hi = compute_impact_mint(credit_type, measured_value, quality_score, r_hi_x, st)
+    r_lo = compute_impact_mint(credit_type, measured_value, quality_score, r_lo_x, st)
 
     scarcity_curve = [
         {"ratio": round(r, 2), "S": round(scarcity_at_ratio(r), 4)}
-        for r in [i / 10 for i in range(0, 11)]
+        for r in [i / 10 for i in range(11)]
     ]
 
     return {
@@ -307,17 +324,13 @@ def sensitivity_analysis(
             "Q": {
                 "plus_10pct_mint": q_hi["mint_total"],
                 "minus_10pct_mint": q_lo["mint_total"],
-                "elasticity_approx": _elasticity(
-                    m0, q_hi["mint_total"], quality_score, q_hi_x
-                ),
+                "elasticity_approx": _elasticity(m0, q_hi["mint_total"], quality_score, q_hi_x),
                 "note": "Clamped to [0.5, 1.2]",
             },
             "R": {
                 "plus_10pct_mint": r_hi["mint_total"],
                 "minus_10pct_mint": r_lo["mint_total"],
-                "elasticity_approx": _elasticity(
-                    m0, r_hi["mint_total"], region_multiplier, r_hi_x
-                ),
+                "elasticity_approx": _elasticity(m0, r_hi["mint_total"], region_multiplier, r_hi_x),
                 "note": "Clamped to [0.8, 1.3]",
             },
         },
@@ -326,7 +339,7 @@ def sensitivity_analysis(
     }
 
 
-def get_tier(tier_id: int) -> Optional[dict[str, Any]]:
+def get_tier(tier_id: int) -> dict[str, Any] | None:
     return next((t for t in STAKING_TIERS if t["id"] == tier_id), None)
 
 
@@ -339,7 +352,7 @@ def estimate_stake_reward(amount: float, tier_id: int) -> dict[str, Any]:
     if amount < tier["min_amount"]:
         return {"ok": False, "error": "below_minimum", "min_amount": tier["min_amount"]}
     estimated = amount * tier["apy"] / 100.0
-    unlock = datetime.now(timezone.utc) + timedelta(days=tier["days"])
+    unlock = datetime.now(UTC) + timedelta(days=tier["days"])
     return {
         "ok": True,
         "estimated_reward": estimated,
@@ -376,7 +389,7 @@ def challenge_reward(
         return 0.0
     share = participant_score / total_score
     if curve == "winner_boost":
-        share = share ** 0.7
+        share = share**0.7
     return round(pool_eco * share, 6)
 
 
@@ -417,7 +430,7 @@ def compute_indicators(state: ProtocolState) -> dict[str, Any]:
 
 
 def tx_hash(*parts: Any) -> str:
-    raw = "|".join(str(p) for p in parts) + "|" + datetime.now(timezone.utc).isoformat()
+    raw = "|".join(str(p) for p in parts) + "|" + datetime.now(UTC).isoformat()
     return "0x" + hashlib.sha256(raw.encode()).hexdigest()
 
 

@@ -1,6 +1,7 @@
 """
 مدل‌های دیتابیس سناریو و مقایسه
 """
+
 from __future__ import annotations
 
 import logging
@@ -8,12 +9,12 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     DateTime,
     Float,
     ForeignKey,
-    JSON,
     String,
     Text,
 )
@@ -30,6 +31,7 @@ except Exception:
 
         class Base(DeclarativeBase):
             pass
+
 
 logger = logging.getLogger(__name__)
 

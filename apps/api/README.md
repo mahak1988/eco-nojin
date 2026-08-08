@@ -56,6 +56,7 @@ api/
 # نمونه کد بارگذاری خودکار از main.py
 try:
     from apps.api.routes.accounting import router as accounting_router
+
     app.include_router(accounting_router, prefix=settings.API_V1_STR)
     logger.info("✅ accounting: روتر بارگذاری شد")
 except Exception as e:
@@ -63,6 +64,7 @@ except Exception as e:
 
 try:
     from apps.api.routes.ecocoin import router as ecocoin_router
+
     app.include_router(ecocoin_router)
     logger.info("✅ ecocoin: روتر بارگذاری شد")
 except Exception as e:

@@ -4,15 +4,26 @@ Validation & Uncertainty Engine.
 - Uncertainty: Monte Carlo 95% confidence interval
 - Sensitivity: Morris elementary effects
 """
+
 import math
 import random
-from typing import Any, Callable, Awaitable
-
+from collections.abc import Awaitable, Callable
 
 # کلیدهای محتمل برای عملکرد/خروجی اصلی هر شبیه‌ساز
-_METRIC_CANDIDATES = ["yield_t_ha", "yield", "grain_yield", "biomass_t_ha",
-                      "total_biomass", "streamflow", "runoff_mm", "soc_t_ha",
-                      "soil_loss_t_ha", "npv", "unmet_demand", "generation_kwh"]
+_METRIC_CANDIDATES = [
+    "yield_t_ha",
+    "yield",
+    "grain_yield",
+    "biomass_t_ha",
+    "total_biomass",
+    "streamflow",
+    "runoff_mm",
+    "soc_t_ha",
+    "soil_loss_t_ha",
+    "npv",
+    "unmet_demand",
+    "generation_kwh",
+]
 
 
 def _find_metric(result: dict, preferred: str = "yield_t_ha") -> float:
@@ -117,7 +128,9 @@ async def monte_carlo(
             val = _find_metric(r, metric_key)
             results.append(val)  # _find_metric always returns float
         except Exception as e:
-            import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
+            import logging
+
+            logging.getLogger(__name__).debug("Skipped: %s", e)
     if len(results) < 5:
         return {"error": "دادهٔ کافی برای تحلیل عدم قطعیت تولید نشد", "n": len(results)}
     results.sort()
@@ -126,8 +139,10 @@ async def monte_carlo(
     mean = sum(results) / len(results)
     std = math.sqrt(sum((x - mean) ** 2 for x in results) / len(results))
     return {
-        "mean": round(mean, 3), "std": round(std, 3),
-        "ci_95_low": round(lo, 3), "ci_95_high": round(hi, 3),
+        "mean": round(mean, 3),
+        "std": round(std, 3),
+        "ci_95_low": round(lo, 3),
+        "ci_95_high": round(hi, 3),
         "cv_pct": round(std / mean * 100, 1) if mean else 0,
         "n": len(results),
     }
@@ -142,6 +157,7 @@ async def morris_sensitivity(
     delta: float = 0.10,
 ) -> dict:
     """Morris elementary effects: mean absolute change per parameter (higher = more influential)."""
+
     async def get_metric(p) -> None:
         """Handle get_metric (p)."""
         try:
@@ -164,5 +180,8 @@ async def morris_sensitivity(
         if ees:
             effects[k] = round(sum(ees) / len(ees), 4)
     ranked = dict(sorted(effects.items(), key=lambda x: -x[1]))
-    return {"base_value": round(base_y, 3), "effects": ranked,
-            "most_influential": next(iter(ranked), None)}
+    return {
+        "base_value": round(base_y, 3),
+        "effects": ranked,
+        "most_influential": next(iter(ranked), None),
+    }

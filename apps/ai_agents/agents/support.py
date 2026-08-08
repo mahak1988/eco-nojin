@@ -3,15 +3,17 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import List, Any
+from typing import Any
+
 from langchain_core.tools import BaseTool
+
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
 from apps.shared_ai.ai.tools.database_tools import query_database
 from apps.shared_ai.ai.tools.rag_tools import (
+    get_knowledge_base_stats,
     get_rag_context,
     search_knowledge_base,
     upload_document,
-    get_knowledge_base_stats
 )
 
 # ==========================================
@@ -43,26 +45,25 @@ SUPPORT_AGENT_PROMPT = """شما یک دستیار پشتیبانی حرفه‌�
 لحن: حرفه‌ای، دوستانه، و کمک‌کننده
 """
 
+
 class SupportAgent:
     """ایجنت پشتیبانی با RAG."""
-    
+
     def __init__(self, llm: Any) -> None:
         self.llm = llm
         """Handle __init__ (llm)."""
-        self.tools: List[BaseTool] = [
+        self.tools: list[BaseTool] = [
             query_database,
             get_rag_context,
             search_knowledge_base,
             upload_document,
-            get_knowledge_base_stats
+            get_knowledge_base_stats,
         ]
         self.builder = ModularAgentBuilder(
-            llm=self.llm,
-            tools=self.tools,
-            system_prompt=SUPPORT_AGENT_PROMPT
+            llm=self.llm, tools=self.tools, system_prompt=SUPPORT_AGENT_PROMPT
         )
         self.graph = self.builder.build()
-    
+
     async def chat(self, user_message: str, context: dict = None) -> str:
         """اجرای ایجنت با یک پیام."""
         return await self.builder.run(user_message, context)

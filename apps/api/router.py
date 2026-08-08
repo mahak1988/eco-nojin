@@ -14,7 +14,6 @@ Endpoints:
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,16 +23,18 @@ try:
     from apps.shared_core.database.session import get_db_session
 except ImportError:
     # Fallback stub — replace with real implementation
-    from typing import AsyncGenerator
+    from collections.abc import AsyncGenerator
+
     async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
         """Handle get_db_session."""
         raise NotImplementedError("Wire up get_db_session in apps.shared_core.database.session")
 
+
 from apps.api.schemas import (
     ApiCreate,
-    ApiUpdate,
-    ApiResponse,
     ApiListResponse,
+    ApiResponse,
+    ApiUpdate,
 )
 from apps.api.service import ApiService
 
@@ -51,7 +52,9 @@ async def list_api(
     items, total = await service.list(skip=skip, limit=limit)
     return ApiListResponse(
         items=[ApiResponse.model_validate(item) for item in items],
-        total=total, skip=skip, limit=limit,
+        total=total,
+        skip=skip,
+        limit=limit,
     )
 
 
@@ -109,4 +112,3 @@ async def delete_api(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     await session.commit()
-    return None

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,9 +27,9 @@ router = APIRouter(prefix="/api/v1/community", tags=["Community"])
 async def list_posts(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
-    search: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
-    author_id: Optional[int] = Query(None),
+    search: str | None = Query(None),
+    category: str | None = Query(None),
+    author_id: int | None = Query(None),
     session: AsyncSession = Depends(get_db_session),
 ) -> PostListResponse:
     service = CommunityService(session)
@@ -98,13 +96,13 @@ async def delete_post(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.get("/posts/{post_id}/comments", response_model=List[CommentResponse])
+@router.get("/posts/{post_id}/comments", response_model=list[CommentResponse])
 async def list_comments(
     post_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
     session: AsyncSession = Depends(get_db_session),
-) -> List[CommentResponse]:
+) -> list[CommentResponse]:
     service = CommunityService(session)
     comments, _ = await service.list_comments(post_id, skip, limit)
     return [CommentResponse.model_validate(c) for c in comments]
@@ -158,7 +156,9 @@ async def delete_comment(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.post("/posts/{post_id}/like", response_model=LikeResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/posts/{post_id}/like", response_model=LikeResponse, status_code=status.HTTP_201_CREATED
+)
 async def like_post(
     post_id: int,
     user_id: int = Query(...),

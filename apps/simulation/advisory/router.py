@@ -1,10 +1,12 @@
 """
 Advisory API Router — analysis + recommendations + scenarios for a simulator run.
 """
+
 import logging
 
 logger = logging.getLogger(__name__)
 from typing import Any
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 

@@ -3,6 +3,7 @@ Open-Elevation API client (no API key).
 Returns ground elevation (m) for coordinates. Useful for lapse-rate temperature
 correction and RUSLE LS factor. Docs: https://open-elevation.com/
 """
+
 import asyncio
 import json
 import urllib.request
@@ -26,5 +27,7 @@ async def get_elevation(lat: float, lon: float) -> float | None:
         if results:
             return float(results[0].get("elevation", 0))
     except Exception as e:
-        import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
+        import logging
+
+        logging.getLogger(__name__).debug("Skipped: %s", e)
     return None

@@ -68,9 +68,7 @@ llm = LLMFactory.create(provider="gemini", model="gemini-2.5-flash")
 
 # ایجاد با تنظیمات سفارشی
 llm = LLMFactory.create(
-    provider="openrouter",
-    model="meta-llama/llama-4-maverick:free",
-    temperature=0.3
+    provider="openrouter", model="meta-llama/llama-4-maverick:free", temperature=0.3
 )
 ```
 
@@ -106,6 +104,7 @@ providers = LLMFactory.list_providers()
 ```python
 from apps.shared_ai.celery_app import celery_app
 
+
 @celery_app.task
 def process_heavy_ai_task(data):
     # پردازش سنگین در پس‌زمینه
@@ -118,15 +117,15 @@ def process_heavy_ai_task(data):
 ```python
 class SharedAi(Base):
     """مدل اشتراکی AI."""
-    
+
     __tablename__ = "shared_ai"
-    
-    id: int                    # شناسه یکتا
-    name: str                  # نام (index)
-    description: str | None    # توضیحات
-    is_active: bool            # وضعیت فعال (پیش‌فرض: True)
-    created_at: datetime       # تاریخ ایجاد
-    updated_at: datetime       # تاریخ بروزرسانی
+
+    id: int  # شناسه یکتا
+    name: str  # نام (index)
+    description: str | None  # توضیحات
+    is_active: bool  # وضعیت فعال (پیش‌فرض: True)
+    created_at: datetime  # تاریخ ایجاد
+    updated_at: datetime  # تاریخ بروزرسانی
 ```
 
 ## Endpointهای API

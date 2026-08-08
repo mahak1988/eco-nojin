@@ -2,10 +2,11 @@
 Tests for EcoCoin API routes
 Prefix: /api/v1/ecocoin (matches router)
 """
-import pytest
-from fastapi.testclient import TestClient
+
 import sys
 from pathlib import Path
+
+from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
@@ -297,17 +298,13 @@ class TestEcoCoinTransactions:
     """Tests for GET /api/v1/ecocoin/transactions/{address}"""
 
     def test_get_transactions_valid_address(self):
-        response = client.get(
-            f"{PREFIX}/transactions/0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18"
-        )
+        response = client.get(f"{PREFIX}/transactions/0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18")
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
 
     def test_get_transactions_default_limit(self):
-        response = client.get(
-            f"{PREFIX}/transactions/0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18"
-        )
+        response = client.get(f"{PREFIX}/transactions/0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18")
         data = response.json()
         assert len(data) <= 20
 
@@ -319,9 +316,7 @@ class TestEcoCoinTransactions:
         assert len(data) <= 1
 
     def test_get_transactions_have_required_fields(self):
-        response = client.get(
-            f"{PREFIX}/transactions/0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18"
-        )
+        response = client.get(f"{PREFIX}/transactions/0x742d35Cc6634C0532925a3b844Bc9e7595f2bD18")
         data = response.json()
         if len(data) > 0:
             tx = data[0]
@@ -478,9 +473,7 @@ class TestEcoCoinModelValidation:
     def test_staking_tier_model(self):
         from apps.api.routes.ecocoin import StakingTier
 
-        tier = StakingTier(
-            id=0, duration="3 months", apy=8.0, multiplier=1.2, min_amount=1000
-        )
+        tier = StakingTier(id=0, duration="3 months", apy=8.0, multiplier=1.2, min_amount=1000)
         assert tier.id == 0
         assert tier.apy == 8.0
         assert tier.multiplier == 1.2

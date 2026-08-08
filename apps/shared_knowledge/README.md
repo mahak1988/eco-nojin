@@ -42,15 +42,15 @@ shared_knowledge/
 ```python
 class SharedKnowledge(Base):
     """مدل دانش اشتراکی."""
-    
+
     __tablename__ = "shared_knowledge"
-    
-    id: int                    # شناسه یکتا
-    name: str                  # نام (index)
-    description: str | None    # توضیحات
-    is_active: bool            # وضعیت فعال (پیش‌فرض: True)
-    created_at: datetime       # تاریخ ایجاد
-    updated_at: datetime       # تاریخ بروزرسانی
+
+    id: int  # شناسه یکتا
+    name: str  # نام (index)
+    description: str | None  # توضیحات
+    is_active: bool  # وضعیت فعال (پیش‌فرض: True)
+    created_at: datetime  # تاریخ ایجاد
+    updated_at: datetime  # تاریخ بروزرسانی
 ```
 
 ## Endpointهای API

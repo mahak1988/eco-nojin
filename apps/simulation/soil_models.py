@@ -11,7 +11,7 @@ Not official USDA RUSLE2 or EPIC binaries.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -54,7 +54,7 @@ def run_rusle2(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "risk_class": risk,
             "monthly_t_ha": monthly,
         },
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -116,5 +116,5 @@ def run_soil_profile(params: dict[str, Any] | None = None) -> dict[str, Any]:
         "layers": layers,
         "total_awc_mm": round(sum(x["awc_mm"] for x in layers), 1),
         "total_water_mm": round(sum(x["water_mm"] for x in layers), 1),
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

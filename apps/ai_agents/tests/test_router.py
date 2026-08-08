@@ -1,4 +1,5 @@
 """Tests for router."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestRouter:
         """Verify get_llm is callable."""
         try:
             from apps.ai_agents.router import get_llm
+
             assert callable(get_llm)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,6 +28,7 @@ class TestRouter:
         """Verify get_agent_service is callable."""
         try:
             from apps.ai_agents.router import get_agent_service
+
             assert callable(get_agent_service)
         except ImportError:
             pytest.skip("Module not available")
@@ -34,6 +37,7 @@ class TestRouter:
         """Verify chat_stream is callable."""
         try:
             from apps.ai_agents.router import chat_stream
+
             assert callable(chat_stream)
         except ImportError:
             pytest.skip("Module not available")
@@ -42,6 +46,7 @@ class TestRouter:
         """Verify chat is callable."""
         try:
             from apps.ai_agents.router import chat
+
             assert callable(chat)
         except ImportError:
             pytest.skip("Module not available")
@@ -50,7 +55,7 @@ class TestRouter:
         """Verify list_conversations is callable."""
         try:
             from apps.ai_agents.router import list_conversations
+
             assert callable(list_conversations)
         except ImportError:
             pytest.skip("Module not available")
-

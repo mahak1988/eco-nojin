@@ -1,4 +1,5 @@
 """Tests for crops router — /api/v1/crops."""
+
 from __future__ import annotations
 
 import pytest
@@ -114,6 +115,7 @@ async def test_rotation_plan_endpoint(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_seed_demo_blocked_in_production(client: AsyncClient, monkeypatch):
     import apps.shared_core.config as cfg
+
     monkeypatch.setattr(cfg.settings, "ENVIRONMENT", "production")
     r = await client.post("/api/v1/crops/seed-demo")
     assert r.status_code in (200, 403, 401)
@@ -123,6 +125,7 @@ class TestCropRouterImport:
     def test_router_importable(self):
         try:
             from apps.crops.router import router
+
             assert router is not None
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -130,6 +133,7 @@ class TestCropRouterImport:
     def test_list_crops_callable(self):
         try:
             from apps.crops.router import list_crops
+
             assert callable(list_crops)
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -137,6 +141,7 @@ class TestCropRouterImport:
     def test_create_crop_callable(self):
         try:
             from apps.crops.router import create_crop
+
             assert callable(create_crop)
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -144,6 +149,7 @@ class TestCropRouterImport:
     def test_calculate_irrigation_callable(self):
         try:
             from apps.crops.router import calculate_irrigation
+
             assert callable(calculate_irrigation)
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")

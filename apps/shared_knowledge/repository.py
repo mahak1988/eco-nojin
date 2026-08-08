@@ -8,9 +8,8 @@ Services call repositories; repositories never call services.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_knowledge.models import SharedKnowledge
@@ -24,26 +23,19 @@ class SharedKnowledgeRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, id: int) -> Optional[SharedKnowledge]:
+    async def get_by_id(self, id: int) -> SharedKnowledge | None:
         """Fetch a single record by ID."""
-        result = await self.session.execute(
-            select(SharedKnowledge).where(SharedKnowledge.id == id)
-        )
+        result = await self.session.execute(select(SharedKnowledge).where(SharedKnowledge.id == id))
         return result.scalar_one_or_none()
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list[SharedKnowledge], int]:
         """Fetch a paginated list of records + total count."""
         result = await self.session.execute(
-            select(SharedKnowledge)
-            .order_by(SharedKnowledge.id.desc())
-            .offset(skip)
-            .limit(limit)
+            select(SharedKnowledge).order_by(SharedKnowledge.id.desc()).offset(skip).limit(limit)
         )
         items = list(result.scalars().all())
 
-        count_result = await self.session.execute(
-            select(func.count()).select_from(SharedKnowledge)
-        )
+        count_result = await self.session.execute(select(func.count()).select_from(SharedKnowledge))
         total = count_result.scalar_one()
         return items, total
 
@@ -55,7 +47,7 @@ class SharedKnowledgeRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, id: int, data: SharedKnowledgeUpdate) -> Optional[SharedKnowledge]:
+    async def update(self, id: int, data: SharedKnowledgeUpdate) -> SharedKnowledge | None:
         """Update an existing record. Returns None if not found."""
         obj = await self.get_by_id(id)
         if not obj:

@@ -1,25 +1,27 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-import logging
 
-from apps.shared_core.database.session import get_db_session
-from apps.shared_ai.ai.llm_factory import LLMFactory
-from apps.users.dependencies import get_current_user
-from apps.users.models import User
-from apps.ai_agents.service import AIAgentService
 from apps.ai_agents.schemas import (
     ChatRequest,
     ChatResponse,
     ConversationCreate,
-    ConversationResponse,
     ConversationDetail,
-    MessageResponse
+    ConversationResponse,
+    MessageResponse,
 )
+from apps.ai_agents.service import AIAgentService
+from apps.shared_ai.ai.llm_factory import LLMFactory
+from apps.shared_core.database.session import get_db_session
+from apps.users.dependencies import get_current_user
+from apps.users.models import User
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai-agents", tags=["AI Agents"])
+
 
 # ==========================================
 # LLM Dependency
@@ -28,11 +30,11 @@ def get_llm() -> None:
     """دریافت نمونه LLM از Factory."""
     return LLMFactory.create()
 
-def get_agent_service(
-    session: AsyncSession = Depends(get_db_session)
-) -> AIAgentService:
+
+def get_agent_service(session: AsyncSession = Depends(get_db_session)) -> AIAgentService:
     """Dependency برای AIAgentService."""
     return AIAgentService(session=session, llm=get_llm())
+
 
 # ==========================================
 # Streaming Endpoint
@@ -41,30 +43,28 @@ def get_agent_service(
 async def chat_stream(
     request: ChatRequest,
     current_user: User = Depends(get_current_user),
-    agent_service: AIAgentService = Depends(get_agent_service)
+    agent_service: AIAgentService = Depends(get_agent_service),
 ):
     """
     ارسال پیام به ایجنت و دریافت پاسخ به صورت streaming (SSE).
-    
+
     این endpoint پاسخ را به صورت real-time ارسال می‌کند (مانند ChatGPT).
-    
+
     فرمت پاسخ:
     - data: {"conversation_id": 123}
     - data: {"content": "chunk of text"}
     - data: {"content": "more text"}
     - data: {"done": true, "used_fallback": false}
     """
+
     async def event_generator() -> None:
         try:
-            async for chunk in agent_service.chat_stream(
-                user_id=current_user.id,
-                request=request
-            ):
+            async for chunk in agent_service.chat_stream(user_id=current_user.id, request=request):
                 yield chunk
         except Exception as e:
             logger.error(f"Streaming error: {e}")
-            yield f"data: {{\"error\": \"{str(e)}\"}}\n\n"
-    
+            yield f'data: {{"error": "{e!s}"}}\n\n'
+
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",
@@ -72,8 +72,9 @@ async def chat_stream(
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",  # برای nginx
-        }
+        },
     )
+
 
 # ==========================================
 # Non-Streaming Endpoint (existing)
@@ -82,35 +83,26 @@ async def chat_stream(
 async def chat(
     request: ChatRequest,
     current_user: User = Depends(get_current_user),
-    agent_service: AIAgentService = Depends(get_agent_service)
+    agent_service: AIAgentService = Depends(get_agent_service),
 ):
     """ارسال پیام به ایجنت و دریافت پاسخ (non-streaming)."""
     try:
-        result = await agent_service.chat(
-            user_id=current_user.id,
-            request=request
-        )
-        
+        result = await agent_service.chat(user_id=current_user.id, request=request)
+
         return ChatResponse(
             conversation_id=result["conversation_id"],
             assistant_message=result["assistant_message"],
-            messages=[
-                MessageResponse.model_validate(m)
-                for m in result["messages"]
-            ],
-            used_fallback=result.get("used_fallback", False)
+            messages=[MessageResponse.model_validate(m) for m in result["messages"]],
+            used_fallback=result.get("used_fallback", False),
         )
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"Chat error: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="خطا در پردازش درخواست"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="خطا در پردازش درخواست"
         )
+
 
 # ==========================================
 # Other Endpoints (existing)
@@ -120,36 +112,31 @@ async def list_conversations(
     agent_type: str = None,
     limit: int = 50,
     current_user: User = Depends(get_current_user),
-    agent_service: AIAgentService = Depends(get_agent_service)
+    agent_service: AIAgentService = Depends(get_agent_service),
 ):
     """دریافت لیست مکالمات کاربر."""
     conversations = await agent_service.get_user_conversations(
-        user_id=current_user.id,
-        agent_type=agent_type,
-        limit=limit
+        user_id=current_user.id, agent_type=agent_type, limit=limit
     )
     return [ConversationResponse(**c) for c in conversations]
+
 
 @router.get("/conversations/{conversation_id}", response_model=ConversationDetail)
 async def get_conversation(
     conversation_id: int,
     current_user: User = Depends(get_current_user),
-    agent_service: AIAgentService = Depends(get_agent_service)
+    agent_service: AIAgentService = Depends(get_agent_service),
 ):
     """دریافت جزئیات یک مکالمه با تمام پیام‌ها."""
     conv = await agent_service.get_conversation_detail(
-        conversation_id=conversation_id,
-        user_id=current_user.id
+        conversation_id=conversation_id, user_id=current_user.id
     )
-    
+
     if not conv:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="مکالمه یافت نشد"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="مکالمه یافت نشد")
+
     msg_count = await agent_service.conversation_repo.get_message_count(conversation_id)
-    
+
     return ConversationDetail(
         id=conv.id,
         user_id=conv.user_id,
@@ -158,23 +145,19 @@ async def get_conversation(
         created_at=conv.created_at,
         updated_at=conv.updated_at,
         message_count=msg_count,
-        messages=[
-            MessageResponse.model_validate(m)
-            for m in conv.messages
-        ]
+        messages=[MessageResponse.model_validate(m) for m in conv.messages],
     )
+
 
 @router.post("/conversations", response_model=ConversationResponse)
 async def create_conversation(
     request: ConversationCreate,
     current_user: User = Depends(get_current_user),
-    agent_service: AIAgentService = Depends(get_agent_service)
+    agent_service: AIAgentService = Depends(get_agent_service),
 ):
     """ایجاد مکالمه جدید."""
     conv = await agent_service.create_conversation(
-        user_id=current_user.id,
-        agent_type=request.agent_type,
-        title=request.title
+        user_id=current_user.id, agent_type=request.agent_type, title=request.title
     )
     return ConversationResponse(
         id=conv.id,
@@ -183,8 +166,9 @@ async def create_conversation(
         title=conv.title,
         created_at=conv.created_at,
         updated_at=conv.updated_at,
-        message_count=0
+        message_count=0,
     )
+
 
 @router.get("/types")
 async def list_agent_types() -> None:
@@ -200,8 +184,8 @@ async def list_agent_types() -> None:
                     "تحلیل روندها و الگوهای مالی",
                     "محاسبات آماری سریع (Numba JIT)",
                     "شبیه‌سازی مونت کارلو",
-                    "بهینه‌سازی پورتفوی"
-                ]
+                    "بهینه‌سازی پورتفوی",
+                ],
             },
             {
                 "type": "support",
@@ -210,8 +194,8 @@ async def list_agent_types() -> None:
                 "capabilities": [
                     "پاسخ به سوالات عمومی",
                     "راهنمایی در استفاده از پلتفرم",
-                    "حل مشکلات فنی"
-                ]
+                    "حل مشکلات فنی",
+                ],
             },
             {
                 "type": "admin",
@@ -221,8 +205,8 @@ async def list_agent_types() -> None:
                     "گزارش‌گیری از وضعیت پروژه",
                     "تحلیل معیارهای کلیدی (KPIs)",
                     "اولویت‌بندی تسک‌ها",
-                    "پشتیبانی تصمیم‌گیری استراتژیک"
-                ]
+                    "پشتیبانی تصمیم‌گیری استراتژیک",
+                ],
             },
             {
                 "type": "research",
@@ -232,8 +216,8 @@ async def list_agent_types() -> None:
                     "جستجو در وب و یافتن منابع معتبر",
                     "خلاصه‌سازی متون طولانی",
                     "استخراج نکات کلیدی",
-                    "تولید گزارش‌های تحقیقاتی"
-                ]
+                    "تولید گزارش‌های تحقیقاتی",
+                ],
             },
             {
                 "type": "data_analyst",
@@ -246,8 +230,8 @@ async def list_agent_types() -> None:
                     "حل معادلات دیفرانسیل (SciPy)",
                     "عملیات ماتریسی پیشرفته",
                     "آموزش مدل‌های ML",
-                    "تولید نمودار"
-                ]
+                    "تولید نمودار",
+                ],
             },
             {
                 "type": "code_assistant",
@@ -259,30 +243,29 @@ async def list_agent_types() -> None:
                     "محاسبه پیچیدگی الگوریتمی",
                     "تولید تست واحد",
                     "تبدیل بین زبان‌ها",
-                    "تولید مستندات"
-                ]
-            }
+                    "تولید مستندات",
+                ],
+            },
         ]
     }
+
 
 @router.get("/llm/providers")
 async def list_llm_providers() -> None:
     """دریافت لیست ارائه‌دهندگان LLM."""
     return LLMFactory.list_providers()
 
+
 @router.get("/llm/current")
 async def get_current_llm() -> None:
     """دریافت اطلاعات LLM فعلی."""
     import os
-    
+
     provider = os.getenv("LLM_PROVIDER", "xai")
     model = os.getenv("LLM_MODEL", "")
-    
+
     from apps.shared_ai.ai.llm_factory import PROVIDER_DEFAULTS
+
     model = model or PROVIDER_DEFAULTS.get(provider, "unknown")
-    
-    return {
-        "provider": provider,
-        "model": model,
-        "status": "active"
-    }
+
+    return {"provider": provider, "model": model, "status": "active"}

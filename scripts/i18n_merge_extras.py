@@ -40,7 +40,7 @@ def load_json(path: Path) -> dict[str, str]:
 
 def keys_in_extras_ts(text: str) -> set[str]:
     """Collect string keys under fa/en/ar blocks (best-effort)."""
-    return set(re.findall(r"^\s{4}([a-z][a-z0-9_]*):\s*\"", text, flags=re.M))
+    return set(re.findall(r"^\s{4}([a-z][a-z0-9_]*):\s*\"", text, flags=re.MULTILINE))
 
 
 def _bullet_keys(keys: list[str]) -> list[str]:
@@ -51,7 +51,9 @@ def _bullet_keys(keys: list[str]) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--print-ts", action="store_true", help="Print TS snippets for missing keys")
+    parser.add_argument(
+        "--print-ts", action="store_true", help="Print TS snippets for missing keys"
+    )
     args = parser.parse_args()
 
     en = load_json(LOCALE / "source_en.json")

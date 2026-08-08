@@ -24,9 +24,10 @@ def test_aquacrop_to_mrv_with_ndvi_series():
         measured_value=25.0,
     )
     assert out["aquacrop"]["ndvi_calibrated"] is True
-    assert out["mrv"]["components"].get("model_field_agreement") is not None or out[
-        "mrv"
-    ]["quality_score"] > 0.5
+    assert (
+        out["mrv"]["components"].get("model_field_agreement") is not None
+        or out["mrv"]["quality_score"] > 0.5
+    )
     assert "steward" in out["mint_preview"]["distribution"]
 
 

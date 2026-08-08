@@ -15,13 +15,13 @@ from apps.shared_core.schemas.pagination import (
 __all__ = [
     "ErrorBody",
     "ErrorResponse",
-    "error_dict",
     "ListEnvelope",
     "ListMeta",
     "Page",
     "PageMeta",
     "build_meta",
     "build_page",
+    "error_dict",
     "page_params",
     "page_to_offset",
 ]

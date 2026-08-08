@@ -4,7 +4,6 @@ Weather Module Tests
 Tests for climate alert evaluation and synthetic forecast generation.
 """
 
-import pytest
 from datetime import date
 
 from apps.weather.alerts import evaluate_alerts
@@ -19,7 +18,15 @@ class TestClimateAlerts:
 
     def test_frost_alert(self) -> None:
         """Verify frost alert triggered when tmin <= 0."""
-        series = [{"date": "2024-01-15", "temp_min_c": -3, "temp_max_c": 5, "temp_mean_c": 1, "precip_mm": 0}]
+        series = [
+            {
+                "date": "2024-01-15",
+                "temp_min_c": -3,
+                "temp_max_c": 5,
+                "temp_mean_c": 1,
+                "precip_mm": 0,
+            }
+        ]
         alerts = evaluate_alerts(series)
         frost = [a for a in alerts if a["type"] == "frost"]
         assert len(frost) == 1
@@ -60,7 +67,13 @@ class TestClimateAlerts:
     def test_no_alerts_normal_conditions(self) -> None:
         """Verify no alerts for normal conditions."""
         series = [
-            {"date": f"2024-01-{i:02d}", "temp_min_c": 10, "temp_max_c": 20, "temp_mean_c": 15, "precip_mm": 5}
+            {
+                "date": f"2024-01-{i:02d}",
+                "temp_min_c": 10,
+                "temp_max_c": 20,
+                "temp_mean_c": 15,
+                "precip_mm": 5,
+            }
             for i in range(1, 5)
         ]
         alerts = evaluate_alerts(series)
@@ -70,9 +83,7 @@ class TestClimateAlerts:
         """Verify 3-day rainfall sum flood alert."""
         series = []
         for i in range(5):
-            series.append(
-                {"date": f"2024-06-{i+10:02d}", "temp_max_c": 30, "precip_mm": 30}
-            )
+            series.append({"date": f"2024-06-{i + 10:02d}", "temp_max_c": 30, "precip_mm": 30})
         alerts = evaluate_alerts(series)
         three_day = [a for a in alerts if "3-day" in a["message"]]
         assert len(three_day) >= 1

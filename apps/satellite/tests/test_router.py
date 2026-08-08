@@ -4,12 +4,14 @@ Covers: gee/status, availability, timeseries, mrv endpoints,
         aquacrop-mrv, rothc-mrv, change-detection, fields.
 All satellite I/O is mocked — no real network calls.
 """
+
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from httpx import AsyncClient, ASGITransport
+
+import pytest
 from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
 
 from apps.satellite.router import router as satellite_router
 
@@ -20,9 +22,7 @@ app.include_router(satellite_router)
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
 
 
@@ -30,7 +30,10 @@ async def client():
 class TestGeeStatus:
     @pytest.mark.anyio
     async def test_gee_status_returns_dict(self, client):
-        with patch("apps.satellite.router.probe_gee", return_value={"available": False, "provider": "synthetic"}):
+        with patch(
+            "apps.satellite.router.probe_gee",
+            return_value={"available": False, "provider": "synthetic"},
+        ):
             resp = await client.get("/api/v1/satellite/gee/status")
         assert resp.status_code == 200
         data = resp.json()
@@ -99,12 +102,15 @@ class TestTimeseries:
 class TestMrvEndpoints:
     @pytest.mark.anyio
     async def test_mrv_from_bands_basic(self, client):
-        with patch(
-            "apps.satellite.router.indices_from_mean_reflectance",
-            return_value={"ndvi": 0.52, "evi": 0.38},
-        ), patch(
-            "apps.satellite.router.mrv_from_bands",
-            return_value={"ecocredit_score": 72.1, "carbon_t_ha": 3.2},
+        with (
+            patch(
+                "apps.satellite.router.indices_from_mean_reflectance",
+                return_value={"ndvi": 0.52, "evi": 0.38},
+            ),
+            patch(
+                "apps.satellite.router.mrv_from_bands",
+                return_value={"ecocredit_score": 72.1, "carbon_t_ha": 3.2},
+            ),
         ):
             resp = await client.post(
                 "/api/v1/satellite/mrv/bands",
@@ -152,12 +158,15 @@ class TestMrvEndpoints:
 class TestAquacropMrv:
     @pytest.mark.anyio
     async def test_aquacrop_mrv_basic(self, client):
-        with patch(
-            "apps.satellite.router.aquacrop_mrv_from_location",
-            return_value={"ecocredit_score": 55.0, "yield_t_ha": 4.2},
-        ), patch(
-            "apps.satellite.router.aquacrop_to_mrv",
-            return_value={"ecocredit_score": 55.0},
+        with (
+            patch(
+                "apps.satellite.router.aquacrop_mrv_from_location",
+                return_value={"ecocredit_score": 55.0, "yield_t_ha": 4.2},
+            ),
+            patch(
+                "apps.satellite.router.aquacrop_to_mrv",
+                return_value={"ecocredit_score": 55.0},
+            ),
         ):
             resp = await client.post(
                 "/api/v1/satellite/aquacrop-mrv",
@@ -176,12 +185,15 @@ class TestAquacropMrv:
     @pytest.mark.anyio
     async def test_aquacrop_mrv_different_crops(self, client):
         for crop in ["wheat", "maize", "rice"]:
-            with patch(
-                "apps.satellite.router.aquacrop_mrv_from_location",
-                return_value={"ecocredit_score": 60.0},
-            ), patch(
-                "apps.satellite.router.aquacrop_to_mrv",
-                return_value={"ecocredit_score": 60.0},
+            with (
+                patch(
+                    "apps.satellite.router.aquacrop_mrv_from_location",
+                    return_value={"ecocredit_score": 60.0},
+                ),
+                patch(
+                    "apps.satellite.router.aquacrop_to_mrv",
+                    return_value={"ecocredit_score": 60.0},
+                ),
             ):
                 resp = await client.post(
                     "/api/v1/satellite/aquacrop-mrv",
@@ -216,9 +228,15 @@ class TestRothcMrv:
     async def test_rothc_mrv_years_validation(self, client):
         resp = await client.post(
             "/api/v1/satellite/rothc-mrv",
-            json={"years": 0, "clay_pct": 25.0, "temp_c": 15.0,
-                  "rain_mm_year": 500, "et_mm_year": 700,
-                  "c_input_t_ha_y": 1.5, "soc_t_ha": 40.0},
+            json={
+                "years": 0,
+                "clay_pct": 25.0,
+                "temp_c": 15.0,
+                "rain_mm_year": 500,
+                "et_mm_year": 700,
+                "c_input_t_ha_y": 1.5,
+                "soc_t_ha": 40.0,
+            },
         )
         assert resp.status_code == 422
 
@@ -227,9 +245,15 @@ class TestRothcMrv:
         """temp_c must be in [-10, 40]"""
         resp = await client.post(
             "/api/v1/satellite/rothc-mrv",
-            json={"years": 10, "clay_pct": 25.0, "temp_c": 99.0,
-                  "rain_mm_year": 500, "et_mm_year": 700,
-                  "c_input_t_ha_y": 1.5, "soc_t_ha": 40.0},
+            json={
+                "years": 10,
+                "clay_pct": 25.0,
+                "temp_c": 99.0,
+                "rain_mm_year": 500,
+                "et_mm_year": 700,
+                "c_input_t_ha_y": 1.5,
+                "soc_t_ha": 40.0,
+            },
         )
         assert resp.status_code == 422
 
@@ -243,7 +267,9 @@ class TestChangeDetection:
         mock_point.mean_ndvi = 0.50
         mock_svc.get_ndvi_timeseries = AsyncMock(return_value=[mock_point, mock_point])
         with patch("apps.satellite.router.get_satellite_service", return_value=mock_svc):
-            resp = await client.post("/api/v1/satellite/change-detection?lat=32.65&lon=51.67&days=120")
+            resp = await client.post(
+                "/api/v1/satellite/change-detection?lat=32.65&lon=51.67&days=120"
+            )
         assert resp.status_code == 200
         data = resp.json()
         assert "signal" in data

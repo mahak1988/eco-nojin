@@ -4,7 +4,8 @@ EcoNojin i18n Generator — generates all 15 language translation files.
 Base: English (en.json) — all other languages are translations of en.json.
 """
 
-import json, os, sys
+import json
+import os
 
 LOCALES_DIR = os.path.join("apps", "web", "src", "i18n", "locales")
 os.makedirs(LOCALES_DIR, exist_ok=True)
@@ -14,7 +15,6 @@ EN = {
     "app.name": "EcoNojin",
     "app.tagline": "Smart Platform for Sustainable Natural Resource & Environmental Management",
     "app.description": "EcoNojin is a comprehensive platform for monitoring, analyzing and sustainably managing natural resources, smart agriculture and the environment",
-
     "nav.home": "Home",
     "nav.dashboard": "Dashboard",
     "nav.analytics": "Analytics",
@@ -31,7 +31,6 @@ EN = {
     "nav.login": "Login",
     "nav.register": "Register",
     "nav.language": "Language",
-
     "auth.welcome": "Welcome",
     "auth.login.title": "Sign In",
     "auth.login.subtitle": "Sign in to your account",
@@ -48,7 +47,6 @@ EN = {
     "auth.or": "or",
     "auth.continueWithGoogle": "Continue with Google",
     "auth.continueWithGithub": "Continue with GitHub",
-
     "dashboard.title": "Dashboard",
     "dashboard.overview": "Overview",
     "dashboard.welcome": "Welcome to EcoNojin Dashboard",
@@ -60,7 +58,6 @@ EN = {
     "dashboard.performance": "Performance",
     "dashboard.recentActivity": "Recent Activity",
     "dashboard.viewAll": "View All",
-
     "common.loading": "Loading...",
     "common.error": "Error!",
     "common.success": "Success",
@@ -96,13 +93,11 @@ EN = {
     "common.of": "of",
     "common.itemsPerPage": "Items per page",
     "common.total": "Total",
-
     "validation.required": "This field is required",
     "validation.email": "Please enter a valid email",
     "validation.minLength": "Minimum {{count}} characters required",
     "validation.maxLength": "Maximum {{count}} characters allowed",
     "validation.passwordMatch": "Passwords do not match",
-
     "settings.title": "Settings",
     "settings.profile": "Profile Settings",
     "settings.security": "Security",
@@ -112,7 +107,6 @@ EN = {
     "settings.darkMode": "Dark Mode",
     "settings.lightMode": "Light Mode",
     "settings.system": "System",
-
     "theme.light": "Light",
     "theme.dark": "Dark",
     "theme.system": "System",
@@ -120,7 +114,6 @@ EN = {
     "theme.blue": "Blue",
     "theme.purple": "Purple",
     "theme.orange": "Orange",
-
     "map.title": "GIS Map",
     "map.satellite": "Satellite",
     "map.terrain": "Terrain",
@@ -129,14 +122,12 @@ EN = {
     "map.zoomIn": "Zoom In",
     "map.zoomOut": "Zoom Out",
     "map.fullscreen": "Fullscreen",
-
     "error.404.title": "Page Not Found",
     "error.404.description": "The page you are looking for does not exist or has been removed.",
     "error.500.title": "Server Error",
     "error.500.description": "Sorry, something went wrong on our end. Please try again later.",
     "error.goHome": "Go Home",
     "error.tryAgain": "Try Again",
-
     "footer.copyright": "© 2026 EcoNojin. All rights reserved.",
     "footer.privacy": "Privacy Policy",
     "footer.terms": "Terms of Service",
@@ -876,12 +867,14 @@ LANGUAGES["it"] = {
     "footer.copyright": "© 2026 EcoNojin. Tutti i diritti riservati.",
 }
 
+
 # ── Write English as reference ──────────────────────────────────────────
 def write_json(filename, data):
     path = os.path.join(LOCALES_DIR, filename)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     print(f"  ✓ {filename}")
+
 
 print("Generating i18n locale files...")
 print(f"  Output: {LOCALES_DIR}")
@@ -896,8 +889,8 @@ for lang_code, translations in LANGUAGES.items():
 write_json("en.json", EN)
 
 print(f"\nDone! Generated {len(LANGUAGES) + 1} language files:")
-print(f"  fa (Persian) - by hand (already exists)")
+print("  fa (Persian) - by hand (already exists)")
 for code in LANGUAGES:
     print(f"  {code}")
-print(f"  en (English)")
+print("  en (English)")
 print(f"\nTotal: 15 languages supported (fa + en + {len(LANGUAGES)} more)")

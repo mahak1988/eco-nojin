@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 ═════════════════════════════════════════════════════════════════════════
   🔧 Econojin Backend Router Fixer  (Phase 1)
@@ -38,12 +37,12 @@
 
 from __future__ import annotations
 
-import re
-import sys
 import ast
+import re
 import shutil
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -150,6 +149,7 @@ def fix_depends_pattern(content: str) -> tuple[str, int]:
         r"Depends\(\s*get_db_session\s*,\s*"
         r"require_write_auth:\s*None\s*=\s*Depends\(require_write_auth\)\s*\)"
     )
+
     def replacer1(m):
         nonlocal count
         count += 1
@@ -162,12 +162,13 @@ def fix_depends_pattern(content: str) -> tuple[str, int]:
     # CRITICAL: include the trailing `)` of Query in the match so we don't break it.
     pattern2 = re.compile(
         r'Query\((\.\.\.,\s*description="[^"]*")\s*,\s*'
-        r'require_write_auth:\s*None\s*=\s*Depends\(require_write_auth\)\s*\)'
+        r"require_write_auth:\s*None\s*=\s*Depends\(require_write_auth\)\s*\)"
     )
+
     def replacer2(m):
         nonlocal count
         count += 1
-        return f'Query({m.group(1)})'
+        return f"Query({m.group(1)})"
 
     new_content = pattern2.sub(replacer2, new_content)
 
@@ -177,6 +178,7 @@ def fix_depends_pattern(content: str) -> tuple[str, int]:
         r"File\(\s*\.\.\.\s*,\s*"
         r"require_write_auth:\s*None\s*=\s*Depends\(require_write_auth\)\s*\)"
     )
+
     def replacer3(m):
         nonlocal count
         count += 1
@@ -192,6 +194,7 @@ def fix_depends_pattern(content: str) -> tuple[str, int]:
     pattern4 = re.compile(
         r",\s*require_write_auth:\s*None\s*=\s*Depends\(require_write_auth\)(?=\s*\))"
     )
+
     def replacer4(m):
         nonlocal count
         count += 1
@@ -250,11 +253,14 @@ def fix_accounting(base: Path, dry_run: bool = False) -> None:
         print("  [+] import require_write_auth از وسط فایل به ابتدا منتقل شد")
 
     # اضافه کردن import require_write_auth اگر اصلاً نیست
-    elif "require_write_auth" in content and "from apps.shared_core.deps import require_write_auth" not in content:
+    elif (
+        "require_write_auth" in content
+        and "from apps.shared_core.deps import require_write_auth" not in content
+    ):
         if "from apps.shared_core.database.session import get_db_session" in content:
             content = content.replace(
                 "from apps.shared_core.database.session import get_db_session",
-                "from apps.shared_core.database.session import get_db_session\nfrom apps.shared_core.deps import require_write_auth"
+                "from apps.shared_core.database.session import get_db_session\nfrom apps.shared_core.deps import require_write_auth",
             )
             print("  [+] import require_write_auth اضافه شد")
 
@@ -309,17 +315,24 @@ def fix_route_with_missing_imports(
         if "File" in content and "File(" in content and "File" not in current:
             additions.append("File")
         if additions:
-            new_imports = ", ".join([s.strip() for s in current.split(",") if s.strip()] + additions)
+            new_imports = ", ".join(
+                [s.strip() for s in current.split(",") if s.strip()] + additions
+            )
             content = content.replace(
-                f"from fastapi import {current}",
-                f"from fastapi import {new_imports}"
+                f"from fastapi import {current}", f"from fastapi import {new_imports}"
             )
             print(f"  [+] fastapi imports: +{', '.join(additions)}")
 
     # اگر require_write_auth استفاده شده ولی import نیست
-    if needs_rwa and "require_write_auth" not in [
-        line for line in content.split("\n") if line.startswith("from") or line.startswith("import")
-    ].__str__():
+    if (
+        needs_rwa
+        and "require_write_auth"
+        not in [
+            line
+            for line in content.split("\n")
+            if line.startswith("from") or line.startswith("import")
+        ].__str__()
+    ):
         # اضافه کردن import در یک خط جدید، بعد از import‌های موجود
         if "from apps.shared_core.deps import require_write_auth" not in content:
             # پیدا کردن آخرین import
@@ -328,7 +341,9 @@ def fix_route_with_missing_imports(
             for i, line in enumerate(lines[:50]):
                 if line.startswith(("import ", "from ")):
                     last_import_idx = i
-            lines.insert(last_import_idx + 1, "from apps.shared_core.deps import require_write_auth")
+            lines.insert(
+                last_import_idx + 1, "from apps.shared_core.deps import require_write_auth"
+            )
             content = "\n".join(lines)
             print("  [+] import require_write_auth اضافه شد")
 
@@ -356,10 +371,7 @@ def fix_route_with_missing_imports(
         r"File\(\s*\.\.\.\s*,\s*require_write_auth:\s*None\s*=\s*Depends\(require_write_auth\)\s*\)"
     )
     if pattern_file.search(content):
-        content = pattern_file.sub(
-            "File(...)",
-            content
-        )
+        content = pattern_file.sub("File(...)", content)
         # اضافه کردن یک dependency جداگانه به پارامترهای تابع
         # اینجا فقط import را اضافه می‌کنیم و Depends(require_write_auth) را به signature اضافه نمی‌کنیم
         # چون File(...) را فقط با Depends(require_write_auth) به‌عنوان پارامتر جداگانه باید اضافه کنیم
@@ -381,8 +393,7 @@ def fix_route_with_missing_imports(
 # ─────────────────────────────────────────────────────────────────────
 # Fix 6, 7, 8: __future__ imports must be at the beginning
 # ─────────────────────────────────────────────────────────────────────
-def fix_future_imports(base: Path, rel_path: str, fix_num: str,
-                       dry_run: bool = False) -> None:
+def fix_future_imports(base: Path, rel_path: str, fix_num: str, dry_run: bool = False) -> None:
     """Move `from __future__ import annotations` to top of file."""
     print(f"\n[{fix_num}] {rel_path} — انتقال __future__ import به ابتدای فایل")
     p = base / rel_path
@@ -530,8 +541,8 @@ async def validation(req: CalibrationRequest) -> dict:
     # Find pattern: @router.post("/validation" ... def _validation_extracted ... async def validation
     pattern = re.compile(
         r'@router\.post\("/validation"[^)]*\)\s*\n'
-        r'def _validation_extracted\(\).*?(?=\nasync def validation)',
-        re.DOTALL
+        r"def _validation_extracted\(\).*?(?=\nasync def validation)",
+        re.DOTALL,
     )
     if pattern.search(content):
         content = pattern.sub(new_validation_endpoint.strip() + "\n\n", content)
@@ -540,8 +551,7 @@ async def validation(req: CalibrationRequest) -> dict:
         # Try alternative pattern
         # Just remove the broken _validation_extracted and add a working validation
         broken_helper = re.compile(
-            r'def _validation_extracted\(\).*?(?=\nasync def validation)',
-            re.DOTALL
+            r"def _validation_extracted\(\).*?(?=\nasync def validation)", re.DOTALL
         )
         if broken_helper.search(content):
             content = broken_helper.sub("", content)
@@ -584,14 +594,14 @@ def fix_data_router(base: Path, dry_run: bool = False) -> None:
     if "fetch_satellite_agro_data" in content and "fetch_satellite_agro_data = None" not in content:
         content = content.replace(
             "from apps.simulation.data.satellite import fetch_satellite_agro_data",
-            "try:\n    from apps.simulation.data.satellite import fetch_satellite_agro_data\nexcept ImportError:\n    fetch_satellite_agro_data = None"
+            "try:\n    from apps.simulation.data.satellite import fetch_satellite_agro_data\nexcept ImportError:\n    fetch_satellite_agro_data = None",
         )
         print("  [+] satellite import محافظت شد")
 
     if "fetch_nasa_power_data" in content and "fetch_nasa_power_data = None" not in content:
         content = content.replace(
             "from apps.simulation.data.nasa_power import fetch_nasa_power_data",
-            "try:\n    from apps.simulation.data.nasa_power import fetch_nasa_power_data\nexcept ImportError:\n    fetch_nasa_power_data = None"
+            "try:\n    from apps.simulation.data.nasa_power import fetch_nasa_power_data\nexcept ImportError:\n    fetch_nasa_power_data = None",
         )
         print("  [+] nasa_power import محافظت شد")
 
@@ -626,31 +636,40 @@ def fix_community_route(base: Path, dry_run: bool = False) -> None:
     # the parameter has a default (since `author_id: int = Query(...)` has a default,
     # subsequent params must also have defaults OR come before).
     # Best fix: make payload use Body(...)
-    pattern_payload = re.compile(r'(payload:\s*\w+)\s*=\s*\.\.\.\s*,')
+    pattern_payload = re.compile(r"(payload:\s*\w+)\s*=\s*\.\.\.\s*,")
     if pattern_payload.search(content):
         # Add Body import if missing
-        if "from fastapi import" in content and "Body" not in content.split("from fastapi import")[1].split("\n")[0]:
+        if (
+            "from fastapi import" in content
+            and "Body" not in content.split("from fastapi import")[1].split("\n")[0]
+        ):
             content = re.sub(
                 r"from fastapi import ([^\n]+)",
-                lambda m: "from fastapi import " + (m.group(1) + ", Body" if "Body" not in m.group(1) else m.group(1)),
+                lambda m: (
+                    "from fastapi import "
+                    + (m.group(1) + ", Body" if "Body" not in m.group(1) else m.group(1))
+                ),
                 content,
-                count=1
+                count=1,
             )
             print("  [+] Body به fastapi imports اضافه شد")
-        content = pattern_payload.sub(r'\1 = Body(...),', content)
+        content = pattern_payload.sub(r"\1 = Body(...),", content)
         print("  [+] payload: X = ... به payload: X = Body(...) اصلاح شد")
 
     # Also fix any `payload: PostCreate ,` (with trailing space) that may have been left
-    pattern_payload_broken = re.compile(r'(payload:\s*\w+)\s+,')
+    pattern_payload_broken = re.compile(r"(payload:\s*\w+)\s+,")
     if pattern_payload_broken.search(content):
         if "Body" not in content:
             content = re.sub(
                 r"from fastapi import ([^\n]+)",
-                lambda m: "from fastapi import " + (m.group(1) + ", Body" if "Body" not in m.group(1) else m.group(1)),
+                lambda m: (
+                    "from fastapi import "
+                    + (m.group(1) + ", Body" if "Body" not in m.group(1) else m.group(1))
+                ),
                 content,
-                count=1
+                count=1,
             )
-        content = pattern_payload_broken.sub(r'\1 = Body(...),', content)
+        content = pattern_payload_broken.sub(r"\1 = Body(...),", content)
         print("  [+] payload: X , به payload: X = Body(...) اصلاح شد")
 
     write_file(p, content, dry_run)
@@ -681,8 +700,11 @@ def main() -> int:
 
     if base is None:
         # جستجو در cwd و parents
-        candidates = [Path.cwd()] + list(Path.cwd().parents) + \
-                     [script_path.parent, script_path.parent.parent]
+        candidates = (
+            [Path.cwd()]
+            + list(Path.cwd().parents)
+            + [script_path.parent, script_path.parent.parent]
+        )
         for c in candidates:
             if (c / "apps").exists():
                 base = c
@@ -691,11 +713,11 @@ def main() -> int:
     if base is None or not (base / "apps").exists():
         base = Path.cwd()  # fallback
 
-    print(f"═══════════════════════════════════════════════════════════════")
-    print(f"  Econojin Backend Router Fixer")
+    print("═══════════════════════════════════════════════════════════════")
+    print("  Econojin Backend Router Fixer")
     print(f"  Project root: {base}")
     print(f"  Mode: {'DRY-RUN' if dry_run else 'APPLY'}")
-    print(f"═══════════════════════════════════════════════════════════════")
+    print("═══════════════════════════════════════════════════════════════")
 
     if not (base / "apps").exists():
         print(f"\n[ERROR] پوشه apps/ پیدا نشد در {base}")
@@ -734,18 +756,20 @@ def main() -> int:
         return 0 if all_ok else 1
 
     # اجرای همه fixها
-    fix_auth_router(base, dry_run)                                                   # 1
-    fix_accounting(base, dry_run)                                                    # 2
-    fix_route_with_missing_imports(base, "apps/api/routes/ecocoin.py", "3", dry_run) # 3
+    fix_auth_router(base, dry_run)  # 1
+    fix_accounting(base, dry_run)  # 2
+    fix_route_with_missing_imports(base, "apps/api/routes/ecocoin.py", "3", dry_run)  # 3
     fix_route_with_missing_imports(base, "apps/api/routes/monitoring.py", "4", dry_run)  # 4
-    fix_route_with_missing_imports(base, "apps/api/routes/simulator.py", "5", dry_run)   # 5
-    fix_future_imports(base, "apps/admin_panel/router.py", "6", dry_run)             # 6
-    fix_future_imports(base, "apps/simulation/scenario/router.py", "7", dry_run)     # 7
-    fix_validation_router(base, dry_run)                                             # 8
-    fix_data_router(base, dry_run)                                                   # 9
-    fix_route_with_missing_imports(base, "apps/api/routes/agriculture_schools.py", "10", dry_run)  # 10
+    fix_route_with_missing_imports(base, "apps/api/routes/simulator.py", "5", dry_run)  # 5
+    fix_future_imports(base, "apps/admin_panel/router.py", "6", dry_run)  # 6
+    fix_future_imports(base, "apps/simulation/scenario/router.py", "7", dry_run)  # 7
+    fix_validation_router(base, dry_run)  # 8
+    fix_data_router(base, dry_run)  # 9
+    fix_route_with_missing_imports(
+        base, "apps/api/routes/agriculture_schools.py", "10", dry_run
+    )  # 10
     fix_route_with_missing_imports(base, "apps/api/routes/education.py", "11", dry_run)  # 11
-    fix_community_route(base, dry_run)                                               # 12
+    fix_community_route(base, dry_run)  # 12
     fix_route_with_missing_imports(base, "apps/api/routes/games.py", "13", dry_run)  # 13
 
     # Verify نهایی
@@ -784,7 +808,7 @@ def main() -> int:
     print(f"  نتیجه: {ok_count} OK / {fail_count} fail")
     print("═" * 65)
     print("\n  برای تست بارگذاری واقعی، در ریشه پروژه اجرا کنید:")
-    print("    python -c \"import apps.main\"")
+    print('    python -c "import apps.main"')
     print("\n  یا سرور را اجرا کنید:")
     print("    uvicorn apps.main:app --reload --port 8000")
 

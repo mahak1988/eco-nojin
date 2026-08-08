@@ -9,12 +9,12 @@ from __future__ import annotations
 
 import json
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 _LOCK = threading.Lock()
-_CACHE: Optional[dict[str, Any]] = None
+_CACHE: dict[str, Any] | None = None
 
 # Project root = parents[2] from apps/simulation/
 _ROOT = Path(__file__).resolve().parents[2]
@@ -28,7 +28,10 @@ CLIMATE_PRESETS: dict[str, dict[str, Any]] = {
         "label_en": "Arid / semi-arid",
         # tighter water / NDVI; looser runoff
         "by_model": {
-            "aquacrop": {"warning_mul": 1.05, "critical_mul": 1.0},  # for lt ops: higher bar = stricter? handled below
+            "aquacrop": {
+                "warning_mul": 1.05,
+                "critical_mul": 1.0,
+            },  # for lt ops: higher bar = stricter? handled below
             "ndvi": {"warning_mul": 0.9, "critical_mul": 0.85},
             "scs": {"warning_mul": 0.7, "critical_mul": 0.75},
             "sensor": {"warning_mul": 0.85, "critical_mul": 0.9},
@@ -93,7 +96,7 @@ def _save(doc: dict[str, Any]) -> None:
     global _CACHE
     with _LOCK:
         _PATH.parent.mkdir(parents=True, exist_ok=True)
-        doc["updated_at"] = datetime.now(timezone.utc).isoformat()
+        doc["updated_at"] = datetime.now(UTC).isoformat()
         _PATH.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
         _CACHE = doc
 

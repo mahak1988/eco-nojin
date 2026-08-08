@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class SatelliteSource(str, Enum):
@@ -57,7 +57,9 @@ class NDVIResult:
             "min_ndvi": self.min_ndvi,
             "std_ndvi": self.std_ndvi,
             "cloud_free_percentage": self.cloud_free_percentage,
-            "source": self.source.value if isinstance(self.source, SatelliteSource) else str(self.source),
+            "source": self.source.value
+            if isinstance(self.source, SatelliteSource)
+            else str(self.source),
             "provider": self.provider,
         }
 
@@ -69,8 +71,7 @@ class SatelliteProvider(ABC):
 
     @property
     @abstractmethod
-    def is_available(self) -> bool:
-        ...
+    def is_available(self) -> bool: ...
 
     @abstractmethod
     async def get_ndvi_timeseries(
@@ -79,8 +80,7 @@ class SatelliteProvider(ABC):
         start_date: date,
         end_date: date,
         cloud_max: int = 20,
-    ) -> list[NDVIResult]:
-        ...
+    ) -> list[NDVIResult]: ...
 
     @abstractmethod
     async def get_ndvi_image(
@@ -88,8 +88,7 @@ class SatelliteProvider(ABC):
         bbox: BBox,
         target_date: date,
         cloud_max: int = 20,
-    ) -> NDVIResult:
-        ...
+    ) -> NDVIResult: ...
 
     @abstractmethod
     async def get_availability(
@@ -97,8 +96,7 @@ class SatelliteProvider(ABC):
         bbox: BBox,
         start_date: date,
         end_date: date,
-    ) -> list[dict[str, Any]]:
-        ...
+    ) -> list[dict[str, Any]]: ...
 
     # Legacy adapters used by older router paths
     async def availability(self, lat: float, lon: float) -> dict[str, Any]:
@@ -109,7 +107,7 @@ class SatelliteProvider(ABC):
             "lon": lon,
         }
 
-    async def ndvi(self, lat: float, lon: float, date_str: Optional[str] = None) -> dict[str, Any]:
+    async def ndvi(self, lat: float, lon: float, date_str: str | None = None) -> dict[str, Any]:
         d = date.fromisoformat(date_str) if date_str else date.today()
         r = await self.get_ndvi_image(BBox.from_point(lat, lon), d)
         out = r.to_dict()

@@ -8,14 +8,14 @@ Units SI / agronomic (t/ha, mm, dS/m, %).
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.evaluation_metrics import evaluate_series, kge, pbias
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _clamp(x: float, lo: float, hi: float) -> float:
@@ -25,6 +25,7 @@ def _clamp(x: float, lo: float, hi: float) -> float:
 # ---------------------------------------------------------------------------
 # 1. Nitrate leaching (multi-layer, drainage-driven)
 # ---------------------------------------------------------------------------
+
 
 def run_nitrate_leaching(params: dict[str, Any] | None = None) -> dict[str, Any]:
     """
@@ -130,6 +131,7 @@ def run_nitrate_leaching(params: dict[str, Any] | None = None) -> dict[str, Any]
 # 2–4. Texture → FC, WP, AWC, bulk density, porosity
 # ---------------------------------------------------------------------------
 
+
 def texture_hydrology(params: dict[str, Any] | None = None) -> dict[str, Any]:
     """Saxton-style simplified FC/WP from sand/clay %."""
     p = params or {}
@@ -137,8 +139,10 @@ def texture_hydrology(params: dict[str, Any] | None = None) -> dict[str, Any]:
     clay = _clamp(float(p.get("clay_pct", 25)), 0, 100)
     silt = _clamp(100.0 - sand - clay, 0, 100)
     # empirical (very simplified Saxton/Rawls)
-    theta_fc = _clamp(0.2576 - 0.002 * sand + 0.0036 * clay + 0.0299 * math.log(max(clay, 1)), 0.08, 0.5)
-    theta_wp = _clamp(0.026 + 0.005 * clay + 0.0158 * (clay ** 0.5) * 0.1, 0.03, 0.35)
+    theta_fc = _clamp(
+        0.2576 - 0.002 * sand + 0.0036 * clay + 0.0299 * math.log(max(clay, 1)), 0.08, 0.5
+    )
+    theta_wp = _clamp(0.026 + 0.005 * clay + 0.0158 * (clay**0.5) * 0.1, 0.03, 0.35)
     if theta_wp >= theta_fc:
         theta_wp = theta_fc * 0.45
     bd = _clamp(1.65 - 0.004 * clay - 0.001 * silt, 1.1, 1.7)  # Mg/m3
@@ -164,6 +168,7 @@ def texture_hydrology(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # 5. SOC stock by depth
 # ---------------------------------------------------------------------------
 
+
 def soc_stock(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
     soc_pct = float(p.get("soc_pct", 1.2))
@@ -185,6 +190,7 @@ def soc_stock(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 6. Liming requirement (Adams-Evans simplified)
 # ---------------------------------------------------------------------------
+
 
 def liming_requirement(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -213,6 +219,7 @@ def liming_requirement(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # 7. CEC estimate from clay + OM
 # ---------------------------------------------------------------------------
 
+
 def cec_estimate(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
     clay = float(p.get("clay_pct", 25))
@@ -231,6 +238,7 @@ def cec_estimate(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 8. Salinity leaching requirement
 # ---------------------------------------------------------------------------
+
 
 def salinity_leaching(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -256,6 +264,7 @@ def salinity_leaching(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 9. Sodicity ESP / gypsum
 # ---------------------------------------------------------------------------
+
 
 def sodicity_gypsum(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -285,6 +294,7 @@ def sodicity_gypsum(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # 10. Compaction / porosity stress
 # ---------------------------------------------------------------------------
 
+
 def compaction_index(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
     bd = float(p.get("bulk_density_mg_m3", 1.55))
@@ -307,6 +317,7 @@ def compaction_index(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # 11. RUSLE-lite soil loss
 # ---------------------------------------------------------------------------
 
+
 def rusle_lite(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
     R = float(p.get("R", 100))
@@ -326,6 +337,7 @@ def rusle_lite(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 12. Compost / biochar amendment C input
 # ---------------------------------------------------------------------------
+
 
 def amendment_carbon(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -349,6 +361,7 @@ def amendment_carbon(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # 13. N leaching index (simple climatic)
 # ---------------------------------------------------------------------------
 
+
 def n_leaching_index(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
     precip = float(p.get("precip_mm_y", 400))
@@ -370,6 +383,7 @@ def n_leaching_index(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 14. Profile available N (kg/ha)
 # ---------------------------------------------------------------------------
+
 
 def profile_available_n(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -400,6 +414,7 @@ def profile_available_n(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 15. Green-Ampt infiltration lite
 # ---------------------------------------------------------------------------
+
 
 def infiltration_green_ampt(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -432,6 +447,7 @@ def infiltration_green_ampt(params: dict[str, Any] | None = None) -> dict[str, A
 # 16. Soil temperature simple profile
 # ---------------------------------------------------------------------------
 
+
 def soil_temperature_profile(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
     t_air = float(p.get("t_air_c", 25))
@@ -453,6 +469,7 @@ def soil_temperature_profile(params: dict[str, Any] | None = None) -> dict[str, 
 # ---------------------------------------------------------------------------
 # 17. Soil health composite score
 # ---------------------------------------------------------------------------
+
 
 def soil_health_score(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = params or {}
@@ -486,21 +503,20 @@ def soil_health_score(params: dict[str, Any] | None = None) -> dict[str, Any]:
 # 18. KGE / PBIAS evaluate helper (soil series)
 # ---------------------------------------------------------------------------
 
+
 def evaluate_soil_series(
     observed: list[float],
     simulated: list[float],
     variable: str = "soil",
 ) -> dict[str, Any]:
     pack = evaluate_series(observed, simulated, variable=variable)
-    pack["kge_standalone"] = None if math.isnan(kge(observed, simulated)) else round(
-        kge(observed, simulated), 5
+    pack["kge_standalone"] = (
+        None if math.isnan(kge(observed, simulated)) else round(kge(observed, simulated), 5)
     )
-    pack["pbias_standalone"] = None if math.isnan(pbias(observed, simulated)) else round(
-        pbias(observed, simulated), 5
+    pack["pbias_standalone"] = (
+        None if math.isnan(pbias(observed, simulated)) else round(pbias(observed, simulated), 5)
     )
-    pack["kge_notes_fa"] = (
-        "KGE=1 ایده‌آل؛ کاهش به‌خاطر همبستگی، نسبت انحراف‌معیار یا بایاس."
-    )
+    pack["kge_notes_fa"] = "KGE=1 ایده‌آل؛ کاهش به‌خاطر همبستگی، نسبت انحراف‌معیار یا بایاس."
     pack["pbias_notes_fa"] = (
         "PBIAS مثبت = بیش‌برآورد مدل؛ |PBIAS|<10% معمولاً خوب برای جریان/نیتروژن."
     )
@@ -508,21 +524,53 @@ def evaluate_soil_series(
 
 
 CATALOG: list[dict[str, str]] = [
-    {"id": "nitrate_leaching", "endpoint": "POST /api/v1/science/soil/nitrate-leaching", "fa": "آبشویی لایه‌ای نیترات"},
-    {"id": "texture_hydrology", "endpoint": "POST /api/v1/science/soil/texture-hydrology", "fa": "FC/WP/AWC از بافت"},
+    {
+        "id": "nitrate_leaching",
+        "endpoint": "POST /api/v1/science/soil/nitrate-leaching",
+        "fa": "آبشویی لایه‌ای نیترات",
+    },
+    {
+        "id": "texture_hydrology",
+        "endpoint": "POST /api/v1/science/soil/texture-hydrology",
+        "fa": "FC/WP/AWC از بافت",
+    },
     {"id": "soc_stock", "endpoint": "POST /api/v1/science/soil/soc-stock", "fa": "ذخیره کربن آلی"},
     {"id": "liming", "endpoint": "POST /api/v1/science/soil/liming", "fa": "نیاز آهک"},
     {"id": "cec", "endpoint": "POST /api/v1/science/soil/cec", "fa": "تخمین CEC"},
-    {"id": "salinity_lr", "endpoint": "POST /api/v1/science/soil/salinity-leaching", "fa": "نیاز آبشویی شوری"},
+    {
+        "id": "salinity_lr",
+        "endpoint": "POST /api/v1/science/soil/salinity-leaching",
+        "fa": "نیاز آبشویی شوری",
+    },
     {"id": "gypsum", "endpoint": "POST /api/v1/science/soil/gypsum", "fa": "گچ برای سدیمی"},
     {"id": "compaction", "endpoint": "POST /api/v1/science/soil/compaction", "fa": "شاخص تراکم"},
     {"id": "rusle", "endpoint": "POST /api/v1/science/soil/rusle", "fa": "فرسایش RUSLE-lite"},
-    {"id": "amendment_c", "endpoint": "POST /api/v1/science/soil/amendment-carbon", "fa": "کربن اصلاح‌کننده"},
-    {"id": "n_leach_index", "endpoint": "POST /api/v1/science/soil/n-leaching-index", "fa": "شاخص آبشویی N"},
-    {"id": "profile_n", "endpoint": "POST /api/v1/science/soil/profile-n", "fa": "N قابل دسترس پروفیل"},
-    {"id": "infiltration", "endpoint": "POST /api/v1/science/soil/infiltration", "fa": "نفوذ Green-Ampt"},
+    {
+        "id": "amendment_c",
+        "endpoint": "POST /api/v1/science/soil/amendment-carbon",
+        "fa": "کربن اصلاح‌کننده",
+    },
+    {
+        "id": "n_leach_index",
+        "endpoint": "POST /api/v1/science/soil/n-leaching-index",
+        "fa": "شاخص آبشویی N",
+    },
+    {
+        "id": "profile_n",
+        "endpoint": "POST /api/v1/science/soil/profile-n",
+        "fa": "N قابل دسترس پروفیل",
+    },
+    {
+        "id": "infiltration",
+        "endpoint": "POST /api/v1/science/soil/infiltration",
+        "fa": "نفوذ Green-Ampt",
+    },
     {"id": "soil_temp", "endpoint": "POST /api/v1/science/soil/temperature", "fa": "دمای پروفیل"},
-    {"id": "health", "endpoint": "POST /api/v1/science/soil/health-score", "fa": "امتیاز سلامت خاک"},
+    {
+        "id": "health",
+        "endpoint": "POST /api/v1/science/soil/health-score",
+        "fa": "امتیاز سلامت خاک",
+    },
     {"id": "metrics", "endpoint": "POST /api/v1/science/soil/evaluate", "fa": "KGE/PBIAS/NSE"},
 ]
 

@@ -8,9 +8,8 @@ Services call repositories; repositories never call services.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.shared_ai.models import SharedAi
@@ -24,26 +23,19 @@ class SharedAiRepository:
         """Handle __init__ (session)."""
         self.session = session
 
-    async def get_by_id(self, id: int) -> Optional[SharedAi]:
+    async def get_by_id(self, id: int) -> SharedAi | None:
         """Fetch a single record by ID."""
-        result = await self.session.execute(
-            select(SharedAi).where(SharedAi.id == id)
-        )
+        result = await self.session.execute(select(SharedAi).where(SharedAi.id == id))
         return result.scalar_one_or_none()
 
     async def list(self, skip: int = 0, limit: int = 100) -> tuple[list[SharedAi], int]:
         """Fetch a paginated list of records + total count."""
         result = await self.session.execute(
-            select(SharedAi)
-            .order_by(SharedAi.id.desc())
-            .offset(skip)
-            .limit(limit)
+            select(SharedAi).order_by(SharedAi.id.desc()).offset(skip).limit(limit)
         )
         items = list(result.scalars().all())
 
-        count_result = await self.session.execute(
-            select(func.count()).select_from(SharedAi)
-        )
+        count_result = await self.session.execute(select(func.count()).select_from(SharedAi))
         total = count_result.scalar_one()
         return items, total
 
@@ -55,7 +47,7 @@ class SharedAiRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, id: int, data: SharedAiUpdate) -> Optional[SharedAi]:
+    async def update(self, id: int, data: SharedAiUpdate) -> SharedAi | None:
         """Update an existing record. Returns None if not found."""
         obj = await self.get_by_id(id)
         if not obj:

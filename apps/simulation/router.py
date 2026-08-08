@@ -5,7 +5,7 @@ Exposes simulators via REST. Supports ?lang=en|fa|ar for localized labels.
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Header, HTTPException, Query
 from pydantic import BaseModel
@@ -31,11 +31,11 @@ class SimulationRunResponse(BaseModel):
     outputs: dict[str, Any] = {}
     metrics: dict[str, float] = {}
     charts: dict[str, list] = {}
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float = 0.0
 
 
-def _resolve_lang(lang: Optional[str], accept_language: Optional[str]) -> str:
+def _resolve_lang(lang: str | None, accept_language: str | None) -> str:
     if lang:
         return normalize_lang(lang)
     if accept_language:
@@ -47,8 +47,8 @@ def _resolve_lang(lang: Optional[str], accept_language: Optional[str]) -> str:
 
 @router.get("/simulators", summary="List all available simulators")
 async def list_simulators(
-    lang: Optional[str] = Query(None, description="en | fa | ar"),
-    accept_language: Optional[str] = Header(None, alias="Accept-Language"),
+    lang: str | None = Query(None, description="en | fa | ar"),
+    accept_language: str | None = Header(None, alias="Accept-Language"),
 ):
     simulators = register_all_simulators()
     locale = _resolve_lang(lang, accept_language)
@@ -63,8 +63,8 @@ async def list_simulators(
 @router.get("/simulators/{simulator_id}", summary="Get simulator details")
 async def get_simulator(
     simulator_id: str,
-    lang: Optional[str] = Query(None),
-    accept_language: Optional[str] = Header(None, alias="Accept-Language"),
+    lang: str | None = Query(None),
+    accept_language: str | None = Header(None, alias="Accept-Language"),
 ):
     params = SimulationRegistry.get_parameters(simulator_id)
     if not params:
@@ -111,8 +111,8 @@ async def run_simulation(request: SimulationRunRequest) -> SimulationRunResponse
 
 @router.get("/categories", summary="List simulator categories")
 async def list_categories(
-    lang: Optional[str] = Query(None),
-    accept_language: Optional[str] = Header(None, alias="Accept-Language"),
+    lang: str | None = Query(None),
+    accept_language: str | None = Header(None, alias="Accept-Language"),
 ):
     from apps.simulation.i18n_catalog import CATEGORY_I18N
 

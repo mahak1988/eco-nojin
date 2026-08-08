@@ -8,17 +8,15 @@ Calculates NPV, IRR, ROI, payback period, and break-even point.
 from __future__ import annotations
 
 import logging
-import math
-from typing import Optional
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.economics.models import EconomicAnalysis, CostItem, BenefitItem
+from apps.economics.models import BenefitItem, CostItem, EconomicAnalysis
 from apps.economics.schemas import (
+    CostBenefitResult,
     EconomicAnalysisCreate,
     EconomicAnalysisUpdate,
-    CostBenefitResult,
 )
 
 logger = logging.getLogger(__name__)
@@ -30,7 +28,7 @@ class EconomicsService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get(self, analysis_id: int) -> Optional[EconomicAnalysis]:
+    async def get(self, analysis_id: int) -> EconomicAnalysis | None:
         """Get a single analysis by ID."""
         result = await self.session.execute(
             select(EconomicAnalysis).where(EconomicAnalysis.id == analysis_id)
@@ -41,10 +39,7 @@ class EconomicsService:
         """List analyses with pagination."""
         limit = min(limit, 1000)
         result = await self.session.execute(
-            select(EconomicAnalysis)
-            .order_by(EconomicAnalysis.id.desc())
-            .offset(skip)
-            .limit(limit)
+            select(EconomicAnalysis).order_by(EconomicAnalysis.id.desc()).offset(skip).limit(limit)
         )
         items = list(result.scalars().all())
 
@@ -116,7 +111,9 @@ class EconomicsService:
         await self.session.refresh(analysis)
         return analysis
 
-    async def update(self, analysis_id: int, data: EconomicAnalysisUpdate) -> Optional[EconomicAnalysis]:
+    async def update(
+        self, analysis_id: int, data: EconomicAnalysisUpdate
+    ) -> EconomicAnalysis | None:
         """Update an existing analysis."""
         analysis = await self.get(analysis_id)
         if not analysis:
@@ -218,7 +215,7 @@ class EconomicsService:
         annual_cash_flows: list[float],
         max_iterations: int = 100,
         tolerance: float = 1e-6,
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Calculate Internal Rate of Return using Newton-Raphson method.
 

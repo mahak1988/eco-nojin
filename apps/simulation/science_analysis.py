@@ -84,8 +84,12 @@ def analyze_aquacrop(result: dict[str, Any]) -> dict[str, Any]:
         "Conceptual AquaCrop-style balance — not the FAO binary.",
     ]
     if y_rel < 0.7:
-        fa.append("عملکرد نسبی زیر ۷۰٪ است؛ آبیاری به‌موقع یا کاهش ET0 مؤثر (مالچ/تاریخ کاشت) را بررسی کنید.")
-        en.append("Relative yield <70%: review irrigation timing or ET demand (mulch, planting date).")
+        fa.append(
+            "عملکرد نسبی زیر ۷۰٪ است؛ آبیاری به‌موقع یا کاهش ET0 مؤثر (مالچ/تاریخ کاشت) را بررسی کنید."
+        )
+        en.append(
+            "Relative yield <70%: review irrigation timing or ET demand (mulch, planting date)."
+        )
     return {
         "summary_fa": " ".join(fa),
         "summary_en": " ".join(en),

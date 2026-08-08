@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
@@ -49,7 +48,7 @@ router = APIRouter(prefix="/api/v1/accounting", tags=["accounting"])
 async def list_accounts(
     skip: int = 0,
     limit: int = 100,
-    account_type: Optional[AccountType] = None,
+    account_type: AccountType | None = None,
     session: AsyncSession = Depends(get_db_session),
 ) -> AccountListResponse:
     service = AccountService(session)
@@ -108,7 +107,7 @@ async def update_account(
 async def list_journal_entries(
     skip: int = 0,
     limit: int = 100,
-    is_posted: Optional[bool] = None,
+    is_posted: bool | None = None,
     session: AsyncSession = Depends(get_db_session),
 ) -> JournalEntryListResponse:
     service = JournalEntryService(session)
@@ -143,7 +142,7 @@ async def create_journal_entry(
 async def list_invoices(
     skip: int = 0,
     limit: int = 100,
-    status_filter: Optional[InvoiceStatus] = None,
+    status_filter: InvoiceStatus | None = None,
     session: AsyncSession = Depends(get_db_session),
 ) -> InvoiceListResponse:
     service = InvoiceService(session)
@@ -263,8 +262,8 @@ async def get_dashboard_summary(
         transactions_count = int(tx_count_result.scalar_one())
     except Exception as e:
         logger.warning("summary fallback zeros: %s", e)
-        total_income = Decimal("0")
-        total_expense = Decimal("0")
+        total_income = Decimal(0)
+        total_expense = Decimal(0)
         transactions_count = 0
 
     return DashboardSummaryResponse(

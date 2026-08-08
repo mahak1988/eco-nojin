@@ -1,4 +1,4 @@
-﻿"""
+"""
 DayCent Daily Carbon-Nitrogen Simulator (Clean Room)
 =====================================================
 Implements daily-step carbon (SOC) and nitrogen (SON) dynamics with
@@ -10,8 +10,9 @@ Based on concepts from:
 
 Not the official DayCent binary. Clean Room implementation for decision support.
 """
+
 from __future__ import annotations
-import math
+
 from typing import Any
 
 ENGINE = "conceptual"
@@ -23,13 +24,18 @@ DISCLAIMER = (
 
 # Soil texture effects on decomposition (sand = fastest, clay = slowest)
 TEXTURE_FACTORS = {
-    "sand": 0.7, "loamy_sand": 0.8, "sandy_loam": 0.9,
-    "loam": 1.0, "silt_loam": 1.1, "clay_loam": 1.2, "clay": 1.3,
+    "sand": 0.7,
+    "loamy_sand": 0.8,
+    "sandy_loam": 0.9,
+    "loam": 1.0,
+    "silt_loam": 1.1,
+    "clay_loam": 1.2,
+    "clay": 1.3,
 }
 
 # Decomposition rate constants at 20C (fraction/day)
-K_ACTIVE = 0.02   # Active pool (fast: weeks-months)
-K_SLOW = 0.0005   # Slow pool (medium: years-decades)
+K_ACTIVE = 0.02  # Active pool (fast: weeks-months)
+K_SLOW = 0.0005  # Slow pool (medium: years-decades)
 K_PASSIVE = 0.00002  # Passive pool (slow: centuries)
 
 
@@ -51,7 +57,7 @@ def run_daycent(params: dict[str, Any] | None = None) -> dict[str, Any]:
     p = dict(params or {})
 
     initial_soc = float(p.get("initial_soc", 50.0))  # t C/ha
-    initial_son = float(p.get("initial_son", 5.0))   # t N/ha (10:1 C:N)
+    initial_son = float(p.get("initial_son", 5.0))  # t N/ha (10:1 C:N)
     n_fertilizer_kg_ha = float(p.get("n_fertilizer_kg_ha", 100.0))
     days = max(1, int(float(p.get("days", 365))))
     temp_c = float(p.get("temp_c", 15.0))

@@ -20,18 +20,26 @@ import os
 import re
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Optional, Set, Tuple
+from typing import NamedTuple
 
 ROOT = Path(__file__).resolve().parent.parent
 
-EXCLUDE_DIRS: Set[str] = {
-    ".git", ".github", ".venv", ".turbo", ".pnpm-store",
-    "node_modules", "dist", "build", ".next", "__pycache__",
+EXCLUDE_DIRS: set[str] = {
+    ".git",
+    ".github",
+    ".venv",
+    ".turbo",
+    ".pnpm-store",
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    "__pycache__",
 }
 
-FRONTEND_DIRS: List[Path] = [
+FRONTEND_DIRS: list[Path] = [
     ROOT / "apps" / "web" / "src",
     ROOT / "packages" / "features" / "src",
     ROOT / "packages" / "ui" / "src",
@@ -45,20 +53,13 @@ LOCALE_DIR = ROOT / "src" / "i18n" / "locales"
 EN_PATH = LOCALE_DIR / "en.json"
 FA_PATH = LOCALE_DIR / "fa.json"
 
-RTL_RE = re.compile(
-    "[\u0600-\u06FF"
-    "\u0750-\u077F"
-    "\u08A0-\u08FF"
-    "\uFB50-\uFDFF"
-    "\uFE70-\uFEFF"
-    "]"
-)
+RTL_RE = re.compile("[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff\ufb50-\ufdff\ufe70-\ufeff]")
 
 # ---------------------------------------------------------------------------
 # Key generation
 # ---------------------------------------------------------------------------
 
-_KEY_COUNTER: Dict[str, int] = defaultdict(int)
+_KEY_COUNTER: dict[str, int] = defaultdict(int)
 
 
 def _make_key(file_rel: str, text: str) -> str:
@@ -95,9 +96,9 @@ class ExtractedString(NamedTuple):
     key: str
 
 
-def scan_frontend_files() -> List[ExtractedString]:
+def scan_frontend_files() -> list[ExtractedString]:
     """Scan frontend directories for hard-coded Persian strings."""
-    results: List[ExtractedString] = []
+    results: list[ExtractedString] = []
 
     for scan_dir in FRONTEND_DIRS:
         if not scan_dir.exists():
@@ -124,12 +125,14 @@ def scan_frontend_files() -> List[ExtractedString]:
                         content = m.group(1)
                         if RTL_RE.search(content):
                             key = _make_key(rel, content)
-                            results.append(ExtractedString(
-                                file=rel,
-                                line=i,
-                                text=content.strip(),
-                                key=key,
-                            ))
+                            results.append(
+                                ExtractedString(
+                                    file=rel,
+                                    line=i,
+                                    text=content.strip(),
+                                    key=key,
+                                )
+                            )
     return results
 
 
@@ -138,7 +141,7 @@ def scan_frontend_files() -> List[ExtractedString]:
 # ---------------------------------------------------------------------------
 
 
-def _load_locale(path: Path) -> Dict[str, str]:
+def _load_locale(path: Path) -> dict[str, str]:
     """Load a JSON locale file, return empty dict if missing."""
     if not path.exists():
         return {}
@@ -149,7 +152,7 @@ def _load_locale(path: Path) -> Dict[str, str]:
         return {}
 
 
-def _save_locale(path: Path, data: Dict[str, str]) -> None:
+def _save_locale(path: Path, data: dict[str, str]) -> None:
     """Save locale data as pretty-printed JSON."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -158,12 +161,14 @@ def _save_locale(path: Path, data: Dict[str, str]) -> None:
     )
 
 
-def update_locale_files(extracted: List[ExtractedString], apply: bool = False) -> Dict[str, List[dict]]:
+def update_locale_files(
+    extracted: list[ExtractedString], apply: bool = False
+) -> dict[str, list[dict]]:
     """Update en.json and fa.json with extracted strings."""
     en_data = _load_locale(EN_PATH)
     fa_data = _load_locale(FA_PATH)
 
-    report: Dict[str, List[dict]] = defaultdict(list)
+    report: dict[str, list[dict]] = defaultdict(list)
     new_keys = 0
     existing_keys = 0
 
@@ -202,9 +207,9 @@ def update_locale_files(extracted: List[ExtractedString], apply: bool = False) -
 # ---------------------------------------------------------------------------
 
 
-def write_report(report: Dict[str, List[dict]], path: Path) -> None:
+def write_report(report: dict[str, list[dict]], path: Path) -> None:
     output = {
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "generated_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "generator": "extract_i18n_keys.py",
         "total_files": len(report),
         "total_strings": sum(len(v) for v in report.values()),
@@ -242,7 +247,7 @@ def main():
     if not args.apply:
         print("\n[DRY RUN] Use --apply to update locale files.", file=sys.stderr)
 
-    print(f"\nDone.", file=sys.stderr)
+    print("\nDone.", file=sys.stderr)
 
 
 if __name__ == "__main__":

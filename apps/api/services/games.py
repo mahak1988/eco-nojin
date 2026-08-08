@@ -7,16 +7,19 @@ Business logic layer — orchestrates repositories and enforces rules.
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.api.models.games import Quiz, QuizAttempt, QuizQuestion, VocabularyWord
 from apps.api.repositories.games import GamesRepository
 from apps.api.schemas.games import (
-    VocabularyWordCreate, VocabularyWordUpdate, QuizCreate,
-    QuizUpdate, QuizQuestionCreate, QuizQuestionUpdate
+    QuizCreate,
+    QuizQuestionCreate,
+    QuizQuestionUpdate,
+    QuizUpdate,
+    VocabularyWordCreate,
+    VocabularyWordUpdate,
 )
-from apps.api.models.games import VocabularyWord, Quiz, QuizQuestion, QuizAttempt
 
 
 class GamesService:
@@ -29,9 +32,12 @@ class GamesService:
     # ==================== Vocabulary Operations ====================
 
     async def list_vocabulary(
-        self, skip: int = 0, limit: int = 100,
-        search: Optional[str] = None, category: Optional[str] = None
-    ) -> tuple[List[VocabularyWord], int]:
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str | None = None,
+        category: str | None = None,
+    ) -> tuple[list[VocabularyWord], int]:
         """Handle list_vocabulary (skip, limit, search, category)."""
         limit = min(limit, 200)
         return await self.repo.list_vocabulary(skip, limit, search, category)
@@ -62,19 +68,25 @@ class GamesService:
     # ==================== Quiz Operations ====================
 
     async def list_quizzes(
-        self, skip: int = 0, limit: int = 100,
-        search: Optional[str] = None, category: Optional[str] = None, difficulty: Optional[str] = None
-    ) -> tuple[List[Quiz], int]:
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str | None = None,
+        category: str | None = None,
+        difficulty: str | None = None,
+    ) -> tuple[list[Quiz], int]:
         """Handle list_quizzes (skip, limit, search, category, difficulty)."""
         limit = min(limit, 200)
         return await self.repo.list_quizzes(skip, limit, search, category, difficulty)
 
     async def create_quiz(self, author_id: int, data: QuizCreate) -> Quiz:
         """Handle create_quiz (author_id, data)."""
-        obj = await self.repo.create_quiz({**data.model_dump(exclude={"questions"}), "author_id": author_id})
+        obj = await self.repo.create_quiz(
+            {**data.model_dump(exclude={"questions"}), "author_id": author_id}
+        )
 
         # Add questions
-        for q_data in (data.questions or []):
+        for q_data in data.questions or []:
             await self.repo.create_question(obj.id, q_data.model_dump())
 
         await self.repo.session.refresh(obj)
@@ -89,7 +101,6 @@ class GamesService:
 
     async def update_quiz(self, quiz_id: int, data: QuizUpdate) -> Quiz:
         """Handle update_quiz (quiz_id, data)."""
-        from apps.api.schemas.games import QuizUpdate
         obj = await self.repo.update_quiz(quiz_id, data.model_dump())
         if not obj:
             raise ValueError(f"Quiz with id={quiz_id} not found")
@@ -102,7 +113,9 @@ class GamesService:
 
     # ==================== Quiz Question Operations ====================
 
-    async def list_questions(self, quiz_id: int, skip: int = 0, limit: int = 100) -> tuple[List[QuizQuestion], int]:
+    async def list_questions(
+        self, quiz_id: int, skip: int = 0, limit: int = 100
+    ) -> tuple[list[QuizQuestion], int]:
         """Handle list_questions (quiz_id, skip, limit)."""
         return await self.repo.list_questions_by_quiz(quiz_id, skip, limit)
 
@@ -120,7 +133,6 @@ class GamesService:
 
     async def update_question(self, question_id: int, data: QuizQuestionUpdate) -> QuizQuestion:
         """Handle update_question (question_id, data)."""
-        from apps.api.schemas.games import QuizQuestionUpdate
         obj = await self.repo.update_question(question_id, data.model_dump())
         if not obj:
             raise ValueError(f"QuizQuestion with id={question_id} not found")
@@ -133,7 +145,9 @@ class GamesService:
 
     # ==================== Quiz Attempt Operations ====================
 
-    async def list_attempts(self, user_id: int, skip: int = 0, limit: int = 100) -> tuple[List[QuizAttempt], int]:
+    async def list_attempts(
+        self, user_id: int, skip: int = 0, limit: int = 100
+    ) -> tuple[list[QuizAttempt], int]:
         """Handle list_attempts (user_id, skip, limit)."""
         return await self.repo.list_attempts_by_user(user_id, skip, limit)
 

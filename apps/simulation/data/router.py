@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 
 from apps.simulation.data import service as data_service
 from apps.simulation.data import world_bank
+
 try:
     from apps.simulation.data.nasa_power import fetch_nasa_power_data
 except ImportError:
@@ -24,8 +25,8 @@ router = APIRouter(prefix="/api/v1/data", tags=["Real-World Data"])
 async def climate(
     lat: float = Query(..., ge=-90, le=90, description="Latitude"),
     lon: float = Query(..., ge=-180, le=180, description="Longitude"),
-    start: Optional[str] = Query(None, description="YYYY-MM-DD (default: 90 days ago)"),
-    end: Optional[str] = Query(None, description="YYYY-MM-DD (default: today)"),
+    start: str | None = Query(None, description="YYYY-MM-DD (default: 90 days ago)"),
+    end: str | None = Query(None, description="YYYY-MM-DD (default: today)"),
     source: str = Query("auto", description="auto | nasa | openmeteo"),
 ) -> dict[str, Any]:
     try:
@@ -101,18 +102,21 @@ async def get_real_weather(lat: float, lon: float, days: int = 30) -> dict[str, 
 @router.get("/satellite", summary="Synthetic satellite agro series")
 async def get_satellite_data(lat: float, lon: float, days: int = 7) -> dict[str, Any]:
     """Return synthetic satellite agro data (no external API key required)."""
-    import random
     import math
+    import random
+
     base_ndvi = 0.3 + 0.5 * abs(math.sin(lat * 0.1))
     base_sm = 20 + 15 * abs(math.cos(lon * 0.05))
     daily = []
     for i in range(min(days, 30)):
-        daily.append({
-            "day": i + 1,
-            "ndvi": round(base_ndvi + random.uniform(-0.05, 0.05), 3),
-            "soil_moisture_pct": round(base_sm + random.uniform(-3, 3), 1),
-            "lst_c": round(25 + random.uniform(-5, 5), 1),
-        })
+        daily.append(
+            {
+                "day": i + 1,
+                "ndvi": round(base_ndvi + random.uniform(-0.05, 0.05), 3),
+                "soil_moisture_pct": round(base_sm + random.uniform(-3, 3), 1),
+                "lst_c": round(25 + random.uniform(-5, 5), 1),
+            }
+        )
     return {
         "status": "success",
         "source": "synthetic",

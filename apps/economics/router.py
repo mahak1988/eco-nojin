@@ -9,16 +9,15 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from apps.auth.dependencies import require_permission
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.auth.dependencies import require_permission
 from apps.economics.schemas import (
-    EconomicAnalysisCreate,
-    EconomicAnalysisUpdate,
-    EconomicAnalysisResponse,
-    EconomicAnalysisListResponse,
     CostBenefitResult,
+    EconomicAnalysisCreate,
+    EconomicAnalysisListResponse,
+    EconomicAnalysisResponse,
+    EconomicAnalysisUpdate,
 )
 from apps.economics.service import EconomicsService
 
@@ -58,7 +57,9 @@ async def get_analysis(
     return analysis
 
 
-@router.post("/analyses", response_model=EconomicAnalysisResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/analyses", response_model=EconomicAnalysisResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_analysis(
     data: EconomicAnalysisCreate,
     current_user: EconomicAnalysis = Depends(require_permission("economics.analysis.create")),

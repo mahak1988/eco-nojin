@@ -21,9 +21,11 @@ def quarantine_files(file_list, quarantine_dir):
             counter = 1
             original_target = target_path
             while target_path.exists():
-                target_path = original_target.with_name(f"{original_target.stem}_{counter}{original_target.suffix}")
+                target_path = original_target.with_name(
+                    f"{original_target.stem}_{counter}{original_target.suffix}"
+                )
                 counter += 1
-            
+
             print(f"Moving {item_path} -> {target_path}")
             shutil.move(str(item_path), str(target_path))
         else:
@@ -47,7 +49,7 @@ if __name__ == "__main__":
     # Add more items from triage report or other sources
     # Let's simulate moving a dummy temp file for demonstration
     temp_file = project_root / "temp_to_delete.tmp"
-    temp_file.touch() # Create a dummy file
+    temp_file.touch()  # Create a dummy file
     junk_items.append(temp_file)
 
     print(f"Starting quarantine process for {len(junk_items)} items into {quarantine_dir}/")

@@ -1,4 +1,5 @@
 """Tests for schemas."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestSchemas:
         """Verify UserBase has expected fields."""
         try:
             from apps.users.schemas import UserBase
+
             schema = UserBase
             assert hasattr(schema, "model_fields") or hasattr(schema, "__fields__")
         except ImportError:
@@ -27,6 +29,7 @@ class TestSchemas:
         """Verify UserUpdate has expected fields."""
         try:
             from apps.users.schemas import UserUpdate
+
             schema = UserUpdate
             assert hasattr(schema, "model_fields") or hasattr(schema, "__fields__")
         except ImportError:
@@ -36,6 +39,7 @@ class TestSchemas:
         """Verify Token has expected fields."""
         try:
             from apps.users.schemas import Token
+
             schema = Token
             assert hasattr(schema, "model_fields") or hasattr(schema, "__fields__")
         except ImportError:
@@ -45,7 +49,7 @@ class TestSchemas:
         """Verify UserCreate can be referenced."""
         try:
             from apps.users.schemas import UserCreate
+
             assert UserCreate is not None
         except ImportError:
             pytest.skip("Module not available")
-

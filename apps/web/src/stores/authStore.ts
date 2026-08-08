@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Lightweight auth session store (no external state library).
  */
 import type { AuthUser } from "../types/auth";
@@ -17,9 +17,18 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch { return true; }
+}
+
 function readToken(): string | null {
   try {
-    return localStorage.getItem("access_token") || localStorage.getItem("token");
+    const tok = localStorage.getItem("access_token") || localStorage.getItem("token");
+  if (tok && isTokenExpired(tok)) { localStorage.removeItem("access_token"); localStorage.removeItem("token"); return null; }
+  return tok;
   } catch {
     return null;
   }

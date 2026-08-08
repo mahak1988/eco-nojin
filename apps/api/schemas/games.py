@@ -8,10 +8,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional, List
 from enum import Enum
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class WordCategoryEnum(str, Enum):
@@ -31,10 +30,10 @@ class DifficultyLevelEnum(str, Enum):
 class VocabularyWordBase(BaseModel):
     word: str = Field(..., min_length=1, max_length=100)
     translation: str = Field(..., min_length=1, max_length=255)
-    pronunciation: Optional[str] = Field(None, max_length=100)
-    example: Optional[str] = None
+    pronunciation: str | None = Field(None, max_length=100)
+    example: str | None = None
     category: WordCategoryEnum = WordCategoryEnum.AGRICULTURE
-    part_of_speech: Optional[str] = Field(None, max_length=30)
+    part_of_speech: str | None = Field(None, max_length=30)
 
 
 class VocabularyWordCreate(VocabularyWordBase):
@@ -42,13 +41,13 @@ class VocabularyWordCreate(VocabularyWordBase):
 
 
 class VocabularyWordUpdate(BaseModel):
-    word: Optional[str] = Field(None, min_length=1, max_length=100)
-    translation: Optional[str] = Field(None, min_length=1, max_length=255)
-    pronunciation: Optional[str] = None
-    example: Optional[str] = None
-    category: Optional[WordCategoryEnum] = None
-    part_of_speech: Optional[str] = None
-    is_active: Optional[bool] = None
+    word: str | None = Field(None, min_length=1, max_length=100)
+    translation: str | None = Field(None, min_length=1, max_length=255)
+    pronunciation: str | None = None
+    example: str | None = None
+    category: WordCategoryEnum | None = None
+    part_of_speech: str | None = None
+    is_active: bool | None = None
 
 
 class VocabularyWordResponse(VocabularyWordBase):
@@ -60,7 +59,7 @@ class VocabularyWordResponse(VocabularyWordBase):
 
 
 class VocabularyWordListResponse(BaseModel):
-    items: List[VocabularyWordResponse]
+    items: list[VocabularyWordResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -70,8 +69,8 @@ class QuizQuestionBase(BaseModel):
     question_text: str = Field(..., min_length=1)
     option_a: str = Field(..., min_length=1, max_length=255)
     option_b: str = Field(..., min_length=1, max_length=255)
-    option_c: Optional[str] = Field(None, max_length=255)
-    option_d: Optional[str] = Field(None, max_length=255)
+    option_c: str | None = Field(None, max_length=255)
+    option_d: str | None = Field(None, max_length=255)
     correct_answer: str = Field(..., pattern="^[a-dA-D]$")
     points: int = Field(1, ge=1)
     order: int = Field(0, ge=0)
@@ -82,14 +81,14 @@ class QuizQuestionCreate(QuizQuestionBase):
 
 
 class QuizQuestionUpdate(BaseModel):
-    question_text: Optional[str] = None
-    option_a: Optional[str] = None
-    option_b: Optional[str] = None
-    option_c: Optional[str] = None
-    option_d: Optional[str] = None
-    correct_answer: Optional[str] = None
-    points: Optional[int] = None
-    order: Optional[int] = None
+    question_text: str | None = None
+    option_a: str | None = None
+    option_b: str | None = None
+    option_c: str | None = None
+    option_d: str | None = None
+    correct_answer: str | None = None
+    points: int | None = None
+    order: int | None = None
 
 
 class QuizQuestionResponse(QuizQuestionBase):
@@ -101,23 +100,23 @@ class QuizQuestionResponse(QuizQuestionBase):
 
 class QuizBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     category: WordCategoryEnum = WordCategoryEnum.AGRICULTURE
     difficulty: DifficultyLevelEnum = DifficultyLevelEnum.MEDIUM
     time_limit: int = Field(0, ge=0)
 
 
 class QuizCreate(QuizBase):
-    questions: Optional[List[QuizQuestionCreate]] = Field(default_factory=list)
+    questions: list[QuizQuestionCreate] | None = Field(default_factory=list)
 
 
 class QuizUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    category: Optional[WordCategoryEnum] = None
-    difficulty: Optional[DifficultyLevelEnum] = None
-    time_limit: Optional[int] = None
-    is_active: Optional[bool] = None
+    title: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    category: WordCategoryEnum | None = None
+    difficulty: DifficultyLevelEnum | None = None
+    time_limit: int | None = None
+    is_active: bool | None = None
 
 
 class QuizResponse(QuizBase):
@@ -126,11 +125,11 @@ class QuizResponse(QuizBase):
     id: int
     is_active: bool
     created_at: datetime
-    questions: List[QuizQuestionResponse] = Field(default_factory=list)
+    questions: list[QuizQuestionResponse] = Field(default_factory=list)
 
 
 class QuizListResponse(BaseModel):
-    items: List[QuizResponse]
+    items: list[QuizResponse]
     total: int
     skip: int = 0
     limit: int = 100
@@ -157,7 +156,7 @@ class QuizAttemptResponse(QuizAttemptBase):
 
 
 class QuizAttemptListResponse(BaseModel):
-    items: List[QuizAttemptResponse]
+    items: list[QuizAttemptResponse]
     total: int
     skip: int = 0
     limit: int = 100

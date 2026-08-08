@@ -1,9 +1,9 @@
 """Validation / calibration endpoints."""
+
 from __future__ import annotations
 
-
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -53,7 +53,7 @@ async def validation(req: CalibrationRequest) -> dict[str, Any]:
     except Exception:
         validated_params = sim_params
 
-    sim_yield: Optional[float] = None
+    sim_yield: float | None = None
     metrics: dict[str, Any] = {}
     try:
         result = await sim.run(validated_params)
@@ -77,9 +77,7 @@ async def validation(req: CalibrationRequest) -> dict[str, Any]:
         gof = goodness_of_fit(observed, simulated_series)
         gof["observed_mean_t_ha"] = mean_obs
         gof["simulated_t_ha"] = round(sim_yield, 3)
-        gof["yield_gap_pct"] = (
-            round((sim_yield - mean_obs) / mean_obs * 100, 1) if mean_obs else 0
-        )
+        gof["yield_gap_pct"] = round((sim_yield - mean_obs) / mean_obs * 100, 1) if mean_obs else 0
 
     uncertainty = None
     if req.run_uncertainty:

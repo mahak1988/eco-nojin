@@ -1,4 +1,5 @@
 """Tests for router."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestRouter:
         """Verify save_run is callable."""
         try:
             from apps.simulation.runs.router import save_run
+
             assert callable(save_run)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,6 +28,7 @@ class TestRouter:
         """Verify list_runs is callable."""
         try:
             from apps.simulation.runs.router import list_runs
+
             assert callable(list_runs)
         except ImportError:
             pytest.skip("Module not available")
@@ -34,6 +37,7 @@ class TestRouter:
         """Verify get_run is callable."""
         try:
             from apps.simulation.runs.router import get_run
+
             assert callable(get_run)
         except ImportError:
             pytest.skip("Module not available")
@@ -42,6 +46,7 @@ class TestRouter:
         """Verify delete_run is callable."""
         try:
             from apps.simulation.runs.router import delete_run
+
             assert callable(delete_run)
         except ImportError:
             pytest.skip("Module not available")
@@ -50,22 +55,24 @@ class TestRouter:
         """Verify RunCreate has expected fields."""
         try:
             from apps.simulation.runs.router import RunCreate
+
             schema = RunCreate
             assert hasattr(schema, "model_fields") or hasattr(schema, "__fields__")
         except ImportError:
             pytest.skip("Module not available")
 
-
     def test_RunUpdate_fields(self) -> None:
         try:
             from apps.simulation.runs.router import RunUpdate
-            assert hasattr(RunUpdate, 'model_fields')
+
+            assert hasattr(RunUpdate, "model_fields")
         except ImportError:
             pass
 
     def test_update_run_exists(self) -> None:
         try:
             from apps.simulation.runs.router import update_run
+
             assert callable(update_run)
         except ImportError:
             pass

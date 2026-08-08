@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -49,13 +48,13 @@ _MODEL_MODULES = [
 MODEL_MODULES = _MODEL_MODULES
 
 
-def import_all_models(module_list: list[str] | None = None) -> List[str]:
+def import_all_models(module_list: list[str] | None = None) -> list[str]:
     """Import every model module so Base.metadata is fully populated.
 
     Returns the list of modules that imported successfully.
     Failures are logged at debug level and skipped (missing optional deps).
     """
-    loaded: List[str] = []
+    loaded: list[str] = []
     modules = module_list if module_list is not None else _MODEL_MODULES
     for mod in modules:
         try:

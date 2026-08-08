@@ -4,10 +4,15 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
 
 logger = logging.getLogger(__name__)
@@ -57,14 +62,15 @@ def _resolve_database_url() -> str:
         if "+asyncpg" in url and not _has_asyncpg():
             if _force_postgres():
                 raise RuntimeError(
-                    "FORCE_POSTGRES=1 but asyncpg is not installed. "
-                    "pip install asyncpg"
+                    "FORCE_POSTGRES=1 but asyncpg is not installed. pip install asyncpg"
                 )
             logger.info("asyncpg not installed — local SQLite")
             return DEFAULT_SQLITE
         # Phase 3: allow Postgres on local when forced OR when asyncpg present and URL is explicit async
         if _force_postgres():
-            logger.info("FORCE_POSTGRES=1 — using Postgres: %s", url.split("@")[-1] if "@" in url else url)
+            logger.info(
+                "FORCE_POSTGRES=1 — using Postgres: %s", url.split("@")[-1] if "@" in url else url
+            )
             return url
         try:
             from apps.shared_core.config import settings
@@ -76,7 +82,9 @@ def _resolve_database_url() -> str:
                     if "localhost" in url or "127.0.0.1" in url or "postgres:" in url:
                         logger.info("Local Postgres URL detected with asyncpg — using Postgres")
                         return url
-                logger.info("Local without FORCE_POSTGRES — SQLite (set FORCE_POSTGRES=1 to use PG)")
+                logger.info(
+                    "Local without FORCE_POSTGRES — SQLite (set FORCE_POSTGRES=1 to use PG)"
+                )
                 return DEFAULT_SQLITE
         except Exception:
             if not _force_postgres():

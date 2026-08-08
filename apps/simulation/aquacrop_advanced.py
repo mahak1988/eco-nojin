@@ -13,7 +13,7 @@ Not the official FAO AquaCrop binary.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.et0 import resolve_et0_mm_day
@@ -192,5 +192,5 @@ def run_aquacrop_advanced(params: dict[str, Any] | None = None) -> dict[str, Any
             "crop": crop,
             "area_ha": area_ha,
         },
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

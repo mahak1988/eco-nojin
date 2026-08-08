@@ -1,4 +1,4 @@
-version: '3.8'
+﻿version: '3.8'
 
 services:
   api:
@@ -60,7 +60,7 @@ services:
     environment:
       - POSTGRES_DB=econojin_prod
       - POSTGRES_USER=econojin
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backups/postgres:/backups
@@ -78,7 +78,7 @@ services:
     image: redis:7-alpine
     container_name: econojin-redis
     restart: always
-    command: redis-server --appendonly yes --maxmemory 2gb
+    command: redis-server --requirepass ${REDIS_PASSWORD:-econojin_redis_secure} --appendonly yes --maxmemory 2gb
     volumes:
       - redis_data:/data
       - ./backups/redis:/backups

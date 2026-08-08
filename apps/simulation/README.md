@@ -62,14 +62,15 @@ All simulators inherit from the `Simulator` base class:
 ```python
 from simulation.base import Simulator
 
+
 class MySimulator(Simulator):
     """Custom simulator"""
-    
+
     name = "my_simulator"
     description = "Simulator description"
     inputs = [{"name": "param1", "type": "float", "description": "..."}]
     outputs = [{"name": "result1", "type": "float", "description": "..."}]
-    
+
     async def run(self, inputs: dict) -> dict:
         # Simulation logic
         return {"result1": 42.0}
@@ -81,6 +82,7 @@ Simulators are registered automatically using the `@register_simulator` decorato
 
 ```python
 from simulation.registry import register_simulator
+
 
 @register_simulator
 class ClimateModel(Simulator):

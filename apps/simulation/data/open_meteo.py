@@ -3,6 +3,7 @@ Open-Meteo API client (no API key for non-commercial use).
 Provides FAO ET0 directly + historical/forecast weather.
 Docs: https://open-meteo.com/en/docs
 """
+
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,5 @@
 """Integration between Phase 1 and Phase 2 models"""
+
 import logging
 
 logger = logging.getLogger(__name__)

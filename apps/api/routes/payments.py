@@ -1,8 +1,9 @@
 """FastAPI routes: /api/v1/payments/*"""
+
 from __future__ import annotations
 
 import os
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
@@ -26,9 +27,9 @@ class CheckoutIn(BaseModel):
     amount: float = Field(..., gt=0)
     currency: str = "USD"
     description: str = "Eco Nojin payment"
-    invoice_id: Optional[str] = None
+    invoice_id: str | None = None
     provider: str = "auto"
-    customer_email: Optional[str] = None
+    customer_email: str | None = None
 
 
 @router.get("/status")

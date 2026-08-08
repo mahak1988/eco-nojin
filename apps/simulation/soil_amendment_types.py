@@ -7,7 +7,7 @@ clay-compacted, organic-poor, waterlogged, gypsiferous, polluted (generic).
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -65,7 +65,7 @@ def classify_soil(params: dict[str, Any] | None = None) -> dict[str, Any]:
             "om_pct": om,
             "bulk_density": bd,
         },
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -170,9 +170,7 @@ def recommend_amendments(params: dict[str, Any] | None = None) -> dict[str, Any]
         cec = float(p.get("cec_cmol_kg", 20))
         depth = float(p.get("depth_cm", 30))
         bd = float(p.get("bulk_density_mg_m3", 1.4))
-        quant["gypsum_t_ha_rough"] = round(
-            (esp - 10) / 100.0 * cec * depth * bd * 0.086, 2
-        )
+        quant["gypsum_t_ha_rough"] = round((esp - 10) / 100.0 * cec * depth * bd * 0.086, 2)
     ec = float(p.get("ec_ds_m", 0))
     if ec >= 4:
         quant["leaching_fraction_hint"] = round(
@@ -185,7 +183,7 @@ def recommend_amendments(params: dict[str, Any] | None = None) -> dict[str, Any]
         "classification": clf,
         "plans": plans,
         "quantitative": quant,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
 
 

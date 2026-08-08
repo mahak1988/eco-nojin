@@ -12,7 +12,7 @@ Returns a single payload suitable for UI dashboards and MRV stubs.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.aquacrop_advanced import run_aquacrop_advanced
@@ -90,7 +90,7 @@ def run_coupled_science(params: dict[str, Any] | None = None) -> dict[str, Any]:
 
     return {
         "pipeline": "coupled_science_v1",
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
         "references": [
             "FAO56 crop coefficients",
             "FAO33 yield response Ky",

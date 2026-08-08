@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
-from apps.simulation.evaluation_metrics import evaluate_series, metrics_catalog, nse
+from apps.simulation.evaluation_metrics import evaluate_series, metrics_catalog
 from apps.simulation.nitrogen_cycle import evaluate_n_series, run_nitrogen_cycle
 
 router = APIRouter(prefix="/api/v1/science", tags=["Nitrogen & Metrics"])
@@ -18,7 +18,7 @@ class NCycleBody(BaseModel):
     steps_per_year: int = Field(12, ge=1, le=24)
     soc_t_ha: float = Field(40.0, ge=5, le=200)
     cn_ratio: float = Field(12.0, ge=5, le=30)
-    n_org_t_ha: Optional[float] = Field(None, ge=0.1, le=30)
+    n_org_t_ha: float | None = Field(None, ge=0.1, le=30)
     nh4_t_ha: float = Field(0.02, ge=0, le=1)
     no3_t_ha: float = Field(0.05, ge=0, le=1)
     k_mineralization: float = Field(0.04, ge=0.005, le=0.2)
@@ -41,10 +41,11 @@ class EvaluateBody(BaseModel):
 
 class NEvaluateBody(BaseModel):
     """Run N cycle then score against annual observations."""
+
     run: NCycleBody = Field(default_factory=NCycleBody)
     observed: dict[str, list[float]] = Field(
         ...,
-        description="e.g. {\"no3\": [0.05, 0.04, ...], \"n_org\": [...]} annual",
+        description='e.g. {"no3": [0.05, 0.04, ...], "n_org": [...]} annual',
     )
 
 

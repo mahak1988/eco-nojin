@@ -32,7 +32,9 @@ def _risk_label(y: float, f: dict[str, float]) -> str:
     return "low"
 
 
-def generate_dataset(n: int = 800, seed: int = 42) -> tuple[list[list[float]], list[float], list[str]]:
+def generate_dataset(
+    n: int = 800, seed: int = 42
+) -> tuple[list[list[float]], list[float], list[str]]:
     rng = random.Random(seed)
     X: list[list[float]] = []
     y_reg: list[float] = []

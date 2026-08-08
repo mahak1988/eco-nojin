@@ -4,9 +4,8 @@ Enhanced Component Extraction & Integration Script
 Extracts, renames, and integrates components from advanced GitHub projects:
 Resolution: 2024/07/20 - v2.0
 """
+
 import json
-import os
-import shutil
 import subprocess
 from pathlib import Path
 from typing import Any

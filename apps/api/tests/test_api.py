@@ -17,7 +17,6 @@ def test_module_imports():
     #     from apps.api import models, schemas, service, repository
     # except ImportError as e:
     #     pytest.fail(f"Failed to import api module: {e}")
-    pass
 
 
 def test_api_create_schema():
@@ -25,13 +24,11 @@ def test_api_create_schema():
     # from apps.api.schemas import ApiCreate
     # obj = ApiCreate(name="test", description="desc")
     # assert obj.name == "test"
-    pass
 
 
 def test_api_response_schema():
     """Test the ApiResponse schema serializes correctly."""
     # from apps.api.schemas import ApiResponse
-    pass
 
 
 @pytest.mark.asyncio
@@ -41,10 +38,8 @@ async def test_api_service_create():
     # service = ApiService(session=test_session)
     # obj = await service.create(ApiCreate(name="test"))
     # assert obj.id is not None
-    pass
 
 
 @pytest.mark.asyncio
 async def test_api_service_list():
     """Test listing records via the service."""
-    pass

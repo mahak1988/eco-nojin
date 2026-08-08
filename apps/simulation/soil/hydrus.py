@@ -1,4 +1,4 @@
-﻿"""
+"""
 HYDRUS-1D Soil Water Flow Simulator (Clean Room)
 ==================================================
 Implements van Genuchten (1980) equations for unsaturated soil water flow.
@@ -11,8 +11,9 @@ Reference: van Genuchten, M.Th. (1980). A closed-form equation for predicting
 
 Not the official HYDRUS binary. Clean Room implementation for decision support.
 """
+
 from __future__ import annotations
-import math
+
 from typing import Any
 
 ENGINE = "conceptual"
@@ -40,10 +41,12 @@ def van_genuchten_theta(h: float, theta_r: float, theta_s: float, alpha: float, 
     denom = 1.0 + abs(alpha * h) ** n
     if denom <= 0:
         return theta_r
-    return theta_r + (theta_s - theta_r) / (denom ** m)
+    return theta_r + (theta_s - theta_r) / (denom**m)
 
 
-def van_genuchten_k(h: float, Ks: float, theta_r: float, theta_s: float, alpha: float, n: float) -> float:
+def van_genuchten_k(
+    h: float, Ks: float, theta_r: float, theta_s: float, alpha: float, n: float
+) -> float:
     """Hydraulic conductivity from pressure head (van Genuchten 1980, Eq. 8)."""
     theta = van_genuchten_theta(h, theta_r, theta_s, alpha, n)
     if theta_s <= theta_r:
@@ -54,7 +57,7 @@ def van_genuchten_k(h: float, Ks: float, theta_r: float, theta_s: float, alpha: 
     inner = 1.0 - Se ** (1.0 / m)
     if inner < 0:
         inner = 0.0
-    return Ks * (Se ** 0.5) * (inner ** m) ** 2
+    return Ks * (Se**0.5) * (inner**m) ** 2
 
 
 def run_hydrus_1d(params: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -85,7 +88,9 @@ def run_hydrus_1d(params: dict[str, Any] | None = None) -> dict[str, Any]:
 
         # Drainage below root zone
         h_avg = -100.0 * (1.0 - current_moisture / sp["theta_s"])
-        k_unsat = van_genuchten_k(h_avg, sp["Ks"], sp["theta_r"], sp["theta_s"], sp["alpha"], sp["n"])
+        k_unsat = van_genuchten_k(
+            h_avg, sp["Ks"], sp["theta_r"], sp["theta_s"], sp["alpha"], sp["n"]
+        )
         drainage = min(k_unsat, max(0.0, available_water * 0.1))
         drainage_total += drainage
 

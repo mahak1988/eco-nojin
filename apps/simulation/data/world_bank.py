@@ -3,6 +3,7 @@ World Bank Open Data API client (no API key).
 Agricultural/economic indicators for calibration & comparison.
 Docs: https://datahelpdesk.worldbank.org/knowledgebase/articles/889392
 """
+
 import asyncio
 import json
 import urllib.request
@@ -35,9 +36,12 @@ async def get_indicators(country_code: str, year_from: int = 2010, year_to: int 
             if len(data) > 1 and isinstance(data[1], list):
                 series = {
                     str(item["date"]): item["value"]
-                    for item in data[1] if item.get("value") is not None
+                    for item in data[1]
+                    if item.get("value") is not None
                 }
                 out[friendly] = series
         except Exception as e:
-            import logging; logging.getLogger(__name__).debug("Skipped: %s", e)
+            import logging
+
+            logging.getLogger(__name__).debug("Skipped: %s", e)
     return out

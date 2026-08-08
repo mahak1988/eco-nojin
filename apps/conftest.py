@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Pytest configuration and shared fixtures
 =========================================
 Adapted from fastapi/full-stack-fastapi-template with async support.
 Provides fixtures for database, authentication, and API testing.
 """
-import pytest
+
 import asyncio
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock
-from typing import AsyncGenerator, Generator
+
+import pytest
 from httpx import ASGITransport, AsyncClient
+
 
 # ── Test Settings ──────────────────────────────────────────────
 @pytest.fixture(scope="session")
@@ -106,7 +108,7 @@ def sample_event_data():
 async def async_client() -> AsyncGenerator[AsyncClient, None]:
     """Create an async HTTP client for API testing."""
     from apps.main import app
-    
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
@@ -115,9 +117,10 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 @pytest.fixture
 def auth_headers(mock_user) -> dict:
     """Generate authorization headers for testing."""
-    from apps.shared_core.security import create_access_token
     from datetime import timedelta
-    
+
+    from apps.shared_core.security import create_access_token
+
     token = create_access_token(
         subject=str(mock_user.id),
         expires_delta=timedelta(minutes=30),
@@ -128,9 +131,10 @@ def auth_headers(mock_user) -> dict:
 @pytest.fixture
 def superuser_headers(mock_superuser) -> dict:
     """Generate authorization headers for superuser testing."""
-    from apps.shared_core.security import create_access_token
     from datetime import timedelta
-    
+
+    from apps.shared_core.security import create_access_token
+
     token = create_access_token(
         subject=str(mock_superuser.id),
         expires_delta=timedelta(minutes=30),
@@ -142,18 +146,24 @@ def superuser_headers(mock_superuser) -> dict:
 @pytest.fixture
 def assert_response_ok():
     """Helper to assert successful API response."""
+
     def _assert(response, expected_status: int = 200):
-        assert response.status_code == expected_status, \
+        assert response.status_code == expected_status, (
             f"Expected {expected_status}, got {response.status_code}: {response.text}"
+        )
+
     return _assert
 
 
 @pytest.fixture
 def assert_response_error():
     """Helper to assert error API response."""
+
     def _assert(response, expected_status: int = 422):
-        assert response.status_code == expected_status, \
+        assert response.status_code == expected_status, (
             f"Expected {expected_status}, got {response.status_code}: {response.text}"
+        )
         data = response.json()
         assert "detail" in data or "error" in data
+
     return _assert

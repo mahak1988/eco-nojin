@@ -3,12 +3,14 @@ Tests for apps/simulation/router.py (public REST endpoints)
 Covers: list_simulators, get_simulator, run simulation.
 All heavy simulator calls are mocked — no real computation.
 """
+
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from httpx import AsyncClient, ASGITransport
+
+import pytest
 from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
 
 from apps.simulation.router import router as sim_router
 
@@ -18,9 +20,7 @@ app.include_router(sim_router, prefix="/api/v1")
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
 
 
@@ -51,15 +51,19 @@ def _mock_sim_list():
 class TestListSimulators:
     @pytest.mark.anyio
     async def test_list_simulators_returns_200(self, client):
-        with patch("apps.simulation.router.register_all_simulators", return_value=[]), \
-             patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()):
+        with (
+            patch("apps.simulation.router.register_all_simulators", return_value=[]),
+            patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()),
+        ):
             resp = await client.get("/api/v1/simulators")
         assert resp.status_code == 200
 
     @pytest.mark.anyio
     async def test_list_simulators_shape(self, client):
-        with patch("apps.simulation.router.register_all_simulators", return_value=[]), \
-             patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()):
+        with (
+            patch("apps.simulation.router.register_all_simulators", return_value=[]),
+            patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()),
+        ):
             resp = await client.get("/api/v1/simulators")
         data = resp.json()
         assert "simulators" in data
@@ -68,16 +72,20 @@ class TestListSimulators:
 
     @pytest.mark.anyio
     async def test_list_simulators_fa_lang(self, client):
-        with patch("apps.simulation.router.register_all_simulators", return_value=[]), \
-             patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()):
+        with (
+            patch("apps.simulation.router.register_all_simulators", return_value=[]),
+            patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()),
+        ):
             resp = await client.get("/api/v1/simulators?lang=fa")
         assert resp.status_code == 200
         assert resp.json()["lang"] == "fa"
 
     @pytest.mark.anyio
     async def test_list_simulators_en_lang(self, client):
-        with patch("apps.simulation.router.register_all_simulators", return_value=[]), \
-             patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()):
+        with (
+            patch("apps.simulation.router.register_all_simulators", return_value=[]),
+            patch("apps.simulation.router.localize_sim_list", return_value=_mock_sim_list()),
+        ):
             resp = await client.get("/api/v1/simulators?lang=en")
         assert resp.status_code == 200
         assert resp.json()["lang"] == "en"
@@ -89,16 +97,19 @@ class TestGetSimulator:
         mock_cls = MagicMock()
         mock_instance = MagicMock()
         mock_instance.get_metadata.return_value = {
-            "id": "aquacrop", "name": "AquaCrop", "parameters": []
+            "id": "aquacrop",
+            "name": "AquaCrop",
+            "parameters": [],
         }
         mock_cls.return_value = mock_instance
 
         with patch("apps.simulation.router.SimulationRegistry") as mock_reg:
             mock_reg.get_parameters.return_value = [{"name": "crop", "type": "string"}]
             mock_reg.get.return_value = mock_cls
-            with patch("apps.simulation.router.localize_sim_meta", return_value={
-                "id": "aquacrop", "name": "AquaCrop FA", "parameters": []
-            }):
+            with patch(
+                "apps.simulation.router.localize_sim_meta",
+                return_value={"id": "aquacrop", "name": "AquaCrop FA", "parameters": []},
+            ):
                 resp = await client.get("/api/v1/simulators/aquacrop")
         assert resp.status_code == 200
 
@@ -120,9 +131,10 @@ class TestGetSimulator:
         with patch("apps.simulation.router.SimulationRegistry") as mock_reg:
             mock_reg.get_parameters.return_value = []
             mock_reg.get.return_value = mock_cls
-            with patch("apps.simulation.router.localize_sim_meta", return_value={
-                "id": "rothc", "name": "RothC", "parameters": []
-            }):
+            with patch(
+                "apps.simulation.router.localize_sim_meta",
+                return_value={"id": "rothc", "name": "RothC", "parameters": []},
+            ):
                 resp = await client.get("/api/v1/simulators/rothc")
         assert resp.status_code == 200
         data = resp.json()
@@ -170,6 +182,7 @@ class TestRunSimulation:
     async def test_run_simulation_body_schema(self, client):
         """SimulationRunRequest must accept simulator_id + parameters."""
         from apps.simulation.router import SimulationRunRequest
+
         req = SimulationRunRequest(simulator_id="aquacrop", parameters={"crop": "wheat"})
         assert req.simulator_id == "aquacrop"
         assert req.parameters["crop"] == "wheat"

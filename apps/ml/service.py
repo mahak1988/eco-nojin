@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from apps.ml.classical import (
     ModelBundle,
@@ -18,7 +18,7 @@ from apps.ml.synthetic_data import generate_dataset
 
 _ROOT = Path(__file__).resolve().parents[2]
 _MODEL_PATH = _ROOT / "data" / "ml_models.json"
-_BUNDLE: Optional[ModelBundle] = None
+_BUNDLE: ModelBundle | None = None
 
 
 def train_default_models(n_samples: int = 1000, seed: int = 42) -> dict[str, Any]:

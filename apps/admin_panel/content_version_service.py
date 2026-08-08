@@ -1,9 +1,10 @@
 """Phase 5 — Content version persistence."""
+
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +13,7 @@ from apps.shared_core.models import ContentVersion
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class ContentVersionService:
@@ -34,7 +35,7 @@ class ContentVersionService:
         content_type: str,
         content_id: int,
         content_data: Any,
-        created_by: Optional[int],
+        created_by: int | None,
         status: str = "draft",
     ) -> ContentVersion:
         if not isinstance(content_data, str):
@@ -55,7 +56,7 @@ class ContentVersionService:
 
     async def list_versions(
         self, content_type: str, content_id: int, limit: int = 50
-    ) -> List[ContentVersion]:
+    ) -> list[ContentVersion]:
         stmt = (
             select(ContentVersion)
             .where(
@@ -70,7 +71,7 @@ class ContentVersionService:
 
     async def approve(
         self, content_type: str, content_id: int, approved_by: int, notes: str = ""
-    ) -> Optional[ContentVersion]:
+    ) -> ContentVersion | None:
         versions = await self.list_versions(content_type, content_id, limit=1)
         if not versions:
             # create approved snapshot if none exist
@@ -96,7 +97,7 @@ class ContentVersionService:
         return row
 
     @staticmethod
-    def to_response_dict(row: ContentVersion) -> Dict[str, Any]:
+    def to_response_dict(row: ContentVersion) -> dict[str, Any]:
         try:
             data = json.loads(row.content_data or "{}")
         except Exception:

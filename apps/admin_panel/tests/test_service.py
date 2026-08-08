@@ -1,4 +1,5 @@
 """Tests for service."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,7 +19,7 @@ class TestService:
         """Verify AdminService can be referenced."""
         try:
             from apps.admin_panel.service import AdminService
+
             assert AdminService is not None
         except ImportError:
             pytest.skip("Module not available")
-

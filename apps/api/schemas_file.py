@@ -8,30 +8,27 @@ import logging
 
 logger = logging.getLogger(__name__)
 from datetime import datetime
-from typing import Optional
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ApiBase(BaseModel):
     """Base schema with shared fields."""
 
     name: str = Field(..., min_length=1, max_length=255, description="Name")
-    description: Optional[str] = Field(None, description="Description")
+    description: str | None = Field(None, description="Description")
 
 
 class ApiCreate(ApiBase):
     """Schema for creating a new api."""
 
-    pass
-
 
 class ApiUpdate(BaseModel):
     """Schema for updating an existing api (all fields optional)."""
 
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    is_active: bool | None = None
 
 
 class ApiResponse(ApiBase):

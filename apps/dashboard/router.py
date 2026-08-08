@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query
@@ -56,7 +56,9 @@ async def _counts(session: AsyncSession) -> dict[str, int]:
     try:
         from apps.education.models import Course
 
-        out["courses"] = int((await session.execute(select(func.count()).select_from(Course))).scalar_one())
+        out["courses"] = int(
+            (await session.execute(select(func.count()).select_from(Course))).scalar_one()
+        )
     except Exception:
         pass
     return out
@@ -74,7 +76,7 @@ async def dashboard_stats(session: AsyncSession = Depends(get_db_session)) -> di
         "alerts_open": 0,
         "environment": settings.ENVIRONMENT,
         "version": settings.VERSION,
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
         "status": "ok",
     }
 
@@ -113,7 +115,7 @@ async def dashboard_overview(
         "science": science,
         "runs": runs,
         "runs_count": len(runs),
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
         "links": {
             "science": "/science",
             "simulators": "/simulators",

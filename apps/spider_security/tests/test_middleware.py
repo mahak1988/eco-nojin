@@ -3,14 +3,14 @@ Tests for apps/spider_security/middleware.py
 Covers: bot UA detection, rate limiting, allowed paths bypass,
         header injection, and legitimate user-agent passthrough.
 """
+
 from __future__ import annotations
 
 import pytest
-from httpx import AsyncClient, ASGITransport
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from httpx import ASGITransport, AsyncClient
 
-from apps.spider_security.middleware import SpiderGuardMiddleware, BOT_UA_PATTERNS
+from apps.spider_security.middleware import BOT_UA_PATTERNS, SpiderGuardMiddleware
 
 
 # ── Minimal test app with SpiderGuard ──────────────────────────
@@ -41,9 +41,7 @@ def make_app(max_requests: int = 120, window_seconds: int = 60):
 @pytest.fixture
 async def client():
     app = make_app()
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
 
 
@@ -165,9 +163,7 @@ class TestRateLimiting:
     async def test_rate_limit_triggers(self):
         """After max_requests, the client should get 429."""
         app = make_app(max_requests=3, window_seconds=60)
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as c:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
             ua = {"User-Agent": "Mozilla/5.0 legitimate"}
             for _ in range(3):
                 r = await c.get("/api/v1/data", headers=ua)
@@ -180,9 +176,7 @@ class TestRateLimiting:
     @pytest.mark.anyio
     async def test_rate_limit_not_triggered_under_limit(self):
         app = make_app(max_requests=10, window_seconds=60)
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as c:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
             ua = {"User-Agent": "Mozilla/5.0 legitimate"}
             for _ in range(5):
                 r = await c.get("/api/v1/data", headers=ua)

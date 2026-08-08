@@ -5,13 +5,14 @@ from __future__ import annotations
 import logging
 import time
 from datetime import datetime
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.admin_panel import derived_analytics as da
 from apps.admin_panel.content_version_service import ContentVersionService
+from apps.admin_panel.middleware.rbac import require_permission
 from apps.admin_panel.recommendation_engine import build_ml_recommendations
 from apps.admin_panel.schemas import (
     AdminDashboardResponse,
@@ -20,32 +21,31 @@ from apps.admin_panel.schemas import (
     AdminUserResponse,
     AdminUserRoleUpdate,
     AdminUserStatusUpdate,
-    AuditLogResponse,
-    ReportGenerateRequest,
-    ReportGenerateResponse,
-    SystemHealthResponse,
-    SystemReportResponse,
-    ContentTypeResponse,
-    ContentItemResponse,
-    ContentCreateRequest,
-    ContentUpdateRequest,
-    SmartRecommendationResponse,
-    UserBehaviorAnalysisResponse,
+    AdvancedAlertResponse,
     AdvancedAnalyticsResponse,
-    ContentSuggestionResponse,
-    IntelligentAlertResponse,
     AdvancedSettingResponse,
     AdvancedSettingUpdate,
-    ContentVersionResponse,
-    ContentApprovalResponse,
-    IntelligentAnalyticsResponse,
+    AuditLogResponse,
     AutoRecommendationResponse,
-    AdvancedAlertResponse,
+    ContentApprovalResponse,
+    ContentCreateRequest,
+    ContentItemResponse,
+    ContentSuggestionResponse,
+    ContentTypeResponse,
+    ContentUpdateRequest,
+    ContentVersionResponse,
+    IntelligentAlertResponse,
+    IntelligentAnalyticsResponse,
+    ReportGenerateRequest,
+    ReportGenerateResponse,
+    SmartRecommendationResponse,
+    SystemHealthResponse,
+    SystemReportResponse,
+    UserBehaviorAnalysisResponse,
 )
 from apps.admin_panel.service import AdminService
 from apps.shared_core.database.session import get_db_session
 from apps.users.dependencies import get_current_active_superuser
-from apps.admin_panel.middleware.rbac import require_permission
 
 if TYPE_CHECKING:
     from apps.users.models import User
@@ -59,7 +59,7 @@ CurrentSuperuser = Annotated["User", Depends(get_current_active_superuser)]
 
 
 async def get_admin_service(
-    session: Annotated["AsyncSession", DBSessionDependency],
+    session: Annotated[AsyncSession, DBSessionDependency],
 ) -> AdminService:
     return AdminService(session)
 
@@ -101,8 +101,12 @@ async def upsert_system_setting(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
-    if not any([payload.value is not None, payload.description is not None, payload.is_active is not None]):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one field required")
+    if not any(
+        [payload.value is not None, payload.description is not None, payload.is_active is not None]
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="At least one field required"
+        )
     setting = await admin_service.upsert_system_setting(
         key=key, value=payload.value, description=payload.description, is_active=payload.is_active
     )
@@ -156,8 +160,8 @@ async def list_content_items(
     content_type: str,
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-    search: Optional[str] = None,
-    status_filter: Optional[str] = Query(default=None, alias="status"),
+    search: str | None = None,
+    status_filter: str | None = Query(default=None, alias="status"),
     limit: int = Query(default=20, le=100),
     offset: int = 0,
 ):
@@ -167,17 +171,23 @@ async def list_content_items(
     return [ContentItemResponse.model_validate(ci) for ci in content_items]
 
 
-@router.post("/content/{content_type}", response_model=ContentItemResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/content/{content_type}",
+    response_model=ContentItemResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 @require_permission("content.items.create")
 async def create_content_item(
     content_type: str,
     payload: ContentCreateRequest,
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-    session: Annotated["AsyncSession", DBSessionDependency],
+    session: Annotated[AsyncSession, DBSessionDependency],
 ):
     content_item = await admin_service.create_content_item(
-        content_type=content_type, data=payload.data if hasattr(payload, "data") else payload.model_dump(), author_id=current_user.id
+        content_type=content_type,
+        data=payload.data if hasattr(payload, "data") else payload.model_dump(),
+        author_id=current_user.id,
     )
     # Phase 5: persist initial version
     try:
@@ -204,7 +214,9 @@ async def get_content_item(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
 ):
-    content_item = await admin_service.get_content_item_by_id(content_type=content_type, item_id=item_id)
+    content_item = await admin_service.get_content_item_by_id(
+        content_type=content_type, item_id=item_id
+    )
     if not content_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content item not found")
     return ContentItemResponse.model_validate(content_item)
@@ -218,7 +230,7 @@ async def update_content_item(
     payload: ContentUpdateRequest,
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-    session: Annotated["AsyncSession", DBSessionDependency],
+    session: Annotated[AsyncSession, DBSessionDependency],
 ):
     content_item = await admin_service.update_content_item(
         content_type=content_type,
@@ -257,13 +269,15 @@ async def delete_content_item(
     await admin_service.sync_content_to_modules(None, content_type, "delete", item_id)
 
 
-@router.get("/content/{content_type}/{item_id}/versions", response_model=list[ContentVersionResponse])
+@router.get(
+    "/content/{content_type}/{item_id}/versions", response_model=list[ContentVersionResponse]
+)
 @require_permission("content.versions.read")
 async def get_content_versions(
     content_type: str,
     item_id: int,
     current_user: CurrentSuperuser,
-    session: Annotated["AsyncSession", DBSessionDependency],
+    session: Annotated[AsyncSession, DBSessionDependency],
 ):
     """Phase 5 — load versions from DB (content_versions table)."""
     cvs = ContentVersionService(session)
@@ -274,7 +288,10 @@ async def get_content_versions(
 
         versions = _da.content_versions_from_item(item_id, current_user.id, None)
         return [ContentVersionResponse.model_validate(v) for v in versions]
-    return [ContentVersionResponse.model_validate(ContentVersionService.to_response_dict(r)) for r in rows]
+    return [
+        ContentVersionResponse.model_validate(ContentVersionService.to_response_dict(r))
+        for r in rows
+    ]
 
 
 @router.post("/content/{content_type}/{item_id}/approve", response_model=ContentApprovalResponse)
@@ -283,7 +300,7 @@ async def approve_content(
     content_type: str,
     item_id: int,
     current_user: CurrentSuperuser,
-    session: Annotated["AsyncSession", DBSessionDependency],
+    session: Annotated[AsyncSession, DBSessionDependency],
 ):
     cvs = ContentVersionService(session)
     row = await cvs.approve(content_type, item_id, current_user.id)
@@ -410,10 +427,10 @@ async def get_advanced_alerts(
 async def list_audit_logs(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-    event_type: Optional[str] = None,
-    actor_email: Optional[str] = None,
-    date_from: Optional[datetime] = None,
-    date_to: Optional[datetime] = None,
+    event_type: str | None = None,
+    actor_email: str | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
     limit: int = Query(default=100, le=1000),
     offset: int = 0,
 ):
@@ -463,15 +480,20 @@ async def generate_report(
 async def list_admin_users(
     current_user: CurrentSuperuser,
     admin_service: AdminServiceDependency,
-    search: Optional[str] = None,
-    role: Optional[str] = None,
-    is_active: Optional[bool] = None,
-    is_superuser: Optional[bool] = None,
+    search: str | None = None,
+    role: str | None = None,
+    is_active: bool | None = None,
+    is_superuser: bool | None = None,
     limit: int = Query(default=100, le=500),
     offset: int = 0,
 ):
     users = await admin_service.list_users(
-        search=search, role=role, is_active=is_active, is_superuser=is_superuser, limit=limit, offset=offset
+        search=search,
+        role=role,
+        is_active=is_active,
+        is_superuser=is_superuser,
+        limit=limit,
+        offset=offset,
     )
     return [AdminUserResponse.model_validate(u) for u in users]
 
@@ -498,7 +520,9 @@ async def update_user_status(
     admin_service: AdminServiceDependency,
 ):
     if current_user.id == user_id and not payload.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot deactivate yourself")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot deactivate yourself"
+        )
     user = await admin_service.update_user_status(user_id, payload.is_active)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -527,7 +551,9 @@ async def delete_user(
     admin_service: AdminServiceDependency,
 ):
     if current_user.id == user_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete yourself")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot delete yourself"
+        )
     success = await admin_service.delete_user(user_id)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

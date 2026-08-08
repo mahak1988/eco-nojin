@@ -7,7 +7,7 @@ import logging
 import math
 from dataclasses import asdict, dataclass
 from datetime import date, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from apps.satellite.processors.indices import evi, ndmi, ndvi, ndwi, smi
 
@@ -83,7 +83,7 @@ def fetch_mpc_stac_mean(
     start: date,
     end: date,
     cloud_max: int = 30,
-) -> Optional[list[IndexSample]]:
+) -> list[IndexSample] | None:
     try:
         import planetary_computer
         import pystac_client
@@ -120,8 +120,8 @@ def fetch_mpc_stac_mean(
 def fetch_indices(
     lat: float,
     lon: float,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
     cloud_max: int = 30,
 ) -> list[IndexSample]:
     end = end or date.today()

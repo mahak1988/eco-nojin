@@ -1,23 +1,26 @@
-﻿"""
+"""
 TEK API Router
 ==============
 Earth Memory Layer API endpoints for historical pattern matching.
 """
+
 import logging
-from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from apps.shared_core.database.session import get_db_session
-from apps.shared_knowledge.knowledge.tek_models import HistoricalPattern, TEKMatchResult
-from apps.shared_knowledge.knowledge.tek_matcher import match_pattern, format_recommendation
+from apps.shared_knowledge.knowledge.tek_matcher import format_recommendation, match_pattern
+from apps.shared_knowledge.knowledge.tek_models import HistoricalPattern
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/tek", tags=["earth-memory"])
 
+
 @router.get("/patterns")
 async def list_patterns(
-    problem_category: Optional[str] = Query(None),
+    problem_category: str | None = Query(None),
     is_active: bool = True,
     session: AsyncSession = Depends(get_db_session),
 ):
@@ -51,6 +54,7 @@ async def list_patterns(
         ],
     }
 
+
 @router.get("/patterns/{pattern_id}")
 async def get_pattern(
     pattern_id: str,
@@ -83,16 +87,17 @@ async def get_pattern(
         "sustainability_index": pattern.sustainability_index,
     }
 
+
 @router.post("/match")
 async def match_conditions(
     climate_zone: str = Query(..., description="Koppen climate zone, e.g. BWk"),
     latitude: float = Query(...),
     longitude: float = Query(...),
-    annual_rainfall_mm: Optional[float] = Query(None),
-    groundwater_depth_m: Optional[float] = Query(None),
-    elevation_m: Optional[float] = Query(None),
-    soil_organic_carbon_pct: Optional[float] = Query(None),
-    frost_risk: Optional[bool] = Query(None),
+    annual_rainfall_mm: float | None = Query(None),
+    groundwater_depth_m: float | None = Query(None),
+    elevation_m: float | None = Query(None),
+    soil_organic_carbon_pct: float | None = Query(None),
+    frost_risk: bool | None = Query(None),
     top_n: int = Query(5, ge=1, le=20),
     session: AsyncSession = Depends(get_db_session),
 ):
@@ -128,19 +133,21 @@ async def match_conditions(
             climate_zone=climate_zone,
         )
 
-        matches.append({
-            "pattern_id": pattern.pattern_id,
-            "name": pattern.name,
-            "name_fa": pattern.name_fa,
-            "civilization": pattern.civilization_fa,
-            "age_years": pattern.age_years,
-            "match_score": round(score, 3),
-            "score_components": {k: round(v, 3) for k, v in components.items()},
-            "problem_category": pattern.problem_category,
-            "solution_type": pattern.solution_type,
-            "recommendation": rec,
-            "principles": pattern.principles,
-        })
+        matches.append(
+            {
+                "pattern_id": pattern.pattern_id,
+                "name": pattern.name,
+                "name_fa": pattern.name_fa,
+                "civilization": pattern.civilization_fa,
+                "age_years": pattern.age_years,
+                "match_score": round(score, 3),
+                "score_components": {k: round(v, 3) for k, v in components.items()},
+                "problem_category": pattern.problem_category,
+                "solution_type": pattern.solution_type,
+                "recommendation": rec,
+                "principles": pattern.principles,
+            }
+        )
 
     matches.sort(key=lambda m: m["match_score"], reverse=True)
 
@@ -156,16 +163,19 @@ async def match_conditions(
         "match_threshold_note": "Scores above 0.5 indicate relevant patterns. Scores above 0.7 are strong matches.",
     }
 
+
 @router.get("/recommendations")
 async def get_top_recommendations(
-    problem_category: Optional[str] = Query(None),
+    problem_category: str | None = Query(None),
     session: AsyncSession = Depends(get_db_session),
 ):
     """Get top TEK recommendations, optionally filtered by problem category."""
     query = select(HistoricalPattern).where(HistoricalPattern.is_active == True)
     if problem_category:
         query = query.where(HistoricalPattern.problem_category == problem_category)
-    query = query.order_by(HistoricalPattern.success_score.desc(), HistoricalPattern.age_years.desc())
+    query = query.order_by(
+        HistoricalPattern.success_score.desc(), HistoricalPattern.age_years.desc()
+    )
     result = await session.execute(query)
     patterns = result.scalars().all()
 

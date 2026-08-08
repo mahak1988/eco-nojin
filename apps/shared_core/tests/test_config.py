@@ -1,4 +1,5 @@
 """Tests for config."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestConfig:
         """Verify get_settings is callable."""
         try:
             from apps.shared_core.config import get_settings
+
             assert callable(get_settings)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,7 +28,7 @@ class TestConfig:
         """Verify Settings can be referenced."""
         try:
             from apps.shared_core.config import Settings
+
             assert Settings is not None
         except ImportError:
             pytest.skip("Module not available")
-

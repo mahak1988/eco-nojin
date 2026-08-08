@@ -40,15 +40,15 @@ shared_sim/
 ```python
 class SharedSim(Base):
     """مدل اشتراکی شبیه‌سازی."""
-    
+
     __tablename__ = "shared_sim"
-    
-    id: int                    # شناسه یکتا
-    name: str                  # نام (index)
-    description: str | None    # توضیحات
-    is_active: bool            # وضعیت فعال (پیش‌فرض: True)
-    created_at: datetime       # تاریخ ایجاد
-    updated_at: datetime       # تاریخ بروزرسانی
+
+    id: int  # شناسه یکتا
+    name: str  # نام (index)
+    description: str | None  # توضیحات
+    is_active: bool  # وضعیت فعال (پیش‌فرض: True)
+    created_at: datetime  # تاریخ ایجاد
+    updated_at: datetime  # تاریخ بروزرسانی
 ```
 
 ## Endpointهای API

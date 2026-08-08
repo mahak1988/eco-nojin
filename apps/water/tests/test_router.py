@@ -1,4 +1,5 @@
 """Tests for water router — /api/v1/water."""
+
 from __future__ import annotations
 
 import pytest
@@ -84,6 +85,7 @@ class TestWaterRouterImport:
     def test_router_importable(self):
         try:
             from apps.water.router import router
+
             assert router is not None
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -91,6 +93,7 @@ class TestWaterRouterImport:
     def test_water_dashboard_callable(self):
         try:
             from apps.water.router import get_water_dashboard
+
             assert callable(get_water_dashboard)
         except (ImportError, AttributeError) as e:
             pytest.skip(f"Not available: {e}")
@@ -98,6 +101,7 @@ class TestWaterRouterImport:
     def test_water_sources_callable(self):
         try:
             from apps.water.router import list_water_sources
+
             assert callable(list_water_sources)
         except (ImportError, AttributeError) as e:
             pytest.skip(f"Not available: {e}")

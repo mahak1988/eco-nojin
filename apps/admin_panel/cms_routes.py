@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any, Dict, Optional
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
@@ -59,7 +59,7 @@ async def cms_get(content_type: str, item_id: int, current_user: CurrentSuperuse
 @router.post("/content/{content_type}", status_code=status.HTTP_201_CREATED)
 async def cms_create(
     content_type: str,
-    body: Dict[str, Any],
+    body: dict[str, Any],
     current_user: CurrentSuperuser,
 ):
     svc = get_cms_service()
@@ -73,7 +73,7 @@ async def cms_create(
 async def cms_update(
     content_type: str,
     item_id: int,
-    body: Dict[str, Any],
+    body: dict[str, Any],
     current_user: CurrentSuperuser,
 ):
     svc = get_cms_service()

@@ -7,17 +7,16 @@ Fetches ERA5-Land reanalysis climate data for meteorological inputs.
 import logging
 
 logger = logging.getLogger(__name__)
-from datetime import datetime, UTC
+from datetime import datetime
 from typing import Any
 
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
-
 
 # ERA5-Land variables
 ERA5_VARIABLES = [
@@ -65,47 +64,77 @@ class ERA5LandFetcher(BaseSimulator):
         """Handle _get_parameters."""
         return [
             SimulationParameter(
-                name="bounds", label="Bounding Box [lon_min, lat_min, lon_max, lat_max]", type="string",
+                name="bounds",
+                label="Bounding Box [lon_min, lat_min, lon_max, lat_max]",
+                type="string",
                 default="[50.0, 30.0, 52.0, 32.0]",
-                description="Geographic bounds", required=True,
+                description="Geographic bounds",
+                required=True,
             ),
             SimulationParameter(
-                name="start_date", label="Start Date", type="string",
-                default="2024-01-01", description="Start date (YYYY-MM-DD)", required=True,
+                name="start_date",
+                label="Start Date",
+                type="string",
+                default="2024-01-01",
+                description="Start date (YYYY-MM-DD)",
+                required=True,
             ),
             SimulationParameter(
-                name="end_date", label="End Date", type="string",
-                default="2024-12-31", description="End date (YYYY-MM-DD)", required=True,
+                name="end_date",
+                label="End Date",
+                type="string",
+                default="2024-12-31",
+                description="End date (YYYY-MM-DD)",
+                required=True,
             ),
             SimulationParameter(
-                name="variables", label="Variables", type="string",
+                name="variables",
+                label="Variables",
+                type="string",
                 default="precipitation,potential_evapotranspiration,temperature_2m",
-                description="Comma-separated list of variables", required=True,
+                description="Comma-separated list of variables",
+                required=True,
             ),
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
         """Handle run (parameters)."""
         import time
+
         start = time.time()
         errors = self.validate(parameters)
         if errors:
-            return SimulationResult(simulator_id=self.id, simulator_name=self.name,
-                status=SimulationStatus.FAILED, parameters=parameters,
-                error="; ".join(errors))
-        
+            return SimulationResult(
+                simulator_id=self.id,
+                simulator_name=self.name,
+                status=SimulationStatus.FAILED,
+                parameters=parameters,
+                error="; ".join(errors),
+            )
+
         try:
             outputs = await self._run_simulation(parameters)
             elapsed = (time.time() - start) * 1000
-            return SimulationResult(simulator_id=self.id, simulator_name=self.name,
-                status=SimulationStatus.COMPLETED, parameters=parameters,
-                outputs=outputs, metrics=self._calculate_metrics(outputs),
-                charts=self._generate_charts(outputs), execution_time_ms=elapsed)
+            return SimulationResult(
+                simulator_id=self.id,
+                simulator_name=self.name,
+                status=SimulationStatus.COMPLETED,
+                parameters=parameters,
+                outputs=outputs,
+                metrics=self._calculate_metrics(outputs),
+                charts=self._generate_charts(outputs),
+                execution_time_ms=elapsed,
+            )
         except Exception as e:
             elapsed = (time.time() - start) * 1000
-            return SimulationResult(simulator_id=self.id, simulator_name=self.name,
-                status=SimulationStatus.FAILED, parameters=parameters,
-                error=str(e), execution_time_ms=elapsed)
+            return SimulationResult(
+                simulator_id=self.id,
+                simulator_name=self.name,
+                status=SimulationStatus.FAILED,
+                parameters=parameters,
+                error=str(e),
+                execution_time_ms=elapsed,
+            )
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
         """Handle _run_simulation (params)."""
@@ -113,7 +142,7 @@ class ERA5LandFetcher(BaseSimulator):
         start = datetime.strptime(params["start_date"], "%Y-%m-%d")
         end = datetime.strptime(params["end_date"], "%Y-%m-%d")
         days = (end - start).days + 1
-        
+
         # Simulate daily values
         data = {}
         for var in variables:
@@ -125,7 +154,7 @@ class ERA5LandFetcher(BaseSimulator):
                 data[var] = [round(15 + 15 * (i % 60) / 60, 1) for i in range(days)]
             else:
                 data[var] = [0.0] * days
-        
+
         return {
             "bounds": params["bounds"],
             "variables": variables,
@@ -139,7 +168,11 @@ class ERA5LandFetcher(BaseSimulator):
         data = outputs.get("hourly_data", {})
         metrics = {}
         for var, values in data.items():
-            if values and var in ["precipitation", "temperature_2m", "potential_evapotranspiration"]:
+            if values and var in [
+                "precipitation",
+                "temperature_2m",
+                "potential_evapotranspiration",
+            ]:
                 metrics[f"mean_{var}"] = round(sum(values) / len(values), 2)
         return metrics
 

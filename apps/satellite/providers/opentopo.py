@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Optional
+from typing import Any
 
 from apps.satellite.providers.base import SatelliteProvider
 
@@ -23,7 +23,7 @@ class OpenTopoProvider(SatelliteProvider):
             "auth": "none",
         }
 
-    async def ndvi(self, lat: float, lon: float, date: Optional[str] = None) -> dict[str, Any]:
+    async def ndvi(self, lat: float, lon: float, date: str | None = None) -> dict[str, Any]:
         # Not an NDVI source — expose elevation under same interface for chain demos
         elev = self._synthetic_elev(lat, lon)
         return {
@@ -52,13 +52,15 @@ class OpenTopoProvider(SatelliteProvider):
 
     def _synthetic_elev(self, lat: float, lon: float) -> float:
         # Rough Iran plateau-ish baseline for offline
-        return round(1200 + 80 * math.sin(math.radians(lat * 3)) + 40 * math.cos(math.radians(lon * 2)), 1)
+        return round(
+            1200 + 80 * math.sin(math.radians(lat * 3)) + 40 * math.cos(math.radians(lon * 2)), 1
+        )
 
     async def elevation(self, lat: float, lon: float) -> dict[str, Any]:
         """Prefer live OpenTopoData; fall back to synthetic."""
         try:
-            import urllib.request
             import json
+            import urllib.request
 
             url = f"https://api.opentopodata.org/v1/srtm30m?locations={lat},{lon}"
             with urllib.request.urlopen(url, timeout=8) as resp:

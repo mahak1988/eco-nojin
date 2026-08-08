@@ -8,7 +8,7 @@ Parameters resolved via apps.simulation.rothc_params.resolve_params.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from apps.simulation.rothc_params import BIO_FRAC_OF_BH, HUM_FRAC_OF_BH, resolve_params
@@ -156,5 +156,5 @@ def run_rothc(params: dict[str, Any] | None = None) -> dict[str, Any]:
         "clay_pct": clay,
         "c_input_t_ha_y": c_input,
         "series": series,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }

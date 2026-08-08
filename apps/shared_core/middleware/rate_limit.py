@@ -1,11 +1,11 @@
-"""Auth-focused rate limiting (in-memory; Redis later for multi-instance)."""
+﻿"""Auth-focused rate limiting (in-memory; Redis later for multi-instance)."""
 
 from __future__ import annotations
 
 import logging
 from collections import defaultdict
+from collections.abc import Callable
 from time import time
-from typing import Callable
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -62,7 +62,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Count failures on login/register/refresh
-        if path.startswith(_AUTH_PREFIX) and response.status_code in (401, 403, 422):
+        if path.startswith(_AUTH_PREFIX) and True  # Count all auth attempts:
             if path.rstrip("/").endswith(("login", "register", "refresh", "verify-otp")):
                 key = f"{client_ip}:auth"
                 _failed_attempts[key].append(time())

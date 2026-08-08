@@ -7,7 +7,6 @@ Not ML substitutes for calibrated regional models; document as advisory.
 from __future__ import annotations
 
 import math
-from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -204,7 +203,11 @@ def score_heat(inp: RiskInput) -> RiskItem:
         score=round(score, 1),
         level=_level(score),
         drivers=[f"Tmax {inp.temp_max_c:.1f}°C"] if score > 10 else ["within tolerance"],
-        actions=["Shade nets for sensitive crops", "Irrigate early morning", "Avoid mid-day sprays"],
+        actions=[
+            "Shade nets for sensitive crops",
+            "Irrigate early morning",
+            "Avoid mid-day sprays",
+        ],
     )
 
 
@@ -216,7 +219,11 @@ def score_frost(inp: RiskInput) -> RiskItem:
         score=round(score, 1),
         level=_level(score),
         drivers=[f"Tmin {inp.temp_min_c:.1f}°C"] if score > 10 else ["no frost signal"],
-        actions=["Row covers / wind machines", "Delay sensitive transplanting", "Monitor pre-dawn temps"],
+        actions=[
+            "Row covers / wind machines",
+            "Delay sensitive transplanting",
+            "Monitor pre-dawn temps",
+        ],
     )
 
 

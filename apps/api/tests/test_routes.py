@@ -2,10 +2,11 @@
 Tests for Accounting, Alerts, and Agriculture Schools API routes
 Aligned with actual router prefixes and response envelopes.
 """
-import pytest
-from fastapi.testclient import TestClient
+
 import sys
 from pathlib import Path
+
+from fastapi.testclient import TestClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
@@ -102,9 +103,7 @@ class TestAgricultureSchoolsAPI:
         assert "total" in data
 
     def test_search_schools(self):
-        response = client.get(
-            "/api/v1/agriculture-schools/?search=%D8%AA%D9%87%D8%B1%D8%A7%D9%86"
-        )
+        response = client.get("/api/v1/agriculture-schools/?search=%D8%AA%D9%87%D8%B1%D8%A7%D9%86")
         assert response.status_code == 200
         data = response.json()
         assert "items" in data

@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
@@ -22,9 +21,9 @@ class SensorIn(BaseModel):
     name: str = Field(..., min_length=1)
     sensor_type: str = Field(..., pattern="^(soil|weather|water|air)$")
     unit: str = "%"
-    farm_id: Optional[int] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    farm_id: int | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 
 class SensorOut(SensorIn):
@@ -73,7 +72,11 @@ async def _broadcast_alert(payload: dict) -> None:
 @router.get("/monitoring/overview")
 async def monitoring_overview(session: AsyncSession = Depends(get_db_session)):
     sensors = int(
-        (await session.execute(select(func.count()).select_from(Sensor).where(Sensor.is_deleted.is_(False)))).scalar_one()
+        (
+            await session.execute(
+                select(func.count()).select_from(Sensor).where(Sensor.is_deleted.is_(False))
+            )
+        ).scalar_one()
     )
     alerts = int(
         (
@@ -94,7 +97,7 @@ async def monitoring_overview(session: AsyncSession = Depends(get_db_session)):
         "open_alerts": alerts,
         "rules_count": rules,
         "status": "ok",
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     }
 
 
@@ -108,8 +111,14 @@ async def list_sensors(
     cq = select(func.count()).select_from(Sensor).where(Sensor.is_deleted.is_(False))
     total = int((await session.execute(cq)).scalar_one())
     rows = (
-        await session.execute(q.order_by(Sensor.id).offset(page_to_offset(page, size)).limit(size))
-    ).scalars().all()
+        (
+            await session.execute(
+                q.order_by(Sensor.id).offset(page_to_offset(page, size)).limit(size)
+            )
+        )
+        .scalars()
+        .all()
+    )
     return {
         "data": [SensorOut.model_validate(r) for r in rows],
         "meta": build_meta(total, page, size),
@@ -136,13 +145,17 @@ async def sensor_readings(
     session: AsyncSession = Depends(get_db_session),
 ):
     rows = (
-        await session.execute(
-            select(SensorReading)
-            .where(SensorReading.sensor_id == sensor_id)
-            .order_by(SensorReading.recorded_at.desc())
-            .limit(limit)
+        (
+            await session.execute(
+                select(SensorReading)
+                .where(SensorReading.sensor_id == sensor_id)
+                .order_by(SensorReading.recorded_at.desc())
+                .limit(limit)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return {"data": [ReadingOut.model_validate(r) for r in rows]}
 
 
@@ -154,21 +167,27 @@ async def push_reading(
     _: object = Depends(require_permission("monitoring:write")),
 ):
     s = (
-        await session.execute(select(Sensor).where(Sensor.id == sensor_id, Sensor.is_deleted.is_(False)))
+        await session.execute(
+            select(Sensor).where(Sensor.id == sensor_id, Sensor.is_deleted.is_(False))
+        )
     ).scalar_one_or_none()
     if not s:
         raise HTTPException(404, "Sensor not found")
     reading = SensorReading(sensor_id=sensor_id, value=value)
     session.add(reading)
     rules = (
-        await session.execute(
-            select(AlertRule).where(
-                AlertRule.is_deleted.is_(False),
-                AlertRule.is_active.is_(True),
-                AlertRule.sensor_type == s.sensor_type,
+        (
+            await session.execute(
+                select(AlertRule).where(
+                    AlertRule.is_deleted.is_(False),
+                    AlertRule.is_active.is_(True),
+                    AlertRule.sensor_type == s.sensor_type,
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     fired = []
     for rule in rules:
         ok = False
@@ -197,7 +216,7 @@ async def push_reading(
                     "sensor_id": sensor_id,
                     "rule": rule.name,
                     "value": value,
-                    "ts": datetime.now(timezone.utc).isoformat(),
+                    "ts": datetime.now(UTC).isoformat(),
                 }
             )
     await session.flush()
@@ -214,9 +233,7 @@ async def list_alerts(
     q = select(AlertEvent).order_by(AlertEvent.created_at.desc())
     cq = select(func.count()).select_from(AlertEvent)
     total = int((await session.execute(cq)).scalar_one())
-    rows = (
-        await session.execute(q.offset(page_to_offset(page, size)).limit(size))
-    ).scalars().all()
+    rows = (await session.execute(q.offset(page_to_offset(page, size)).limit(size))).scalars().all()
     return {
         "data": [
             {
@@ -251,14 +268,24 @@ async def seed_monitoring(
     _: object = Depends(require_permission("monitoring:write")),
 ):
     count = int(
-        (await session.execute(select(func.count()).select_from(Sensor).where(Sensor.is_deleted.is_(False)))).scalar_one()
+        (
+            await session.execute(
+                select(func.count()).select_from(Sensor).where(Sensor.is_deleted.is_(False))
+            )
+        ).scalar_one()
     )
     if count > 0:
         return {"seeded": 0}
     sensors = [
-        Sensor(name="Soil moisture A", sensor_type="soil", unit="%", latitude=32.65, longitude=51.67),
-        Sensor(name="Air temp north", sensor_type="weather", unit="C", latitude=32.66, longitude=51.68),
-        Sensor(name="Reservoir level", sensor_type="water", unit="%", latitude=32.64, longitude=51.66),
+        Sensor(
+            name="Soil moisture A", sensor_type="soil", unit="%", latitude=32.65, longitude=51.67
+        ),
+        Sensor(
+            name="Air temp north", sensor_type="weather", unit="C", latitude=32.66, longitude=51.68
+        ),
+        Sensor(
+            name="Reservoir level", sensor_type="water", unit="%", latitude=32.64, longitude=51.66
+        ),
     ]
     for s in sensors:
         session.add(s)
@@ -274,7 +301,13 @@ async def seed_monitoring(
                 )
             )
     session.add(
-        AlertRule(name="Low soil moisture", sensor_type="soil", operator="lt", threshold=25, severity="warning")
+        AlertRule(
+            name="Low soil moisture",
+            sensor_type="soil",
+            operator="lt",
+            threshold=25,
+            severity="warning",
+        )
     )
     await session.flush()
     return {"seeded": len(sensors)}

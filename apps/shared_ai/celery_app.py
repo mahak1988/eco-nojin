@@ -11,12 +11,13 @@ Features:
 """
 
 import logging
-from celery import Celery
-from celery.signals import task_success, task_failure, task_prerun, task_postrun
-from typing import Any, Optional
+from typing import Any
 
-from apps.simulation.base import SimulationRegistry
+from celery import Celery
+from celery.signals import task_failure, task_postrun, task_prerun, task_success
+
 from apps.shared_core.config import settings
+from apps.simulation.base import SimulationRegistry
 
 logger = logging.getLogger("econojin")
 
@@ -94,7 +95,7 @@ def task_success_handler(sender=None, result=None, **kwargs) -> None:
 def task_failure_handler(sender=None, exception=None, **kwargs) -> None:
     """Increment failed count on failure."""
     TaskMonitor._tasks_failed += 1
-    logger.error(f"Task failed: {sender.name}, error: {str(exception)}")
+    logger.error(f"Task failed: {sender.name}, error: {exception!s}")
 
 
 @celery_app.task

@@ -22,7 +22,9 @@ class SyntheticProvider(SatelliteProvider):
         spatial = 0.05 * math.sin(lat) * math.cos(lon / 10)
         return round(max(0.05, min(0.95, seasonal + spatial)), 3)
 
-    async def get_ndvi_image(self, bbox: BBox, target_date: date, cloud_max: int = 20) -> NDVIResult:
+    async def get_ndvi_image(
+        self, bbox: BBox, target_date: date, cloud_max: int = 20
+    ) -> NDVIResult:
         lat, lon = bbox.center()
         v = self._ndvi_at(lat, lon, target_date)
         return NDVIResult(

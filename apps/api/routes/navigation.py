@@ -2,16 +2,16 @@
 Navigation API routes for dynamic header and topic categories.
 """
 
-from typing import List, Optional, Dict, Any
-from enum import Enum
-from pydantic import BaseModel
+from typing import Any
+
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+from sqlalchemy import distinct
 from sqlalchemy.orm import Session
-from apps.shared_core.database.session import get_db
+
 from apps.api.models.education import CourseCategory
 from apps.api.models.library import LibraryResource
-from sqlalchemy import distinct
-
+from apps.shared_core.database.session import get_db
 
 router = APIRouter(prefix="/navigation", tags=["Navigation"])
 
@@ -24,22 +24,23 @@ class NavigationItem(BaseModel):
     source: str
     order: int
     isActive: bool
-    count: Optional[int] = None
+    count: int | None = None
 
 
 class HeaderNavigationResponse(BaseModel):
-    primaryMenu: List[NavigationItem]
-    topicCategories: List[NavigationItem]
-    meta: Dict[str, Any]
+    primaryMenu: list[NavigationItem]
+    topicCategories: list[NavigationItem]
+    meta: dict[str, Any]
 
 
 def _generate_slug(title: str) -> str:
     """Convert Persian/English title to URL-friendly slug."""
     # Simple slug generation - could be enhanced
     import re
-    slug = re.sub(r'[^\w\s\u0600-\u06FF]', ' ', title)
-    slug = re.sub(r'\s+', '-', slug).lower()
-    return slug.strip('-')
+
+    slug = re.sub(r"[^\w\s\u0600-\u06FF]", " ", title)
+    slug = re.sub(r"\s+", "-", slug).lower()
+    return slug.strip("-")
 
 
 @router.get("/header", response_model=HeaderNavigationResponse)
@@ -50,13 +51,7 @@ def get_header_navigation(db: Session = Depends(get_db)):
     """
     primary_menu = [
         NavigationItem(
-            id="home",
-            title="Home",
-            slug="home",
-            url="/",
-            source="static",
-            order=0,
-            isActive=True
+            id="home", title="Home", slug="home", url="/", source="static", order=0, isActive=True
         ),
         NavigationItem(
             id="courses",
@@ -65,7 +60,7 @@ def get_header_navigation(db: Session = Depends(get_db)):
             url="/education",
             source="static",
             order=1,
-            isActive=True
+            isActive=True,
         ),
         NavigationItem(
             id="library",
@@ -74,8 +69,8 @@ def get_header_navigation(db: Session = Depends(get_db)):
             url="/library",
             source="static",
             order=2,
-            isActive=True
-        )
+            isActive=True,
+        ),
     ]
 
     topic_categories = []
@@ -87,17 +82,19 @@ def get_header_navigation(db: Session = Depends(get_db)):
         course_categories = db.query(CourseCategory).distinct().all()
         for idx, category in enumerate(course_categories):
             slug = _generate_slug(category.value)
-            topic_categories.append(NavigationItem(
-                id=f"course:{category.value}",
-                title=category.value.replace('-', ' ').replace('_', ' ').title(),
-                slug=slug,
-                url=f"/education?category={slug}",
-                source="course",
-                order=idx,
-                isActive=True
-            ))
+            topic_categories.append(
+                NavigationItem(
+                    id=f"course:{category.value}",
+                    title=category.value.replace("-", " ").replace("_", " ").title(),
+                    slug=slug,
+                    url=f"/education?category={slug}",
+                    source="course",
+                    order=idx,
+                    isActive=True,
+                )
+            )
     except Exception as e:
-        failed_sources.append(f"course_categories: {str(e)}")
+        failed_sources.append(f"course_categories: {e!s}")
         degraded = True
 
     # Fetch Library Resource Categories
@@ -109,17 +106,19 @@ def get_header_navigation(db: Session = Depends(get_db)):
             full_slug = slug
             if any(item.slug == full_slug for item in topic_categories):
                 full_slug = f"library-{slug}"
-            topic_categories.append(NavigationItem(
-                id=f"library:{cat}",
-                title=cat.replace('-', ' ').replace('_', ' ').title(),
-                slug=full_slug,
-                url=f"/library?category={full_slug}",
-                source="library",
-                order=len(course_categories) + idx if 'course_categories' in locals() else idx,
-                isActive=True
-            ))
+            topic_categories.append(
+                NavigationItem(
+                    id=f"library:{cat}",
+                    title=cat.replace("-", " ").replace("_", " ").title(),
+                    slug=full_slug,
+                    url=f"/library?category={full_slug}",
+                    source="library",
+                    order=len(course_categories) + idx if "course_categories" in locals() else idx,
+                    isActive=True,
+                )
+            )
     except Exception as e:
-        failed_sources.append(f"library_categories: {str(e)}")
+        failed_sources.append(f"library_categories: {e!s}")
         degraded = True
 
     # Sort topic categories by order
@@ -128,11 +127,9 @@ def get_header_navigation(db: Session = Depends(get_db)):
     meta = {
         "degraded": degraded,
         "sources": ["CourseCategory", "LibraryResource"],
-        "failedSources": failed_sources if failed_sources else None
+        "failedSources": failed_sources if failed_sources else None,
     }
 
     return HeaderNavigationResponse(
-        primaryMenu=primary_menu,
-        topicCategories=topic_categories,
-        meta=meta
+        primaryMenu=primary_menu, topicCategories=topic_categories, meta=meta
     )

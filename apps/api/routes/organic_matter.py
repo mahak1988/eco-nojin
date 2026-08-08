@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -25,8 +25,8 @@ class CalibrateBody(BaseModel):
         min_length=2,
         description="Annual SOC t C/ha starting at year 0",
     )
-    base_params: Optional[dict[str, Any]] = None
-    free_params: Optional[list[str]] = None
+    base_params: dict[str, Any] | None = None
+    free_params: list[str] | None = None
     n_samples: int = Field(80, ge=20, le=400)
     metric: str = Field("rmse", pattern="^(rmse|nse)$")
     seed: int = 42

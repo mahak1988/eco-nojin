@@ -1,4 +1,4 @@
-﻿"""
+"""
 TEK Pattern Matcher
 ===================
 Earth Memory matching algorithm - Section 3.4 of Hydroma-Nojin paper.
@@ -13,13 +13,13 @@ Algorithm:
 
 import logging
 import math
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 # Climate zone compatibility matrix
 # Which modern Koppen zones match each TEK climate requirement
-CLIMATE_ZONE_ALIASES: Dict[str, List[str]] = {
+CLIMATE_ZONE_ALIASES: dict[str, list[str]] = {
     "arid": ["BWk", "BWh", "BSh"],
     "semi_arid": ["BSk", "BSh", "BWk"],
     "highland": ["ETH", "ET", "Cwb", "Cwc", "Dsb", "Dsc"],
@@ -29,9 +29,7 @@ CLIMATE_ZONE_ALIASES: Dict[str, List[str]] = {
 }
 
 
-def match_climate_zone(
-    current_zone: str, pattern_zones: List[str]
-) -> float:
+def match_climate_zone(current_zone: str, pattern_zones: list[str]) -> float:
     """
     Check if current climate zone is compatible with pattern zones.
     Returns 0.0 to 1.0.
@@ -51,8 +49,8 @@ def match_climate_zone(
 
 
 def match_rainfall(
-    current_rainfall_mm: Optional[float],
-    conditions: Dict[str, Any],
+    current_rainfall_mm: float | None,
+    conditions: dict[str, Any],
 ) -> float:
     """Match annual rainfall against pattern conditions."""
     if current_rainfall_mm is None:
@@ -85,8 +83,8 @@ def match_rainfall(
 
 
 def match_groundwater(
-    current_depth_m: Optional[float],
-    conditions: Dict[str, Any],
+    current_depth_m: float | None,
+    conditions: dict[str, Any],
 ) -> float:
     """Match groundwater depth against pattern conditions."""
     if current_depth_m is None:
@@ -118,8 +116,8 @@ def match_groundwater(
 
 
 def match_elevation(
-    current_elevation_m: Optional[float],
-    conditions: Dict[str, Any],
+    current_elevation_m: float | None,
+    conditions: dict[str, Any],
 ) -> float:
     """Match elevation against pattern conditions."""
     if current_elevation_m is None:
@@ -141,8 +139,8 @@ def match_elevation(
 
 
 def match_soil_carbon(
-    current_soc_pct: Optional[float],
-    conditions: Dict[str, Any],
+    current_soc_pct: float | None,
+    conditions: dict[str, Any],
 ) -> float:
     """Match soil organic carbon against pattern conditions."""
     if current_soc_pct is None:
@@ -157,8 +155,8 @@ def match_soil_carbon(
 
 
 def match_frost(
-    frost_risk: Optional[bool],
-    conditions: Dict[str, Any],
+    frost_risk: bool | None,
+    conditions: dict[str, Any],
 ) -> float:
     """Match frost risk against pattern conditions."""
     if frost_risk is None:
@@ -185,15 +183,15 @@ def calculate_age_bonus(age_years: int) -> float:
 
 def match_pattern(
     climate_zone: str,
-    annual_rainfall_mm: Optional[float],
-    groundwater_depth_m: Optional[float],
-    elevation_m: Optional[float],
-    soil_organic_carbon_pct: Optional[float],
-    frost_risk: Optional[bool],
-    pattern_climate_zones: List[str],
-    pattern_conditions: Dict[str, Any],
+    annual_rainfall_mm: float | None,
+    groundwater_depth_m: float | None,
+    elevation_m: float | None,
+    soil_organic_carbon_pct: float | None,
+    frost_risk: bool | None,
+    pattern_climate_zones: list[str],
+    pattern_conditions: dict[str, Any],
     pattern_age_years: int,
-) -> Tuple[float, Dict[str, float]]:
+) -> tuple[float, dict[str, float]]:
     """
     Calculate similarity score between current conditions and a historical pattern.
 
@@ -211,7 +209,7 @@ def match_pattern(
     Returns:
         Tuple of (total_score, component_scores_dict)
     """
-    components: Dict[str, float] = {}
+    components: dict[str, float] = {}
 
     # Core factors
     components["climate"] = match_climate_zone(climate_zone, pattern_climate_zones)
@@ -226,10 +224,10 @@ def match_pattern(
 
     # Weighted total - core weights
     total = (
-        components["climate"] * 0.30 +
-        components["rainfall"] * 0.20 +
-        components["groundwater"] * 0.20 +
-        components["age"] * 0.30
+        components["climate"] * 0.30
+        + components["rainfall"] * 0.20
+        + components["groundwater"] * 0.20
+        + components["age"] * 0.30
     )
 
     # Boost with optional factors (up to +0.15 bonus total)
@@ -272,7 +270,8 @@ def format_recommendation(
 
 # Qanat/Mirab water flow formula (Darcy's Law for underground channels)
 def calculate_qanat_flow(
-    slope_pct: float, aquifer_transmissivity_m2_day: float,
+    slope_pct: float,
+    aquifer_transmissivity_m2_day: float,
     channel_width_m: float = 0.8,
 ) -> float:
     """
@@ -295,8 +294,10 @@ def calculate_qanat_flow(
 
 # Waru Waru thermal buffer formula
 def calculate_waru_waru_thermal_buffer(
-    water_volume_m3: float, soil_volume_m3: float,
-    water_temp_day_c: float = 15.0, night_air_temp_c: float = -3.0,
+    water_volume_m3: float,
+    soil_volume_m3: float,
+    water_temp_day_c: float = 15.0,
+    night_air_temp_c: float = -3.0,
 ) -> float:
     """
     Calculate night-time temperature increase from Waru Waru water channels.
@@ -317,8 +318,8 @@ def calculate_waru_waru_thermal_buffer(
         return 0.0
 
     c_water = 4.18  # kJ/(kg*K) specific heat of water
-    rho_soil = 1.3   # bulk density g/cm^3 (t/m^3)
-    c_soil = 0.8     # kJ/(kg*K) specific heat of dry soil
+    rho_soil = 1.3  # bulk density g/cm^3 (t/m^3)
+    c_soil = 0.8  # kJ/(kg*K) specific heat of dry soil
 
     delta_t_stored = max(0.0, water_temp_day_c - night_air_temp_c)
     energy_stored = c_water * water_volume_m3 * delta_t_stored
@@ -329,7 +330,8 @@ def calculate_waru_waru_thermal_buffer(
 
 # Terra Preta biochar decomposition formula
 def calculate_biochar_soc_change(
-    biochar_input_t_ha: float, years: int,
+    biochar_input_t_ha: float,
+    years: int,
     decomposition_rate_k: float = 0.05,
 ) -> float:
     """
@@ -348,7 +350,8 @@ def calculate_biochar_soc_change(
 
 # Milpa nitrogen fixation formula
 def calculate_milpa_nitrogen(
-    bean_biomass_kg_ha: float, rhizobia_efficiency: float = 0.6,
+    bean_biomass_kg_ha: float,
+    rhizobia_efficiency: float = 0.6,
 ) -> float:
     """
     Calculate biological nitrogen fixation from legume in Milpa polyculture.
@@ -365,9 +368,10 @@ def calculate_milpa_nitrogen(
 
 # Subak water distribution formula
 def calculate_subak_water_allocation(
-    total_flow_m3_s: float, field_areas_ha: List[float],
-    priority_factors: Optional[List[float]] = None,
-) -> List[float]:
+    total_flow_m3_s: float,
+    field_areas_ha: list[float],
+    priority_factors: list[float] | None = None,
+) -> list[float]:
     """
     Calculate equitable water distribution per Subak principles.
 
@@ -391,19 +395,13 @@ def calculate_subak_water_allocation(
         priority_factors = [1.0] * len(field_areas_ha)
 
     # Weighted area = area * priority
-    weighted_areas = [
-        area * max(0.1, pf)
-        for area, pf in zip(field_areas_ha, priority_factors)
-    ]
+    weighted_areas = [area * max(0.1, pf) for area, pf in zip(field_areas_ha, priority_factors)]
     total_weighted = sum(weighted_areas)
 
     if total_weighted <= 0:
         # Fallback: equal distribution
         return [total_flow_m3_s / len(field_areas_ha)] * len(field_areas_ha)
 
-    allocations = [
-        round(total_flow_m3_s * wa / total_weighted, 4)
-        for wa in weighted_areas
-    ]
+    allocations = [round(total_flow_m3_s * wa / total_weighted, 4) for wa in weighted_areas]
 
     return allocations

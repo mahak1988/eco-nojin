@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,7 +13,6 @@ from apps.shared_core.config import settings
 from apps.shared_core.database.session import get_db_session
 from apps.shared_core.rbac import require_permission
 from apps.shared_core.schemas.pagination import ListMeta
-from apps.users.dependencies import get_current_user
 
 router = APIRouter(prefix="/api/v1/farms", tags=["Farms"])
 
@@ -24,7 +21,7 @@ router = APIRouter(prefix="/api/v1/farms", tags=["Farms"])
 async def list_farms(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
-    search: Optional[str] = None,
+    search: str | None = None,
     session: AsyncSession = Depends(get_db_session),
 ):
     service = FarmService(session)
@@ -130,7 +127,6 @@ async def delete_farm(
     success = await service.delete_farm(farm_id)
     if not success:
         raise HTTPException(status_code=404, detail="Farm not found")
-    return  # 204 No Content
 
 
 @router.get("/{farm_id}/geojson")

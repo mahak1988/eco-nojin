@@ -8,17 +8,16 @@ vegetation indices, and land use analysis.
 import logging
 
 logger = logging.getLogger(__name__)
-from datetime import datetime, UTC
-from typing import Any, Optional
+from datetime import datetime
+from typing import Any
 
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
-
 
 # Sentinel-2 band specifications
 SENTINEL2_BANDS = {
@@ -72,35 +71,56 @@ class Sentinel2Fetcher(BaseSimulator):
         """Define Sentinel-2 fetcher parameters."""
         return [
             SimulationParameter(
-                name="bounds", label="Bounding Box [lon_min, lat_min, lon_max, lat_max]", type="string",
+                name="bounds",
+                label="Bounding Box [lon_min, lat_min, lon_max, lat_max]",
+                type="string",
                 default="[50.0, 30.0, 52.0, 32.0]",
-                description="Geographic bounds for data extraction", required=True,
+                description="Geographic bounds for data extraction",
+                required=True,
             ),
             SimulationParameter(
-                name="start_date", label="Start Date", type="string",
-                default="2024-01-01", description="Start date (YYYY-MM-DD)", required=True,
+                name="start_date",
+                label="Start Date",
+                type="string",
+                default="2024-01-01",
+                description="Start date (YYYY-MM-DD)",
+                required=True,
             ),
             SimulationParameter(
-                name="end_date", label="End Date", type="string",
-                default="2024-12-31", description="End date (YYYY-MM-DD)", required=True,
+                name="end_date",
+                label="End Date",
+                type="string",
+                default="2024-12-31",
+                description="End date (YYYY-MM-DD)",
+                required=True,
             ),
             SimulationParameter(
-                name="index", label="Vegetation Index", type="select",
-                options=list(VEGETATION_INDICES.keys()), default="NDVI",
-                description="Vegetation index to calculate", required=True,
+                name="index",
+                label="Vegetation Index",
+                type="select",
+                options=list(VEGETATION_INDICES.keys()),
+                default="NDVI",
+                description="Vegetation index to calculate",
+                required=True,
             ),
             SimulationParameter(
-                name="cloud_cover_percent", label="Max Cloud Cover (%)", type="int",
-                default=20, min_value=0, max_value=100,
-                description="Maximum cloud cover percentage", required=True,
+                name="cloud_cover_percent",
+                label="Max Cloud Cover (%)",
+                type="int",
+                default=20,
+                min_value=0,
+                max_value=100,
+                description="Maximum cloud cover percentage",
+                required=True,
             ),
         ]
 
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
         """Execute the Sentinel-2 data fetch."""
         import time
+
         start = time.time()
-        
+
         errors = self.validate(parameters)
         if errors:
             return SimulationResult(
@@ -110,7 +130,7 @@ class Sentinel2Fetcher(BaseSimulator):
                 parameters=parameters,
                 error="; ".join(errors),
             )
-        
+
         try:
             outputs = await self._run_simulation(parameters)
             elapsed = (time.time() - start) * 1000
@@ -140,34 +160,38 @@ class Sentinel2Fetcher(BaseSimulator):
         # This is a mock - in production would connect to Google Earth Engine
         start = datetime.strptime(params["start_date"], "%Y-%m-%d")
         end = datetime.strptime(params["end_date"], "%Y-%m-%d")
-        
+
         # Generate weekly observations
         images = []
         current = start
         while current <= end:
-            images.append({
-                "date": current.strftime("%Y-%m-%d"),
-                "cloud_cover": 15 + (hash(current.strftime("%Y%m%d")) % 10),
-                "tiles": ["T38TMT", "T38TNT"],
-            })
+            images.append(
+                {
+                    "date": current.strftime("%Y-%m-%d"),
+                    "cloud_cover": 15 + (hash(current.strftime("%Y%m%d")) % 10),
+                    "tiles": ["T38TMT", "T38TNT"],
+                }
+            )
             current = datetime(current.year, current.month, current.day + 7)
-        
+
         return images
 
     async def _run_simulation(self, params: dict[str, Any]) -> dict:
         """Core Sentinel-2 data processing logic."""
         bounds = params["bounds"]
         index = params["index"]
-        
+
         # Fetch imagery
         images = await self._fetch_imagery(params)
-        
+
         # Calculate vegetation index statistics
-        valid_images = [img for img in images if img["cloud_cover"] <= params["cloud_cover_percent"]]
-        
+        valid_images = [
+            img for img in images if img["cloud_cover"] <= params["cloud_cover_percent"]
+        ]
+
         # Simulate NDVI values
         ndvi_values = [0.3 + 0.4 * (i % 10) / 10 for i in range(len(valid_images))]
-        
+
         return {
             "bounds": bounds,
             "vegetation_index": index,
@@ -185,8 +209,10 @@ class Sentinel2Fetcher(BaseSimulator):
         """Calculate performance metrics from outputs."""
         return {
             "mean_vegetation_index": outputs.get("mean_index_value", 0),
-            "vegetation_range": outputs.get("max_index_value", 0) - outputs.get("min_index_value", 0),
-            "valid_image_ratio": outputs.get("valid_images", 0) / max(1, outputs.get("images_found", 1)),
+            "vegetation_range": outputs.get("max_index_value", 0)
+            - outputs.get("min_index_value", 0),
+            "valid_image_ratio": outputs.get("valid_images", 0)
+            / max(1, outputs.get("images_found", 1)),
         }
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:

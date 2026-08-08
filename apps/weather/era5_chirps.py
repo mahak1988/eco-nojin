@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, date, datetime, timedelta
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -118,7 +118,7 @@ async def fetch_forecast_openmeteo(
             "provider": "open-meteo-forecast",
             "lat": lat,
             "lon": lon,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "daily": daily_series,
         }
     except Exception as e:
@@ -171,7 +171,7 @@ async def fetch_chirps_like(
         }
 
 
-def _at(daily: dict, key: str, i: int) -> Optional[float]:
+def _at(daily: dict, key: str, i: int) -> float | None:
     arr = daily.get(key) or []
     if i >= len(arr) or arr[i] is None:
         return None

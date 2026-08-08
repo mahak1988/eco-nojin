@@ -6,17 +6,16 @@ Uses Argon2/Bcrypt from shared_core.security with settings from config.
 """
 
 import logging
-from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.shared_core.config import settings
 from apps.shared_core.security import (
     create_access_token,
-    verify_password,
-    get_password_hash,
     decode_token,
+    get_password_hash,
+    verify_password,
 )
-from apps.shared_core.config import settings
 from apps.users.models import User
 from apps.users.repository import UserRepository
 from apps.users.schemas import UserCreate, UserUpdate
@@ -33,27 +32,26 @@ def decode_access_token(token: str) -> dict:
     return decode_token(token)
 
 
-
 class UserService:
     """
     سرویس مدیریت کاربران.
     این کلاس مسئول تمام عملیات مرتبط با کاربران است.
     """
-    
+
     def __init__(self, session: AsyncSession) -> None:
         """Handle __init__ (session)."""
         self.repo = UserRepository(session)
-    
+
     async def register_user(self, user_in: UserCreate) -> User:
         """
         ثبت‌نام کاربر جدید.
-        
+
         Args:
             user_in: اطلاعات کاربر برای ثبت‌نام
-            
+
         Returns:
             User: شیء کاربر ایجاد شده
-            
+
         Raises:
             ValueError: اگر ایمیل تکراری باشد
         """
@@ -71,7 +69,7 @@ class UserService:
         )
         return await self.repo.create(db_user)
 
-    async def authenticate_user(self, email: str, password: str) -> Optional[User]:
+    async def authenticate_user(self, email: str, password: str) -> User | None:
         """Authenticate user by email and password."""
         user = await self.repo.get_by_email(email)
         if not user or not verify_password(password, user.hashed_password):
@@ -82,18 +80,18 @@ class UserService:
         """Create an access token for the authenticated user."""
         return create_access_token(subject=user.id)
 
-    async def get_user_by_id(self, user_id: int) -> Optional[User]:
+    async def get_user_by_id(self, user_id: int) -> User | None:
         """Retrieve a user by their ID."""
         return await self.repo.get_by_id(user_id)
 
-    async def update_user(self, user_id: int, user_in: UserUpdate) -> Optional[User]:
+    async def update_user(self, user_id: int, user_in: UserUpdate) -> User | None:
         """Update user details."""
         update_data = user_in.model_dump(exclude_unset=True)
         if "password" in update_data:
             update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
         return await self.repo.update(user_id, update_data)
 
-    async def update_user_permissions(self, user_id: int, permissions: list[str]) -> Optional[User]:
+    async def update_user_permissions(self, user_id: int, permissions: list[str]) -> User | None:
         """
         Update permissions for a user. This is a placeholder for the actual permission logic
         which might involve a separate Permission table/model or a role-based lookup.

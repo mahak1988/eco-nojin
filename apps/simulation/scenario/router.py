@@ -1,11 +1,11 @@
 """Scenario / comparison / model-chain API."""
-from __future__ import annotations
 
+from __future__ import annotations
 
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -29,48 +29,47 @@ router = APIRouter(prefix="/api/v1/simulation", tags=["Scenario & Comparison"])
 
 class ScenarioCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     simulator_id: str
     base_params: dict[str, Any] = Field(default_factory=dict)
     scenario_params: dict[str, Any] = Field(default_factory=dict)
-    category: Optional[str] = None
+    category: str | None = None
     is_preset: bool = False
-
-
 
 
 class ScenarioUpdate(BaseModel):
     """Schema for PATCH /scenarios/{id} - partial updates only."""
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    base_params: Optional[dict[str, Any]] = None
-    scenario_params: Optional[dict[str, Any]] = None
-    category: Optional[str] = None
+
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    base_params: dict[str, Any] | None = None
+    scenario_params: dict[str, Any] | None = None
+    category: str | None = None
 
 
 class ScenarioResponse(BaseModel):
     id: str
     name: str
-    description: Optional[str]
+    description: str | None
     simulator_id: str
     base_params: dict[str, Any]
     scenario_params: dict[str, Any]
-    category: Optional[str]
+    category: str | None
     is_preset: bool
     created_at: str
 
 
 class ScenarioRunRequest(BaseModel):
     scenario_id: str
-    override_params: Optional[dict[str, Any]] = None
+    override_params: dict[str, Any] | None = None
 
 
 class ScenarioRunResponse(BaseModel):
     scenario_id: str
     scenario_name: str
     metrics: dict[str, Any]
-    outputs: Optional[dict[str, Any]]
-    execution_time_ms: Optional[float]
+    outputs: dict[str, Any] | None
+    execution_time_ms: float | None
     status: str
 
 
@@ -78,7 +77,7 @@ class ComparisonCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     scenario_ids: list[str] = Field(..., min_length=2, max_length=6)
     comparison_type: str = "side_by_side"
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class ComparisonResponse(BaseModel):
@@ -87,7 +86,7 @@ class ComparisonResponse(BaseModel):
     scenarios: list[dict[str, Any]]
     comparison_type: str
     comparison_data: dict[str, Any]
-    notes: Optional[str]
+    notes: str | None
 
 
 class ChainConfig(BaseModel):
@@ -161,8 +160,8 @@ async def create_scenario(
 
 @router.get("/scenarios", response_model=list[ScenarioResponse])
 async def list_scenarios(
-    simulator_id: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
+    simulator_id: str | None = Query(None),
+    category: str | None = Query(None),
     db: AsyncSession = Depends(get_db_session),
 ) -> list[ScenarioResponse]:
     query = select(Scenario)
@@ -211,17 +210,13 @@ async def get_scenario(
 
 
 @router.delete("/scenarios/{scenario_id}", status_code=204)
-async def delete_scenario(
-    scenario_id: str, db: AsyncSession = Depends(get_db_session)
-) -> None:
+async def delete_scenario(scenario_id: str, db: AsyncSession = Depends(get_db_session)) -> None:
     result = await db.execute(select(Scenario).where(Scenario.id == uuid.UUID(scenario_id)))
     scenario = result.scalar_one_or_none()
     if not scenario:
         raise HTTPException(404, "Scenario not found")
     await db.delete(scenario)
     await db.commit()
-
-
 
 
 @router.patch("/scenarios/{scenario_id}", response_model=ScenarioResponse)
@@ -255,10 +250,11 @@ async def update_scenario(
         created_at=scenario.created_at.isoformat(),
     )
 
+
 @router.post("/scenarios/{scenario_id}/run", response_model=ScenarioRunResponse)
 async def run_scenario(
     scenario_id: str,
-    data: Optional[ScenarioRunRequest] = None,
+    data: ScenarioRunRequest | None = None,
     db: AsyncSession = Depends(get_db_session),
 ) -> ScenarioRunResponse:
     if scenario_id.startswith("preset_"):
@@ -294,9 +290,7 @@ async def run_scenario(
     sim_result = await sim_instance.run(params)
 
     status_val = (
-        sim_result.status.value
-        if hasattr(sim_result.status, "value")
-        else str(sim_result.status)
+        sim_result.status.value if hasattr(sim_result.status, "value") else str(sim_result.status)
     )
 
     scenario_result = ScenarioResult(
@@ -433,9 +427,7 @@ async def create_chain(
 
 
 @router.post("/chains/{chain_id}/run", response_model=ChainRunResponse)
-async def run_chain(
-    chain_id: str, db: AsyncSession = Depends(get_db_session)
-) -> ChainRunResponse:
+async def run_chain(chain_id: str, db: AsyncSession = Depends(get_db_session)) -> ChainRunResponse:
     result = await db.execute(select(ModelChain).where(ModelChain.id == uuid.UUID(chain_id)))
     chain = result.scalar_one_or_none()
     if not chain:

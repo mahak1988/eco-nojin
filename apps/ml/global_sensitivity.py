@@ -15,11 +15,13 @@ from __future__ import annotations
 
 import math
 import random
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from apps.ml.features import FEATURE_NAMES
 from apps.ml.sensitivity import FEATURE_RANGES
 from apps.ml.service import predict_bundle
+
 
 # Default operational bounds (same as FEATURE_RANGES)
 def _bounds() -> list[tuple[float, float]]:
@@ -109,7 +111,7 @@ def standardized_regression_coefficients(
     # R²
     y_hat = [sum(beta[j] * Z[i][j] for j in range(d)) for i in range(n_samples)]
     ss_res = sum((yz[i] - y_hat[i]) ** 2 for i in range(n_samples))
-    ss_tot = sum(v ** 2 for v in yz) or 1.0
+    ss_tot = sum(v**2 for v in yz) or 1.0
     r2 = 1.0 - ss_res / ss_tot
 
     rows = [
@@ -283,8 +285,7 @@ def saltelli_sobol(
     for col in y_ab:
         all_y.extend(col)
     vy = _var(all_y)
-    if vy < 1e-12:
-        vy = 1e-12
+    vy = max(vy, 1e-12)
 
     indices = []
     for i, name in enumerate(FEATURE_NAMES):
@@ -349,12 +350,12 @@ def full_global_sensitivity(
 
     top_st = sobol["indices"][:3]
     summary_fa = (
-        f"Sobol ST برتر: {", ".join(t['feature'] for t in top_st)}. "
+        f"Sobol ST برتر: {', '.join(t['feature'] for t in top_st)}. "
         f"R²(SRC)={src['r_squared']:.2f}. "
         f"Morris μ* برتر: {morris['effects'][0]['feature']}."
     )
     summary_en = (
-        f"Top Sobol ST: {", ".join(t['feature'] for t in top_st)}. "
+        f"Top Sobol ST: {', '.join(t['feature'] for t in top_st)}. "
         f"SRC R²={src['r_squared']:.2f}. "
         f"Top Morris μ*: {morris['effects'][0]['feature']}."
     )

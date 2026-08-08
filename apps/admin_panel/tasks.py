@@ -1,9 +1,12 @@
-﻿from celery import shared_task
 import logging
-from apps.shared_core.database.session import get_db_session
+
+from celery import shared_task
+
 from apps.admin_panel.service import ReportService
+from apps.shared_core.database.session import get_db_session
 
 logger = logging.getLogger(__name__)
+
 
 @shared_task(name="admin.generate_report_task", bind=True)
 def generate_report_task(self, report_id: int, report_type: str, filters: dict):
@@ -16,15 +19,17 @@ def generate_report_task(self, report_id: int, report_type: str, filters: dict):
         # استفاده از سینتکس صحیح برای Dependency Injection در Celery
         db_gen = get_db_session()
         db = next(db_gen)
-        
+
         report_service = ReportService()
         # فرض بر این است که متد process_report در سرویس وجود دارد
-        report_service.process_report(db=db, report_id=report_id, report_type=report_type, filters=filters)
-        
+        report_service.process_report(
+            db=db, report_id=report_id, report_type=report_type, filters=filters
+        )
+
         logger.info(f"Report {report_id} generated successfully.")
         return {"status": "completed", "report_id": report_id}
-        
+
     except Exception as e:
-        logger.error(f"Failed to generate report {report_id}: {str(e)}")
+        logger.error(f"Failed to generate report {report_id}: {e!s}")
         # بهروزرسانی وضعیت گزارش به 'failed' در دیتابیس
         return {"status": "failed", "report_id": report_id, "error": str(e)}

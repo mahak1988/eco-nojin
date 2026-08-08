@@ -1,4 +1,5 @@
 """Tests for dashboard router — /api/v1/dashboard."""
+
 from __future__ import annotations
 
 import pytest
@@ -52,6 +53,7 @@ class TestDashboardRouterImport:
     def test_router_importable(self):
         try:
             from apps.dashboard.router import router
+
             assert router is not None
         except ImportError as e:
             pytest.skip(f"Import failed: {e}")
@@ -59,6 +61,7 @@ class TestDashboardRouterImport:
     def test_stats_endpoint_exists(self):
         try:
             from apps.dashboard import router as dash_router
+
             route_paths = [r.path for r in dash_router.router.routes]
             assert any("stats" in p for p in route_paths)
         except (ImportError, AttributeError) as e:
@@ -67,6 +70,7 @@ class TestDashboardRouterImport:
     def test_overview_endpoint_exists(self):
         try:
             from apps.dashboard import router as dash_router
+
             route_paths = [r.path for r in dash_router.router.routes]
             assert any("overview" in p for p in route_paths)
         except (ImportError, AttributeError) as e:

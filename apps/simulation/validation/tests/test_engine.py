@@ -1,4 +1,5 @@
 """Tests for engine."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestEngine:
         """Verify rmse is callable."""
         try:
             from apps.simulation.validation.engine import rmse
+
             assert callable(rmse)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,6 +28,7 @@ class TestEngine:
         """Verify nse is callable."""
         try:
             from apps.simulation.validation.engine import nse
+
             assert callable(nse)
         except ImportError:
             pytest.skip("Module not available")
@@ -34,6 +37,7 @@ class TestEngine:
         """Verify r_squared is callable."""
         try:
             from apps.simulation.validation.engine import r_squared
+
             assert callable(r_squared)
         except ImportError:
             pytest.skip("Module not available")
@@ -42,6 +46,7 @@ class TestEngine:
         """Verify goodness_of_fit is callable."""
         try:
             from apps.simulation.validation.engine import goodness_of_fit
+
             assert callable(goodness_of_fit)
         except ImportError:
             pytest.skip("Module not available")
@@ -50,7 +55,7 @@ class TestEngine:
         """Verify monte_carlo is callable."""
         try:
             from apps.simulation.validation.engine import monte_carlo
+
             assert callable(monte_carlo)
         except ImportError:
             pytest.skip("Module not available")
-

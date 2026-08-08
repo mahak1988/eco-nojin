@@ -3,16 +3,18 @@
 import logging
 
 logger = logging.getLogger(__name__)
-from typing import List, Any
+from typing import Any
+
 from langchain_core.tools import BaseTool
+
 from apps.shared_ai.ai.base_agent import ModularAgentBuilder
 from apps.shared_ai.ai.tools.code_tools import (
     analyze_code,
-    find_bugs,
     calculate_complexity,
+    find_bugs,
+    generate_documentation,
     generate_tests,
     translate_code,
-    generate_documentation
 )
 
 # ==========================================
@@ -98,7 +100,7 @@ CODE_ASSISTANT_PROMPT = """شما یک دستیار برنامه‌نویسی ح
 class CodeAssistantAgent:
     """
     ایجنت دستیار کدنویسی برای تحلیل و بهبود کد.
-    
+
     قابلیت‌ها:
     - تحلیل ساختاری کد (AST-based)
     - شناسایی باگ‌های رایج
@@ -107,29 +109,27 @@ class CodeAssistantAgent:
     - تبدیل بین زبان‌ها
     - تولید مستندات
     """
-    
+
     def __init__(self, llm: Any) -> None:
         self.llm = llm
         """Handle __init__ (llm)."""
-        self.tools: List[BaseTool] = [
+        self.tools: list[BaseTool] = [
             analyze_code,
             find_bugs,
             calculate_complexity,
             generate_tests,
             translate_code,
-            generate_documentation
+            generate_documentation,
         ]
         self.builder = ModularAgentBuilder(
-            llm=self.llm,
-            tools=self.tools,
-            system_prompt=CODE_ASSISTANT_PROMPT
+            llm=self.llm, tools=self.tools, system_prompt=CODE_ASSISTANT_PROMPT
         )
         self.graph = self.builder.build()
-    
+
     async def chat(self, user_message: str, context: dict = None) -> str:
         """اجرای ایجنت با یک پیام."""
         return await self.builder.run(user_message, context)
-    
+
     def get_system_prompt(self) -> str:
         """دریافت system prompt."""
         return CODE_ASSISTANT_PROMPT

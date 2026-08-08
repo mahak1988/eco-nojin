@@ -8,15 +8,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 import random
-import math
-from datetime import datetime, UTC
 from typing import Any
 
 from apps.simulation.base import (
     BaseSimulator,
     SimulationParameter,
-    SimulationResult,
     SimulationRegistry,
+    SimulationResult,
     SimulationStatus,
 )
 
@@ -141,7 +139,7 @@ class ABMSimulator(BaseSimulator):
     async def run(self, parameters: dict[str, Any]) -> SimulationResult:
         """Execute the simulation."""
         start = time.time()
-        
+
         errors = self.validate(parameters)
         if errors:
             return SimulationResult(
@@ -151,7 +149,7 @@ class ABMSimulator(BaseSimulator):
                 parameters=parameters,
                 error="; ".join(errors),
             )
-        
+
         try:
             # This is a skeleton - in the real implementation, we would run the ABM
             outputs = self._run_skeleton_simulation(parameters)
@@ -187,7 +185,7 @@ class ABMSimulator(BaseSimulator):
         resource_availability = params.get("resource_availability", 1.0)
         price_volatility = params.get("price_volatility", 0.1)
         sim_steps = params.get("simulation_steps", 50)
-        
+
         # Initialize agents with different characteristics
         agents = []
         for i in range(num_agents):
@@ -195,44 +193,46 @@ class ABMSimulator(BaseSimulator):
                 "id": i,
                 "wealth": random.uniform(1000, 10000),
                 "risk_tolerance": random.uniform(0.1, 0.9),
-                "strategy": agent_behavior
+                "strategy": agent_behavior,
             }
             agents.append(agent)
-        
+
         # Simulate market dynamics over time
         price_history = []
         wealth_history = []
         trade_volume_history = []
-        
+
         current_price = 100.0  # Starting price
         avg_wealth = sum([a["wealth"] for a in agents]) / len(agents)
-        
+
         for step in range(sim_steps):
             # Market dynamics based on market type
             if market_type == "perfect_competition":
                 # Prices move toward equilibrium based on supply/demand
                 demand_shock = random.uniform(0.9, 1.1) * resource_availability
                 supply_response = random.uniform(0.8, 1.2)
-                
+
                 # Price adjustment with volatility
-                price_change = (demand_shock - supply_response) * (1.0 + random.uniform(-price_volatility, price_volatility))
+                price_change = (demand_shock - supply_response) * (
+                    1.0 + random.uniform(-price_volatility, price_volatility)
+                )
                 current_price = max(10.0, current_price * (1.0 + price_change * 0.1))
-                
+
             elif market_type == "monopoly":
                 # Monopolist sets prices higher
                 current_price = max(10.0, current_price * (1.0 + random.uniform(0.02, 0.08)))
-                
+
             elif market_type == "oligopoly":
                 # Few firms compete strategically
                 current_price = max(10.0, current_price * (1.0 + random.uniform(-0.03, 0.05)))
-                
+
             else:  # monopolistic
                 # Differentiated products with moderate competition
                 current_price = max(10.0, current_price * (1.0 + random.uniform(-0.05, 0.05)))
-            
+
             # Simulate trading activity
             trade_volume = random.uniform(0.1, 0.5) * num_agents * resource_availability
-            
+
             # Update agent wealth based on market performance
             for agent in agents:
                 # Random trading outcomes based on strategy and risk tolerance
@@ -244,24 +244,42 @@ class ABMSimulator(BaseSimulator):
                     profit_factor = 1.0 + random.uniform(-0.03, 0.08) * agent["risk_tolerance"]
                 else:  # random
                     profit_factor = 1.0 + random.uniform(-0.1, 0.15) * agent["risk_tolerance"]
-                
+
                 agent["wealth"] *= profit_factor
                 agent["wealth"] = max(100, agent["wealth"])  # Minimum wealth
-            
+
             # Record history
             price_history.append(round(current_price, 2))
             avg_wealth = sum([a["wealth"] for a in agents]) / len(agents)
             wealth_history.append(round(avg_wealth, 2))
             trade_volume_history.append(round(trade_volume, 2))
-        
+
         return {
             "series": [
-                {"key": "price", "label": "Market Price", "color": "#3b82f6", 
-                 "values": price_history, "kind": "line", "fill": False},
-                {"key": "avg_wealth", "label": "Average Wealth", "color": "#10b981", 
-                 "values": wealth_history, "kind": "line", "fill": True},
-                {"key": "trade_volume", "label": "Trade Volume", "color": "#f59e0b", 
-                 "values": trade_volume_history, "kind": "line", "fill": False},
+                {
+                    "key": "price",
+                    "label": "Market Price",
+                    "color": "#3b82f6",
+                    "values": price_history,
+                    "kind": "line",
+                    "fill": False,
+                },
+                {
+                    "key": "avg_wealth",
+                    "label": "Average Wealth",
+                    "color": "#10b981",
+                    "values": wealth_history,
+                    "kind": "line",
+                    "fill": True,
+                },
+                {
+                    "key": "trade_volume",
+                    "label": "Trade Volume",
+                    "color": "#f59e0b",
+                    "values": trade_volume_history,
+                    "kind": "line",
+                    "fill": False,
+                },
             ],
             "metrics": {
                 "num_agents": num_agents,
@@ -272,13 +290,19 @@ class ABMSimulator(BaseSimulator):
                 "price_volatility_applied": price_volatility,
                 "resource_availability": resource_availability,
                 "price_return": round((current_price - 100.0) / 100.0 * 100, 2),
-                "market_efficiency": round(1.0 - price_volatility, 2),  # Lower volatility = higher efficiency
+                "market_efficiency": round(
+                    1.0 - price_volatility, 2
+                ),  # Lower volatility = higher efficiency
             },
         }
 
     def _calculate_metrics(self, outputs: dict) -> dict[str, float]:
         """Calculate performance metrics from outputs."""
-        return {k: float(v) for k, v in outputs.get("metrics", {}).items() if isinstance(v, (int, float))}
+        return {
+            k: float(v)
+            for k, v in outputs.get("metrics", {}).items()
+            if isinstance(v, (int, float))
+        }
 
     def _generate_charts(self, outputs: dict) -> dict[str, list]:
         """Generate chart data series from outputs."""

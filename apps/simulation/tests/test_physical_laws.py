@@ -1,4 +1,4 @@
-﻿"""
+"""
 Scientific Property-Based Tests for Simulation Engines
 ======================================================
 Tests physical conservation laws (mass, energy, water balance)
@@ -6,7 +6,9 @@ and monotonicity constraints across all simulators.
 
 Based on: Hydroma-Nojin paper - Section 4 (Results)
 """
+
 import math
+
 import pytest
 
 # Import simulation functions
@@ -19,11 +21,13 @@ class TestConservationLaws:
 
     def test_water_balance_aquacrop(self):
         """Water balance: P + I = ETa + RO + D + dS (evapotranspiration + runoff + drainage + storage change)."""
-        result = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 90,
-            "area_ha": 1.0,
-        })
+        result = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 90,
+                "area_ha": 1.0,
+            }
+        )
 
         total_water = result.get("total_water_use_mm", 0)
         assert total_water >= 0, f"Water use must be non-negative, got {total_water}"
@@ -89,22 +93,26 @@ class TestPhysicalConstraints:
 
     def test_yield_non_negative(self):
         """Crop yield must never be negative."""
-        result = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 90,
-            "area_ha": 1.0,
-        })
+        result = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 90,
+                "area_ha": 1.0,
+            }
+        )
 
         yield_val = result.get("total_yield_t_ha", 0)
         assert yield_val >= 0, f"Yield must be non-negative, got {yield_val}"
 
     def test_yield_bounded(self):
         """Crop yield must be within realistic bounds for given crop."""
-        result = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 120,
-            "area_ha": 1.0,
-        })
+        result = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 120,
+                "area_ha": 1.0,
+            }
+        )
 
         yield_val = result.get("total_yield_t_ha", 0)
         # Wheat world record is ~17 t/ha, typical rainfed < 6 t/ha
@@ -153,16 +161,20 @@ class TestMonotonicity:
 
     def test_yield_increases_with_irrigation(self):
         """With more irrigation, crop yield should not decrease."""
-        result_dry = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 90,
-            "area_ha": 1.0,
-        })
-        result_wet = run_aquacrop_advanced({
-            "crop": "wheat",
-            "days": 90,
-            "area_ha": 1.0,
-        })
+        result_dry = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 90,
+                "area_ha": 1.0,
+            }
+        )
+        result_wet = run_aquacrop_advanced(
+            {
+                "crop": "wheat",
+                "days": 90,
+                "area_ha": 1.0,
+            }
+        )
 
         # Both should produce valid yields
         assert result_dry.get("total_yield_t_ha", 0) >= 0
@@ -245,18 +257,14 @@ class TestHargreavesET0:
 
         # Tehran, July 15, doy=196, lat=35.7
         et0 = hargreaves_et0(tmax=37.0, tmin=24.0, tmean=30.5, doy=196, lat=35.7)
-        assert 5.0 <= et0 <= 12.0, (
-            f"Tehran summer ET0 should be 5-12 mm/day, got {et0}"
-        )
+        assert 5.0 <= et0 <= 12.0, f"Tehran summer ET0 should be 5-12 mm/day, got {et0}"
 
     def test_et0_winter_minimum(self):
         """Winter day with low radiation should produce low ET0."""
         from apps.simulation.data.nasa_power import hargreaves_et0
 
         et0 = hargreaves_et0(tmax=5.0, tmin=-2.0, tmean=1.5, doy=15, lat=50.0)
-        assert 0.0 <= et0 <= 2.0, (
-            f"Winter ET0 should be 0-2 mm/day, got {et0}"
-        )
+        assert 0.0 <= et0 <= 2.0, f"Winter ET0 should be 0-2 mm/day, got {et0}"
 
     def test_et0_equator(self):
         """Equatorial location has high, consistent ET0."""

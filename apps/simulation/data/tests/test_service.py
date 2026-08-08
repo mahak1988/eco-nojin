@@ -1,4 +1,5 @@
 """Tests for service."""
+
 from __future__ import annotations
 
 import pytest
@@ -18,6 +19,7 @@ class TestService:
         """Verify get_climate_series is callable."""
         try:
             from apps.simulation.data.service import get_climate_series
+
             assert callable(get_climate_series)
         except ImportError:
             pytest.skip("Module not available")
@@ -26,7 +28,7 @@ class TestService:
         """Verify get_elevation is callable."""
         try:
             from apps.simulation.data.service import get_elevation
+
             assert callable(get_elevation)
         except ImportError:
             pytest.skip("Module not available")
-

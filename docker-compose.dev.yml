@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_USER: econojin
-      POSTGRES_PASSWORD: econojin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       POSTGRES_DB: econojin
     volumes:
       - pg_data:/var/lib/postgresql/data

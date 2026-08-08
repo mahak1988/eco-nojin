@@ -8,13 +8,14 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.api.models.community import Post, Comment, Like
+from apps.api.models.community import Comment, Like, Post
 
 
 @pytest.fixture
 async def community_db_session():
     """Create a test database session for community models."""
-    from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
     from apps.shared_core.database.session import Base
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
@@ -77,9 +78,7 @@ async def test_comment_crud(community_db_session: AsyncSession):
     community_db_session.add(comment)
     await community_db_session.flush()
 
-    result = await community_db_session.execute(
-        select(Comment).where(Comment.id == comment.id)
-    )
+    result = await community_db_session.execute(select(Comment).where(Comment.id == comment.id))
     fetched = result.scalar_one_or_none()
     assert fetched is not None
     assert fetched.content == "This is a test comment"
