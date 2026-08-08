@@ -1,2 +1,2 @@
 # Hydroma Optimization Module
-# QAOA, QUBO, Simulated Annealing
+# QAOA (quantum+classical), QUBO, water allocation
